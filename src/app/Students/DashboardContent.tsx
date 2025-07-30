@@ -30,7 +30,7 @@ export default function DashboardContent() {
                     { title: "Clases Completadas", value: "24", icon: GraduationCap, color: "text-green-600", bg: "bg-green-50" },
                     { title: "Horas de Estudio", value: "48", icon: Clock, color: "text-purple-600", bg: "bg-purple-50" },
                     { title: "Certificados", value: "2", icon: Award, color: "text-yellow-600", bg: "bg-yellow-50" },
-                ].map((stat, index) => (
+                ].map((stat) => (
                     <motion.div
                         key={stat.title}
                         variants={itemVariants}

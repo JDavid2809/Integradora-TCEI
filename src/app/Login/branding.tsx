@@ -1,7 +1,7 @@
 "use client"
 
 import { motion } from "framer-motion"
-import { BookOpen, Users, Award, Brain } from "lucide-react"
+import {  Users, Award, Brain } from "lucide-react"
 import Image from "next/image"
 
 export default function BrandingSection() {
@@ -67,7 +67,7 @@ export default function BrandingSection() {
                         title: "Aprendizaje personalizado",
                         description: "Planes adaptados a tu nivel y objetivos",
                     },
-                ].map((feature, index) => (
+                ].map((feature) => (
                     <motion.div
                         key={feature.title}
                         className="flex items-start space-x-4 group"

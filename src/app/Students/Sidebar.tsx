@@ -1,6 +1,6 @@
 "use client"
 
-import { BookOpen, Home, GraduationCap, Calendar, BarChart3, Settings, LogOut, X, CheckSquare } from "lucide-react"
+import { BookOpen, Home, GraduationCap, Calendar, LogOut, X, CheckSquare } from "lucide-react"
 import Image from "next/image"
 
 interface SidebarProps {

@@ -7,6 +7,7 @@ import RegisterForm from "./register"
 import LoginForm from "./login"
 
 
+
 export default function AuthInterface() {
     const [isLogin, setIsLogin] = useState(true)
 
@@ -39,7 +40,8 @@ export default function AuthInterface() {
 
     return (
         <div className="min-h-screen flex items-center justify-center p-4">
-            <div className="w-full max-w-6xl grid lg:grid-cols-2 gap-12 items-center">
+         
+            <div className="w-full max-w-6xl grid lg:grid-cols-2 gap-12 items-center ">
                 <AnimatePresence mode="wait" custom={isLogin ? 1 : -1}>
                     {isLogin ? (
                         <motion.div

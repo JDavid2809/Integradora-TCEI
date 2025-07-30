@@ -1,0 +1,17 @@
+
+version: '3'
+
+services:
+  English-App:
+    image: postgres:15.3
+    container_name: English-DB
+    restart: always
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_USER=GalletasMarias
+      - POSTGRES_PASSWORD=GalletasMarias
+    volumes: 
+      - ./postgres:/var/lib/postgresql/data
+    
+      

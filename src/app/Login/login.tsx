@@ -5,21 +5,54 @@ import { motion } from "framer-motion"
 import { Eye, EyeOff } from "lucide-react"
 import Image from "next/image"
 import {useRouter} from "next/navigation"
+import { signIn } from "next-auth/react"
 
+
+import { getRedirectPath } from "@/actions/auth/redirectLogin"
+import Loader from "@/components/Loader"
 interface LoginFormProps {
     toggleMode: () => void
 }
 
 
-export default function LoginForm({ toggleMode }: LoginFormProps) {
-    const [showPassword, setShowPassword] = useState(false)
-    const router = useRouter()
+export default  function LoginForm({ toggleMode }: LoginFormProps) {
+ 
 
-    const handlerLogin = (e: React.FormEvent) => {
-        e.preventDefault() // Previene el envío del formulario
-        router.push('/Students')
+
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const router = useRouter();
+      const [showPassword, setShowPassword] = useState(false)
+  
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
+
+    const res = await signIn("credentials", {
+      redirect: false,
+      email,
+      password,
+    });
+    setLoading(false);
+
+    if (res?.error) {
+      setError("Correo o contraseña incorrectos");
+    } else if (res?.ok) {
+      console.log({ res });
+        const path = await getRedirectPath()
+      router.push(path)
     }
 
+  }
+
+
+  
+  
     const containerVariants = {
         hidden: { opacity: 0, y: 20 },
         visible: {
@@ -40,9 +73,11 @@ export default function LoginForm({ toggleMode }: LoginFormProps) {
             transition: { duration: 0.3 },
         },
     }
+  
 
     return (
         <motion.div variants={containerVariants} initial="hidden" animate="visible" className="w-full">
+        
             <div className="bg-white rounded-3xl shadow-xl border border-slate-100 p-8">
                 {/* Mobile header */}
                 <motion.div variants={itemVariants} className="lg:hidden flex items-center justify-center space-x-3 mb-8">
@@ -63,9 +98,22 @@ export default function LoginForm({ toggleMode }: LoginFormProps) {
                     <h2 className="text-2xl font-bold text-[#00246a] mb-2">Bienvenido de vuelta</h2>
                     <p className="text-slate-600">Continúa tu viaje de aprendizaje</p>
                 </motion.div>
+                   {
+                    loading && <Loader />
+                   }
+                   {
+                    error && (
+                        <motion.div
+                            variants={itemVariants}
+                            className="bg-red-100 text-red-800 p-4 rounded-lg mb-6 text-center"
+                        >
+                            {error}
+                        </motion.div>
+                    )
+                   }
 
                 {/* Form */}
-                <form className="space-y-6" onSubmit={handlerLogin}>
+                <form className="space-y-6" onSubmit={handleSubmit}>
                     <motion.div variants={itemVariants} className="space-y-2">
                         <label htmlFor="email" className="block text-sm font-medium text-[#00246a]">
                             Correo electrónico
@@ -73,6 +121,9 @@ export default function LoginForm({ toggleMode }: LoginFormProps) {
                         <input
                             id="email"
                             type="email"
+                              onChange={(e) => setEmail(e.target.value)}
+                            value={email}
+                            name="email"
                             placeholder="tu@email.com"
                             className="w-full h-12 px-4 border border-[#00246a] focus:border-[#e30f28] focus:ring-2 focus:ring-[#e30f28]/10 transition-all duration-200 rounded-xl bg-white text-[#00246a] placeholder-slate-400"
                         />
@@ -85,6 +136,9 @@ export default function LoginForm({ toggleMode }: LoginFormProps) {
                         <div className="relative">
                             <input
                                 id="password"
+                                value={password}
+                                name="password"
+                                onChange={(e) => setPassword(e.target.value)}
                                 type={showPassword ? "text" : "password"}
                                 placeholder="••••••••"
                                 className="w-full h-12 px-4 pr-12 border border-[#00246a] focus:border-[#e30f28] focus:ring-2 focus:ring-[#e30f28]/10 transition-all duration-200 rounded-xl bg-white text-[#00246a] placeholder-slate-400"
@@ -115,7 +169,7 @@ export default function LoginForm({ toggleMode }: LoginFormProps) {
 
                     <motion.button
                         variants={itemVariants}
-                        onClick={handlerLogin}
+                        onClick={handleSubmit}
                         type="submit"
                         className="w-full h-12 bg-[#e30f28] hover:bg-[#e30f28]/90 text-white font-medium rounded-xl transition-all duration-200 transform hover:scale-[1.01] active:scale-[0.99]"
                         whileHover={{ y: -1 }}
@@ -182,3 +236,4 @@ export default function LoginForm({ toggleMode }: LoginFormProps) {
         </motion.div>
     )
 }
+

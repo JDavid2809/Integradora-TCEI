@@ -1,7 +1,7 @@
 "use client"
 
 import { motion } from "framer-motion"
-import { BookOpen, Home, GraduationCap, BarChart3, CheckSquare } from "lucide-react"
+import { BookOpen, Home, GraduationCap, CheckSquare } from "lucide-react"
 
 interface BottomTabsProps {
     activeSection: string

@@ -1,9 +1,10 @@
 "use client"
 
 import { useState } from "react"
-import { motion } from "framer-motion"
+import {  motion } from "framer-motion"
 import { Eye, EyeOff } from "lucide-react"
 import Image from "next/image"
+import { registerUser } from "@/actions/auth/Auth-actions"
 
 interface RegisterFormProps {
     toggleMode: () => void
@@ -33,10 +34,47 @@ export default function RegisterForm({ toggleMode }: RegisterFormProps) {
             transition: { duration: 0.3 },
         },
     }
+    const [errorMessage, setErrorMessage] = useState("")
+    const [mensaje, setMensaje] = useState("")
+
+
+  const [error, setError] = useState(false)
+  
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    setErrorMessage("")
+    setError(false)
+
+  const formData = new FormData(e.currentTarget)
+   
+  try {
+   
+    const result = await registerUser(formData)
+
+    if (result.success) {
+    setMensaje(result.message)
+    setError(false)
+
+   
+
+  } else {
+        setErrorMessage(result.message)
+        setError(true)
+        setMensaje("")
+    }
+}catch (error) {
+    console.error("Error al registrar usuario:", error)
+   
+  }
+
+  
+}
 
     return (
         <motion.div variants={containerVariants} initial="hidden" animate="visible" className="w-full">
+             
             <div className="bg-white rounded-3xl shadow-xl border border-slate-100 p-8">
+                
                 {/* Mobile header */}
                 <motion.div variants={itemVariants} className="lg:hidden flex items-center justify-center space-x-3 mb-8">
                                     <div className="relative w-10 h-10 rounded-xl overflow-hidden">
@@ -55,11 +93,37 @@ export default function RegisterForm({ toggleMode }: RegisterFormProps) {
                 <motion.div variants={itemVariants} className="text-center mb-8">
                     <h2 className="text-2xl font-bold text-[#00246a] mb-2">Crea tu cuenta</h2>
                     <p className="text-slate-600">Comienza tu aventura aprendiendo inglés</p>
+              
                 </motion.div>
-
+                 
+             
                 {/* Form */}
-                <form className="space-y-6">
-                    <motion.div variants={itemVariants} className="grid grid-cols-2 gap-4">
+                {
+                    error && (
+                        <motion.div
+                            variants={itemVariants}
+                            className="bg-red-100 text-red-800 p-4 rounded-lg mb-6 text-center"
+                        >
+                            {errorMessage}
+                        </motion.div>
+                    )
+                   }
+                   {
+                    mensaje && (
+                        <motion.div
+                            variants={itemVariants}
+                            className="bg-green-100 text-green-800 p-4 rounded-lg mb-6 text-center"
+                        >
+                            {mensaje}
+                        </motion.div>
+                    )
+                   }
+               
+                <form className="space-y-6"
+                       onSubmit={handleSubmit}
+                >
+                   
+                    <motion.div variants={itemVariants} className="  gap-4">
                         <div className="space-y-2">
                             <label htmlFor="firstName" className="block text-sm font-medium text-[#00246a]">
                                 Nombre
@@ -67,21 +131,39 @@ export default function RegisterForm({ toggleMode }: RegisterFormProps) {
                             <input
                                 id="firstName"
                                 type="text"
+                                 name="nombre"
                                 placeholder="Juan"
                                 className="w-full h-12 px-4 border border-slate-200 focus:border-[#e30f28] focus:ring-2 focus:ring-[#e30f28]/10 transition-all duration-200 rounded-xl bg-white text-[#00246a] placeholder-slate-400"
                             />
                         </div>
+                        
+                    </motion.div>
+                    <motion.div variants={itemVariants} className="grid grid-cols-2  gap-4">
                         <div className="space-y-2">
-                            <label htmlFor="lastName" className="block text-sm font-medium text-[#00246a]">
-                                Apellido
+                            <label htmlFor="firstName" className="block text-sm font-medium text-[#00246a]">
+                                Apellido Paterno
                             </label>
                             <input
-                                id="lastName"
+                                id="firstName"
                                 type="text"
+                                 name="apellidoPaterno"
                                 placeholder="Pérez"
                                 className="w-full h-12 px-4 border border-slate-200 focus:border-[#e30f28] focus:ring-2 focus:ring-[#e30f28]/10 transition-all duration-200 rounded-xl bg-white text-[#00246a] placeholder-slate-400"
                             />
                         </div>
+                       <div className="space-y-2">
+                            <label htmlFor="lastName" className="block text-sm font-medium text-[#00246a]">
+                                Apellido materno
+                            </label>
+                            <input
+                                id="lastName"
+                                type="text"
+                                name="apellidoMaterno"
+                                placeholder="Gómez"
+                                className="w-full h-12 px-4 border border-slate-200 focus:border-[#e30f28] focus:ring-2 focus:ring-[#e30f28]/10 transition-all duration-200 rounded-xl bg-white text-[#00246a] placeholder-slate-400"
+                            />
+                        </div>
+                        
                     </motion.div>
 
                     <motion.div variants={itemVariants} className="space-y-2">
@@ -91,7 +173,20 @@ export default function RegisterForm({ toggleMode }: RegisterFormProps) {
                         <input
                             id="registerEmail"
                             type="email"
+                            name="email"
                             placeholder="tu@email.com"
+                            className="w-full h-12 px-4 border border-slate-200 focus:border-[#e30f28] focus:ring-2 focus:ring-[#e30f28]/10 transition-all duration-200 rounded-xl bg-white text-[#00246a] placeholder-slate-400"
+                        />
+                    </motion.div>
+                    <motion.div variants={itemVariants} className="space-y-2">
+                        <label htmlFor="telefono" className="block text-sm font-medium text-[#00246a]">
+                            Teléfono
+                        </label>
+                        <input
+                            id="telefono"
+                            type="tel"
+                            name="telefono"
+                            placeholder="123-456-7890"
                             className="w-full h-12 px-4 border border-slate-200 focus:border-[#e30f28] focus:ring-2 focus:ring-[#e30f28]/10 transition-all duration-200 rounded-xl bg-white text-[#00246a] placeholder-slate-400"
                         />
                     </motion.div>
@@ -102,6 +197,7 @@ export default function RegisterForm({ toggleMode }: RegisterFormProps) {
                         </label>
                         <div className="relative">
                             <input
+                                name="password"
                                 id="registerPassword"
                                 type={showPassword ? "text" : "password"}
                                 placeholder="••••••••"
@@ -127,6 +223,7 @@ export default function RegisterForm({ toggleMode }: RegisterFormProps) {
                         </label>
                         <div className="relative">
                             <input
+                                name="confirmPassword"
                                 id="confirmPassword"
                                 type={showConfirmPassword ? "text" : "password"}
                                 placeholder="••••••••"

@@ -1,7 +1,7 @@
 "use client"
 
 import { motion } from "framer-motion"
-import { Play, Sparkles, Zap, Brain, Globe, ArrowRight } from "lucide-react"
+import { Play, Zap, Brain, Globe, ArrowRight } from "lucide-react"
 
 export default function Hero() {
     return (
@@ -222,8 +222,8 @@ export default function Hero() {
                                 </div>
 
                                 <div className="bg-gray-50/80 rounded-2xl p-6 border border-gray-200/50">
-                                    <p className="text-gray-700 mb-4 font-medium">"Complete with the correct form:"</p>
-                                    <p className="text-2xl font-bold text-gray-800">"I _____ studying English for 3 years."</p>
+                                    <p className="text-gray-700 mb-4 font-medium">{"Complete with the correct form:"}</p>
+                                    <p className="text-2xl font-bold text-gray-800">{"I _____ studying English for 3 years."}</p>
                                 </div>
 
                                 <div className="grid grid-cols-2 gap-4">

@@ -1,0 +1,316 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model estudiante {
+  id_estudiante           Int                       @id @default(autoincrement())
+  nombre                  String                    @db.VarChar(100)
+  paterno                String?                  @db.VarChar(30)
+  materno                 String?                  @db.VarChar(30)
+  email                   String                    @unique @db.VarChar(100)
+  telefono                String?                   @db.VarChar(20)
+  edad                    Int
+  id_categoria_edad       Int?
+  b_activo                Boolean?                  @default(true)
+  id_usuario              Int                       @unique
+  categoria_edad          categoria_edad?           @relation(fields: [id_categoria_edad], references: [id_categoria_edad])
+  usuario                 usuario                   @relation(fields: [id_usuario], references: [id], onDelete: Cascade)
+  historial_academico     historial_academico[]
+  horario                 horario[]
+  imparte_registro_remota imparte_registro_remota[]
+  pago                    pago[]
+  resultado_examen        resultado_examen[]
+
+  @@index([id_categoria_edad])
+}
+
+model categoria_edad {
+  id_categoria_edad Int          @id @default(autoincrement())
+  rango             String       @db.VarChar(50)
+  b_activo          Boolean      @default(true)
+  estudiante        estudiante[]
+}
+
+model examen {
+  id_examen        Int                @id @default(autoincrement())
+  id_nivel         Int?
+  nombre           String             @db.VarChar(100)
+  b_activo         Boolean?           @default(true)
+  nivel            nivel?             @relation(fields: [id_nivel], references: [id_nivel])
+  pregunta         pregunta[]
+  resultado_examen resultado_examen[]
+
+  @@index([id_nivel])
+}
+
+model historial_academico {
+  id_historial    Int                   @id @default(autoincrement())
+  id_estudiante   Int
+  id_imparte      Int
+  id_capturo      Int
+  tipo_capturo    TipoCapturo?
+  calificacion    Float?
+  fecha           DateTime?             @db.Date
+  tipo            TipoEvaluacion?
+  comentario      String?
+  asistencia      Float?
+  tipo_evaluacion TipoEvaluacionExamen?
+  estudiante      estudiante            @relation(fields: [id_estudiante], references: [id_estudiante])
+  imparte         imparte               @relation(fields: [id_imparte], references: [id_imparte])
+
+  @@index([id_estudiante])
+  @@index([id_capturo])
+  @@index([id_imparte])
+}
+
+model horario {
+  id_horario      Int               @id @default(autoincrement())
+  id_estudiante   Int
+  id_curso        Int
+  comentario      String?
+  curso           curso             @relation(fields: [id_curso], references: [id_curso])
+  estudiante      estudiante        @relation(fields: [id_estudiante], references: [id_estudiante])
+  horario_detalle horario_detalle[]
+
+  @@index([id_estudiante])
+  @@index([id_curso])
+}
+
+model horario_detalle {
+  id_imparte Int
+  id_horario Int
+  comentario String?
+  horario    horario @relation(fields: [id_horario], references: [id_horario])
+  imparte    imparte @relation(fields: [id_imparte], references: [id_imparte])
+
+  @@id([id_imparte, id_horario])
+  @@index([id_horario])
+}
+
+model horario_pred {
+  id_horario_pred      Int                    @id @default(autoincrement())
+  id_curso             Int
+  comentario           String?
+  curso                curso                  @relation(fields: [id_curso], references: [id_curso])
+  horario_pred_detalle horario_pred_detalle[]
+
+  @@index([id_curso])
+}
+
+model horario_pred_detalle {
+  id_detalle      Int          @id @default(autoincrement())
+  id_imparte      Int
+  id_horario_pred Int
+  horario_pred    horario_pred @relation(fields: [id_horario_pred], references: [id_horario_pred])
+  imparte         imparte      @relation(fields: [id_imparte], references: [id_imparte])
+
+  @@index([id_horario_pred])
+  @@index([id_imparte])
+}
+
+model imparte {
+  id_imparte                Int                         @id @default(autoincrement())
+  id_profesor               Int
+  id_nivel                  Int
+  id_curso                  Int
+  dias                      String?                     @db.VarChar(12)
+  hora_inicio               Int?
+  duracion_min              Int?
+  tipo                      TipoImparte?
+  historial_academico       historial_academico[]
+  horario_detalle           horario_detalle[]
+  horario_pred_detalle      horario_pred_detalle[]
+  curso                     curso                       @relation(fields: [id_curso], references: [id_curso])
+  nivel                     nivel                       @relation(fields: [id_nivel], references: [id_nivel])
+  profesor                  profesor                    @relation(fields: [id_profesor], references: [id_profesor])
+  imparte_calendario_remota imparte_calendario_remota[]
+  pago                      pago[]
+
+  @@index([id_profesor])
+  @@index([id_nivel])
+  @@index([id_curso])
+}
+
+model imparte_calendario_remota {
+  id_calendario_remota    Int                       @id @default(autoincrement())
+  id_imparte              Int
+  hora_inicio             String?
+  duracion_minutos        Int?
+  url                     String?                   @db.VarChar(60)
+  fecha                   DateTime?                 @db.Date
+  tema                    String?                   @db.VarChar(30)
+  recurrencia             Recurrencia?
+  imparte                 imparte                   @relation(fields: [id_imparte], references: [id_imparte])
+  imparte_registro_remota imparte_registro_remota[]
+
+  @@index([id_imparte])
+}
+
+model imparte_registro_remota {
+  id_registro               Int                       @id @default(autoincrement())
+  id_estudiante             Int
+  id_calendario_remota      Int
+  fecha_ingreso             DateTime?
+  imparte_calendario_remota imparte_calendario_remota @relation(fields: [id_calendario_remota], references: [id_calendario_remota])
+  estudiante                estudiante                @relation(fields: [id_estudiante], references: [id_estudiante])
+
+  @@index([id_calendario_remota])
+  @@index([id_estudiante])
+}
+
+model nivel {
+  id_nivel Int       @id @default(autoincrement())
+  nombre   String    @unique
+  b_activo Boolean?  @default(true)
+  examen   examen[]
+  imparte  imparte[]
+}
+
+model pago {
+  id_pago       Int         @id @default(autoincrement())
+  id_estudiante Int?
+  id_imparte    Int
+  monto         Decimal     @db.Decimal(10, 2)
+  fecha_pago    DateTime    @db.Date
+  tipo          PagoTipo
+  estudiante    estudiante? @relation(fields: [id_estudiante], references: [id_estudiante])
+  imparte       imparte     @relation(fields: [id_imparte], references: [id_imparte])
+
+  @@index([id_estudiante])
+  @@index([id_imparte])
+}
+
+model pregunta {
+  id_pregunta     Int         @id @default(autoincrement())
+  id_examen       Int?
+  descripcion     String
+  ruta_file_media String?     @db.VarChar(100)
+  examen          examen?     @relation(fields: [id_examen], references: [id_examen])
+  respuesta       respuesta[]
+
+  @@index([id_examen])
+}
+
+model profesor {
+  id_profesor    Int       @id @default(autoincrement())
+  nombre         String    @db.VarChar(30)
+  paterno        String?   @db.VarChar(30)
+  materno        String?   @db.VarChar(30)
+  edad           Int?      @db.Integer
+  curp           String?   @db.VarChar(20)
+  rfc            String?   @db.VarChar(14)
+  direccion      String?   @db.VarChar(30)
+  telefono      String?   @db.VarChar(25)
+  nivel_estudios String?   @db.VarChar(30)
+  observaciones  String?   @db.VarChar(50)
+  b_activo       Boolean?  @default(true)
+  id_usuario     Int       @unique
+  imparte        imparte[]
+  usuario        usuario   @relation(fields: [id_usuario], references: [id], onDelete: Cascade)
+}
+
+model respuesta {
+  id_respuesta    Int       @id @default(autoincrement())
+  id_pregunta     Int?
+  descripcion     String
+  ruta_file_media String?   @db.VarChar(100)
+  es_correcta     Boolean
+  pregunta        pregunta? @relation(fields: [id_pregunta], references: [id_pregunta])
+
+  @@index([id_pregunta])
+}
+
+model resultado_examen {
+  id_resultado  Int         @id @default(autoincrement())
+  id_estudiante Int?
+  id_examen     Int?
+  calificacion  Decimal     @db.Decimal(5, 2)
+  fecha         DateTime    @db.Date
+  estudiante    estudiante? @relation(fields: [id_estudiante], references: [id_estudiante])
+  examen        examen?     @relation(fields: [id_examen], references: [id_examen])
+
+  @@index([id_estudiante])
+  @@index([id_examen])
+}
+
+model Administrador {
+  id_administrador Int     @id @default(autoincrement())
+  id_usuario       Int     @unique
+  nombre           String? @db.VarChar(25)
+  image            String  @db.VarChar(50)
+  email_unico      String? @db.VarChar(200)
+  b_activo         Boolean @default(true)
+  usuario          usuario @relation(fields: [id_usuario], references: [id], onDelete: Cascade)
+}
+
+model usuario {
+  email         String         @unique
+  password      String
+  nombre        String
+  apellido      String
+  rol           Rol
+  id            Int            @id @default(autoincrement())
+  administrador Administrador?
+  estudiante    estudiante?
+  profesor      profesor?
+}
+
+model curso {
+  id_curso     Int            @id @default(autoincrement())
+  nombre       String         @db.VarChar(100)
+  modalidad    Modalidad
+  inicio       DateTime?      @db.Date
+  fin          DateTime?      @db.Date
+  b_activo     Boolean?       @default(true)
+  horario      horario[]
+  horario_pred horario_pred[]
+  imparte      imparte[]
+}
+
+enum TipoCapturo {
+  PROFESOR
+  USER
+}
+
+enum TipoEvaluacion {
+  PARCIAL
+  FINAL
+}
+
+enum TipoEvaluacionExamen {
+  ORD
+  RE
+  EX
+  EX2
+}
+
+enum TipoImparte {
+  PRESENCIAL
+  ONLINE
+}
+
+enum Recurrencia {
+  UNICO
+  PERIODICO
+}
+
+enum PagoTipo {
+  Mensualidad
+  // Inscripción
+}
+
+enum Rol {
+  ADMIN
+  PROFESOR
+  ESTUDIANTE
+}
+
+enum Modalidad {
+  PRESENCIAL
+  ONLINE
+}

@@ -247,6 +247,7 @@ export default function TasksContent() {
                     <div className="space-y-4">
                         {completedTasks.map((task, index) => {
                             const TaskIcon = getTaskIcon(task.type)
+                            console.log(TaskIcon)
                             return (
                                 <motion.div
                                     key={task.id}

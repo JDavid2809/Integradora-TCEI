@@ -1,7 +1,8 @@
 "use client"
 
 import { useState } from "react"
-import {Search,Clock,Users,Star,BookOpen,Play,Award,Globe,Headphones,MessageCircle,FileText,} from "lucide-react"
+import {Search,BookOpen,Play,Award,Globe,} from "lucide-react"
+import Image from "next/image"
 
 const recommendedCourses = [
     {
@@ -130,25 +131,42 @@ const getLevelColor = (level: string) => {
     return colors[level as keyof typeof colors] || "bg-gray-100 text-gray-800 border-gray-200"
 }
 
-const getSkillIcon = (skill: string) => {
-    const icons = {
-        Speaking: MessageCircle,
-        Listening: Headphones,
-        Reading: BookOpen,
-        Writing: FileText,
-        Grammar: BookOpen,
-        Vocabulary: BookOpen,
-        Pronunciation: MessageCircle,
-        Business: Globe,
-    }
+// const getSkillIcon = (skill: string) => {
+//     const icons = {
+//         Speaking: MessageCircle,
+//         Listening: Headphones,
+//         Reading: BookOpen,
+//         Writing: FileText,
+//         Grammar: BookOpen,
+//         Vocabulary: BookOpen,
+//         Pronunciation: MessageCircle,
+//         Business: Globe,
+//     }
 
-    for (const [key, Icon] of Object.entries(icons)) {
-        if (skill.toLowerCase().includes(key.toLowerCase())) {
-            return Icon
-        }
-    }
-    return BookOpen
+//     for (const [key, Icon] of Object.entries(icons)) {
+//         if (skill.toLowerCase().includes(key.toLowerCase())) {
+//             return Icon
+//         }
+//     }
+//     return BookOpen
+// }
+
+type Course = {
+  id: number
+  title?: string
+  description?: string
+  image?: string
+  instructor: string
+  level: string
+  price: string
+  duration: string
+  students: number
+  rating: number
+  skills: string[]
+  lessons: number
 }
+
+
 
 export default function Courses() {
     const [searchTerm, setSearchTerm] = useState("")
@@ -164,12 +182,12 @@ export default function Courses() {
         return matchesSearch && matchesLevel
     })
 
-    const CourseCard = ({ course, isRecommended = false }: { course: any; isRecommended?: boolean }) => (
+    const CourseCard = ({ course, isRecommended = false }: { course: Course; isRecommended?: boolean }) => (
         <div className="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden group border border-gray-100">
             <div className="relative overflow-hidden">
-                <img
+                <Image
                     src={course.image || "/placeholder.svg"}
-                    alt={course.title}
+                    alt={course.title!}
                     className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-500"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>

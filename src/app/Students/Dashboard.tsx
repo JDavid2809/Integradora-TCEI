@@ -10,12 +10,14 @@ import ScheduleContent from "./Schedule"
 import Sidebar from "./Sidebar"
 import Header from "./Header"
 import BottomTabs from "./Tabs"
+import { Session } from "next-auth"
 
 interface DashboardProps {
     onLogout: () => void
+    user?: Session
 }
 
-export default function Dashboard({ onLogout }: DashboardProps) {
+export default function Dashboard({ onLogout, user }: DashboardProps) {
     const [activeSection, setActiveSection] = useState("dashboard")
     const [sidebarOpen, setSidebarOpen] = useState(false)
 
@@ -83,7 +85,7 @@ export default function Dashboard({ onLogout }: DashboardProps) {
 
             {/* Main Content */}
             <div className="flex-1 flex flex-col lg:ml-0">
-                <Header activeSection={activeSection} setSidebarOpen={setSidebarOpen} />
+                <Header activeSection={activeSection} setSidebarOpen={setSidebarOpen} user={user} />
 
                 {/* Content */}
                 <main className="flex-1 p-4 lg:p-6 pb-20 lg:pb-6 pt-4 lg:pt-6">

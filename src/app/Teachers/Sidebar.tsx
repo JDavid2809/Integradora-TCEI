@@ -1,7 +1,6 @@
 "use client"
 
 import { BookOpen, Home, GraduationCap, Calendar, LogOut, X, CheckSquare } from "lucide-react"
-import { signOut } from "next-auth/react"
 import Image from "next/image"
 
 interface SidebarProps {
@@ -9,7 +8,7 @@ interface SidebarProps {
     setActiveSection: (section: string) => void
     sidebarOpen: boolean
     setSidebarOpen: (open: boolean) => void
-    
+    onLogout?: () => void
 }
 
 export default function Sidebar({
@@ -17,7 +16,7 @@ export default function Sidebar({
     setActiveSection,
     sidebarOpen,
     setSidebarOpen,
-    
+    onLogout,
 }: SidebarProps) {
     const menuItems = [
         { id: "dashboard", label: "Dashboard", icon: Home },
@@ -79,7 +78,7 @@ export default function Sidebar({
                 {/* Logout Button */}
                 <div className="p-3 flex-shrink-0">
                     <button
-                        onClick={() => signOut()}
+                        onClick={onLogout}
                         className="w-full flex items-center space-x-3 px-3 py-3 rounded-xl text-slate-600 hover:bg-red-50 hover:text-red-600 transition-all duration-200"
                     >
                         <LogOut className="w-5 h-5" />

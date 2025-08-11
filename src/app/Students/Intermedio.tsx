@@ -21,6 +21,6 @@ export default function Intermedio({ user }: Props) {
   }
 
   return (
-    <Dashboard user={user} onLogout={handleLogout} />
+    <Dashboard onLogout={handleLogout} user={user} />
   )
 }

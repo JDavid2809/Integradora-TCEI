@@ -12,8 +12,11 @@ async function main(){
     try {
           const hashedPassword = await bcrypt.hash("12345", 10);
 
-    const nuevoProfesor = await prisma.usuario.create({
-      data: {
+    // Usar upsert para evitar errores de duplicados
+    const nuevoProfesor = await prisma.usuario.upsert({
+      where: { email: "mario@gmail.com" },
+      update: {},
+      create: {
         nombre: `Mario`,
         email: "mario@gmail.com",
         apellido: "Perez Gomez",
@@ -42,8 +45,10 @@ async function main(){
       },
     });
 
-    const nuevoEstudiante = await prisma.usuario.create({
-      data: {
+    const nuevoEstudiante = await prisma.usuario.upsert({
+      where: { email: "estudiante@test.com" },
+      update: {},
+      create: {
         nombre: `Estudiante Test`,
         email: "estudiante@test.com",
         password: hashedPassword,
@@ -65,6 +70,24 @@ async function main(){
         },
       },
     });
+
+    const nuevoAdmin = await prisma.usuario.upsert({
+      where: { email: "admin@admin.com" },
+      update: {},
+      create: {
+        nombre: `Admin`,
+        email: "admin@admin.com",
+        password: hashedPassword,
+        apellido: "Sistema",
+        rol: "ADMIN",
+      },
+    });
+
+    console.log('✅ Seed completed successfully');
+    console.log('📧 Users created/updated:');
+    console.log('  - Teacher: mario@gmail.com (password: 12345)');
+    console.log('  - Student: estudiante@test.com (password: 12345)');
+    console.log('  - Admin: admin@admin.com (password: 12345)');
     
     } catch (error) {
         console.error("Error during seeding:", error);

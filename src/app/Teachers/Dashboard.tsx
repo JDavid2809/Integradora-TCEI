@@ -13,11 +13,11 @@ import BottomTabs from "./Tabs"
 import { Session } from "next-auth"
 
 interface DashboardProps {
-    
     user: Session
+    onLogout?: () => void
 }
 
-export default function Dashboard({  user }: DashboardProps) {
+export default function Dashboard({ user, onLogout }: DashboardProps) {
     const [activeSection, setActiveSection] = useState("dashboard")
     const [sidebarOpen, setSidebarOpen] = useState(false)
 
@@ -63,7 +63,7 @@ export default function Dashboard({  user }: DashboardProps) {
                     setActiveSection={setActiveSection}
                     sidebarOpen={false}
                     setSidebarOpen={setSidebarOpen}
-                    
+                    onLogout={onLogout}
                 />
             </div>
 
@@ -74,7 +74,7 @@ export default function Dashboard({  user }: DashboardProps) {
                     setActiveSection={setActiveSection}
                     sidebarOpen={sidebarOpen}
                     setSidebarOpen={setSidebarOpen}
-                    
+                    onLogout={onLogout}
                 />
             </div>
 

@@ -25,7 +25,7 @@ export default function BottomTabs({ activeSection, setActiveSection }: BottomTa
                         <motion.button
                             key={item.id}
                             onClick={() => setActiveSection(item.id)}
-                            className={`relative flex flex-col items-center justify-center p-2 rounded-xl transition-all duration-200 min-w-0 flex-1 ${isActive ? "text-[#e30f28]" : "text-slate-500"
+                            className={`relative flex flex-col items-center justify-center p-2 rounded-xl transition-all duration-200 min-w-0 flex-1 ${isActive ? "text-blue-600" : "text-slate-500"
                                 }`}
                             whileTap={{ scale: 0.95 }}
                         >
@@ -33,7 +33,7 @@ export default function BottomTabs({ activeSection, setActiveSection }: BottomTa
                             {isActive && (
                                 <motion.div
                                     layoutId="activeTab"
-                                    className="absolute inset-0 bg-[#e30f28]/10 rounded-xl"
+                                    className="absolute inset-0 bg-blue-600/10 rounded-xl"
                                     initial={false}
                                     transition={{
                                         type: "spring",
@@ -45,18 +45,18 @@ export default function BottomTabs({ activeSection, setActiveSection }: BottomTa
 
                             {/* Icon */}
                             <div className="relative z-10 mb-1">
-                                <item.icon className={`w-5 h-5 ${isActive ? "text-[#e30f28]" : "text-slate-500"}`} />
+                                <item.icon className={`w-5 h-5 ${isActive ? "text-blue-600" : "text-slate-500"}`} />
                             </div>
 
                             {/* Label */}
-                            <span className={`text-xs font-medium relative z-10 ${isActive ? "text-[#e30f28]" : "text-slate-500"}`}>
+                            <span className={`text-xs font-medium relative z-10 ${isActive ? "text-blue-600" : "text-slate-500"}`}>
                                 {item.label}
                             </span>
 
                             {/* Active dot */}
                             {isActive && (
                                 <motion.div
-                                    className="absolute -top-1 w-1 h-1 bg-[#e30f28] rounded-full"
+                                    className="absolute -top-1 w-1 h-1 bg-blue-600 rounded-full"
                                     initial={{ scale: 0 }}
                                     animate={{ scale: 1 }}
                                     transition={{ delay: 0.1 }}

@@ -29,7 +29,7 @@ export default function Header({ activeSection, setSidebarOpen, user }: HeaderPr
                 >
                     <Menu className="w-5 h-5 text-slate-600" />
                 </button>
-                <h2 className="text-lg lg:text-xl font-semibold text-[#00246a]">
+                <h2 className="text-lg lg:text-xl font-semibold text-blue-600">
                     {sectionTitles[activeSection] || "Dashboard"}
                 </h2>
             </div>
@@ -43,20 +43,20 @@ export default function Header({ activeSection, setSidebarOpen, user }: HeaderPr
                 {/* User info - hidden on small screens, visible on larger */}
                 <div className="hidden sm:flex items-center space-x-3 mt-5">
                     <div className="text-right p-3">
-                        <p className="text-sm font-medium text-[#00246a]">{user.user.name} {" "}
+                        <p className="text-sm font-medium text-blue-600">{user.user.name} {" "}
                             <span>{user.user.apellido?.charAt(0)}</span>
                              </p>
                              
                         <p className="text-xs text-slate-500">{user.user.rol}</p>
                     </div>
-                    <div className="w-10 h-10 bg-gradient-to-br from-[#e30f28] to-[#00246a] rounded-full flex items-center justify-center">
+                    <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-700 rounded-full flex items-center justify-center">
                         <span className="text-white font-medium text-sm">{user.user.name!.charAt(0)}{user.user.apellido?.charAt(0)}</span>
                     </div>
                 </div>
 
                 {/* User avatar only for mobile */}
-                <div className="sm:hidden w-8 h-8 bg-gradient-to-br from-[#e30f28] to-[#00246a] rounded-full flex items-center justify-center">
-                    <span className="text-white font-medium text-xs">JP</span>
+                <div className="sm:hidden w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-700 rounded-full flex items-center justify-center">
+                    <span className="text-white font-medium text-xs">{user.user.name!.charAt(0)}{user.user.apellido?.charAt(0)}</span>
                 </div>
             </div>
         </header>

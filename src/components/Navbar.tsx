@@ -1,10 +1,12 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { ChevronDown, Menu, Search, X, Play, User, BookOpenText, GraduationCap, School, House } from "lucide-react"
+import { ChevronDown, Menu, Search, X, Play, User, BookOpenText, GraduationCap, School, House, LogOut } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 import Image from "next/image"
 import { useRouter } from "next/navigation"
+import { useSession, signOut } from 'next-auth/react'
+import type { Session } from 'next-auth'
 
 const navigationItems = [
     { name: "Inicio", icon: <House className="ml-2"/>, href:"/" },
@@ -80,6 +82,102 @@ function DropdownMenu({ label, options }: { label: string; options: { name: stri
     )
 }
 
+function UserMenu({ user }: { user: NonNullable<Session['user']> }) {
+    const [isHovered, setIsHovered] = useState(false)
+    const router = useRouter()
+
+    const handleLogout = async () => {
+        await signOut({ 
+            redirect: false,
+            callbackUrl: '/' 
+        })
+        router.push('/')
+    }
+
+    const handleDashboard = () => {
+        switch (user.rol) {
+            case 'PROFESOR':
+                router.push('/Teachers')
+                break
+            case 'ESTUDIANTE':
+                router.push('/Students')
+                break
+            case 'ADMIN':
+                router.push('/Admin')
+                break
+            default:
+                router.push('/')
+        }
+    }
+
+    const userInitials = `${user.name?.charAt(0) || ''}${user.apellido?.charAt(0) || ''}`.toUpperCase()
+    const userColor = user.rol === 'PROFESOR' ? 'from-blue-500 to-blue-700' : 
+                     user.rol === 'ESTUDIANTE' ? 'from-green-500 to-green-700' : 
+                     'from-purple-500 to-purple-700'
+
+    return (
+        <div
+            className="relative"
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
+        >
+            <motion.button
+                className="flex items-center space-x-3 px-4 py-2 rounded-full hover:bg-slate-100 transition-all duration-200"
+                whileHover={{ scale: 1.02 }}
+            >
+                <div className={`w-8 h-8 bg-gradient-to-br ${userColor} rounded-full flex items-center justify-center`}>
+                    <span className="text-white font-medium text-sm">{userInitials}</span>
+                </div>
+                <div className="hidden md:block text-left">
+                    <p className="text-sm font-medium text-[#00246a]">{user.name} {user.apellido}</p>
+                    <p className="text-xs text-slate-500 capitalize">{user.rol?.toLowerCase()}</p>
+                </div>
+                <ChevronDown 
+                    className="ml-2 h-4 w-4 text-slate-600 transition-transform duration-300 ease-in-out" 
+                    style={{ transform: isHovered ? "rotate(180deg)" : "rotate(0deg)" }}
+                />
+            </motion.button>
+
+            <AnimatePresence>
+                {isHovered && (
+                    <motion.div
+                        initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                        className="absolute top-full right-0 mt-2 w-64 bg-white rounded-xl shadow-xl border border-slate-100 p-2 z-50"
+                    >
+                        <div className="px-4 py-3 border-b border-slate-100">
+                            <p className="text-sm font-medium text-[#00246a]">{user.name} {user.apellido}</p>
+                            <p className="text-xs text-slate-500">{user.email}</p>
+                            <p className="text-xs text-blue-600 font-medium mt-1 capitalize">{user.rol?.toLowerCase()}</p>
+                        </div>
+                        
+                        <motion.button
+                            onClick={handleDashboard}
+                            className="w-full flex items-center space-x-3 px-4 py-3 text-left hover:bg-slate-50 rounded-lg transition-colors duration-200"
+                            whileHover={{ scale: 1.02 }}
+                            whileTap={{ scale: 0.98 }}
+                        >
+                            <House className="w-4 h-4 text-slate-600" />
+                            <span className="text-slate-700">Mi Dashboard</span>
+                        </motion.button>
+
+                        <motion.button
+                            onClick={handleLogout}
+                            className="w-full flex items-center space-x-3 px-4 py-3 text-left hover:bg-red-50 hover:text-red-600 rounded-lg transition-colors duration-200"
+                            whileHover={{ scale: 1.02 }}
+                            whileTap={{ scale: 0.98 }}
+                        >
+                            <LogOut className="w-4 h-4" />
+                            <span>Cerrar Sesión</span>
+                        </motion.button>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+        </div>
+    )
+}
+
 function AccountDropdown() {
     const [isHovered, setIsHovered] = useState(false)
     const router = useRouter()
@@ -138,10 +236,20 @@ export default function NavBar() {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
     const [isVisible, setIsVisible] = useState(true)
     const [lastScrollY, setLastScrollY] = useState(0)
+    const { data: session, status } = useSession()
     const router = useRouter()
 
     const handleNavigation = (href: string) => {
         router.push(href)
+    }
+
+    const handleLogout = async () => {
+        await signOut({ 
+            redirect: false,
+            callbackUrl: '/' 
+        })
+        router.push('/')
+        setIsMobileMenuOpen(false)
     }
 
     useEffect(() => {
@@ -215,9 +323,16 @@ export default function NavBar() {
                                 <Search className="h-5 w-5" />
                             </motion.button>
 
-                            <DropdownMenu label="Comenzar" options={studentOptions} />
-
-                            <AccountDropdown />
+                            {status === "loading" ? (
+                                <div className="w-8 h-8 bg-slate-200 rounded-full animate-pulse"></div>
+                            ) : session?.user ? (
+                                <UserMenu user={session.user} />
+                            ) : (
+                                <>
+                                    <DropdownMenu label="Comenzar" options={studentOptions} />
+                                    <AccountDropdown />
+                                </>
+                            )}
                         </div>
 
                         <motion.button
@@ -286,39 +401,104 @@ export default function NavBar() {
                                 </nav>
 
                                 <div className="mt-8 space-y-4 pt-6 border-t border-gray-200">
-                                    <div className="flex justify-between items-center">
-                                        <motion.button 
-                                            className="p-3 bg-[#e30f28] hover:bg-[#00246a] hover:text-white text-white rounded-full flex items-center justify-center"
-                                            whileHover={{ scale: 1.1 }}
-                                            whileTap={{ scale: 0.9 }}
-                                        >
-                                            <Search className="h-5 w-5" />
-                                        </motion.button>
-                                        
-                                        <motion.button 
-                                            className="p-3 bg-[#e30f28] hover:bg-[#00246a] hover:text-white text-white rounded-full flex items-center justify-center"
-                                            whileHover={{ scale: 1.1 }}
-                                            whileTap={{ scale: 0.9 }}
-                                        >
-                                            <Play className="h-5 w-5" />
-                                        </motion.button>
-                                        
-                                        <motion.button 
-                                            className="p-3 bg-[#e30f28] text-white hover:bg-[#00246a] rounded-full flex items-center justify-center transition-colors duration-200"
-                                            whileHover={{ scale: 1.1 }}
-                                            whileTap={{ scale: 0.9 }}
-                                        >
-                                            <User className="h-5 w-5" />
-                                        </motion.button>
-                                    </div>
-                                    
-                                    <div className="text-center space-y-1 text-xs text-gray-500">
-                                        <div className="flex justify-between">
-                                            <span>Buscar</span>
-                                            <span>Comenzar</span>
-                                            <span>Mi Cuenta</span>
+                                    {session?.user ? (
+                                        // Usuario autenticado - Mostrar información y logout
+                                        <div className="space-y-4">
+                                            <div className="flex items-center space-x-3 p-3 bg-slate-50 rounded-lg">
+                                                <div className={`w-10 h-10 bg-gradient-to-br ${
+                                                    session.user.rol === 'PROFESOR' ? 'from-blue-500 to-blue-700' : 
+                                                    session.user.rol === 'ESTUDIANTE' ? 'from-green-500 to-green-700' : 
+                                                    'from-purple-500 to-purple-700'
+                                                } rounded-full flex items-center justify-center`}>
+                                                    <span className="text-white font-medium text-sm">
+                                                        {`${session.user.name?.charAt(0) || ''}${session.user.apellido?.charAt(0) || ''}`.toUpperCase()}
+                                                    </span>
+                                                </div>
+                                                <div>
+                                                    <p className="text-sm font-medium text-[#00246a]">{session.user.name} {session.user.apellido}</p>
+                                                    <p className="text-xs text-slate-500 capitalize">{session.user.rol?.toLowerCase()}</p>
+                                                </div>
+                                            </div>
+                                            
+                                            <motion.button
+                                                onClick={() => {
+                                                    switch (session.user.rol) {
+                                                        case 'PROFESOR':
+                                                            handleNavigation('/Teachers')
+                                                            break
+                                                        case 'ESTUDIANTE':
+                                                            handleNavigation('/Students')
+                                                            break
+                                                        case 'ADMIN':
+                                                            handleNavigation('/Admin')
+                                                            break
+                                                    }
+                                                    setIsMobileMenuOpen(false)
+                                                }}
+                                                className="w-full flex items-center space-x-3 p-3 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors duration-200"
+                                                whileHover={{ scale: 1.02 }}
+                                                whileTap={{ scale: 0.98 }}
+                                            >
+                                                <House className="h-5 w-5 text-blue-600" />
+                                                <span className="text-blue-600 font-medium">Mi Dashboard</span>
+                                            </motion.button>
+
+                                            <motion.button
+                                                onClick={handleLogout}
+                                                className="w-full flex items-center space-x-3 p-3 bg-red-50 hover:bg-red-100 rounded-lg transition-colors duration-200"
+                                                whileHover={{ scale: 1.02 }}
+                                                whileTap={{ scale: 0.98 }}
+                                            >
+                                                <LogOut className="h-5 w-5 text-red-600" />
+                                                <span className="text-red-600 font-medium">Cerrar Sesión</span>
+                                            </motion.button>
                                         </div>
-                                    </div>
+                                    ) : (
+                                        // Usuario no autenticado - Mostrar botones originales
+                                        <>
+                                            <div className="flex justify-between items-center">
+                                                <motion.button 
+                                                    className="p-3 bg-[#e30f28] hover:bg-[#00246a] hover:text-white text-white rounded-full flex items-center justify-center"
+                                                    whileHover={{ scale: 1.1 }}
+                                                    whileTap={{ scale: 0.9 }}
+                                                >
+                                                    <Search className="h-5 w-5" />
+                                                </motion.button>
+                                                
+                                                <motion.button 
+                                                    onClick={() => {
+                                                        handleNavigation('/Login')
+                                                        setIsMobileMenuOpen(false)
+                                                    }}
+                                                    className="p-3 bg-[#e30f28] hover:bg-[#00246a] hover:text-white text-white rounded-full flex items-center justify-center"
+                                                    whileHover={{ scale: 1.1 }}
+                                                    whileTap={{ scale: 0.9 }}
+                                                >
+                                                    <Play className="h-5 w-5" />
+                                                </motion.button>
+                                                
+                                                <motion.button 
+                                                    onClick={() => {
+                                                        handleNavigation('/Login')
+                                                        setIsMobileMenuOpen(false)
+                                                    }}
+                                                    className="p-3 bg-[#e30f28] text-white hover:bg-[#00246a] rounded-full flex items-center justify-center transition-colors duration-200"
+                                                    whileHover={{ scale: 1.1 }}
+                                                    whileTap={{ scale: 0.9 }}
+                                                >
+                                                    <User className="h-5 w-5" />
+                                                </motion.button>
+                                            </div>
+                                            
+                                            <div className="text-center space-y-1 text-xs text-gray-500">
+                                                <div className="flex justify-between">
+                                                    <span>Buscar</span>
+                                                    <span>Comenzar</span>
+                                                    <span>Iniciar Sesión</span>
+                                                </div>
+                                            </div>
+                                        </>
+                                    )}
                                 </div>
                             </div>
                         </motion.div>

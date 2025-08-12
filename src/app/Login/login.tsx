@@ -33,21 +33,38 @@ export default  function LoginForm({ toggleMode }: LoginFormProps) {
     setError("");
     setLoading(true);
 
-    const res = await signIn("credentials", {
-      redirect: false,
-      email,
-      password,
-    });
-    setLoading(false);
+    try {
+      console.log('🔐 Attempting login for:', email);
+      
+      const res = await signIn("credentials", {
+        redirect: false,
+        email,
+        password,
+      });
 
-    if (res?.error) {
-      setError("Correo o contraseña incorrectos");
-    } else if (res?.ok) {
-      console.log({ res });
-        const path = await getRedirectPath()
-      router.push(path)
+      if (res?.error) {
+        console.log('❌ Login failed:', res.error);
+        setError("Correo o contraseña incorrectos");
+        setLoading(false);
+      } else if (res?.ok) {
+        console.log('✅ Login successful, getting redirect path...');
+        
+        // Obtener la ruta de redirección basada en el rol
+        const path = await getRedirectPath();
+        console.log('🔄 Redirecting to:', path);
+        
+        // Usar replace en lugar de push para evitar que puedan volver atrás
+        router.replace(path);
+      } else {
+        console.log('⚠️ Unexpected login response:', res);
+        setError("Error inesperado durante el inicio de sesión");
+        setLoading(false);
+      }
+    } catch (error) {
+      console.error('💥 Login error:', error);
+      setError("Error de conexión. Intenta nuevamente.");
+      setLoading(false);
     }
-
   }
 
 

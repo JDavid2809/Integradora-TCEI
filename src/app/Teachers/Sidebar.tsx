@@ -65,8 +65,8 @@ export default function Sidebar({
                                 setSidebarOpen(false)
                             }}
                             className={`w-full flex items-center space-x-3 px-3 py-3 rounded-xl text-left transition-all duration-200 mb-1 ${activeSection === item.id
-                                ? "bg-[#e30f28]/10 text-[#e30f28] border-r-2 border-[#e30f28]"
-                                : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+                                ? "bg-blue-600/10 text-blue-600 border-r-2 border-blue-600"
+                                : "text-slate-600 hover:bg-blue-50 hover:text-blue-700"
                                 }`}
                         >
                             <item.icon className="w-5 h-5" />

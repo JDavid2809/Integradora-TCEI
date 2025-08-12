@@ -44,7 +44,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} font-sans antialiased bg-white text-[#00246a]`}
       >
         <Providers>
-          <NavBar />
+          <NavBar /><br />
           <main className="pt-[80px] pb-16 px-4 min-h-screen bg-white">
             {children}
           </main>

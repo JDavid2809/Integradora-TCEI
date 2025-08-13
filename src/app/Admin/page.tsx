@@ -3,6 +3,31 @@
 import { useEffect, useState } from 'react'
 import { useSession } from 'next-auth/react'
 import { redirect } from 'next/navigation'
+import { 
+  BarChart3, 
+  Users, 
+  BookOpen, 
+  FileText, 
+  CreditCard, 
+  Settings,
+  GraduationCap,
+  DollarSign,
+  UserPlus,
+  CheckCircle,
+  Eye,
+  Edit,
+  Trash2,
+  ArrowRight,
+  UserCheck,
+  Target,
+  Activity
+} from 'lucide-react'
+
+// Import CRUD components
+import AdminUserCrud from '@/components/AdminUserCrud'
+import AdminCourseCrud from '@/components/AdminCourseCrud'
+import AdminExamCrud from '@/components/AdminExamCrud'
+import AdminPaymentCrud from '@/components/AdminPaymentCrud'
 
 interface SystemStats {
   resumen: {
@@ -109,12 +134,12 @@ export default function AdminPage() {
   console.log('✅ Admin access granted:', session.user.email, 'Role:', session.user.rol)
 
   const navigationItems = [
-    { id: 'dashboard', name: 'Dashboard', icon: '📊' },
-    { id: 'users', name: 'Usuarios', icon: '👥' },
-    { id: 'courses', name: 'Cursos', icon: '📚' },
-    { id: 'exams', name: 'Exámenes', icon: '📝' },
-    { id: 'payments', name: 'Pagos', icon: '💰' },
-    { id: 'system', name: 'Sistema', icon: '⚙️' }
+    { id: 'dashboard', name: 'Dashboard', icon: BarChart3 },
+    { id: 'users', name: 'Usuarios', icon: Users },
+    { id: 'courses', name: 'Cursos', icon: BookOpen },
+    { id: 'exams', name: 'Exámenes', icon: FileText },
+    { id: 'payments', name: 'Pagos', icon: CreditCard },
+    { id: 'system', name: 'Sistema', icon: Settings }
   ]
 
   const renderDashboard = () => (
@@ -127,7 +152,7 @@ export default function AdminPage() {
               <p className="text-blue-100">Total Usuarios</p>
               <p className="text-3xl font-bold">{stats?.resumen.total_usuarios || 0}</p>
             </div>
-            <div className="text-4xl opacity-80">👥</div>
+            <Users className="w-10 h-10 opacity-80" />
           </div>
         </div>
 
@@ -137,7 +162,7 @@ export default function AdminPage() {
               <p className="text-green-100">Estudiantes Activos</p>
               <p className="text-3xl font-bold">{stats?.resumen.estudiantes_activos || 0}</p>
             </div>
-            <div className="text-4xl opacity-80">🎓</div>
+            <GraduationCap className="w-10 h-10 opacity-80" />
           </div>
         </div>
 
@@ -147,7 +172,7 @@ export default function AdminPage() {
               <p className="text-purple-100">Cursos Activos</p>
               <p className="text-3xl font-bold">{stats?.resumen.cursos_activos || 0}</p>
             </div>
-            <div className="text-4xl opacity-80">📚</div>
+            <BookOpen className="w-10 h-10 opacity-80" />
           </div>
         </div>
 
@@ -157,7 +182,7 @@ export default function AdminPage() {
               <p className="text-orange-100">Ingresos Total</p>
               <p className="text-3xl font-bold">${stats?.resumen.ingresos_total?.toLocaleString() || 0}</p>
             </div>
-            <div className="text-4xl opacity-80">💰</div>
+            <DollarSign className="w-10 h-10 opacity-80" />
           </div>
         </div>
       </div>
@@ -225,20 +250,24 @@ export default function AdminPage() {
     </div>
   )
 
+  const navigateToPage = (page: string) => {
+    window.location.href = `/Admin/${page}`
+  }
+
   const renderContent = () => {
     switch (activeSection) {
       case 'dashboard':
         return renderDashboard()
       case 'users':
-        return <AdminUsersSection />
+        return <AdminUserCrud />
       case 'courses':
-        return <AdminCoursesSection />
+        return <AdminCourseCrud />
       case 'exams':
-        return <AdminExamsSection />
+        return <AdminExamCrud />
       case 'payments':
-        return <AdminPaymentsSection />
+        return <AdminPaymentCrud />
       case 'system':
-        return <AdminSystemSection />
+        return <AdminSystemSection navigateToPage={navigateToPage} />
       default:
         return renderDashboard()
     }
@@ -267,20 +296,23 @@ export default function AdminPage() {
         <div className="w-64 bg-white shadow-sm h-screen sticky top-0">
           <nav className="p-4">
             <div className="space-y-2">
-              {navigationItems.map(item => (
-                <button
-                  key={item.id}
-                  onClick={() => setActiveSection(item.id)}
-                  className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${
-                    activeSection === item.id
-                      ? 'bg-[#00246a] text-white'
-                      : 'text-gray-700 hover:bg-gray-100'
-                  }`}
-                >
-                  <span className="text-xl">{item.icon}</span>
-                  <span className="font-medium">{item.name}</span>
-                </button>
-              ))}
+              {navigationItems.map(item => {
+                const IconComponent = item.icon
+                return (
+                  <button
+                    key={item.id}
+                    onClick={() => setActiveSection(item.id)}
+                    className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${
+                      activeSection === item.id
+                        ? 'bg-[#00246a] text-white'
+                        : 'text-gray-700 hover:bg-gray-100'
+                    }`}
+                  >
+                    <IconComponent className="w-5 h-5" />
+                    <span className="font-medium">{item.name}</span>
+                  </button>
+                )
+              })}
             </div>
           </nav>
         </div>
@@ -294,7 +326,7 @@ export default function AdminPage() {
   )
 }
 
-// Componentes de sección (placeholders - se implementarán posteriormente)
+// Componentes de sección con enlaces a páginas específicas
 function AdminUsersSection() {
   return (
     <div className="bg-white p-6 rounded-lg shadow-md">
@@ -304,15 +336,24 @@ function AdminUsersSection() {
       </p>
       <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="p-4 border border-gray-200 rounded-lg">
-          <h3 className="font-semibold text-green-600">✅ Crear Usuarios</h3>
+          <div className="flex items-center gap-2 mb-2">
+            <UserPlus className="w-5 h-5 text-green-600" />
+            <h3 className="font-semibold text-green-600">Crear Usuarios</h3>
+          </div>
           <p className="text-sm text-gray-600">Alumnos, profesores, otros administradores</p>
         </div>
         <div className="p-4 border border-gray-200 rounded-lg">
-          <h3 className="font-semibold text-blue-600">👁️ Leer Contenido</h3>
+          <div className="flex items-center gap-2 mb-2">
+            <Eye className="w-5 h-5 text-blue-600" />
+            <h3 className="font-semibold text-blue-600">Leer Contenido</h3>
+          </div>
           <p className="text-sm text-gray-600">Ver todos los datos del sistema</p>
         </div>
         <div className="p-4 border border-gray-200 rounded-lg">
-          <h3 className="font-semibold text-orange-600">✏️ Actualizar Datos</h3>
+          <div className="flex items-center gap-2 mb-2">
+            <Edit className="w-5 h-5 text-orange-600" />
+            <h3 className="font-semibold text-orange-600">Actualizar Datos</h3>
+          </div>
           <p className="text-sm text-gray-600">Modificar perfiles, configuraciones</p>
         </div>
       </div>
@@ -320,20 +361,34 @@ function AdminUsersSection() {
   )
 }
 
-function AdminCoursesSection() {
+function AdminCoursesSection({ navigateToPage }: { navigateToPage: (page: string) => void }) {
   return (
     <div className="bg-white p-6 rounded-lg shadow-md">
-      <h2 className="text-xl font-bold text-[#00246a] mb-4">Gestión de Cursos</h2>
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-xl font-bold text-[#00246a]">Gestión de Cursos</h2>
+        <button
+          onClick={() => navigateToPage('courses')}
+          className="bg-[#00246a] text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
+        >
+          Ir a Cursos <ArrowRight className="w-4 h-4" />
+        </button>
+      </div>
       <p className="text-gray-600">
         Administra cursos y contenidos educativos.
       </p>
       <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="p-4 border border-gray-200 rounded-lg">
-          <h3 className="font-semibold text-green-600">✅ Crear Cursos</h3>
-          <p className="text-sm text-gray-600">Nuevos cursos y contenidos</p>
+          <div className="flex items-center gap-2 mb-2">
+            <CheckCircle className="w-5 h-5 text-green-600" />
+            <h3 className="font-semibold text-green-600">Crear Cursos</h3>
+          </div>
+          <p className="text-sm text-gray-600">Nuevos cursos con profesores y niveles</p>
         </div>
         <div className="p-4 border border-gray-200 rounded-lg">
-          <h3 className="font-semibold text-red-600">🗑️ Eliminar Cursos</h3>
+          <div className="flex items-center gap-2 mb-2">
+            <Trash2 className="w-5 h-5 text-red-600" />
+            <h3 className="font-semibold text-red-600">Eliminar Cursos</h3>
+          </div>
           <p className="text-sm text-gray-600">Remover cursos obsoletos</p>
         </div>
       </div>
@@ -341,20 +396,34 @@ function AdminCoursesSection() {
   )
 }
 
-function AdminExamsSection() {
+function AdminExamsSection({ navigateToPage }: { navigateToPage: (page: string) => void }) {
   return (
     <div className="bg-white p-6 rounded-lg shadow-md">
-      <h2 className="text-xl font-bold text-[#00246a] mb-4">Gestión de Exámenes</h2>
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-xl font-bold text-[#00246a]">Gestión de Exámenes</h2>
+        <button
+          onClick={() => navigateToPage('exams')}
+          className="bg-[#00246a] text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
+        >
+          Ir a Exámenes <ArrowRight className="w-4 h-4" />
+        </button>
+      </div>
       <p className="text-gray-600">
         Crear y administrar exámenes y evaluaciones.
       </p>
       <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="p-4 border border-gray-200 rounded-lg">
-          <h3 className="font-semibold text-green-600">✅ Crear Exámenes</h3>
-          <p className="text-sm text-gray-600">Nuevos exámenes y evaluaciones</p>
+          <div className="flex items-center gap-2 mb-2">
+            <CheckCircle className="w-5 h-5 text-green-600" />
+            <h3 className="font-semibold text-green-600">Crear Exámenes</h3>
+          </div>
+          <p className="text-sm text-gray-600">Exámenes con preguntas múltiples</p>
         </div>
         <div className="p-4 border border-gray-200 rounded-lg">
-          <h3 className="font-semibold text-red-600">🗑️ Eliminar Evaluaciones</h3>
+          <div className="flex items-center gap-2 mb-2">
+            <Trash2 className="w-5 h-5 text-red-600" />
+            <h3 className="font-semibold text-red-600">Eliminar Evaluaciones</h3>
+          </div>
           <p className="text-sm text-gray-600">Remover exámenes obsoletos</p>
         </div>
       </div>
@@ -362,20 +431,34 @@ function AdminExamsSection() {
   )
 }
 
-function AdminPaymentsSection() {
+function AdminPaymentsSection({ navigateToPage }: { navigateToPage: (page: string) => void }) {
   return (
     <div className="bg-white p-6 rounded-lg shadow-md">
-      <h2 className="text-xl font-bold text-[#00246a] mb-4">Gestión de Pagos</h2>
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-xl font-bold text-[#00246a]">Gestión de Pagos</h2>
+        <button
+          onClick={() => navigateToPage('payments')}
+          className="bg-[#00246a] text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
+        >
+          Ir a Pagos <ArrowRight className="w-4 h-4" />
+        </button>
+      </div>
       <p className="text-gray-600">
         Administra registros de pagos y transacciones.
       </p>
       <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="p-4 border border-gray-200 rounded-lg">
-          <h3 className="font-semibold text-green-600">✅ Registrar Pagos</h3>
-          <p className="text-sm text-gray-600">Nuevos registros de pago</p>
+          <div className="flex items-center gap-2 mb-2">
+            <CheckCircle className="w-5 h-5 text-green-600" />
+            <h3 className="font-semibold text-green-600">Registrar Pagos</h3>
+          </div>
+          <p className="text-sm text-gray-600">Nuevos registros de pago por curso</p>
         </div>
         <div className="p-4 border border-gray-200 rounded-lg">
-          <h3 className="font-semibold text-red-600">🗑️ Eliminar Registros</h3>
+          <div className="flex items-center gap-2 mb-2">
+            <Trash2 className="w-5 h-5 text-red-600" />
+            <h3 className="font-semibold text-red-600">Eliminar Registros</h3>
+          </div>
           <p className="text-sm text-gray-600">Remover registros erróneos</p>
         </div>
       </div>
@@ -383,25 +466,42 @@ function AdminPaymentsSection() {
   )
 }
 
-function AdminSystemSection() {
+function AdminSystemSection({ navigateToPage }: { navigateToPage: (page: string) => void }) {
   return (
     <div className="bg-white p-6 rounded-lg shadow-md">
-      <h2 className="text-xl font-bold text-[#00246a] mb-4">Configuración del Sistema</h2>
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-xl font-bold text-[#00246a]">Configuración del Sistema</h2>
+        <button
+          onClick={() => navigateToPage('system')}
+          className="bg-[#00246a] text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
+        >
+          Ir a Configuraciones <ArrowRight className="w-4 h-4" />
+        </button>
+      </div>
       <p className="text-gray-600">
-        Administra configuraciones del sistema y del bot.
+        Administra configuraciones del sistema.
       </p>
       <div className="mt-4 space-y-4">
         <div className="p-4 border border-gray-200 rounded-lg">
-          <h3 className="font-semibold text-purple-600">⚙️ Configuraciones Generales</h3>
-          <p className="text-sm text-gray-600">Sin restricciones de acceso ni modificación</p>
+          <div className="flex items-center gap-2 mb-2">
+            <Target className="w-5 h-5 text-purple-600" />
+            <h3 className="font-semibold text-purple-600">Niveles de Inglés</h3>
+          </div>
+          <p className="text-sm text-gray-600">Configurar niveles del sistema (A1, A2, B1, etc.)</p>
         </div>
         <div className="p-4 border border-gray-200 rounded-lg">
-          <h3 className="font-semibold text-blue-600">🤖 Configuración del Bot</h3>
-          <p className="text-sm text-gray-600">Personalizar asistente virtual</p>
+          <div className="flex items-center gap-2 mb-2">
+            <UserCheck className="w-5 h-5 text-blue-600" />
+            <h3 className="font-semibold text-blue-600">Categorías de Edad</h3>
+          </div>
+          <p className="text-sm text-gray-600">Gestionar rangos de edad para estudiantes</p>
         </div>
         <div className="p-4 border border-gray-200 rounded-lg">
-          <h3 className="font-semibold text-orange-600">📊 Registros de Asistencia</h3>
-          <p className="text-sm text-gray-600">Administrar asistencias de estudiantes</p>
+          <div className="flex items-center gap-2 mb-2">
+            <Activity className="w-5 h-5 text-orange-600" />
+            <h3 className="font-semibold text-orange-600">Estado del Sistema</h3>
+          </div>
+          <p className="text-sm text-gray-600">Ver estadísticas de uso de configuraciones</p>
         </div>
       </div>
     </div>

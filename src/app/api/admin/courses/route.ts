@@ -3,8 +3,6 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/authOptions'
 import { prisma } from '@/lib/prisma'
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
 // Middleware para verificar autorización de admin
 async function checkAdminAuth() {
   const session = await getServerSession(authOptions)
@@ -33,8 +31,7 @@ export async function GET(request: NextRequest) {
 
     const skip = (page - 1) * limit
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    let whereClause: any = {}
+    let whereClause: Record<string, unknown> = {}
     
     if (modalidad && ['PRESENCIAL', 'ONLINE'].includes(modalidad)) {
       whereClause.modalidad = modalidad

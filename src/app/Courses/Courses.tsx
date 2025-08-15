@@ -1,8 +1,9 @@
 "use client"
 
-import { useState } from "react"
-import {Search,BookOpen,Play,Award,Globe,} from "lucide-react"
+import { useState, useEffect } from "react"
+import {Search,BookOpen,Play,Award,Globe,X,} from "lucide-react"
 import Image from "next/image"
+import { useSearchParams } from 'next/navigation'
 
 const recommendedCourses = [
     {
@@ -15,7 +16,7 @@ const recommendedCourses = [
         rating: 4.9,
         price: "$199",
         level: "B2",
-        image: "logos/logoIngles1.jpg",
+    image: "/logos/logoIngles1.jpg",
         skills: ["Speaking", "Listening", "Pronunciation"],
         lessons: 48,
     },
@@ -29,7 +30,7 @@ const recommendedCourses = [
         rating: 4.8,
         price: "$299",
         level: "C1",
-        image: "logos/logoIngles1.jpg",
+    image: "/logos/logoIngles1.jpg",
         skills: ["Business Writing", "Presentations", "Meetings"],
         lessons: 40,
     },
@@ -43,7 +44,7 @@ const recommendedCourses = [
         rating: 4.7,
         price: "$149",
         level: "A1",
-        image: "logos/logoIngles1.jpg",
+    image: "/logos/logoIngles1.jpg",
         skills: ["Grammar", "Vocabulary", "Basic Speaking"],
         lessons: 64,
     },
@@ -61,7 +62,7 @@ const allCourses = [
         rating: 4.9,
         price: "$249",
         level: "B2",
-        image: "logos/logoIngles1.jpg",
+    image: "/logos/logoIngles1.jpg",
         skills: ["Reading", "Writing", "Speaking", "Listening"],
         lessons: 32,
     },
@@ -75,7 +76,7 @@ const allCourses = [
         rating: 4.6,
         price: "$99",
         level: "A2",
-        image: "logos/logoIngles1.jpg",
+    image: "/logos/logoIngles1.jpg",
         skills: ["Grammar", "Exercises", "Practice"],
         lessons: 24,
     },
@@ -89,7 +90,7 @@ const allCourses = [
         rating: 4.8,
         price: "$349",
         level: "C2",
-        image: "logos/logoIngles1.jpg",
+    image: "/logos/logoIngles1.jpg",
         skills: ["Literature", "Critical Analysis", "Writing"],
         lessons: 56,
     },
@@ -103,7 +104,7 @@ const allCourses = [
         rating: 4.7,
         price: "$79",
         level: "B1",
-        image: "logos/logoIngles1.jpg",
+    image: "/logos/logoIngles1.jpg",
         skills: ["Pronunciation", "Phonetics", "Accent"],
         lessons: 16,
     },
@@ -169,14 +170,44 @@ type Course = {
 
 
 export default function Courses() {
+    const searchParams = useSearchParams()
     const [searchTerm, setSearchTerm] = useState("")
     const [selectedLevel, setSelectedLevel] = useState("all")
 
+    // Efecto para leer parámetros de búsqueda de la URL
+    useEffect(() => {
+        const searchFromUrl = searchParams?.get('search')
+        if (searchFromUrl) {
+            setSearchTerm(searchFromUrl)
+        }
+    }, [searchParams])
+
+    // Función para resaltar texto de búsqueda
+    const highlightText = (text: string, searchTerm: string) => {
+        if (!searchTerm) return text
+        
+        const regex = new RegExp(`(${searchTerm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi')
+        const parts = text.split(regex)
+        
+        return parts.map((part, index) => 
+            regex.test(part) ? 
+                <span key={index} className="bg-yellow-200 text-yellow-800 font-medium px-1 rounded">
+                    {part}
+                </span> : part
+        )
+    }
+
     const filteredCourses = allCourses.filter((course) => {
-        const matchesSearch =
-            course.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            course.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            course.instructor.toLowerCase().includes(searchTerm.toLowerCase())
+        const searchLower = searchTerm.toLowerCase()
+        
+        const matchesSearch = searchTerm === "" || 
+            course.title.toLowerCase().includes(searchLower) ||
+            course.description.toLowerCase().includes(searchLower) ||
+            course.instructor.toLowerCase().includes(searchLower) ||
+            course.skills.some((skill: string) => skill.toLowerCase().includes(searchLower)) ||
+            course.level.toLowerCase().includes(searchLower) ||
+            course.price.toLowerCase().includes(searchLower)
+            
         const matchesLevel = selectedLevel === "all" || course.level === selectedLevel
 
         return matchesSearch && matchesLevel
@@ -188,6 +219,8 @@ export default function Courses() {
                 <Image
                     src={course.image || "/placeholder.svg"}
                     alt={course.title!}
+                    width={200}   
+                    height={200} 
                     className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-500"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
@@ -216,16 +249,18 @@ export default function Courses() {
             <div className="p-6">
                 <div className="flex items-start justify-between gap-3 mb-3">
                     <h3 className="text-xl font-bold text-[#00246a] group-hover:text-[#e30f28] transition-colors duration-300 line-clamp-2">
-                        {course.title}
+                        {highlightText(course.title || "", searchTerm)}
                     </h3>
                     <div className="text-2xl font-bold text-[#e30f28] shrink-0">{course.price}</div>
                 </div>
 
-                <p className="text-gray-600 mb-4 line-clamp-2">{course.description}</p>
+                <p className="text-gray-600 mb-4 line-clamp-2">
+                    {highlightText(course.description || "", searchTerm)}
+                </p>
 
                 <div className="flex items-center gap-2 mb-4 text-sm text-gray-500">
                     <BookOpen className="w-4 h-4" />
-                    <span>{course.instructor}</span>
+                    <span>{highlightText(course.instructor, searchTerm)}</span>
                     <span className="text-gray-300">•</span>
                     {/* LECCIONES */}
                     {/* <span>{course.lessons} lecciones</span> */}
@@ -257,6 +292,23 @@ export default function Courses() {
                         Aprende inglés con los mejores instructores nativos y metodología probada. Desde principiante hasta nivel
                         avanzado.
                     </p>
+                    
+                    {/* Indicador de búsqueda activa */}
+                    {searchTerm && (
+                        <div className="mt-6 inline-flex items-center gap-2 bg-yellow-100 border border-yellow-300 text-yellow-800 px-4 py-2 rounded-full text-sm font-medium">
+                            <Search className="w-4 h-4" />
+                            Mostrando resultados para: &ldquo;{searchTerm}&rdquo;
+                            <button
+                                onClick={() => {
+                                    setSearchTerm("")
+                                    window.history.pushState({}, '', '/Courses')
+                                }}
+                                className="ml-2 hover:bg-yellow-200 p-1 rounded-full transition-colors duration-200"
+                            >
+                                <X className="w-3 h-3" />
+                            </button>
+                        </div>
+                    )}
                 </div>
                 <section className="mb-20">
                     <div className="text-center mb-12">
@@ -358,17 +410,38 @@ export default function Courses() {
                             <div className="bg-gray-100 rounded-full w-24 h-24 flex items-center justify-center mx-auto mb-6">
                                 <Search className="w-12 h-12 text-gray-400" />
                             </div>
-                            <h3 className="text-2xl font-bold text-gray-700 mb-3">No se encontraron cursos</h3>
-                            <p className="text-gray-500 mb-6">Intenta ajustar tus criterios de búsqueda</p>
-                            <button
-                                onClick={() => {
-                                    setSearchTerm("")
-                                    setSelectedLevel("all")
-                                }}
-                                className="bg-[#e30f28] hover:bg-[#c20e24] text-white font-semibold py-3 px-6 rounded-xl transition-all duration-300"
-                            >
-                                Limpiar Filtros
-                            </button>
+                            <h3 className="text-2xl font-bold text-gray-700 mb-3">
+                                {searchTerm ? `No se encontraron cursos para "${searchTerm}"` : 'No se encontraron cursos'}
+                            </h3>
+                            <p className="text-gray-500 mb-6">
+                                {searchTerm 
+                                    ? 'Intenta con otros términos de búsqueda o ajusta los filtros' 
+                                    : 'Intenta ajustar tus criterios de búsqueda'
+                                }
+                            </p>
+                            <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                                <button
+                                    onClick={() => {
+                                        setSearchTerm("")
+                                        setSelectedLevel("all")
+                                        window.history.pushState({}, '', '/Courses')
+                                    }}
+                                    className="bg-[#e30f28] hover:bg-[#c20e24] text-white font-semibold py-3 px-6 rounded-xl transition-all duration-300"
+                                >
+                                    Limpiar Filtros
+                                </button>
+                                {searchTerm && (
+                                    <button
+                                        onClick={() => {
+                                            setSearchTerm("")
+                                            window.history.pushState({}, '', '/Courses')
+                                        }}
+                                        className="bg-white border-2 border-[#00246a] text-[#00246a] hover:bg-[#00246a] hover:text-white font-semibold py-3 px-6 rounded-xl transition-all duration-300"
+                                    >
+                                        Ver Todos los Cursos
+                                    </button>
+                                )}
+                            </div>
                         </div>
                     )}
                 </section>

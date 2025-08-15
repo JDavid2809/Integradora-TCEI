@@ -12,11 +12,7 @@ import {
   Filter,
   Edit,
   Trash2,
-  Plus,
-  Download,
-  Save,
-  Eye
-} from 'lucide-react'
+  Save} from 'lucide-react'
 
 export default function CrudImplementationSummary() {
   const implementations = [

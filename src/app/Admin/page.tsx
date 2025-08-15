@@ -327,144 +327,144 @@ export default function AdminPage() {
 }
 
 // Componentes de sección con enlaces a páginas específicas
-function AdminUsersSection() {
-  return (
-    <div className="bg-white p-6 rounded-lg shadow-md">
-      <h2 className="text-xl font-bold text-[#00246a] mb-4">Gestión de Usuarios</h2>
-      <p className="text-gray-600">
-        Aquí puedes crear, leer, actualizar y eliminar usuarios (estudiantes, profesores, administradores).
-      </p>
-      <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="p-4 border border-gray-200 rounded-lg">
-          <div className="flex items-center gap-2 mb-2">
-            <UserPlus className="w-5 h-5 text-green-600" />
-            <h3 className="font-semibold text-green-600">Crear Usuarios</h3>
-          </div>
-          <p className="text-sm text-gray-600">Alumnos, profesores, otros administradores</p>
-        </div>
-        <div className="p-4 border border-gray-200 rounded-lg">
-          <div className="flex items-center gap-2 mb-2">
-            <Eye className="w-5 h-5 text-blue-600" />
-            <h3 className="font-semibold text-blue-600">Leer Contenido</h3>
-          </div>
-          <p className="text-sm text-gray-600">Ver todos los datos del sistema</p>
-        </div>
-        <div className="p-4 border border-gray-200 rounded-lg">
-          <div className="flex items-center gap-2 mb-2">
-            <Edit className="w-5 h-5 text-orange-600" />
-            <h3 className="font-semibold text-orange-600">Actualizar Datos</h3>
-          </div>
-          <p className="text-sm text-gray-600">Modificar perfiles, configuraciones</p>
-        </div>
-      </div>
-    </div>
-  )
-}
+// function AdminUsersSection() {
+//   return (
+//     <div className="bg-white p-6 rounded-lg shadow-md">
+//       <h2 className="text-xl font-bold text-[#00246a] mb-4">Gestión de Usuarios</h2>
+//       <p className="text-gray-600">
+//         Aquí puedes crear, leer, actualizar y eliminar usuarios (estudiantes, profesores, administradores).
+//       </p>
+//       <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
+//         <div className="p-4 border border-gray-200 rounded-lg">
+//           <div className="flex items-center gap-2 mb-2">
+//             <UserPlus className="w-5 h-5 text-green-600" />
+//             <h3 className="font-semibold text-green-600">Crear Usuarios</h3>
+//           </div>
+//           <p className="text-sm text-gray-600">Alumnos, profesores, otros administradores</p>
+//         </div>
+//         <div className="p-4 border border-gray-200 rounded-lg">
+//           <div className="flex items-center gap-2 mb-2">
+//             <Eye className="w-5 h-5 text-blue-600" />
+//             <h3 className="font-semibold text-blue-600">Leer Contenido</h3>
+//           </div>
+//           <p className="text-sm text-gray-600">Ver todos los datos del sistema</p>
+//         </div>
+//         <div className="p-4 border border-gray-200 rounded-lg">
+//           <div className="flex items-center gap-2 mb-2">
+//             <Edit className="w-5 h-5 text-orange-600" />
+//             <h3 className="font-semibold text-orange-600">Actualizar Datos</h3>
+//           </div>
+//           <p className="text-sm text-gray-600">Modificar perfiles, configuraciones</p>
+//         </div>
+//       </div>
+//     </div>
+//   )
+// }
 
-function AdminCoursesSection({ navigateToPage }: { navigateToPage: (page: string) => void }) {
-  return (
-    <div className="bg-white p-6 rounded-lg shadow-md">
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-bold text-[#00246a]">Gestión de Cursos</h2>
-        <button
-          onClick={() => navigateToPage('courses')}
-          className="bg-[#00246a] text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
-        >
-          Ir a Cursos <ArrowRight className="w-4 h-4" />
-        </button>
-      </div>
-      <p className="text-gray-600">
-        Administra cursos y contenidos educativos.
-      </p>
-      <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="p-4 border border-gray-200 rounded-lg">
-          <div className="flex items-center gap-2 mb-2">
-            <CheckCircle className="w-5 h-5 text-green-600" />
-            <h3 className="font-semibold text-green-600">Crear Cursos</h3>
-          </div>
-          <p className="text-sm text-gray-600">Nuevos cursos con profesores y niveles</p>
-        </div>
-        <div className="p-4 border border-gray-200 rounded-lg">
-          <div className="flex items-center gap-2 mb-2">
-            <Trash2 className="w-5 h-5 text-red-600" />
-            <h3 className="font-semibold text-red-600">Eliminar Cursos</h3>
-          </div>
-          <p className="text-sm text-gray-600">Remover cursos obsoletos</p>
-        </div>
-      </div>
-    </div>
-  )
-}
+// function AdminCoursesSection({ navigateToPage }: { navigateToPage: (page: string) => void }) {
+//   return (
+//     <div className="bg-white p-6 rounded-lg shadow-md">
+//       <div className="flex justify-between items-center mb-4">
+//         <h2 className="text-xl font-bold text-[#00246a]">Gestión de Cursos</h2>
+//         <button
+//           onClick={() => navigateToPage('courses')}
+//           className="bg-[#00246a] text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
+//         >
+//           Ir a Cursos <ArrowRight className="w-4 h-4" />
+//         </button>
+//       </div>
+//       <p className="text-gray-600">
+//         Administra cursos y contenidos educativos.
+//       </p>
+//       <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+//         <div className="p-4 border border-gray-200 rounded-lg">
+//           <div className="flex items-center gap-2 mb-2">
+//             <CheckCircle className="w-5 h-5 text-green-600" />
+//             <h3 className="font-semibold text-green-600">Crear Cursos</h3>
+//           </div>
+//           <p className="text-sm text-gray-600">Nuevos cursos con profesores y niveles</p>
+//         </div>
+//         <div className="p-4 border border-gray-200 rounded-lg">
+//           <div className="flex items-center gap-2 mb-2">
+//             <Trash2 className="w-5 h-5 text-red-600" />
+//             <h3 className="font-semibold text-red-600">Eliminar Cursos</h3>
+//           </div>
+//           <p className="text-sm text-gray-600">Remover cursos obsoletos</p>
+//         </div>
+//       </div>
+//     </div>
+//   )
+// }
 
-function AdminExamsSection({ navigateToPage }: { navigateToPage: (page: string) => void }) {
-  return (
-    <div className="bg-white p-6 rounded-lg shadow-md">
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-bold text-[#00246a]">Gestión de Exámenes</h2>
-        <button
-          onClick={() => navigateToPage('exams')}
-          className="bg-[#00246a] text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
-        >
-          Ir a Exámenes <ArrowRight className="w-4 h-4" />
-        </button>
-      </div>
-      <p className="text-gray-600">
-        Crear y administrar exámenes y evaluaciones.
-      </p>
-      <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="p-4 border border-gray-200 rounded-lg">
-          <div className="flex items-center gap-2 mb-2">
-            <CheckCircle className="w-5 h-5 text-green-600" />
-            <h3 className="font-semibold text-green-600">Crear Exámenes</h3>
-          </div>
-          <p className="text-sm text-gray-600">Exámenes con preguntas múltiples</p>
-        </div>
-        <div className="p-4 border border-gray-200 rounded-lg">
-          <div className="flex items-center gap-2 mb-2">
-            <Trash2 className="w-5 h-5 text-red-600" />
-            <h3 className="font-semibold text-red-600">Eliminar Evaluaciones</h3>
-          </div>
-          <p className="text-sm text-gray-600">Remover exámenes obsoletos</p>
-        </div>
-      </div>
-    </div>
-  )
-}
+// function AdminExamsSection({ navigateToPage }: { navigateToPage: (page: string) => void }) {
+//   return (
+//     <div className="bg-white p-6 rounded-lg shadow-md">
+//       <div className="flex justify-between items-center mb-4">
+//         <h2 className="text-xl font-bold text-[#00246a]">Gestión de Exámenes</h2>
+//         <button
+//           onClick={() => navigateToPage('exams')}
+//           className="bg-[#00246a] text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
+//         >
+//           Ir a Exámenes <ArrowRight className="w-4 h-4" />
+//         </button>
+//       </div>
+//       <p className="text-gray-600">
+//         Crear y administrar exámenes y evaluaciones.
+//       </p>
+//       <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+//         <div className="p-4 border border-gray-200 rounded-lg">
+//           <div className="flex items-center gap-2 mb-2">
+//             <CheckCircle className="w-5 h-5 text-green-600" />
+//             <h3 className="font-semibold text-green-600">Crear Exámenes</h3>
+//           </div>
+//           <p className="text-sm text-gray-600">Exámenes con preguntas múltiples</p>
+//         </div>
+//         <div className="p-4 border border-gray-200 rounded-lg">
+//           <div className="flex items-center gap-2 mb-2">
+//             <Trash2 className="w-5 h-5 text-red-600" />
+//             <h3 className="font-semibold text-red-600">Eliminar Evaluaciones</h3>
+//           </div>
+//           <p className="text-sm text-gray-600">Remover exámenes obsoletos</p>
+//         </div>
+//       </div>
+//     </div>
+//   )
+// }
 
-function AdminPaymentsSection({ navigateToPage }: { navigateToPage: (page: string) => void }) {
-  return (
-    <div className="bg-white p-6 rounded-lg shadow-md">
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-bold text-[#00246a]">Gestión de Pagos</h2>
-        <button
-          onClick={() => navigateToPage('payments')}
-          className="bg-[#00246a] text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
-        >
-          Ir a Pagos <ArrowRight className="w-4 h-4" />
-        </button>
-      </div>
-      <p className="text-gray-600">
-        Administra registros de pagos y transacciones.
-      </p>
-      <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="p-4 border border-gray-200 rounded-lg">
-          <div className="flex items-center gap-2 mb-2">
-            <CheckCircle className="w-5 h-5 text-green-600" />
-            <h3 className="font-semibold text-green-600">Registrar Pagos</h3>
-          </div>
-          <p className="text-sm text-gray-600">Nuevos registros de pago por curso</p>
-        </div>
-        <div className="p-4 border border-gray-200 rounded-lg">
-          <div className="flex items-center gap-2 mb-2">
-            <Trash2 className="w-5 h-5 text-red-600" />
-            <h3 className="font-semibold text-red-600">Eliminar Registros</h3>
-          </div>
-          <p className="text-sm text-gray-600">Remover registros erróneos</p>
-        </div>
-      </div>
-    </div>
-  )
-}
+// function AdminPaymentsSection({ navigateToPage }: { navigateToPage: (page: string) => void }) {
+//   return (
+//     <div className="bg-white p-6 rounded-lg shadow-md">
+//       <div className="flex justify-between items-center mb-4">
+//         <h2 className="text-xl font-bold text-[#00246a]">Gestión de Pagos</h2>
+//         <button
+//           onClick={() => navigateToPage('payments')}
+//           className="bg-[#00246a] text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
+//         >
+//           Ir a Pagos <ArrowRight className="w-4 h-4" />
+//         </button>
+//       </div>
+//       <p className="text-gray-600">
+//         Administra registros de pagos y transacciones.
+//       </p>
+//       <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+//         <div className="p-4 border border-gray-200 rounded-lg">
+//           <div className="flex items-center gap-2 mb-2">
+//             <CheckCircle className="w-5 h-5 text-green-600" />
+//             <h3 className="font-semibold text-green-600">Registrar Pagos</h3>
+//           </div>
+//           <p className="text-sm text-gray-600">Nuevos registros de pago por curso</p>
+//         </div>
+//         <div className="p-4 border border-gray-200 rounded-lg">
+//           <div className="flex items-center gap-2 mb-2">
+//             <Trash2 className="w-5 h-5 text-red-600" />
+//             <h3 className="font-semibold text-red-600">Eliminar Registros</h3>
+//           </div>
+//           <p className="text-sm text-gray-600">Remover registros erróneos</p>
+//         </div>
+//       </div>
+//     </div>
+//   )
+// }
 
 function AdminSystemSection({ navigateToPage }: { navigateToPage: (page: string) => void }) {
   return (

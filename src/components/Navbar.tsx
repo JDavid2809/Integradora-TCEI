@@ -7,6 +7,8 @@ import Image from "next/image"
 import { useRouter } from "next/navigation"
 import { useSession, signOut } from 'next-auth/react'
 import type { Session } from 'next-auth'
+import { useSearch } from '../contexts/SearchContext'
+import SearchResults from './SearchResults'
 
 const navigationItems = [
     { name: "Inicio", icon: <House className="ml-2"/>, href:"/" },
@@ -17,16 +19,18 @@ const navigationItems = [
 
 const studentOptions = [
     { name: "Inscribirse ahora", href: "/inscribirse" },
-    { name: "Iniciar sesión", href: "/Login" },
-    { name: "Registrarse", href: "/Login" }
 ]
 
 const platformOptions = [
+    { name: "Iniciar sesión", href: "/Login" },
+    { name: "Registrarse", href: "/Login" },
+]
+
+const accountOptions = [
     { name: "Mi perfil", href: "/perfil" },
     { name: "Mis cursos", href: "/mis-cursos" },
     { name: "Progreso", href: "/progreso" },
     { name: "Certificados", href: "/certificados" },
-    { name: "Configuración", href: "/configuracion" }
 ]
 
 function DropdownMenu({ label, options }: { label: string; options: { name: string; href: string }[] }) {
@@ -154,37 +158,42 @@ function UserMenu({ user }: { user: NonNullable<Session['user']> }) {
                         
                         <motion.button
                             onClick={handleDashboard}
-                            className="w-full flex items-center space-x-3 px-4 py-3 text-left hover:bg-slate-50 rounded-lg transition-colors duration-200"
+                            className="w-full flex items-center space-x-3 px-4 py-3 text-left hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-colors duration-200 group"
                             whileHover={{ scale: 1.02 }}
                             whileTap={{ scale: 0.98 }}
                         >
-                            <House className="w-4 h-4 text-slate-600" />
-                            <span className="text-slate-700">Mi Dashboard</span>
+                            <House className="w-4 h-4 text-slate-600 group-hover:text-blue-600 transition-colors duration-200" />
+                            <span className="text-slate-700 group-hover:text-blue-600 transition-colors duration-200">Mi Dashboard</span>
                         </motion.button>
 
                         <motion.button
                             onClick={handleLogout}
-                            className="w-full flex items-center space-x-3 px-4 py-3 text-left hover:bg-red-50 hover:text-red-600 rounded-lg transition-colors duration-200"
+                            className="w-full flex items-center space-x-3 px-4 py-3 text-left hover:bg-red-50 hover:text-red-600 rounded-lg transition-colors duration-200 group"
                             whileHover={{ scale: 1.02 }}
                             whileTap={{ scale: 0.98 }}
                         >
-                            <LogOut className="w-4 h-4" />
-                            <span>Cerrar Sesión</span>
+                            <LogOut className="w-4 h-4 text-slate-700 group-hover:text-red-600 transition-colors duration-200" />
+                            <span className="text-slate-700 group-hover:text-red-600 transition-colors duration-200">Cerrar Sesión</span>
                         </motion.button>
                     </motion.div>
                 )}
             </AnimatePresence>
-        </div>
+        </div>  
+
     )
 }
 
 function AccountDropdown() {
     const [isHovered, setIsHovered] = useState(false)
     const router = useRouter()
+    const { data: session } = useSession()
 
     const handleNavigation = (href: string) => {
         router.push(href)
     }
+
+    // Determinar qué opciones mostrar según el estado de la sesión
+    const menuOptions = session?.user ? accountOptions : platformOptions
 
     return (
         <div
@@ -211,7 +220,7 @@ function AccountDropdown() {
                         exit={{ opacity: 0, y: -10, scale: 0.95 }}
                         className="absolute top-full right-0 mt-2 w-48 bg-white rounded-xl shadow-xl p-2 z-50"
                     >
-                        {platformOptions.map((option, i) => (
+                        {menuOptions.map((option, i) => (
                             <motion.div 
                                 key={option.name} 
                                 initial={{ opacity: 0, x: 10 }}
@@ -236,7 +245,10 @@ export default function NavBar() {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
     const [isVisible, setIsVisible] = useState(true)
     const [lastScrollY, setLastScrollY] = useState(0)
+    const [isSearchOpen, setIsSearchOpen] = useState(false)
+    const [showSearchResults, setShowSearchResults] = useState(false)
     const { data: session, status } = useSession()
+    const { searchQuery, setSearchQuery, performSearch, clearSearch, currentPage } = useSearch()
     const router = useRouter()
 
     const handleNavigation = (href: string) => {
@@ -250,6 +262,24 @@ export default function NavBar() {
         })
         router.push('/')
         setIsMobileMenuOpen(false)
+    }
+
+    const handleSearch = (e: React.FormEvent) => {
+        e.preventDefault()
+        if (searchQuery.trim()) {
+            performSearch(searchQuery)
+            setIsSearchOpen(false)
+            // Mostrar resultados globales solo si NO estamos en la página de cursos
+            if (!currentPage.includes('/Courses')) {
+                setShowSearchResults(true)
+            }
+        }
+    }
+
+    const handleClearSearch = () => {
+        clearSearch()
+        setIsSearchOpen(false)
+        setShowSearchResults(false)
     }
 
     useEffect(() => {
@@ -278,6 +308,7 @@ export default function NavBar() {
     }, [lastScrollY, isMobileMenuOpen])
 
     return (
+        <>
         <motion.header
             className="w-full px-4 pt-0 pb-0 fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md"
             initial={{ y: 0 }}
@@ -314,14 +345,48 @@ export default function NavBar() {
                             ))}
                         </div>
 
-                        <div className="hidden lg:flex items-center space-x-4">
-                            <motion.button
-                                className="text-[#00246a] hover:bg-[#e30f28] hover:text-white rounded-full p-2"
-                                whileHover={{ scale: 1.1 }}
-                                whileTap={{ scale: 0.9 }}
-                            >
-                                <Search className="h-5 w-5" />
-                            </motion.button>
+                        <div className="hidden lg:flex items-center space-x-4 relative">
+                            {/* Barra de búsqueda expandible */}
+                            <div className="relative">
+                                <AnimatePresence>
+                                    {isSearchOpen && (
+                                        <motion.div
+                                            initial={{ width: 0, opacity: 0 }}
+                                            animate={{ width: "300px", opacity: 1 }}
+                                            exit={{ width: 0, opacity: 0 }}
+                                            transition={{ duration: 0.3, ease: "easeInOut" }}
+                                            className="absolute right-12 top-1/2 transform -translate-y-1/2 z-50"
+                                        >
+                                            <form onSubmit={handleSearch} className="relative">
+                                                <input
+                                                    type="text"
+                                                    value={searchQuery}
+                                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                                    placeholder="Buscar cursos, recursos..."
+                                                    autoFocus
+                                                    className="w-full px-4 py-2 pr-10 text-slate-500 bg-white border-2 border-[#e30f28] rounded-full shadow-lg focus:outline-none focus:border-[#00246a] transition-colors duration-200"
+                                                />
+                                                <button
+                                                    type="button"
+                                                    onClick={handleClearSearch}
+                                                    className="absolute right-2 top-1/2 transform -translate-y-1/2 p-1 hover:bg-gray-100 rounded-full transition-colors duration-200"
+                                                >
+                                                    <X className="w-4 h-4 text-gray-500" />
+                                                </button>
+                                            </form>
+                                        </motion.div>
+                                    )}
+                                </AnimatePresence>
+                                
+                                <motion.button
+                                    onClick={() => setIsSearchOpen(!isSearchOpen)}
+                                    className={`${isSearchOpen ? 'bg-[#e30f28] text-white' : 'text-[#00246a] hover:bg-[#e30f28] hover:text-white'} rounded-full p-2 transition-all duration-200`}
+                                    whileHover={{ scale: 1.1 }}
+                                    whileTap={{ scale: 0.9 }}
+                                >
+                                    <Search className="h-5 w-5" />
+                                </motion.button>
+                            </div>
 
                             {status === "loading" ? (
                                 <div className="w-8 h-8 bg-slate-200 rounded-full animate-pulse"></div>
@@ -506,5 +571,12 @@ export default function NavBar() {
                 )}
             </AnimatePresence>
         </motion.header>
+        
+        {/* Componente de resultados de búsqueda global */}
+        <SearchResults 
+            isOpen={showSearchResults} 
+            onClose={() => setShowSearchResults(false)} 
+        />
+        </>
     )
 }

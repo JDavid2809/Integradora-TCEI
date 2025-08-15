@@ -86,7 +86,8 @@ async function main(){
     console.log('✅ Seed completed successfully');
     console.log('📧 Users created/updated:');
     console.log('  - Teacher: mario@gmail.com (password: 12345)');
-    console.log('  - Student: estudiante@test.com (password: 12345)');
+    console.log('  - Student: estudiante@test.com (password: 12345)'); 
+    
     console.log('  - Admin: admin@admin.com (password: 12345)');
     
     } catch (error) {

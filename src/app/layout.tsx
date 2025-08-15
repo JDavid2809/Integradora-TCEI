@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import NavBar from "../components/Navbar";
 import Providers from "../components/Providers";
+import { SearchProvider } from "../contexts/SearchContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -44,10 +45,12 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} font-sans antialiased bg-white text-[#00246a]`}
       >
         <Providers>
-          <NavBar /><br />
-          <main className="pt-[80px] pb-16 px-4 min-h-screen bg-white">
-            {children}
-          </main>
+          <SearchProvider>
+            <NavBar /><br />
+            <main className="pt-[80px] pb-16 px-4 min-h-screen bg-white">
+              {children}
+            </main>
+          </SearchProvider>
         </Providers>
       </body>
     </html>

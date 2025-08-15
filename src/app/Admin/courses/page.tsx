@@ -41,7 +41,7 @@ export default function AdminCoursesPage() {
   const [levels, setLevels] = useState<Level[]>([])
   const [loading, setLoading] = useState(true)
   const [showCreateForm, setShowCreateForm] = useState(false)
-  const [editingCourse, setEditingCourse] = useState<Course | null>(null)
+  const [, setEditingCourse] = useState<Course | null>(null)
 
   const [formData, setFormData] = useState<CourseFormData>({
     nombre: '',

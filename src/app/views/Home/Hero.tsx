@@ -1,11 +1,65 @@
 "use client"
 
 import { motion } from "framer-motion"
-import { Play, Zap, Brain, Globe, ArrowRight } from "lucide-react"
+import { Play, Zap, Brain, Globe, ArrowRight, SearchCheck } from "lucide-react"
+import { usePageSearch } from "../../../hooks/usePageSearch"
+import { useState, useEffect } from "react"
 
 export default function Hero() {
+    const { searchQuery, highlightText, hasActiveSearch } = usePageSearch(
+        [
+            'domina inglés',
+            'inteligencia artificial',
+            'aprendizaje',
+            'cursos',
+            'lecciones',
+            'pronunciación',
+            'gramática',
+            'conversación',
+            'vocabulario'
+        ],
+        'Home'
+    )
+    
+    const [showSearchIndicator, setShowSearchIndicator] = useState(false)
+
+    useEffect(() => {
+        if (hasActiveSearch) {
+            setShowSearchIndicator(true)
+            // Ocultar después de 3 segundos
+            const timer = setTimeout(() => {
+                setShowSearchIndicator(false)
+            }, 3000)
+            
+            return () => clearTimeout(timer)
+        } else {
+            setShowSearchIndicator(false)
+        }
+    }, [hasActiveSearch, searchQuery])
     return (
         <section className="min-h-screen flex items-center justify-center relative overflow-hidden">
+            {/* Indicador de búsqueda activa */}
+            {showSearchIndicator && (
+                <motion.div
+                    initial={{ opacity: 0, y: -50, scale: 0.8 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: -50, scale: 0.8 }}
+                    className="absolute top-8 left-1/2 transform -translate-x-1/2 z-20 bg-white border-2 border-[#00246a] text-[#00246a] px-6 py-3 rounded-full font-semibold shadow-2xl"
+                    style={{
+                        background: 'linear-gradient(135deg, #ffffff 0%, #f8faff 100%)',
+                        boxShadow: '0 10px 30px rgba(0, 36, 106, 0.2), 0 4px 15px rgba(227, 15, 40, 0.1)'
+                    }}
+                >
+                    <span className="flex items-center gap-2">
+                        <SearchCheck className="text-[#e30f28]" />
+                        <span className="text-[#00246a]">Resaltando:</span>
+                        <span className="text-black font-bold">
+                            &ldquo;{searchQuery}&rdquo;
+                        </span>
+                    </span>
+                </motion.div>
+            )}
+            
             {/* Fondo con formas geométricas animadas */}
             <div className="absolute inset-0 bg-gradient-to-br from-slate-50 via-blue-50/30 to-red-50/20">
                 <motion.div
@@ -87,10 +141,10 @@ export default function Hero() {
                             className="text-6xl lg:text-8xl font-black leading-none tracking-tighter"
                         >
                             <span className="block" style={{ color: "#00246a" }}>
-                                DOMINA
+                                {highlightText('DOMINA', searchQuery)}
                             </span>
                             <span className="block bg-gradient-to-r from-red-500 to-blue-900 bg-clip-text text-transparent">
-                                INGLÉS
+                                {highlightText('INGLÉS', searchQuery)}
                             </span>
                         </motion.h1>
 
@@ -101,8 +155,12 @@ export default function Hero() {
                             className="text-2xl font-light text-gray-600 leading-relaxed max-w-2xl"
                         >
                             La primera plataforma que usa{" "}
-                            <span className="font-bold text-red-500">inteligencia artificial cuántica</span> para acelerar tu
-                            aprendizaje 10x más rápido.
+                            <span className="font-bold text-red-500">
+                                {highlightText('inteligencia artificial cuántica', searchQuery)}
+                            </span> para acelerar tu{" "}
+                            <span className="font-bold text-blue-900">
+                                {highlightText('aprendizaje', searchQuery)}
+                            </span> 10x más rápido.
                         </motion.p>
                     </div>
 
@@ -217,13 +275,21 @@ export default function Hero() {
                             {/* Contenido de la lección */}
                             <div className="space-y-6">
                                 <div className="text-center">
-                                    <h3 className="text-2xl font-bold text-gray-800 mb-2">Lección Adaptativa</h3>
-                                    <p className="text-gray-600">Tus mentores analizan tu progreso en tiempo real</p>
+                                    <h3 className="text-2xl font-bold text-gray-800 mb-2">
+                                        {highlightText('Lección Adaptativa', searchQuery)}
+                                    </h3>
+                                    <p className="text-gray-600">
+                                        {highlightText('Tus mentores analizan tu progreso en tiempo real', searchQuery)}
+                                    </p>
                                 </div>
 
                                 <div className="bg-gray-50/80 rounded-2xl p-6 border border-gray-200/50">
-                                    <p className="text-gray-700 mb-4 font-medium">{"Complete with the correct form:"}</p>
-                                    <p className="text-2xl font-bold text-gray-800">{"I _____ studying English for 3 years."}</p>
+                                    <p className="text-gray-700 mb-4 font-medium">
+                                        {highlightText("Complete with the correct form:", searchQuery)}
+                                    </p>
+                                    <p className="text-2xl font-bold text-gray-800">
+                                        {highlightText("I _____ studying English for 3 years.", searchQuery)}
+                                    </p>
                                 </div>
 
                                 <div className="grid grid-cols-2 gap-4">

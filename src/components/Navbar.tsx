@@ -26,12 +26,38 @@ const platformOptions = [
     { name: "Registrarse", href: "/Login" },
 ]
 
-const accountOptions = [
-    { name: "Mi perfil", href: "/perfil" },
-    { name: "Mis cursos", href: "/mis-cursos" },
-    { name: "Progreso", href: "/progreso" },
-    { name: "Certificados", href: "/certificados" },
-]
+// Dynamic account options based on user role
+const getAccountOptions = (userRole?: string) => {
+    const baseOptions = [
+        { name: "Mis cursos", href: "/mis-cursos" },
+        { name: "Progreso", href: "/progreso" },
+        { name: "Certificados", href: "/certificados" },
+    ]
+
+    // Add role-specific profile option
+    if (userRole === 'ESTUDIANTE') {
+        return [
+            { name: "Mi perfil", href: "/Students/profileS" },
+            ...baseOptions
+        ]
+    } else if (userRole === 'PROFESOR') {
+        return [
+            { name: "Mi perfil", href: "/Teachers/profileT" },
+            ...baseOptions
+        ]
+    } else if (userRole === 'ADMIN') {
+        return [
+            { name: "Mi perfil", href: "/Admin/profile" },
+            ...baseOptions
+        ]
+    }
+
+    // Default options for users without specific roles
+    return [
+        { name: "Mi perfil", href: "/perfil" },
+        ...baseOptions
+    ]
+}
 
 function DropdownMenu({ label, options }: { label: string; options: { name: string; href: string }[] }) {
     const [isHovered, setIsHovered] = useState(false)
@@ -114,6 +140,22 @@ function UserMenu({ user }: { user: NonNullable<Session['user']> }) {
         }
     }
 
+    const handleProfile = () => {
+        switch (user.rol) {
+            case 'PROFESOR':
+                router.push('/Teachers/profileT')
+                break
+            case 'ESTUDIANTE':
+                router.push('/Students/profileS')
+                break
+            case 'ADMIN':
+                router.push('/Admin/profile')
+                break
+            default:
+                router.push('/perfil')
+        }
+    }
+
     const userInitials = `${user.name?.charAt(0) || ''}${user.apellido?.charAt(0) || ''}`.toUpperCase()
     const userColor = user.rol === 'PROFESOR' ? 'from-blue-500 to-blue-700' : 
                      user.rol === 'ESTUDIANTE' ? 'from-green-500 to-green-700' : 
@@ -167,6 +209,16 @@ function UserMenu({ user }: { user: NonNullable<Session['user']> }) {
                         </motion.button>
 
                         <motion.button
+                            onClick={handleProfile}
+                            className="w-full flex items-center space-x-3 px-4 py-3 text-left hover:bg-green-50 hover:text-green-600 rounded-lg transition-colors duration-200 group"
+                            whileHover={{ scale: 1.02 }}
+                            whileTap={{ scale: 0.98 }}
+                        >
+                            <User className="w-4 h-4 text-slate-600 group-hover:text-green-600 transition-colors duration-200" />
+                            <span className="text-slate-700 group-hover:text-green-600 transition-colors duration-200">Mi Perfil</span>
+                        </motion.button>
+
+                        <motion.button
                             onClick={handleLogout}
                             className="w-full flex items-center space-x-3 px-4 py-3 text-left hover:bg-red-50 hover:text-red-600 rounded-lg transition-colors duration-200 group"
                             whileHover={{ scale: 1.02 }}
@@ -193,7 +245,7 @@ function AccountDropdown() {
     }
 
     // Determinar qué opciones mostrar según el estado de la sesión
-    const menuOptions = session?.user ? accountOptions : platformOptions
+    const menuOptions = session?.user ? getAccountOptions(session.user.rol) : platformOptions
 
     return (
         <div
@@ -220,7 +272,7 @@ function AccountDropdown() {
                         exit={{ opacity: 0, y: -10, scale: 0.95 }}
                         className="absolute top-full right-0 mt-2 w-48 bg-white rounded-xl shadow-xl p-2 z-50"
                     >
-                        {menuOptions.map((option, i) => (
+                        {menuOptions.map((option: { name: string; href: string }, i: number) => (
                             <motion.div 
                                 key={option.name} 
                                 initial={{ opacity: 0, x: 10 }}
@@ -506,6 +558,31 @@ export default function NavBar() {
                                             >
                                                 <House className="h-5 w-5 text-blue-600" />
                                                 <span className="text-blue-600 font-medium">Mi Dashboard</span>
+                                            </motion.button>
+
+                                            <motion.button
+                                                onClick={() => {
+                                                    switch (session.user.rol) {
+                                                        case 'PROFESOR':
+                                                            handleNavigation('/Teachers/profileT')
+                                                            break
+                                                        case 'ESTUDIANTE':
+                                                            handleNavigation('/Students/profileS')
+                                                            break
+                                                        case 'ADMIN':
+                                                            handleNavigation('/Admin/profile')
+                                                            break
+                                                        default:
+                                                            handleNavigation('/perfil')
+                                                    }
+                                                    setIsMobileMenuOpen(false)
+                                                }}
+                                                className="w-full flex items-center space-x-3 p-3 bg-green-50 hover:bg-green-100 rounded-lg transition-colors duration-200"
+                                                whileHover={{ scale: 1.02 }}
+                                                whileTap={{ scale: 0.98 }}
+                                            >
+                                                <User className="h-5 w-5 text-green-600" />
+                                                <span className="text-green-600 font-medium">Mi Perfil</span>
                                             </motion.button>
 
                                             <motion.button

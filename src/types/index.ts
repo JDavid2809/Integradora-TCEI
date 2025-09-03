@@ -11,6 +11,7 @@ declare module "next-auth" {
       email?: string | null;
       image?: string | null;
       rol: "ADMIN" | "PROFESOR" | "ESTUDIANTE";
+      verificado?: boolean;
     };
   }
 
@@ -29,3 +30,47 @@ declare module "next-auth/jwt" {
   }
 }
 console.log(NextAuth);
+
+
+export interface FormValues {
+  nombre: string;
+  apellidoPaterno: string;
+  apellidoMaterno?: string;
+  email: string;
+  telefono?: string;
+  password: string;
+  confirmPassword: string;
+  terms? : boolean;
+}
+
+
+//user profile studen
+export interface dataProfileStudent {
+  
+        email: string;
+        nombre: string;
+        id_estudiante: number;
+        paterno: string;
+        materno: string;
+        telefono: string;
+        edad: number;
+        descripcion?: string;
+    }
+
+export interface UserStudent {
+  id: number;
+  email: string;
+  nombre: string;
+  apellido: string;
+  estudiante?: {
+      id_estudiante: number;
+      nombre: string;
+      paterno: string ;
+      materno: string ;
+        email: string;
+        telefono: string ;
+        edad: number;
+        descripcion?: string ;
+       
+    } 
+  }

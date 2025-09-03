@@ -220,7 +220,7 @@ export default function AdminUserCrud() {
         setErrors({ general: data.error || 'Error al guardar usuario' })
       }
     } catch (error) {
-      setErrors({ general: 'Error de conexión' })
+      setErrors({ general: 'Error de conexión' + error  })
     } finally {
       setIsSubmitting(false)
     }
@@ -243,7 +243,7 @@ export default function AdminUserCrud() {
         alert(data.error || 'Error al eliminar usuario')
       }
     } catch (error) {
-      alert('Error de conexión')
+      alert('Error de conexión' + error)
     }
   }
 

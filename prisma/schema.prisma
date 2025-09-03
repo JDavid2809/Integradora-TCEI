@@ -15,6 +15,7 @@ model estudiante {
   email                   String                    @unique @db.VarChar(100)
   telefono                String?                   @db.VarChar(20)
   edad                    Int
+  descripcion             String?                  @db.VarChar(255)
   id_categoria_edad       Int?
   b_activo                Boolean?                  @default(true)
   id_usuario              Int                       @unique
@@ -258,7 +259,15 @@ model usuario {
   administrador Administrador?
   estudiante    estudiante?
   profesor      profesor?
+  verificado    Boolean       @default(false)
+
+  tokenVerif String?  
+  expiraEn   DateTime? 
+
 }
+
+
+
 
 model curso {
   id_curso     Int            @id @default(autoincrement())

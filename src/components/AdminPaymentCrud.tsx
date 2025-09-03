@@ -250,7 +250,7 @@ export default function AdminPaymentCrud() {
         setErrors({ general: data.error || 'Error al guardar pago' })
       }
     } catch (error) {
-      setErrors({ general: 'Error de conexión' })
+      setErrors({ general: 'Error de conexión: ' + error })
     } finally {
       setIsSubmitting(false)
     }
@@ -273,7 +273,7 @@ export default function AdminPaymentCrud() {
         alert(data.error || 'Error al eliminar pago')
       }
     } catch (error) {
-      alert('Error de conexión')
+      alert('Error de conexión: ' + error)
     }
   }
 
@@ -313,7 +313,7 @@ export default function AdminPaymentCrud() {
         window.URL.revokeObjectURL(url)
       }
     } catch (error) {
-      alert('Error al exportar datos')
+      alert('Error al exportar datos: ' + error)
     }
   }
 

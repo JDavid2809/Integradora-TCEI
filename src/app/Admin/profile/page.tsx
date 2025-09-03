@@ -1,18 +1,13 @@
-"use client"
+"use client";
 
-import { useSession } from "next-auth/react"
-import { useRouter } from "next/navigation"
-import { useEffect, useState } from "react"
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import {
   MapPin,
-  //Star,
   Users,
   Award,
   Globe,
-  //MessageCircle,
-  //Calendar,
-  //BookOpen,
-  //CheckCircle,
   Edit3,
   Save,
   X,
@@ -21,12 +16,12 @@ import {
   Settings,
   Shield,
   BarChart3,
-} from "lucide-react"
+} from "lucide-react";
 
 export default function AdminProfile() {
-  const { data: session, status } = useSession()
-  const router = useRouter()
-  const [isEditing, setIsEditing] = useState(false)
+  const { data: session, status } = useSession();
+  const router = useRouter();
+  const [isEditing, setIsEditing] = useState(false);
   const [profileData, setProfileData] = useState({
     name: "",
     title: "Administrador del Sistema",
@@ -38,27 +33,28 @@ export default function AdminProfile() {
     users: "1,250 usuarios",
     experience: "3+ años",
     uptime: "99.9%",
-  })
+  });
 
   useEffect(() => {
-    if (status === "loading") return
+    if (status === "loading") return;
 
     if (!session?.user || session.user.rol !== "ADMIN") {
-      router.push("/Login")
+      router.push("/Login");
     } else {
       setProfileData((prev) => ({
         ...prev,
-        name: `${session.user.name} ${session.user.apellido}` || "Administrador",
-      }))
+        name:
+          `${session.user.name} ${session.user.apellido}` || "Administrador",
+      }));
     }
-  }, [session, status, router])
+  }, [session, status, router]);
 
   if (status === "loading") {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-lg text-gray-600">Cargando...</div>
       </div>
-    )
+    );
   }
 
   if (!session?.user || session.user.rol !== "ADMIN") {
@@ -66,23 +62,25 @@ export default function AdminProfile() {
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-lg text-gray-600">Redirigiendo...</div>
       </div>
-    )
+    );
   }
 
   const handleSave = () => {
-    setIsEditing(false)
-    console.log("Perfil actualizado:", profileData)
-  }
+    setIsEditing(false);
+    console.log("Perfil actualizado:", profileData);
+  };
 
   const handleCancel = () => {
-    setIsEditing(false)
-  }
+    setIsEditing(false);
+  };
 
   const updateField = (field: string, value: string) => {
-    setProfileData((prev) => ({ ...prev, [field]: value }))
-  }
+    setProfileData((prev) => ({ ...prev, [field]: value }));
+  };
 
-  const userInitials = `${session.user.name?.charAt(0) || ""}${session.user.apellido?.charAt(0) || ""}`.toUpperCase()
+  const userInitials = `${session.user.name?.charAt(0) || ""}${
+    session.user.apellido?.charAt(0) || ""
+  }`.toUpperCase();
 
   return (
     <div className="min-h-screen bg-gray-50 pt-20">
@@ -98,7 +96,9 @@ export default function AdminProfile() {
               {/* Avatar */}
               <div className="relative">
                 <div className="w-28 h-28 rounded-3xl bg-white/20 backdrop-blur-sm border border-white/30 flex items-center justify-center shadow-2xl">
-                  <span className="text-3xl font-bold text-white">{userInitials}</span>
+                  <span className="text-3xl font-bold text-white">
+                    {userInitials}
+                  </span>
                 </div>
                 <div className="absolute -bottom-2 -right-2 bg-purple-500 rounded-full p-2 shadow-lg">
                   <Shield className="h-4 w-4 text-white" />
@@ -124,12 +124,18 @@ export default function AdminProfile() {
                   </div>
                 ) : (
                   <div>
-                    <h1 className="text-3xl font-bold mb-3">{profileData.name}</h1>
-                    <p className="text-xl text-blue-100 mb-4">{profileData.title}</p>
+                    <h1 className="text-3xl font-bold mb-3">
+                      {profileData.name}
+                    </h1>
+                    <p className="text-xl text-blue-100 mb-4">
+                      {profileData.title}
+                    </p>
                     <div className="flex flex-wrap justify-center lg:justify-start gap-4 text-blue-100">
                       <div className="flex items-center gap-2 bg-white/20 rounded-full px-4 py-2">
                         <Users className="h-4 w-4" />
-                        <span className="font-semibold text-white">{profileData.users}</span>
+                        <span className="font-semibold text-white">
+                          {profileData.users}
+                        </span>
                       </div>
                       <div className="flex items-center gap-2 bg-white/20 rounded-full px-4 py-2">
                         <Shield className="h-4 w-4" />
@@ -197,13 +203,17 @@ export default function AdminProfile() {
                   className="w-full bg-gray-50 border border-gray-200 rounded-xl p-4 text-gray-900 focus:border-blue-500 focus:ring-4 focus:ring-blue-100 outline-none resize-none"
                 />
               ) : (
-                <p className="text-gray-700 leading-relaxed text-lg">{profileData.description}</p>
+                <p className="text-gray-700 leading-relaxed text-lg">
+                  {profileData.description}
+                </p>
               )}
             </div>
 
             {/* Admin Actions */}
             <div className="bg-white rounded-2xl p-8 shadow-lg border border-gray-100">
-              <h3 className="text-xl font-bold text-gray-900 mb-6">Panel de administración</h3>
+              <h3 className="text-xl font-bold text-gray-900 mb-6">
+                Panel de administración
+              </h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
                 <button className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-6 py-4 rounded-xl font-semibold transition-all duration-300 inline-flex items-center justify-center gap-3 shadow-lg hover:shadow-xl group">
                   <Settings className="h-5 w-5 group-hover:scale-110 transition-transform" />
@@ -219,7 +229,10 @@ export default function AdminProfile() {
                   <div className="p-2 bg-blue-200 rounded-lg">
                     <Info className="h-4 w-4" />
                   </div>
-                  <p className="font-medium">Sistema funcionando correctamente - Todos los servicios operativos</p>
+                  <p className="font-medium">
+                    Sistema funcionando correctamente - Todos los servicios
+                    operativos
+                  </p>
                 </div>
               </div>
             </div>
@@ -229,14 +242,18 @@ export default function AdminProfile() {
           <div className="space-y-6">
             {/* Quick Stats */}
             <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100">
-              <h3 className="font-bold text-gray-900 mb-6 text-lg">Estadísticas del sistema</h3>
+              <h3 className="font-bold text-gray-900 mb-6 text-lg">
+                Estadísticas del sistema
+              </h3>
               <div className="space-y-4">
                 <div className="flex items-center justify-between p-4 bg-green-50 rounded-xl border border-green-200">
                   <div className="flex items-center gap-3">
                     <BarChart3 className="h-5 w-5 text-green-600" />
                     <span className="text-gray-700 font-medium">Uptime</span>
                   </div>
-                  <span className="font-bold text-gray-900 text-lg">{profileData.uptime}</span>
+                  <span className="font-bold text-gray-900 text-lg">
+                    {profileData.uptime}
+                  </span>
                 </div>
                 <div className="flex items-center justify-between p-4 bg-blue-50 rounded-xl border border-blue-200">
                   <div className="flex items-center gap-3">
@@ -248,21 +265,29 @@ export default function AdminProfile() {
                 <div className="flex items-center justify-between p-4 bg-purple-50 rounded-xl border border-purple-200">
                   <div className="flex items-center gap-3">
                     <Award className="h-5 w-5 text-purple-600" />
-                    <span className="text-gray-700 font-medium">Experiencia</span>
+                    <span className="text-gray-700 font-medium">
+                      Experiencia
+                    </span>
                   </div>
-                  <span className="font-bold text-gray-900 text-lg">3+ años</span>
+                  <span className="font-bold text-gray-900 text-lg">
+                    3+ años
+                  </span>
                 </div>
               </div>
             </div>
 
             {/* Info Cards */}
             <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100">
-              <h3 className="font-bold text-gray-900 mb-6 text-lg">Información personal</h3>
+              <h3 className="font-bold text-gray-900 mb-6 text-lg">
+                Información personal
+              </h3>
               <div className="space-y-4">
                 <div className="p-4 bg-gray-50 rounded-xl border border-gray-200">
                   <div className="flex items-center gap-3 mb-2">
                     <MapPin className="h-4 w-4 text-blue-600" />
-                    <span className="text-sm text-gray-600 font-medium">Ubicación</span>
+                    <span className="text-sm text-gray-600 font-medium">
+                      Ubicación
+                    </span>
                   </div>
                   {isEditing ? (
                     <input
@@ -272,33 +297,45 @@ export default function AdminProfile() {
                       className="text-gray-900 bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm focus:border-blue-500 outline-none w-full"
                     />
                   ) : (
-                    <p className="text-gray-900 font-semibold">{profileData.location}</p>
+                    <p className="text-gray-900 font-semibold">
+                      {profileData.location}
+                    </p>
                   )}
                 </div>
 
                 <div className="p-4 bg-gray-50 rounded-xl border border-gray-200">
                   <div className="flex items-center gap-3 mb-2">
                     <Globe className="h-4 w-4 text-blue-600" />
-                    <span className="text-sm text-gray-600 font-medium">Departamento</span>
+                    <span className="text-sm text-gray-600 font-medium">
+                      Departamento
+                    </span>
                   </div>
                   {isEditing ? (
                     <input
                       type="text"
                       value={profileData.department}
-                      onChange={(e) => updateField("department", e.target.value)}
+                      onChange={(e) =>
+                        updateField("department", e.target.value)
+                      }
                       className="text-gray-900 bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm focus:border-blue-500 outline-none w-full"
                     />
                   ) : (
-                    <p className="text-gray-900 font-semibold">{profileData.department}</p>
+                    <p className="text-gray-900 font-semibold">
+                      {profileData.department}
+                    </p>
                   )}
                 </div>
 
                 <div className="p-4 bg-gray-50 rounded-xl border border-gray-200">
                   <div className="flex items-center gap-3 mb-2">
                     <Mail className="h-4 w-4 text-blue-600" />
-                    <span className="text-sm text-gray-600 font-medium">Email</span>
+                    <span className="text-sm text-gray-600 font-medium">
+                      Email
+                    </span>
                   </div>
-                  <p className="text-gray-900 font-semibold">{session.user.email}</p>
+                  <p className="text-gray-900 font-semibold">
+                    {session.user.email}
+                  </p>
                 </div>
               </div>
             </div>
@@ -306,5 +343,5 @@ export default function AdminProfile() {
         </div>
       </div>
     </div>
-  )
+  );
 }

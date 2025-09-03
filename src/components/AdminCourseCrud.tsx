@@ -58,8 +58,8 @@ interface CourseFormData {
 
 export default function AdminCourseCrud() {
   const [courses, setCourses] = useState<Course[]>([])
-  const [levels, setLevels] = useState<Level[]>([])
-  const [teachers, setTeachers] = useState<Teacher[]>([])
+  const [, setLevels] = useState<Level[]>([])
+  const [, setTeachers] = useState<Teacher[]>([])
   const [loading, setLoading] = useState(true)
   const [showModal, setShowModal] = useState(false)
   const [editingCourse, setEditingCourse] = useState<Course | null>(null)
@@ -217,7 +217,7 @@ export default function AdminCourseCrud() {
         setErrors({ general: data.error || 'Error al guardar curso' })
       }
     } catch (error) {
-      setErrors({ general: 'Error de conexión' })
+      setErrors({ general: 'Error de conexión: ' + error })
     } finally {
       setIsSubmitting(false)
     }
@@ -240,7 +240,7 @@ export default function AdminCourseCrud() {
         alert(data.error || 'Error al eliminar curso')
       }
     } catch (error) {
-      alert('Error de conexión')
+      alert('Error de conexión: ' + error)
     }
   }
 
@@ -480,7 +480,7 @@ export default function AdminCourseCrud() {
 
       {/* Modal */}
       {showModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-black/45 bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-xl font-bold text-[#00246a]">

@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import Modal from "@/components/Modal"
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import {
@@ -14,15 +15,40 @@ import {
   BookOpen,
   //CheckCircle,
   Edit3,
-  Save,
-  X,
-  Info,
+    Info,
   Mail,
   GraduationCap,
   Target
 } from "lucide-react"
+import { dataProfileStudent } from "@/types"
+import { updateStudentProfile } from "@/actions/student/Perfil"
+import { useForm } from "react-hook-form"
+import Error from "@/components/ui/Error"
 
-export default function StudentProfile() {
+
+
+export default  function StudentProfile() {
+   const [studentData, setStudentData] = useState<dataProfileStudent>();
+   const { update } = useSession();
+   
+   const { register, handleSubmit, formState: { errors }, reset } = useForm<dataProfileStudent>({
+     
+    });
+
+useEffect(() => {
+  async function fetchStudent() {
+    const res = await fetch("/api/student");
+    if (res.ok) {
+      const data = await res.json();
+      setStudentData(data);
+      reset(data); // 🔹 actualiza el formulario con los datos del servidor
+    }
+  }
+  fetchStudent();
+}, [reset]);
+
+
+
   const { data: session, status } = useSession()
   const router = useRouter()
   const [isEditing, setIsEditing] = useState(false)
@@ -38,6 +64,12 @@ export default function StudentProfile() {
     rating: "8.5",
     progress: "75% completado",
   })
+  useEffect(() => {
+  if (isEditing && studentData) {
+    reset(studentData);
+  }
+}, [isEditing, studentData, reset]);
+    
 
   useEffect(() => {
     if (status === "loading") return
@@ -68,17 +100,41 @@ export default function StudentProfile() {
     )
   }
 
-  const handleSave = () => {
-    setIsEditing(false)
-    console.log("Perfil actualizado:", profileData)
-  }
+
+
+const handleSave = (formData: dataProfileStudent) => {
+  if (!studentData || !studentData.id_estudiante) return;
+
+  updateStudentProfile({
+    ...formData,              
+    id_estudiante: studentData.id_estudiante,
+        edad: Number(formData.edad) 
+  })
+  .then(updated => {
+    console.log("Estudiante actualizado:", updated);
+    setIsEditing(false);
+    setStudentData(updated as dataProfileStudent);
+     
+    
+   update({
+         nombre: updated.nombre,
+         apellido: updated.paterno,
+         email: updated.email
+       });
+      
+  })
+  .catch(err => console.error(err));
+
+};
+
+  
 
   const handleCancel = () => {
     setIsEditing(false)
   }
 
   const updateField = (field: string, value: string) => {
-    setProfileData((prev) => ({ ...prev, [field]: value }))
+     console.log(field, value);
   }
 
   const userInitials = `${session.user.name?.charAt(0) || ''}${session.user.apellido?.charAt(0) || ''}`.toUpperCase()
@@ -92,7 +148,6 @@ export default function StudentProfile() {
             {/* Decorative elements */}
             <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -translate-y-32 translate-x-32"></div>
             <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/5 rounded-full translate-y-24 -translate-x-24"></div>
-            
             <div className="relative flex flex-col lg:flex-row items-center gap-8">
               {/* Avatar */}
               <div className="relative">
@@ -103,80 +158,115 @@ export default function StudentProfile() {
                   <GraduationCap className="h-4 w-4 text-white" />
                 </div>
               </div>
-
               {/* Info */}
               <div className="flex-1 text-center lg:text-left text-white">
-                {isEditing ? (
-                  <div className="space-y-4">
-                    <input
-                      type="text"
-                      value={profileData.name}
-                      onChange={(e) => updateField("name", e.target.value)}
-                      className="text-3xl font-bold bg-white/20 backdrop-blur-sm border border-white/30 rounded-xl px-4 py-2 text-white placeholder-white/70 focus:bg-white/30 outline-none w-full"
-                    />
-                    <input
-                      type="text"
-                      value={profileData.title}
-                      onChange={(e) => updateField("title", e.target.value)}
-                      className="text-xl bg-white/20 backdrop-blur-sm border border-white/30 rounded-xl px-4 py-2 text-white placeholder-white/70 focus:bg-white/30 outline-none w-full"
-                    />
+                <h1 className="text-3xl font-bold mb-3">{` ${studentData?.nombre} ${studentData?.paterno} ${studentData?.materno}`}</h1>
+                <p className="text-xl text-blue-100 mb-4">{profileData.title}</p>
+                <div className="flex flex-wrap justify-center lg:justify-start gap-4 text-blue-100">
+                  <div className="flex items-center gap-2 bg-white/20 rounded-full px-4 py-2">
+                    <Star className="h-4 w-4 fill-yellow-300 text-yellow-300" />
+                    <span className="font-semibold text-white">{profileData.rating}</span>
+                    <span>promedio</span>
                   </div>
-                ) : (
-                  <div>
-                    <h1 className="text-3xl font-bold mb-3">{profileData.name}</h1>
-                    <p className="text-xl text-blue-100 mb-4">{profileData.title}</p>
-                    <div className="flex flex-wrap justify-center lg:justify-start gap-4 text-blue-100">
-                      <div className="flex items-center gap-2 bg-white/20 rounded-full px-4 py-2">
-                        <Star className="h-4 w-4 fill-yellow-300 text-yellow-300" />
-                        <span className="font-semibold text-white">{profileData.rating}</span>
-                        <span>promedio</span>
-                      </div>
-                      <div className="flex items-center gap-2 bg-white/20 rounded-full px-4 py-2">
-                        <BookOpen className="h-4 w-4" />
-                        <span>{profileData.courses}</span>
-                      </div>
-                      <div className="flex items-center gap-2 bg-white/20 rounded-full px-4 py-2">
-                        <Target className="h-4 w-4" />
-                        <span>{profileData.progress}</span>
-                      </div>
-                    </div>
+                  <div className="flex items-center gap-2 bg-white/20 rounded-full px-4 py-2">
+                    <BookOpen className="h-4 w-4" />
+                    <span>{profileData.courses}</span>
                   </div>
-                )}
+                  <div className="flex items-center gap-2 bg-white/20 rounded-full px-4 py-2">
+                    <Target className="h-4 w-4" />
+                    <span>{profileData.progress}</span>
+                  </div>
+                </div>
               </div>
-
               {/* Action Button */}
               <div>
-                {!isEditing ? (
-                  <button
-                    onClick={() => setIsEditing(true)}
-                    className="bg-white/20 hover:bg-white/30 backdrop-blur-sm border border-white/30 text-white px-6 py-3 rounded-2xl font-semibold transition-all duration-300 inline-flex items-center gap-3 shadow-lg hover:shadow-xl"
-                  >
-                    <Edit3 className="h-5 w-5" />
-                    Editar Perfil
-                  </button>
-                ) : (
-                  <div className="flex gap-3">
-                    <button
-                      onClick={handleSave}
-                      className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-2xl font-semibold transition-all duration-300 inline-flex items-center gap-2 shadow-lg"
-                    >
-                      <Save className="h-4 w-4" />
-                      Guardar
-                    </button>
-                    <button
-                      onClick={handleCancel}
-                      className="bg-red-500 hover:bg-red-600 text-white px-6 py-3 rounded-2xl font-semibold transition-all duration-300 inline-flex items-center gap-2 shadow-lg"
-                    >
-                      <X className="h-4 w-4" />
-                      Cancelar
-                    </button>
-                  </div>
-                )}
+                <button
+                  onClick={() => setIsEditing(true)}
+                  className="bg-white/20 hover:bg-white/30 backdrop-blur-sm border border-white/30 text-white px-6 py-3 rounded-2xl font-semibold transition-all duration-300 inline-flex items-center gap-3 shadow-lg hover:shadow-xl"
+                >
+                  <Edit3 className="h-5 w-5" />
+                  Editar Perfil
+                </button>
               </div>
             </div>
           </div>
         </div>
 
+        {/* Modal de edición */}
+        <Modal open={isEditing} onClose={handleCancel}>
+          <h2 className="text-2xl font-bold mb-4">Editar datos del alumno</h2>
+          {studentData &&  (
+            <form
+              onSubmit={handleSubmit(handleSave)}
+              className="space-y-4 overflow-y-auto max-h-[70vh] pr-2"
+            >
+              <input
+                type="text"
+                className="w-full border rounded-lg px-3 py-2"
+                placeholder="Nombre completo"
+                {...register("nombre", { required: "El nombre es obligatorio" })}
+              />
+              {errors.nombre && (<Error>{errors.nombre.message}</Error>)}
+             <div className="flex justify-between gap-3">
+               <input
+                type="text"
+                className="w-full border rounded-lg px-3 py-2"
+                placeholder="Apellido Paterno"
+                {...register("paterno", { required: "El apellido paterno es obligatorio" })}
+              />
+             
+              <input
+                type="text"
+                {...register("materno", { required: "El apellido materno es obligatorio" })}
+                className="w-full border rounded-lg px-3 py-2"
+                placeholder="Apellido Materno"
+              />
+               
+             </div>
+             {errors.materno && (<Error>{errors.materno.message}</Error>)}
+              {errors.paterno && (<Error>{errors.paterno.message}</Error>)}
+              <input
+                type="number"
+                {...register("edad", { required: "La edad es obligatoria" })}
+                className="w-full border rounded-lg px-3 py-2"
+                placeholder="Edad"
+              />
+              {errors.edad && (<Error>{errors.edad.message}</Error>)}
+              <input
+                type="email"
+                className="w-full border rounded-lg px-3 py-2"
+                placeholder="Email"
+                {...register("email", { required: "El email es obligatorio" })}
+              />
+              {errors.email && (<Error>{errors.email.message}</Error>)}
+              <textarea
+                {...register("descripcion", { required: "La descripción es obligatoria" })}
+                rows={2}
+                placeholder="Descripción"
+                className="w-full bg-gray-50 border border-gray-200 rounded-xl p-4 text-gray-900 focus:border-blue-500 focus:ring-4 focus:ring-blue-100 outline-none resize-none"
+
+              />
+              {errors.descripcion && (<Error>{errors.descripcion.message}</Error>)}
+              <div className="flex gap-3 justify-end">
+                <button
+                  type="button"
+                  onClick={handleCancel}
+                  className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg"
+                >
+                  Cancelar
+                </button>
+                <button
+                
+                  type="submit"
+                  className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg"
+                >
+                  Guardar
+                </button>
+              </div>
+            </form>
+          )}
+          
+        </Modal>
         {/* Content Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Main Content */}
@@ -189,16 +279,14 @@ export default function StudentProfile() {
                 </div>
                 Sobre mí
               </h2>
-              {isEditing ? (
+              
                 <textarea
-                  value={profileData.description}
-                  onChange={(e) => updateField("description", e.target.value)}
+                  value={studentData?.descripcion}
                   rows={5}
+                  placeholder="Hola 😉, por favor selecciona editar  perfil y escribe sobre ti en la descripción"
                   className="w-full bg-gray-50 border border-gray-200 rounded-xl p-4 text-gray-900 focus:border-blue-500 focus:ring-4 focus:ring-blue-100 outline-none resize-none"
                 />
-              ) : (
-                <p className="text-gray-700 leading-relaxed text-lg">{profileData.description}</p>
-              )}
+              
             </div>
 
             {/* Learning Section */}
@@ -254,6 +342,7 @@ export default function StudentProfile() {
                 </div>
               </div>
             </div>
+            
 
             {/* Info Cards */}
             <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100">

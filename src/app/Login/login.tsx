@@ -10,6 +10,7 @@ import { signIn } from "next-auth/react"
 
 import { getRedirectPath } from "@/actions/auth/redirectLogin"
 import Loader from "@/components/Loader"
+import Link from "next/link"
 interface LoginFormProps {
     toggleMode: () => void
 }
@@ -41,19 +42,19 @@ export default  function LoginForm({ toggleMode }: LoginFormProps) {
         email,
         password,
       });
+      
 
       if (res?.error) {
-        console.log('❌ Login failed:', res.error);
-        setError("Correo o contraseña incorrectos");
+         const cleanError = res.error.replace(/^Error:\s*/, "");
+
+        setError(cleanError);
         setLoading(false);
       } else if (res?.ok) {
         console.log('✅ Login successful, getting redirect path...');
-        
-        // Obtener la ruta de redirección basada en el rol
+
         const path = await getRedirectPath();
         console.log('🔄 Redirecting to:', path);
-        
-        // Usar replace en lugar de push para evitar que puedan volver atrás
+
         router.replace(path);
       } else {
         console.log('⚠️ Unexpected login response:', res);
@@ -124,7 +125,8 @@ export default  function LoginForm({ toggleMode }: LoginFormProps) {
                             variants={itemVariants}
                             className="bg-red-100 text-red-800 p-4 rounded-lg mb-6 text-center"
                         >
-                            {error}
+                            {error
+                            }
                         </motion.div>
                     )
                    }
@@ -179,9 +181,9 @@ export default  function LoginForm({ toggleMode }: LoginFormProps) {
                             <input type="checkbox" className="w-4 h-4 rounded border-slate-300 text-[#e30f28] focus:ring-[#e30f28]/20" />
                             <span className="text-slate-600">Recordarme</span>
                         </label>
-                        <a href="#" className="text-[#e30f28] hover:text-[#e30f28]/80 transition-colors">
+                        <Link href="/Login/olvide-password" className="text-[#e30f28] hover:text-[#e30f28]/80 transition-colors">
                             ¿Olvidaste tu contraseña?
-                        </a>
+                        </Link>
                     </motion.div>
 
                     <motion.button
@@ -248,6 +250,20 @@ export default  function LoginForm({ toggleMode }: LoginFormProps) {
                             Regístrate aquí
                         </button>
                     </p>
+
+                         
+                           
+                    <p className="  ">
+                        o
+                    </p>
+                    
+                    
+                    <Link
+                     href="/Login/solicitar-token"
+                    className="text-slate-600">
+                   
+                   <span className="text-[#e30f28] hover:text-[#e30f28]/80 transition-colors font-medium hover:underline">solicita un nuevo token</span>
+                    </Link>
                 </motion.div>
             </div>
         </motion.div>

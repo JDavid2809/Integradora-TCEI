@@ -243,7 +243,7 @@ export default function AdminExamCrud() {
         setErrors({ general: data.error || 'Error al guardar examen' })
       }
     } catch (error) {
-      setErrors({ general: 'Error de conexión' })
+      setErrors({ general: 'Error de conexión: ' + error })
     } finally {
       setIsSubmitting(false)
     }
@@ -282,7 +282,7 @@ export default function AdminExamCrud() {
         setErrors({ general: data.error || 'Error al agregar pregunta' })
       }
     } catch (error) {
-      setErrors({ general: 'Error de conexión' })
+      setErrors({ general: 'Error de conexión: ' + error })
     } finally {
       setIsSubmitting(false)
     }
@@ -305,7 +305,7 @@ export default function AdminExamCrud() {
         alert(data.error || 'Error al eliminar examen')
       }
     } catch (error) {
-      alert('Error de conexión')
+      alert('Error de conexión: ' + error)
     }
   }
 
@@ -325,7 +325,7 @@ export default function AdminExamCrud() {
         alert('Error al eliminar pregunta')
       }
     } catch (error) {
-      alert('Error de conexión')
+      alert('Error de conexión: ' + error)
     }
   }
 
@@ -771,7 +771,7 @@ export default function AdminExamCrud() {
                       <p className="text-gray-700 mb-3">{question.descripcion}</p>
                       
                       <div className="space-y-1">
-                        {question.respuesta.map((answer, answerIndex) => (
+                        {question.respuesta.map((answer) => (
                           <div key={answer.id_respuesta} className={`flex items-center gap-2 p-2 rounded ${
                             answer.es_correcta ? 'bg-green-50 border border-green-200' : 'bg-gray-50'
                           }`}>

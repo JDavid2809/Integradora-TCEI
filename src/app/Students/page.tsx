@@ -13,6 +13,8 @@ export default async function page() {
 
   // Verificación estricta de rol
   if (session.user?.rol !== 'ESTUDIANTE') {
+
+    
     // Redirigir según el rol actual
     switch (session.user?.rol) {
       case 'PROFESOR':
@@ -25,6 +27,7 @@ export default async function page() {
         redirect("/Login")
     }
   }
+   
 
   console.log('✅ Student access granted:', session.user.email, 'Role:', session.user.rol)
  

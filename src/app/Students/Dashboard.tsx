@@ -4,9 +4,9 @@ import { useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import DashboardContent from "./DashboardContent"
 import CoursesContent from "./CoursesContent"
-import ClassesContent from "./Class"
-import TasksContent from "./Tasks"
 import ScheduleContent from "./Schedule"
+import PaymentsContent from "./PaymentsContent"
+import ExamsContent from "./ExamsContent"
 import Sidebar from "./Sidebar"
 import Header from "./Header"
 import BottomTabs from "./Tabs"
@@ -38,12 +38,12 @@ export default function Dashboard({ onLogout, user }: DashboardProps) {
                 return <DashboardContent key="dashboard" />
             case "courses":
                 return <CoursesContent key="courses" />
-            case "classes":
-                return <ClassesContent key="classes" />
-            case "tasks":
-                return <TasksContent key="tasks" />
             case "schedule":
                 return <ScheduleContent key="schedule" />
+            case "payments":
+                return <PaymentsContent key="payments" />
+            case "exams":
+                return <ExamsContent key="exams" />
             default:
                 return <DashboardContent key="dashboard" />
         }

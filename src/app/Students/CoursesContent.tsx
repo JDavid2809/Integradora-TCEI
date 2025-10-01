@@ -2,8 +2,15 @@
 
 import { motion } from "framer-motion"
 import { BookOpen } from "lucide-react"
+import { useRouter } from "next/navigation"
 
 export default function CoursesContent() {
+    const router = useRouter()
+
+    const handleExploreCourses = () => {
+        router.push("/Courses")
+    }
+
     const courses = [
         {
             title: "Business English",
@@ -41,7 +48,8 @@ export default function CoursesContent() {
         >
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div className="text-2xl font-bold text-[#00246a]"></div>
-                <button className="bg-[#e30f28] hover:bg-[#e30f28]/90 text-white px-6 py-2 rounded-xl font-medium transition-colors duration-200">
+                <button className="bg-[#e30f28] hover:bg-[#e30f28]/90 text-white px-6 py-2 rounded-xl font-medium transition-colors duration-200"
+                onClick={handleExploreCourses}>
                     Explorar Cursos
                 </button>
             </div>

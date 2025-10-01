@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import {Search,BookOpen,Play,Award,Globe,X,} from "lucide-react"
 import Image from "next/image"
-import { useSearchParams } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 
 const recommendedCourses = [
     {
@@ -171,8 +171,14 @@ type Course = {
 
 export default function Courses() {
     const searchParams = useSearchParams()
+    const router = useRouter()
     const [searchTerm, setSearchTerm] = useState("")
     const [selectedLevel, setSelectedLevel] = useState("all")
+
+    // Función para navegar a los detalles del curso
+    const handlerDetailsCourses = () => {
+        router.push("/Courses/CoursesDetails");
+    }
 
     // Efecto para leer parámetros de búsqueda de la URL
     useEffect(() => {
@@ -269,10 +275,10 @@ export default function Courses() {
                     <div className="flex items-center gap-4 text-sm text-gray-500">
                     </div>
                 </div>
-
-                <button className="w-full bg-[#e30f28] hover:bg-[#c20e24] text-white font-semibold py-3 px-6 rounded-xl transition-all duration-300 flex items-center justify-center gap-2 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
+                    
+                <button onClick={handlerDetailsCourses} className="w-full bg-[#e30f28] hover:bg-[#c20e24] text-white font-semibold py-3 px-6 rounded-xl transition-all duration-300 flex items-center justify-center gap-2 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
                     <Play className="w-4 h-4" />
-                    Comenzar Curso
+                    Ver curso
                 </button>
             </div>
         </div>
@@ -312,7 +318,7 @@ export default function Courses() {
                 </div>
                 <section className="mb-20">
                     <div className="text-center mb-12">
-                        <h2 className="text-4xl font-bold text-[#00246a] mb-4">Cursos recomendados oara ti</h2>
+                        <h2 className="text-4xl font-bold text-[#00246a] mb-4">Cursos recomendados para ti</h2>
                         <p className="text-lg text-gray-600 max-w-2xl mx-auto">
                             Los cursos que se adaptan a tus necesidades y objetivos de aprendizaje. Mejora tu inglés con cursos
                             diseñados por expertos.

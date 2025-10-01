@@ -2,7 +2,9 @@
 import { getServerSession } from 'next-auth'
 import { redirect } from 'next/navigation'
 import { authOptions } from '@/lib/authOptions'
-import Hero from "./views/Home/Hero"
+import { Benefits } from './views/Home/benefist'
+import { Testimonials } from './views/testimonials'
+import { Hero } from './views/Home/Hero'
 
 export default async function Home() {
   // Verificar si hay una sesión activa
@@ -31,6 +33,8 @@ export default async function Home() {
   return (
     <div className="min-h-screen bg-slate-50 overflow-x-hidden">
       <Hero />
+      <Benefits/>
+      <Testimonials/>
     </div>
   )
 }

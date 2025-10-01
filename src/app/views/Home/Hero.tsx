@@ -1,363 +1,132 @@
 "use client"
 
-import { motion } from "framer-motion"
-import { Play, Zap, Brain, Globe, ArrowRight, SearchCheck } from "lucide-react"
-import { usePageSearch } from "../../../hooks/usePageSearch"
 import { useState, useEffect } from "react"
+import { ChevronLeft, ChevronRight, Play } from "lucide-react"
 
-export default function Hero() {
-    const { searchQuery, highlightText, hasActiveSearch } = usePageSearch(
-        [
-            'domina inglés',
-            'inteligencia artificial',
-            'aprendizaje',
-            'cursos',
-            'lecciones',
-            'pronunciación',
-            'gramática',
-            'conversación',
-            'vocabulario'
-        ],
-        'Home'
-    )
-    
-    const [showSearchIndicator, setShowSearchIndicator] = useState(false)
+const slides = [
+  {
+    id: 1,
+    badge: "¡Nuevo!",
+    title: "Domina el Inglés con Confianza",
+    subtitle:
+      "Aprende inglés de forma práctica y efectiva con nuestros cursos interactivos diseñados para hispanohablantes",
+    image: "/logos/logoIngles1.jpg",
+    cta: "Empieza Gratis",
+  },
+  {
+    id: 2,
+    badge: "Certificado",
+    title: "Profesores Nativos Expertos",
+    subtitle: "Clases en vivo con instructores certificados que te guiarán paso a paso hacia la fluidez completa",
+    image: "/logos/logoIngles1.jpg",
+    cta: "Ver Profesores",
+  },
+  {
+    id: 3,
+    badge: "Reconocido",
+    title: "Certificación Internacional",
+    subtitle: "Obtén certificados reconocidos mundialmente que impulsen tu carrera profesional al siguiente nivel",
+    image: "/logos/logoIngles1.jpg",
+    cta: "Conoce Más",
+  },
+]
 
-    useEffect(() => {
-        if (hasActiveSearch) {
-            setShowSearchIndicator(true)
-            // Ocultar después de 3 segundos
-            const timer = setTimeout(() => {
-                setShowSearchIndicator(false)
-            }, 3000)
-            
-            return () => clearTimeout(timer)
-        } else {
-            setShowSearchIndicator(false)
-        }
-    }, [hasActiveSearch, searchQuery])
-    return (
-        <section className="min-h-screen flex items-center justify-center relative overflow-hidden">
-            {/* Indicador de búsqueda activa */}
-            {showSearchIndicator && (
-                <motion.div
-                    initial={{ opacity: 0, y: -50, scale: 0.8 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0, y: -50, scale: 0.8 }}
-                    className="absolute top-8 left-1/2 transform -translate-x-1/2 z-20 bg-white border-2 border-[#00246a] text-[#00246a] px-6 py-3 rounded-full font-semibold shadow-2xl"
-                    style={{
-                        background: 'linear-gradient(135deg, #ffffff 0%, #f8faff 100%)',
-                        boxShadow: '0 10px 30px rgba(0, 36, 106, 0.2), 0 4px 15px rgba(227, 15, 40, 0.1)'
-                    }}
-                >
-                    <span className="flex items-center gap-2">
-                        <SearchCheck className="text-[#e30f28]" />
-                        <span className="text-[#00246a]">Resaltando:</span>
-                        <span className="text-black font-bold">
-                            &ldquo;{searchQuery}&rdquo;
-                        </span>
-                    </span>
-                </motion.div>
-            )}
-            
-            {/* Fondo con formas geométricas animadas */}
-            <div className="absolute inset-0 bg-gradient-to-br from-slate-50 via-blue-50/30 to-red-50/20">
-                <motion.div
-                    animate={{
-                        rotate: [0, 360],
-                        scale: [1, 1.2, 1],
-                    }}
-                    transition={{
-                        duration: 20,
-                        repeat: Number.POSITIVE_INFINITY,
-                        ease: "linear",
-                    }}
-                    className="absolute top-20 left-20 w-96 h-96 opacity-10"
-                    style={{
-                        background: "conic-gradient(from 0deg, #e30f28, #00246a, #e30f28)",
-                        clipPath: "polygon(50% 0%, 100% 38%, 82% 100%, 18% 100%, 0% 38%)",
-                    }}
-                />
+export function Hero() {
+  const [currentSlide, setCurrentSlide] = useState(0)
 
-                <motion.div
-                    animate={{
-                        rotate: [360, 0],
-                        y: [0, -50, 0],
-                    }}
-                    transition={{
-                        duration: 15,
-                        repeat: Number.POSITIVE_INFINITY,
-                        ease: "easeInOut",
-                    }}
-                    className="absolute bottom-32 right-32 w-64 h-64 opacity-10"
-                    style={{
-                        background: "linear-gradient(45deg, #00246a, #e30f28)",
-                        clipPath: "polygon(25% 0%, 100% 0%, 75% 100%, 0% 100%)",
-                    }}
-                />
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % slides.length)
+    }, 6000)
+    return () => clearInterval(timer)
+  }, [])
 
-                {/* Partículas flotantes */}
-                {[...Array(12)].map((_, i) => (
-                    <motion.div
-                        key={i}
-                        animate={{
-                            y: [0, -100, 0],
-                            x: [0, Math.sin(i) * 50, 0],
-                            opacity: [0.2, 0.8, 0.2],
-                            scale: [0.5, 1, 0.5],
-                        }}
-                        transition={{
-                            duration: 8 + i * 0.5,
-                            repeat: Number.POSITIVE_INFINITY,
-                            ease: "easeInOut",
-                            delay: i * 0.3,
-                        }}
-                        className="absolute w-3 h-3 rounded-full"
-                        style={{
-                            background: i % 2 === 0 ? "#e30f28" : "#00246a",
-                            left: `${10 + i * 8}%`,
-                            top: `${20 + (i % 3) * 20}%`,
-                        }}
-                    />
-                ))}
+  const nextSlide = () => {
+    setCurrentSlide((prev) => (prev + 1) % slides.length)
+  }
+
+  const prevSlide = () => {
+    setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length)
+  }
+
+  return (
+    <section className="relative h-screen overflow-hidden">
+      {slides.map((slide, index) => (
+        <div
+          key={slide.id}
+          className={`absolute inset-0 transition-all duration-1000 ${
+            index === currentSlide ? "opacity-100 scale-100" : "opacity-0 scale-105"
+          }`}
+        >
+          <div className="relative h-full">
+            <div className="absolute inset-0">
+              <img src={slide.image || "/placeholder.svg"} alt={slide.title} className="w-full h-full object-cover" />
+              <div
+                className="absolute inset-0 bg-gradient-to-br from-white/95 via-white/80 to-transparent"
+                style={{
+                  clipPath: "polygon(0 0, 65% 0, 45% 100%, 0% 100%)",
+                }}
+              ></div>
             </div>
 
-            <div className="max-w-8xl mx-auto px-8 lg:px-12 grid lg:grid-cols-2 gap-20 items-center relative z-10">
-                {/* Contenido principal */}
-                <motion.div
-                    initial={{ opacity: 0, x: -100 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 1.2, ease: [0.25, 0.46, 0.45, 0.94] }}
-                    className="space-y-12"
-                >
-                    {/* Badge futurista */}
+            <div className="relative z-10 h-full flex items-center">
+              <div className="max-w-2xl px-16 space-y-8">
+                <div className="inline-block animate-pulse">
+                  <span className="bg-[#e30f28] text-white px-6 py-3 rounded-full text-sm font-bold shadow-lg border-2 border-white">
+                    {slide.badge}
+                  </span>
+                </div>
 
-                    {/* Título principal con efectos únicos */}
-                    <div className="space-y-8">
-                        <motion.h1
-                            initial={{ opacity: 0, y: 50 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: 0.5, duration: 1 }}
-                            className="text-6xl lg:text-8xl font-black leading-none tracking-tighter"
-                        >
-                            <span className="block" style={{ color: "#00246a" }}>
-                                {highlightText('DOMINA', searchQuery)}
-                            </span>
-                            <span className="block bg-gradient-to-r from-red-500 to-blue-900 bg-clip-text text-transparent">
-                                {highlightText('INGLÉS', searchQuery)}
-                            </span>
-                        </motion.h1>
+                {/* Title with shadow effect */}
+                <h1 className="text-6xl font-black text-[#00246a] leading-tight text-balance drop-shadow-sm">
+                  {slide.title}
+                </h1>
 
-                        <motion.p
-                            initial={{ opacity: 0, y: 30 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: 0.8, duration: 0.8 }}
-                            className="text-2xl font-light text-gray-600 leading-relaxed max-w-2xl"
-                        >
-                            La primera plataforma que usa{" "}
-                            <span className="font-bold text-red-500">
-                                {highlightText('inteligencia artificial cuántica', searchQuery)}
-                            </span> para acelerar tu{" "}
-                            <span className="font-bold text-blue-900">
-                                {highlightText('aprendizaje', searchQuery)}
-                            </span> 10x más rápido.
-                        </motion.p>
-                    </div>
+                {/* Subtitle */}
+                <p className="text-xl text-gray-700 leading-relaxed text-pretty font-medium">{slide.subtitle}</p>
 
-                    {/* Botones únicos */}
-                    <motion.div
-                        initial={{ opacity: 0, y: 30 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 1, duration: 0.8 }}
-                        className="flex flex-col sm:flex-row gap-6"
-                    >
-                        <motion.button
-                            whileHover={{
-                                scale: 1.05,
-                                boxShadow: "0 25px 50px rgba(227, 15, 40, 0.3)",
-                                y: -5,
-                            }}
-                            whileTap={{ scale: 0.95 }}
-                            className="group relative px-12 py-6 bg-gradient-to-r from-red-500 to-blue-900 text-white font-black text-lg tracking-wider rounded-2xl overflow-hidden shadow-2xl"
-                        >
-                            <span className="relative z-10 flex items-center justify-center">
-                                <Zap className="w-6 h-6 mr-3" />
-                                COMENZAR AHORA
-                                <ArrowRight className="w-6 h-6 ml-3 group-hover:translate-x-2 transition-transform duration-300" />
-                            </span>
-                            <div className="absolute inset-0 bg-gradient-to-r from-blue-900 to-red-500 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                            <motion.div
-                                animate={{ x: [-100, 100] }}
-                                transition={{ duration: 2, repeat: Number.POSITIVE_INFINITY, ease: "linear" }}
-                                className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent skew-x-12"
-                            />
-                        </motion.button>
-
-                        <motion.button
-                            whileHover={{
-                                scale: 1.05,
-                                boxShadow: "0 20px 40px rgba(0, 0, 0, 0.1)",
-                                y: -3,
-                            }}
-                            whileTap={{ scale: 0.95 }}
-                            className="group flex items-center justify-center px-12 py-6 bg-white/30 backdrop-blur-xl border-2 border-white/50 text-gray-800 font-bold text-lg tracking-wider rounded-2xl hover:bg-white/50 transition-all duration-300 shadow-xl"
-                        >
-                            <Play className="w-6 h-6 mr-3 group-hover:scale-110 transition-transform duration-300" />
-                            VER DEMO IA
-                        </motion.button>
-                    </motion.div>
-
-                    {/* Stats únicos */}
-                    <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ delay: 1.3, duration: 0.8 }}
-                        className="flex items-center space-x-12 pt-8"
-                    >
-                        {[
-                            { icon: Brain, value: "98%", label: "Precisión IA" },
-                            { icon: Globe, value: "150+", label: "Países" },
-                            { icon: Zap, value: "10x", label: "Más Rápido" },
-                        ].map((stat, index) => (
-                            <motion.div
-                                key={stat.label}
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: 1.5 + index * 0.2, duration: 0.6 }}
-                                className="text-center group cursor-pointer"
-                            >
-                                <div className="flex items-center justify-center mb-2">
-                                    <stat.icon className="w-8 h-8 text-red-500 group-hover:scale-110 transition-transform duration-300" />
-                                </div>
-                                <div className="text-3xl font-black text-gray-800">{stat.value}</div>
-                                <div className="text-sm font-medium text-gray-500 tracking-wide">{stat.label}</div>
-                            </motion.div>
-                        ))}
-                    </motion.div>
-                </motion.div>
-
-                {/* Interfaz futurista */}
-                <motion.div
-                    initial={{ opacity: 0, x: 100, rotateY: -30 }}
-                    animate={{ opacity: 1, x: 0, rotateY: 0 }}
-                    transition={{ duration: 1.2, delay: 0.3, ease: [0.25, 0.46, 0.45, 0.94] }}
-                    className="relative perspective-1000"
-                >
-                    <div className="relative z-10">
-                        <motion.div
-                            animate={{
-                                y: [0, -20, 0],
-                                rotateX: [0, 5, 0],
-                                rotateY: [0, -5, 0],
-                            }}
-                            transition={{
-                                duration: 6,
-                                repeat: Number.POSITIVE_INFINITY,
-                                ease: "easeInOut",
-                            }}
-                            className="bg-white/10 backdrop-blur-2xl rounded-3xl p-10 shadow-2xl border border-white/20 transform-gpu"
-                        >
-                            {/* Header de la interfaz */}
-                            <div className="flex items-center justify-between mb-8">
-                                <div className="flex items-center space-x-3">
-                                    <div className="w-4 h-4 bg-red-500 rounded-full animate-pulse" />
-                                    <div
-                                        className="w-4 h-4 bg-yellow-500 rounded-full animate-pulse"
-                                        style={{ animationDelay: "0.2s" }}
-                                    />
-                                    <div className="w-4 h-4 bg-green-500 rounded-full animate-pulse" style={{ animationDelay: "0.4s" }} />
-                                </div>
-                                <div className="px-4 py-2 bg-gradient-to-r from-green-400 to-blue-500 text-white text-sm font-bold rounded-full">
-                                    IA ACTIVA
-                                </div>
-                            </div>
-
-                            {/* Contenido de la lección */}
-                            <div className="space-y-6">
-                                <div className="text-center">
-                                    <h3 className="text-2xl font-bold text-gray-800 mb-2">
-                                        {highlightText('Lección Adaptativa', searchQuery)}
-                                    </h3>
-                                    <p className="text-gray-600">
-                                        {highlightText('Tus mentores analizan tu progreso en tiempo real', searchQuery)}
-                                    </p>
-                                </div>
-
-                                <div className="bg-gray-50/80 rounded-2xl p-6 border border-gray-200/50">
-                                    <p className="text-gray-700 mb-4 font-medium">
-                                        {highlightText("Complete with the correct form:", searchQuery)}
-                                    </p>
-                                    <p className="text-2xl font-bold text-gray-800">
-                                        {highlightText("I _____ studying English for 3 years.", searchQuery)}
-                                    </p>
-                                </div>
-
-                                <div className="grid grid-cols-2 gap-4">
-                                    {["have been", "am", "was", "will be"].map((option, index) => (
-                                        <motion.button
-                                            key={option}
-                                            whileHover={{ scale: 1.05, y: -2 }}
-                                            whileTap={{ scale: 0.95 }}
-                                            className={`p-4 rounded-xl border-2 transition-all duration-300 font-semibold ${index === 0
-                                                    ? "border-green-500 bg-green-50 text-green-700 shadow-lg shadow-green-500/20"
-                                                    : "border-gray-200 bg-white/50 text-gray-600 hover:border-red-500/50 hover:bg-red-50/50"
-                                                }`}
-                                        >
-                                            {option}
-                                        </motion.button>
-                                    ))}
-                                </div>
-
-                                {/* Barra de progreso IA */}
-                                <div className="space-y-3">
-                                    <div className="flex justify-between items-center">
-                                        <span className="text-sm font-medium text-gray-600">Análisis IA</span>
-                                        <span className="text-sm font-bold text-green-600">94% Confianza</span>
-                                    </div>
-                                    <div className="w-full bg-gray-200 rounded-full h-3">
-                                        <motion.div
-                                            initial={{ width: 0 }}
-                                            animate={{ width: "94%" }}
-                                            transition={{ duration: 2, delay: 1 }}
-                                            className="h-3 bg-gradient-to-r from-green-400 to-blue-500 rounded-full shadow-lg"
-                                        />
-                                    </div>
-                                </div>
-                            </div>
-                        </motion.div>
-                    </div>
-
-                    {/* Elementos decorativos 3D */}
-                    <motion.div
-                        animate={{
-                            rotate: [0, 360],
-                            scale: [1, 1.2, 1],
-                        }}
-                        transition={{
-                            duration: 12,
-                            repeat: Number.POSITIVE_INFINITY,
-                            ease: "linear",
-                        }}
-                        className="absolute -top-8 -right-8 w-16 h-16 bg-gradient-to-br from-red-500 to-blue-900 rounded-2xl shadow-2xl"
-                        style={{
-                            clipPath: "polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)",
-                        }}
-                    />
-
-                    <motion.div
-                        animate={{
-                            rotate: [360, 0],
-                            y: [0, -20, 0],
-                        }}
-                        transition={{
-                            duration: 8,
-                            repeat: Number.POSITIVE_INFINITY,
-                            ease: "easeInOut",
-                        }}
-                        className="absolute -bottom-8 -left-8 w-20 h-20 bg-gradient-to-br from-blue-900 to-red-500 rounded-full shadow-2xl opacity-80"
-                    />
-                </motion.div>
+                {/* CTA Buttons */}
+                <div className="flex gap-4">
+                  <button className="bg-[#e30f28] hover:bg-[#c20e24] text-white px-8 py-4 rounded-full font-bold text-lg transition-all duration-300 shadow-xl hover:shadow-2xl hover:scale-105 flex items-center gap-2">
+                    <Play className="w-5 h-5" />
+                    {slide.cta}
+                  </button>
+                  <button className="bg-white hover:bg-gray-50 text-[#00246a] px-8 py-4 rounded-full font-bold text-lg transition-all duration-300 shadow-xl hover:shadow-2xl hover:scale-105 border-2 border-[#00246a]">
+                    Ver Demo
+                  </button>
+                </div>
+              </div>
             </div>
-        </section>
-    )
+          </div>
+        </div>
+      ))}
+
+      <div className="absolute right-8 top-1/2 -translate-y-1/2 flex flex-col gap-4 z-20">
+        <button
+          onClick={prevSlide}
+          className="w-14 h-14 bg-[#e30f28] hover:bg-[#c20e24] rounded-full flex items-center justify-center transition-all duration-300 shadow-xl hover:shadow-2xl hover:scale-110"
+        >
+          <ChevronLeft className="w-6 h-6 text-white" />
+        </button>
+        <button
+          onClick={nextSlide}
+          className="w-14 h-14 bg-[#e30f28] hover:bg-[#c20e24] rounded-full flex items-center justify-center transition-all duration-300 shadow-xl hover:shadow-2xl hover:scale-110"
+        >
+          <ChevronRight className="w-6 h-6 text-white" />
+        </button>
+      </div>
+
+      <div className="absolute bottom-8 right-8 flex gap-3 z-20">
+        {slides.map((_, index) => (
+          <button
+            key={index}
+            onClick={() => setCurrentSlide(index)}
+            className={`transition-all duration-300 rounded-full shadow-lg hover:scale-125 ${
+              index === currentSlide ? "w-10 h-3 bg-[#e30f28] shadow-xl" : "w-3 h-3 bg-[#00246a] hover:bg-white"
+            }`}
+          />
+        ))}
+      </div>
+    </section>
+  )
 }

@@ -21,10 +21,9 @@ export default function Sidebar({
     const menuItems = [
         { id: "dashboard", label: "Dashboard", icon: Home },
         { id: "courses", label: "Mis Cursos", icon: BookOpen },
-        { id: "classes", label: "Clases", icon: GraduationCap },
-        { id: "tasks", label: "Tareas", icon: CheckSquare },
-        { id: "schedule", label: "Horario", icon: Calendar },
-
+        { id: "students", label: "Mis Estudiantes", icon: GraduationCap },
+        { id: "attendance", label: "Asistencia", icon: CheckSquare },
+        { id: "exams", label: "Exámenes", icon: Calendar },
     ]
 
     return (

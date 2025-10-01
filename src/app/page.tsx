@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation'
 import { authOptions } from '@/lib/authOptions'
 import Hero from "./views/Home/Hero"
 
+
 export default async function Home() {
   // Verificar si hay una sesión activa
   const session = await getServerSession(authOptions)
@@ -31,6 +32,7 @@ export default async function Home() {
   return (
     <div className="min-h-screen bg-slate-50 overflow-x-hidden">
       <Hero />
+    
     </div>
   )
 }

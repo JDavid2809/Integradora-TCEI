@@ -4,6 +4,7 @@ import "./globals.css";
 import NavBar from "../components/Navbar";
 import Providers from "../components/Providers";
 import { SearchProvider } from "../contexts/SearchContext";
+import Chatbot from "@/components/ui/Chatbot";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -49,6 +50,8 @@ export default function RootLayout({
             <NavBar /><br />
             <main className="pt-[80px] pb-16 px-4 min-h-screen bg-white">
               {children}
+              
+            <Chatbot />
             </main>
           </SearchProvider>
         </Providers>

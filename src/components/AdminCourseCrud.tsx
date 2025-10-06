@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { 
   BookOpen, 
   Plus, 
@@ -27,7 +27,7 @@ interface Course {
   fin: string | null
   b_activo: boolean
   _count?: {
-    horario: number
+    inscripciones: number
     imparte: number
   }
 }
@@ -48,12 +48,146 @@ interface Teacher {
   }
 }
 
+// Tipos para las respuestas de la API
+interface CoursesApiResponse {
+  courses: Course[]
+  total: number
+}
+
+interface LevelsApiResponse {
+  levels: Level[]
+}
+
+interface TeachersApiResponse {
+  users: Array<{
+    detalles?: { id_profesor: number }
+    nombre: string
+    apellido: string
+    email: string
+  }>
+}
+
+interface ValidationErrors {
+  [key: string]: string
+}
+
 interface CourseFormData {
   nombre: string
   modalidad: 'PRESENCIAL' | 'ONLINE'
   inicio: string
   fin: string
   b_activo: boolean
+}
+
+// Funciones utilitarias
+const formatDate = (dateString: string | null): string => {
+  if (!dateString) return 'No definida'
+  return new Date(dateString).toLocaleDateString('es-ES', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric'
+  })
+}
+
+const getModalityIcon = (modalidad: string): React.ReactElement => {
+  return modalidad === 'ONLINE' ? <Globe className="w-4 h-4" /> : <MapPin className="w-4 h-4" />
+}
+
+const getModalityColor = (modalidad: string): string => {
+  return modalidad === 'ONLINE' ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800'
+}
+
+// Funciones de validación
+const validateCourseForm = (formData: CourseFormData): ValidationErrors => {
+  const errors: ValidationErrors = {}
+
+  if (!formData.nombre.trim()) {
+    errors.nombre = 'Nombre del curso es requerido'
+  }
+  if (!formData.inicio) {
+    errors.inicio = 'Fecha de inicio es requerida'
+  }
+  if (!formData.fin) {
+    errors.fin = 'Fecha de fin es requerida'
+  }
+  
+  if (formData.inicio && formData.fin && new Date(formData.inicio) >= new Date(formData.fin)) {
+    errors.fin = 'La fecha de fin debe ser posterior a la fecha de inicio'
+  }
+
+  return errors
+}
+
+// Funciones de API
+const fetchCoursesApi = async (params: URLSearchParams): Promise<CoursesApiResponse> => {
+  const response = await fetch(`/api/admin/courses?${params}`)
+  const data = await response.json()
+  
+  if (!response.ok) {
+    throw new Error(data.error || 'Error al obtener cursos')
+  }
+  
+  return data
+}
+
+const fetchLevelsApi = async (): Promise<Level[]> => {
+  const response = await fetch('/api/admin/system/levels')
+  const data: LevelsApiResponse = await response.json()
+  
+  if (!response.ok) {
+    throw new Error('Error al obtener niveles')
+  }
+  
+  return data.levels
+}
+
+const fetchTeachersApi = async (): Promise<Teacher[]> => {
+  const response = await fetch('/api/admin/users?role=PROFESOR&limit=100')
+  const data: TeachersApiResponse = await response.json()
+  
+  if (!response.ok) {
+    throw new Error('Error al obtener profesores')
+  }
+  
+  return data.users
+    .map((user) => ({
+      id_profesor: user.detalles?.id_profesor || 0,
+      nombre: user.nombre,
+      paterno: user.apellido,
+      materno: '',
+      usuario: { email: user.email }
+    }))
+    .filter((teacher) => teacher.id_profesor > 0)
+}
+
+const saveCourseApi = async (formData: CourseFormData, courseId?: number): Promise<void> => {
+  const url = courseId ? `/api/admin/courses/${courseId}` : '/api/admin/courses'
+  const method = courseId ? 'PUT' : 'POST'
+
+  const response = await fetch(url, {
+    method,
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(formData)
+  })
+
+  const data = await response.json()
+
+  if (!response.ok) {
+    throw new Error(data.error || 'Error al guardar curso')
+  }
+}
+
+const deleteCourseApi = async (courseId: number): Promise<void> => {
+  const response = await fetch(`/api/admin/courses/${courseId}`, {
+    method: 'DELETE'
+  })
+
+  if (!response.ok) {
+    const data = await response.json()
+    throw new Error(data.error || 'Error al eliminar curso')
+  }
 }
 
 export default function AdminCourseCrud() {
@@ -81,13 +215,7 @@ export default function AdminCourseCrud() {
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [successMessage, setSuccessMessage] = useState('')
 
-  useEffect(() => {
-    fetchCourses()
-    fetchLevels()
-    fetchTeachers()
-  }, [currentPage, modalityFilter, statusFilter, searchTerm])
-
-  const fetchCourses = async () => {
+  const fetchCourses = useCallback(async () => {
     try {
       setLoading(true)
       const params = new URLSearchParams({
@@ -98,29 +226,27 @@ export default function AdminCourseCrud() {
         ...(searchTerm && { search: searchTerm })
       })
 
-      const response = await fetch(`/api/admin/courses?${params}`)
-      const data = await response.json()
-
-      if (response.ok) {
-        setCourses(data.courses)
-        setTotalPages(Math.ceil(data.total / 10))
-      } else {
-        console.error('Error fetching courses:', data.error)
-      }
+      const data = await fetchCoursesApi(params)
+      setCourses(data.courses)
+      setTotalPages(Math.ceil(data.total / 10))
     } catch (error) {
       console.error('Error fetching courses:', error)
+      setErrors({ general: error instanceof Error ? error.message : 'Error desconocido' })
     } finally {
       setLoading(false)
     }
-  }
+  }, [currentPage, modalityFilter, statusFilter, searchTerm])
+
+  useEffect(() => {
+    fetchCourses()
+    fetchLevels()
+    fetchTeachers()
+  }, [fetchCourses])
 
   const fetchLevels = async () => {
     try {
-      const response = await fetch('/api/admin/system/levels')
-      const data = await response.json()
-      if (response.ok) {
-        setLevels(data.levels)
-      }
+      const levels = await fetchLevelsApi()
+      setLevels(levels)
     } catch (error) {
       console.error('Error fetching levels:', error)
     }
@@ -128,22 +254,8 @@ export default function AdminCourseCrud() {
 
   const fetchTeachers = async () => {
     try {
-      const response = await fetch('/api/admin/users?role=PROFESOR&limit=100')
-      const data = await response.json()
-      if (response.ok) {
-        setTeachers(data.users.map((user: {
-          detalles: { id_profesor: number };
-          nombre: string;
-          apellido: string;
-          email: string;
-        }) => ({
-          id_profesor: user.detalles?.id_profesor,
-          nombre: user.nombre,
-          paterno: user.apellido,
-          materno: '',
-          usuario: { email: user.email }
-        })).filter((teacher: Record<string, unknown>) => teacher.id_profesor))
-      }
+      const teachers = await fetchTeachersApi()
+      setTeachers(teachers)
     } catch (error) {
       console.error('Error fetching teachers:', error)
     }
@@ -176,16 +288,7 @@ export default function AdminCourseCrud() {
   }
 
   const validateForm = (): boolean => {
-    const newErrors: Record<string, string> = {}
-
-    if (!formData.nombre) newErrors.nombre = 'Nombre del curso es requerido'
-    if (!formData.inicio) newErrors.inicio = 'Fecha de inicio es requerida'
-    if (!formData.fin) newErrors.fin = 'Fecha de fin es requerida'
-    
-    if (formData.inicio && formData.fin && new Date(formData.inicio) >= new Date(formData.fin)) {
-      newErrors.fin = 'La fecha de fin debe ser posterior a la fecha de inicio'
-    }
-
+    const newErrors = validateCourseForm(formData)
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
   }
@@ -195,29 +298,13 @@ export default function AdminCourseCrud() {
 
     setIsSubmitting(true)
     try {
-      const url = editingCourse ? `/api/admin/courses/${editingCourse.id_curso}` : '/api/admin/courses'
-      const method = editingCourse ? 'PUT' : 'POST'
-
-      const response = await fetch(url, {
-        method,
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(formData)
-      })
-
-      const data = await response.json()
-
-      if (response.ok) {
-        setSuccessMessage(editingCourse ? 'Curso actualizado exitosamente' : 'Curso creado exitosamente')
-        setShowModal(false)
-        fetchCourses()
-        setTimeout(() => setSuccessMessage(''), 3000)
-      } else {
-        setErrors({ general: data.error || 'Error al guardar curso' })
-      }
+      await saveCourseApi(formData, editingCourse?.id_curso)
+      setSuccessMessage(editingCourse ? 'Curso actualizado exitosamente' : 'Curso creado exitosamente')
+      setShowModal(false)
+      fetchCourses()
+      setTimeout(() => setSuccessMessage(''), 3000)
     } catch (error) {
-      setErrors({ general: 'Error de conexión: ' + error })
+      setErrors({ general: error instanceof Error ? error.message : 'Error desconocido' })
     } finally {
       setIsSubmitting(false)
     }
@@ -227,39 +314,17 @@ export default function AdminCourseCrud() {
     if (!confirm('¿Estás seguro de que quieres eliminar este curso?')) return
 
     try {
-      const response = await fetch(`/api/admin/courses/${courseId}`, {
-        method: 'DELETE'
-      })
-
-      if (response.ok) {
-        setSuccessMessage('Curso eliminado exitosamente')
-        fetchCourses()
-        setTimeout(() => setSuccessMessage(''), 3000)
-      } else {
-        const data = await response.json()
-        alert(data.error || 'Error al eliminar curso')
-      }
+      await deleteCourseApi(courseId)
+      setSuccessMessage('Curso eliminado exitosamente')
+      fetchCourses()
+      setTimeout(() => setSuccessMessage(''), 3000)
     } catch (error) {
-      alert('Error de conexión: ' + error)
+      const errorMessage = error instanceof Error ? error.message : 'Error desconocido'
+      alert('Error al eliminar curso: ' + errorMessage)
     }
   }
 
-  const getModalityIcon = (modalidad: string) => {
-    return modalidad === 'ONLINE' ? <Globe className="w-4 h-4" /> : <MapPin className="w-4 h-4" />
-  }
 
-  const getModalityColor = (modalidad: string) => {
-    return modalidad === 'ONLINE' ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800'
-  }
-
-  const formatDate = (dateString: string | null) => {
-    if (!dateString) return 'No definida'
-    return new Date(dateString).toLocaleDateString('es-ES', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
-    })
-  }
 
   return (
     <div className="p-6 space-y-6">
@@ -387,7 +452,7 @@ export default function AdminCourseCrud() {
                       <div className="space-y-1">
                         <div className="flex items-center gap-1">
                           <Users className="w-4 h-4 text-gray-400" />
-                          <span className="text-xs">{course._count?.horario || 0} estudiantes</span>
+                          <span className="text-xs">{course._count?.inscripciones || 0} estudiantes</span>
                         </div>
                         <div className="flex items-center gap-1">
                           <BookOpen className="w-4 h-4 text-gray-400" />

@@ -1,5 +1,6 @@
 "use client"
 
+import Image from "next/image"
 import { Clock, Users, Star, BookOpen } from "lucide-react"
 
 export default function CoursesDetails() {
@@ -65,9 +66,11 @@ export default function CoursesDetails() {
           <div className="lg:col-span-2 space-y-8">
             {/* Course Image Card */}
             <div className="bg-white rounded-2xl shadow-xl overflow-hidden transform hover:shadow-2xl transition-all duration-300 hover:-translate-y-1">
-              <img
+              <Image
                 src={course.image || "/placeholder.svg"}
                 alt={course.name}
+                width={800}
+                height={256}
                 className="w-full h-64 object-cover transform hover:scale-105 transition-transform duration-700"
               />
             </div>
@@ -133,9 +136,11 @@ export default function CoursesDetails() {
             <div className="bg-white rounded-2xl shadow-xl p-8 transform hover:shadow-2xl transition-all duration-300 hover:-translate-y-1">
               <h3 className="text-xl font-bold text-[#00246a] mb-6">Tu Instructor</h3>
               <div className="flex items-start gap-4">
-                <img
+                <Image
                   src={course.instructor.avatar || "/placeholder.svg"}
                   alt={course.instructor.name}
+                  width={80}
+                  height={80}
                   className="w-20 h-20 rounded-full object-cover border-4 border-[#e30f28]/20 transform hover:scale-110 transition-transform duration-300"
                 />
                 <div className="flex-1">

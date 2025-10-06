@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth'
 import { redirect } from 'next/navigation'
 import Intermedio from './Intermedio'
 import { authOptions } from '@/lib/authOptions'
+import { getStudentCourses, getAllCourses } from '@/actions/courses/manageCourses'
 
 export default async function page() {
   const session = await getServerSession(authOptions)
@@ -13,8 +14,6 @@ export default async function page() {
 
   // Verificación estricta de rol
   if (session.user?.rol !== 'ESTUDIANTE') {
-
-    
     // Redirigir según el rol actual
     switch (session.user?.rol) {
       case 'PROFESOR':
@@ -27,11 +26,20 @@ export default async function page() {
         redirect("/Login")
     }
   }
-   
+
+  // Obtener cursos del estudiante y todos los cursos disponibles
+  const [studentCourses, allCourses] = await Promise.all([
+    getStudentCourses(+session.user.id),
+    getAllCourses()
+  ])
 
   console.log('✅ Student access granted:', session.user.email, 'Role:', session.user.rol)
  
   return (
-    <Intermedio user={session} />
+    <Intermedio 
+      user={session} 
+      studentCourses={studentCourses}
+      allCourses={allCourses}
+    />
   )
 }

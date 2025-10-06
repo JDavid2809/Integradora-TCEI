@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { 
   Users, 
   Edit, 
@@ -92,12 +92,7 @@ export default function AdminUserCrud() {
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [successMessage, setSuccessMessage] = useState('')
 
-  useEffect(() => {
-    fetchUsers()
-    fetchCategories()
-  }, [currentPage, roleFilter, searchTerm])
-
-  const fetchUsers = async () => {
+  const fetchUsers = useCallback(async () => {
     try {
       setLoading(true)
       const params = new URLSearchParams({
@@ -121,7 +116,12 @@ export default function AdminUserCrud() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [currentPage, roleFilter, searchTerm])
+
+  useEffect(() => {
+    fetchUsers()
+    fetchCategories()
+  }, [fetchUsers])
 
   const fetchCategories = async () => {
     try {

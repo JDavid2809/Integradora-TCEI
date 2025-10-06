@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { ChevronLeft, ChevronRight, Play } from "lucide-react"
+import Image from "next/image"
 
 const slides = [
   {
@@ -60,7 +61,13 @@ export function Hero() {
         >
           <div className="relative h-full">
             <div className="absolute inset-0">
-              <img src={slide.image || "/placeholder.svg"} alt={slide.title} className="w-full h-full object-cover" />
+              <Image   
+                src={slide.image || "/placeholder.svg"} 
+                alt={slide.title} 
+                width={1920}
+                height={1080}
+                className="w-full h-full object-cover" 
+              />
               <div
                 className="absolute inset-0 bg-gradient-to-br from-white/95 via-white/80 to-transparent"
                 style={{

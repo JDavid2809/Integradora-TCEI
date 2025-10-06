@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { 
   FileText, 
   Plus, 
@@ -104,12 +104,7 @@ export default function AdminExamCrud() {
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [successMessage, setSuccessMessage] = useState('')
 
-  useEffect(() => {
-    fetchExams()
-    fetchLevels()
-  }, [currentPage, levelFilter, statusFilter, searchTerm])
-
-  const fetchExams = async () => {
+  const fetchExams = useCallback(async () => {
     try {
       setLoading(true)
       const params = new URLSearchParams({
@@ -134,7 +129,12 @@ export default function AdminExamCrud() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [currentPage, levelFilter, statusFilter, searchTerm])
+
+  useEffect(() => {
+    fetchExams()
+    fetchLevels()
+  }, [fetchExams])
 
   const fetchLevels = async () => {
     try {

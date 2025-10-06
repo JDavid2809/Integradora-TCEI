@@ -1,4 +1,5 @@
 import { Star } from "lucide-react"
+import Image from "next/image"
 
 const testimonials = [
     {
@@ -65,9 +66,11 @@ export function Testimonials() {
                             className="bg-white rounded-2xl p-8 hover:shadow-xl transition-all duration-300 hover:-translate-y-2 border border-gray-100"
                         >
                             <div className="flex items-center mb-6">
-                                <img
+                                <Image
                                     src={testimonial.image || "/placeholder.svg"}
                                     alt={testimonial.name}
+                                    width={64}
+                                    height={64}
                                     className="w-16 h-16 rounded-full object-cover mr-4 border-2 border-gray-100"
                                 />
                                 <div>
@@ -82,7 +85,7 @@ export function Testimonials() {
                                 ))}
                             </div>
 
-                            <p className="text-gray-600 leading-relaxed italic">"{testimonial.text}"</p>
+                            <p className="text-gray-600 leading-relaxed italic">&ldquo;{testimonial.text}&rdquo;</p>
                         </div>
                     ))}
                 </div>

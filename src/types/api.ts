@@ -363,7 +363,7 @@ export interface PaginatedResponse<T> {
 
 export interface StatsResponse {
   total_registros: number;
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 // ========================

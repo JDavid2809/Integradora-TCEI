@@ -24,3 +24,38 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* Estilos para scroll horizontal en móvil */
+.scrollbar-hide {
+  -ms-overflow-style: none;  /* Internet Explorer 10+ */
+  scrollbar-width: none;  /* Firefox */
+}
+
+.scrollbar-hide::-webkit-scrollbar { 
+  display: none;  /* Safari and Chrome */
+}
+
+/* Smooth scroll para navegación */
+.scroll-smooth {
+  scroll-behavior: smooth;
+}
+
+/* Mejoras para touch en móvil */
+@media (max-width: 768px) {
+  /* Mejorar área de touch para botones */
+  button {
+    min-height: 44px;
+  }
+  
+  /* Spacing mejorado para elementos interactivos */
+  .touch-target {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  /* Mejorar legibilidad en móvil */
+  body {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+}

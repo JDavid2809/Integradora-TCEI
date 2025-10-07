@@ -31,7 +31,12 @@ export async function GET(request: NextRequest) {
 
     const skip = (page - 1) * limit
 
-    let whereClause: any = {}
+    // Tipado explícito para el filtro de exámenes
+    let whereClause: {
+      id_nivel?: number;
+      b_activo?: boolean;
+      nombre?: { contains: string; mode: 'insensitive' };
+    } = {};
     
     if (nivelId) {
       whereClause.id_nivel = parseInt(nivelId)
@@ -111,78 +116,12 @@ export async function GET(request: NextRequest) {
 // POST - Crear nuevo examen
 export async function POST(request: NextRequest) {
   try {
+    // Admin has read/update/delete permissions, but must NOT create exams per spec
     const isAuthorized = await checkAdminAuth()
     if (!isAuthorized) {
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 })
     }
-
-    const body = await request.json()
-    const { nombre, id_nivel, preguntas } = body
-
-    if (!nombre) {
-      return NextResponse.json({ error: 'El nombre es requerido' }, { status: 400 })
-    }
-
-    // Verificar que el nivel existe si se proporciona
-    if (id_nivel) {
-      const nivel = await prisma.nivel.findUnique({
-        where: { id_nivel: parseInt(id_nivel) }
-      })
-
-      if (!nivel) {
-        return NextResponse.json({ error: 'Nivel no encontrado' }, { status: 400 })
-      }
-    }
-
-    const result = await prisma.$transaction(async (tx) => {
-      // Crear examen
-      const newExam = await tx.examen.create({
-        data: {
-          nombre,
-          id_nivel: id_nivel ? parseInt(id_nivel) : null,
-          b_activo: true
-        }
-      })
-
-      // Crear preguntas si se proporcionan
-      if (preguntas && Array.isArray(preguntas)) {
-        for (const pregunta of preguntas) {
-          const newQuestion = await tx.pregunta.create({
-            data: {
-              id_examen: newExam.id_examen,
-              descripcion: pregunta.descripcion,
-              ruta_file_media: pregunta.ruta_file_media || null
-            }
-          })
-
-          // Crear respuestas para la pregunta
-          if (pregunta.respuestas && Array.isArray(pregunta.respuestas)) {
-            for (const respuesta of pregunta.respuestas) {
-              await tx.respuesta.create({
-                data: {
-                  id_pregunta: newQuestion.id_pregunta,
-                  descripcion: respuesta.descripcion,
-                  ruta_file_media: respuesta.ruta_file_media || null,
-                  es_correcta: respuesta.es_correcta || false
-                }
-              })
-            }
-          }
-        }
-      }
-
-      return newExam
-    })
-
-    return NextResponse.json({
-      message: 'Examen creado exitosamente',
-      exam: {
-        id: result.id_examen,
-        nombre: result.nombre,
-        id_nivel: result.id_nivel,
-        activo: result.b_activo
-      }
-    }, { status: 201 })
+    return NextResponse.json({ error: 'Creación de exámenes no permitida para ADMIN' }, { status: 403 })
 
   } catch (error) {
     console.error('Error al crear examen:', error)

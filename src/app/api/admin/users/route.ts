@@ -1,7 +1,17 @@
+
+type UserWhere = {
+  rol?: Rol;
+  OR?: Array<{
+    nombre?: { contains: string; mode: 'insensitive' };
+    apellido?: { contains: string; mode: 'insensitive' };
+    email?: { contains: string; mode: 'insensitive' };
+  }>;
+};
 import { NextResponse, NextRequest } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/authOptions'
 import { prisma } from '@/lib/prisma'
+import { Rol } from '@prisma/client'
 import bcrypt from 'bcryptjs'
 
 // Middleware para verificar autorización de admin
@@ -18,31 +28,28 @@ async function checkAdminAuth() {
 // GET - Obtener todos los usuarios
 export async function GET(request: NextRequest) {
   try {
-    const isAuthorized = await checkAdminAuth()
+    const isAuthorized = await checkAdminAuth();
     if (!isAuthorized) {
-      return NextResponse.json({ error: 'No autorizado' }, { status: 401 })
+      return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
     }
 
-    const { searchParams } = new URL(request.url)
-    const role = searchParams.get('role')
-    const page = parseInt(searchParams.get('page') || '1')
-    const limit = parseInt(searchParams.get('limit') || '10')
-    const search = searchParams.get('search')
+    const { searchParams } = new URL(request.url);
+    const role = searchParams.get('role');
+    const search = searchParams.get('search') || '';
+    const page = parseInt(searchParams.get('page') || '1', 10);
+    const limit = parseInt(searchParams.get('limit') || '10', 10);
+    const skip = (page - 1) * limit;
 
-    const skip = (page - 1) * limit
-
-    let whereClause: any = {}
-    
+    let whereClause: UserWhere = {};
     if (role && ['ADMIN', 'PROFESOR', 'ESTUDIANTE'].includes(role)) {
-      whereClause.rol = role
+      whereClause.rol = role as Rol;
     }
-
     if (search) {
       whereClause.OR = [
         { nombre: { contains: search, mode: 'insensitive' } },
         { apellido: { contains: search, mode: 'insensitive' } },
-        { email: { contains: search, mode: 'insensitive' } }
-      ]
+        { email: { contains: search, mode: 'insensitive' } },
+      ];
     }
 
     const [users, total] = await Promise.all([
@@ -51,20 +58,14 @@ export async function GET(request: NextRequest) {
         skip,
         take: limit,
         include: {
-          estudiante: {
-            include: {
-              categoria_edad: true
-            }
-          },
+          estudiante: { include: { categoria_edad: true } },
           profesor: true,
-          administrador: true
+          administrador: true,
         },
-        orderBy: {
-          id: 'desc'
-        }
+        orderBy: { id: 'desc' },
       }),
-      prisma.usuario.count({ where: whereClause })
-    ])
+      prisma.usuario.count({ where: whereClause }),
+    ]);
 
     return NextResponse.json({
       users: users.map(user => ({
@@ -74,19 +75,18 @@ export async function GET(request: NextRequest) {
         apellido: user.apellido,
         rol: user.rol,
         detalles: user.estudiante || user.profesor || user.administrador,
-        activo: user.estudiante?.b_activo ?? user.profesor?.b_activo ?? user.administrador?.b_activo ?? true
+        activo: user.estudiante?.b_activo ?? user.profesor?.b_activo ?? user.administrador?.b_activo ?? true,
       })),
       pagination: {
         page,
         limit,
         total,
-        pages: Math.ceil(total / limit)
-      }
-    })
-
+        pages: Math.ceil(total / limit),
+      },
+    });
   } catch (error) {
-    console.error('Error al obtener usuarios:', error)
-    return NextResponse.json({ error: 'Error interno del servidor' }, { status: 500 })
+    console.error('Error al obtener usuarios:', error);
+    return NextResponse.json({ error: 'Error interno del servidor' }, { status: 500 });
   }
 }
 

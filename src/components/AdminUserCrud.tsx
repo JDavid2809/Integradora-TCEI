@@ -1,21 +1,11 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
-import { 
-  Users, 
-  Edit, 
-  Trash2, 
-  Search, 
-  Filter,
-  UserPlus,
-  Mail,
-  Phone,
-  Calendar,
-  Save,
-  X,
-  AlertTriangle,
-  CheckCircle
-} from 'lucide-react'
+import React, { useState, useEffect, useRef } from 'react'
+import { Users, Edit, Trash2, UserPlus, Mail, Phone, Calendar, Save, Search, Filter, X, AlertTriangle } from 'lucide-react'
+import { useDebounce } from '@/hooks/useDebounce'
+import { Pagination } from './admin/common/Pagination'
+import { FeedbackAlert } from './admin/common/FeedbackAlert'
+import { api } from '@/lib/apiClient'
 
 interface User {
   id: number
@@ -58,23 +48,57 @@ interface UserFormData {
   observaciones?: string
 }
 
-interface CategoryAge {
-  id_categoria_edad: number
-  rango: string
-  b_activo: boolean
+// Nota: las categorías ya no se cargan ni seleccionan; se calculan automáticamente
+
+// Helper para renderizar números de forma segura
+const renderSafeNumber = (value: number | undefined, suffix: string = '') => {
+  if (typeof value === 'number' && !isNaN(value)) {
+    return `${value}${suffix}`
+  }
+  return 'N/A'
+}
+
+// Cálculo automático de categoría por edad
+const calcularCategoriaEdad = (edad: number): number => {
+  if (edad >= 18 && edad <= 25) return 1 // 18-25 años
+  if (edad >= 26 && edad <= 35) return 2 // 26-35 años
+  if (edad >= 36 && edad <= 45) return 3 // 36-45 años
+  if (edad >= 46) return 4 // 46+ años
+  return 1
+}
+
+const obtenerNombreCategoria = (edad?: number): string | null => {
+  if (!edad || isNaN(edad)) return null
+  const id = calcularCategoriaEdad(edad)
+  switch (id) {
+    case 1: return '18-25 años'
+    case 2: return '26-35 años'
+    case 3: return '36-45 años'
+    case 4: return '46+ años'
+    default: return null
+  }
 }
 
 export default function AdminUserCrud() {
   const [users, setUsers] = useState<User[]>([])
-  const [categories, setCategories] = useState<CategoryAge[]>([])
+  // Categorías: ya no se cargan manualmente; se calculan automáticamente a partir de la edad
   const [loading, setLoading] = useState(true)
   const [showModal, setShowModal] = useState(false)
   const [editingUser, setEditingUser] = useState<User | null>(null)
   const [searchTerm, setSearchTerm] = useState('')
   const [roleFilter, setRoleFilter] = useState<string>('ALL')
-  const [currentPage, setCurrentPage] = useState(1)
+  const [currentPage, setCurrentPageState] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const abortRef = useRef<AbortController | null>(null)
+
+  // Función segura para cambiar página
+  const setCurrentPage = (page: number) => {
+    const safePage = typeof page === 'number' && !isNaN(page) && page > 0 ? page : 1
+    setCurrentPageState(safePage)
+  }
+
+  const debouncedSearch = useDebounce(searchTerm, 400)
 
   const [formData, setFormData] = useState<UserFormData>({
     email: '',
@@ -94,46 +118,39 @@ export default function AdminUserCrud() {
 
   useEffect(() => {
     fetchUsers()
-    fetchCategories()
-  }, [currentPage, roleFilter, searchTerm])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentPage, roleFilter, debouncedSearch])
+
+  // Ya no se cargan categorías desde API (se calculan automáticamente)
 
   const fetchUsers = async () => {
     try {
       setLoading(true)
+      // Cancelar request previo
+      if (abortRef.current) abortRef.current.abort()
+      const controller = new AbortController()
+      abortRef.current = controller
+
       const params = new URLSearchParams({
         page: currentPage.toString(),
         limit: '10',
         ...(roleFilter !== 'ALL' && { role: roleFilter }),
-        ...(searchTerm && { search: searchTerm })
+        ...(debouncedSearch && { search: debouncedSearch })
       })
 
-      const response = await fetch(`/api/admin/users?${params}`)
-      const data = await response.json()
-
-      if (response.ok) {
-        setUsers(data.users)
-        setTotalPages(Math.ceil(data.total / 10))
-      } else {
-        console.error('Error fetching users:', data.error)
-      }
-    } catch (error) {
+      const data = await api<{ users: User[]; total: number }>(`/api/admin/users?${params}`, { signal: controller.signal })
+      setUsers(data.users || [])
+      const total = typeof data.total === 'number' && !isNaN(data.total) ? data.total : 0
+      setTotalPages(Math.max(1, Math.ceil(total / 10)))
+    } catch (error: any) {
+      if (error?.name === 'AbortError') return
       console.error('Error fetching users:', error)
     } finally {
       setLoading(false)
     }
   }
 
-  const fetchCategories = async () => {
-    try {
-      const response = await fetch('/api/admin/system/age-categories')
-      const data = await response.json()
-      if (response.ok) {
-        setCategories(data.categories)
-      }
-    } catch (error) {
-      console.error('Error fetching categories:', error)
-    }
-  }
+  // Eliminado: fetchCategories (categorías calculadas automáticamente)
 
   const handleCreateUser = () => {
     setEditingUser(null)
@@ -145,7 +162,7 @@ export default function AdminUserCrud() {
       rol: 'ESTUDIANTE',
       telefono: '',
       edad: undefined,
-      id_categoria_edad: undefined,
+  id_categoria_edad: undefined,
       nivel_estudios: '',
       observaciones: ''
     })
@@ -163,8 +180,10 @@ export default function AdminUserCrud() {
       rol: user.rol,
       telefono: user.estudiante?.telefono || user.profesor?.telefono || '',
       edad: user.estudiante?.edad || user.profesor?.edad || undefined,
-      id_categoria_edad: user.estudiante?.categoria_edad ? 
-        categories.find(c => c.rango === user.estudiante?.categoria_edad?.rango)?.id_categoria_edad : undefined,
+      // La categoría se recalculará automáticamente a partir de la edad
+      id_categoria_edad: user.rol === 'ESTUDIANTE' && typeof user.estudiante?.edad === 'number'
+        ? calcularCategoriaEdad(user.estudiante.edad)
+        : undefined,
       nivel_estudios: user.profesor?.nivel_estudios || '',
       observaciones: ''
     })
@@ -182,7 +201,7 @@ export default function AdminUserCrud() {
     
     if (formData.rol === 'ESTUDIANTE') {
       if (!formData.edad) newErrors.edad = 'Edad es requerida para estudiantes'
-      if (!formData.id_categoria_edad) newErrors.id_categoria_edad = 'Categoría de edad es requerida'
+      // id_categoria_edad se calculará automáticamente en base a la edad
     }
     
     if (formData.rol === 'PROFESOR') {
@@ -201,26 +220,25 @@ export default function AdminUserCrud() {
       const url = editingUser ? `/api/admin/users/${editingUser.id}` : '/api/admin/users'
       const method = editingUser ? 'PUT' : 'POST'
 
-      const response = await fetch(url, {
-        method,
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(formData)
-      })
-
-      const data = await response.json()
-
-      if (response.ok) {
-        setSuccessMessage(editingUser ? 'Usuario actualizado exitosamente' : 'Usuario creado exitosamente')
-        setShowModal(false)
-        fetchUsers()
-        setTimeout(() => setSuccessMessage(''), 3000)
-      } else {
-        setErrors({ general: data.error || 'Error al guardar usuario' })
+      // Construir payload y calcular categoría automáticamente si aplica
+      const payload = {
+        ...formData,
+        ...(formData.rol === 'ESTUDIANTE' && typeof formData.edad === 'number'
+          ? { id_categoria_edad: calcularCategoriaEdad(formData.edad) }
+          : { id_categoria_edad: undefined, edad: undefined })
       }
-    } catch (error) {
-      setErrors({ general: 'Error de conexión' + error  })
+
+      await api(url, {
+        method,
+        body: JSON.stringify(payload)
+      })
+      setSuccessMessage(editingUser ? 'Usuario actualizado exitosamente' : 'Usuario creado exitosamente')
+      setShowModal(false)
+      fetchUsers()
+      setTimeout(() => setSuccessMessage(''), 3000)
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Error al guardar usuario'
+      setErrors({ general: message })
     } finally {
       setIsSubmitting(false)
     }
@@ -230,20 +248,13 @@ export default function AdminUserCrud() {
     if (!confirm('¿Estás seguro de que quieres eliminar este usuario?')) return
 
     try {
-      const response = await fetch(`/api/admin/users/${userId}`, {
-        method: 'DELETE'
-      })
-
-      if (response.ok) {
-        setSuccessMessage('Usuario eliminado exitosamente')
-        fetchUsers()
-        setTimeout(() => setSuccessMessage(''), 3000)
-      } else {
-        const data = await response.json()
-        alert(data.error || 'Error al eliminar usuario')
-      }
-    } catch (error) {
-      alert('Error de conexión' + error)
+      await api(`/api/admin/users/${userId}`, { method: 'DELETE' })
+      setSuccessMessage('Usuario eliminado exitosamente')
+      fetchUsers()
+      setTimeout(() => setSuccessMessage(''), 3000)
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Error al eliminar usuario'
+      alert(message)
     }
   }
 
@@ -275,10 +286,7 @@ export default function AdminUserCrud() {
 
       {/* Success Message */}
       {successMessage && (
-        <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded flex items-center gap-2">
-          <CheckCircle className="w-5 h-5" />
-          {successMessage}
-        </div>
+        <FeedbackAlert type="success">{successMessage}</FeedbackAlert>
       )}
 
       {/* Filters */}
@@ -301,10 +309,10 @@ export default function AdminUserCrud() {
               onChange={(e) => setRoleFilter(e.target.value)}
               className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00246a] focus:border-transparent"
             >
-              <option value="ALL">Todos los roles</option>
-              <option value="ESTUDIANTE">Estudiantes</option>
-              <option value="PROFESOR">Profesores</option>
-              <option value="ADMIN">Administradores</option>
+              <option key="ALL" value="ALL">Todos los roles</option>
+              <option key="ESTUDIANTE" value="ESTUDIANTE">Estudiantes</option>
+              <option key="PROFESOR" value="PROFESOR">Profesores</option>
+              <option key="ADMIN" value="ADMIN">Administradores</option>
             </select>
           </div>
         </div>
@@ -366,12 +374,15 @@ export default function AdminUserCrud() {
                             {user.estudiante?.telefono || user.profesor?.telefono}
                           </div>
                         )}
-                        {(user.estudiante?.edad || user.profesor?.edad) && (
-                          <div className="flex items-center gap-1">
-                            <Calendar className="w-4 h-4 text-gray-400" />
-                            {user.estudiante?.edad || user.profesor?.edad} años
-                          </div>
-                        )}
+                        {(() => {
+                          const edad = user.estudiante?.edad || user.profesor?.edad
+                          return (typeof edad === 'number' && !isNaN(edad) && edad > 0) && (
+                            <div className="flex items-center gap-1">
+                              <Calendar className="w-4 h-4 text-gray-400" />
+                              {renderSafeNumber(edad, ' años')}
+                            </div>
+                          )
+                        })()}
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
@@ -411,53 +422,12 @@ export default function AdminUserCrud() {
         )}
 
         {/* Pagination */}
-        {!loading && totalPages > 1 && (
-          <div className="bg-white px-4 py-3 border-t border-gray-200 sm:px-6">
-            <div className="flex items-center justify-between">
-              <div className="flex-1 flex justify-between sm:hidden">
-                <button
-                  onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-                  disabled={currentPage === 1}
-                  className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
-                >
-                  Anterior
-                </button>
-                <button
-                  onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
-                  disabled={currentPage === totalPages}
-                  className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
-                >
-                  Siguiente
-                </button>
-              </div>
-              <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
-                <div>
-                  <p className="text-sm text-gray-700">
-                    Página <span className="font-medium">{currentPage}</span> de{' '}
-                    <span className="font-medium">{totalPages}</span>
-                  </p>
-                </div>
-                <div>
-                  <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
-                    <button
-                      onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-                      disabled={currentPage === 1}
-                      className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
-                    >
-                      Anterior
-                    </button>
-                    <button
-                      onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
-                      disabled={currentPage === totalPages}
-                      className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
-                    >
-                      Siguiente
-                    </button>
-                  </nav>
-                </div>
-              </div>
-            </div>
-          </div>
+        {!loading && (
+          <Pagination 
+            page={isNaN(currentPage) ? 1 : currentPage} 
+            totalPages={isNaN(totalPages) ? 1 : totalPages} 
+            onChange={setCurrentPage} 
+          />
         )}
       </div>
 
@@ -560,9 +530,9 @@ export default function AdminUserCrud() {
                     onChange={(e) => setFormData({ ...formData, rol: e.target.value as 'ESTUDIANTE' | 'PROFESOR' | 'ADMIN' })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00246a] focus:border-transparent"
                   >
-                    <option value="ESTUDIANTE">Estudiante</option>
-                    <option value="PROFESOR">Profesor</option>
-                    <option value="ADMIN">Administrador</option>
+                    <option key="ESTUDIANTE" value="ESTUDIANTE">Estudiante</option>
+                    <option key="PROFESOR" value="PROFESOR">Profesor</option>
+                    <option key="ADMIN" value="ADMIN">Administrador</option>
                   </select>
                 </div>
 
@@ -592,7 +562,15 @@ export default function AdminUserCrud() {
                       <input
                         type="number"
                         value={formData.edad || ''}
-                        onChange={(e) => setFormData({ ...formData, edad: parseInt(e.target.value) || undefined })}
+                        onChange={(e) => {
+                          const value = e.target.value
+                          if (!value) {
+                            setFormData({ ...formData, edad: undefined })
+                          } else {
+                            const parsedValue = parseInt(value)
+                            setFormData({ ...formData, edad: isNaN(parsedValue) ? undefined : parsedValue })
+                          }
+                        }}
                         className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-[#00246a] focus:border-transparent ${
                           errors.edad ? 'border-red-500' : 'border-gray-300'
                         }`}
@@ -601,28 +579,13 @@ export default function AdminUserCrud() {
                         placeholder="Edad"
                       />
                       {errors.edad && <p className="mt-1 text-sm text-red-600">{errors.edad}</p>}
+                      {typeof formData.edad === 'number' && !isNaN(formData.edad) && (
+                        <p className="mt-1 text-xs text-gray-500">
+                          Categoría asignada automáticamente: <span className="font-medium">{obtenerNombreCategoria(formData.edad)}</span>
+                        </p>
+                      )}
                     </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Categoría de Edad *
-                      </label>
-                      <select
-                        value={formData.id_categoria_edad || ''}
-                        onChange={(e) => setFormData({ ...formData, id_categoria_edad: parseInt(e.target.value) || undefined })}
-                        className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-[#00246a] focus:border-transparent ${
-                          errors.id_categoria_edad ? 'border-red-500' : 'border-gray-300'
-                        }`}
-                      >
-                        <option value="">Seleccionar categoría</option>
-                        {categories.map((cat) => (
-                          <option key={cat.id_categoria_edad} value={cat.id_categoria_edad}>
-                            {cat.rango}
-                          </option>
-                        ))}
-                      </select>
-                      {errors.id_categoria_edad && <p className="mt-1 text-sm text-red-600">{errors.id_categoria_edad}</p>}
-                    </div>
+                    {/* La categoría se asigna automáticamente con base en la edad; no hay selección manual */}
                   </div>
                 </div>
               )}
@@ -638,7 +601,15 @@ export default function AdminUserCrud() {
                       <input
                         type="number"
                         value={formData.edad || ''}
-                        onChange={(e) => setFormData({ ...formData, edad: parseInt(e.target.value) || undefined })}
+                        onChange={(e) => {
+                          const value = e.target.value
+                          if (!value) {
+                            setFormData({ ...formData, edad: undefined })
+                          } else {
+                            const parsedValue = parseInt(value)
+                            setFormData({ ...formData, edad: isNaN(parsedValue) ? undefined : parsedValue })
+                          }
+                        }}
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00246a] focus:border-transparent"
                         min="18"
                         max="80"

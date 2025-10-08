@@ -44,6 +44,7 @@ export default function RootLayout({
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} font-sans antialiased bg-white text-[#00246a]`}
+        suppressHydrationWarning={true}
       >
         <Providers>
           <SearchProvider>

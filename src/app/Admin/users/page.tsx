@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useSession } from 'next-auth/react'
 
 interface User {
@@ -44,11 +44,7 @@ export default function AdminUsersPage() {
     detalles: {}
   })
 
-  useEffect(() => {
-    fetchUsers()
-  }, [currentPage, searchTerm, filterRole])
-
-  const fetchUsers = async () => {
+  const fetchUsers = useCallback(async () => {
     try {
       setLoading(true)
       const params = new URLSearchParams({
@@ -70,7 +66,11 @@ export default function AdminUsersPage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [currentPage, searchTerm, filterRole])
+
+  useEffect(() => {
+    fetchUsers()
+  }, [fetchUsers])
 
   const handleCreateUser = async (e: React.FormEvent) => {
     e.preventDefault()

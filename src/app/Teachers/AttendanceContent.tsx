@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
-import { CheckSquare, User, Calendar, Edit, Save, X } from 'lucide-react'
-import { TeacherManagedAttendance, TeacherCreateAttendanceRequest, TeacherUpdateAttendanceRequest } from '@/types/api'
+import { CheckSquare, User, Edit, Save, X } from 'lucide-react'
+import { TeacherManagedAttendance, TeacherUpdateAttendanceRequest } from '@/types/api'
 
 export default function AttendanceContent() {
     const [attendance, setAttendance] = useState<TeacherManagedAttendance[]>([])

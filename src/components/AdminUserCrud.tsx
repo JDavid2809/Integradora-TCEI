@@ -1,11 +1,30 @@
 'use client'
 
+<<<<<<< HEAD
 import React, { useState, useEffect, useRef } from 'react'
 import { Users, Edit, Trash2, UserPlus, Mail, Phone, Calendar, Save, Search, Filter, X, AlertTriangle } from 'lucide-react'
 import { useDebounce } from '@/hooks/useDebounce'
 import { Pagination } from './admin/common/Pagination'
 import { FeedbackAlert } from './admin/common/FeedbackAlert'
 import { api } from '@/lib/apiClient'
+=======
+import React, { useState, useEffect, useCallback } from 'react'
+import { 
+  Users, 
+  Edit, 
+  Trash2, 
+  Search, 
+  Filter,
+  UserPlus,
+  Mail,
+  Phone,
+  Calendar,
+  Save,
+  X,
+  AlertTriangle,
+  CheckCircle
+} from 'lucide-react'
+>>>>>>> 5e89fd7f48b85234594ec16f9175f9cdbca92c39
 
 interface User {
   id: number
@@ -116,6 +135,7 @@ export default function AdminUserCrud() {
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [successMessage, setSuccessMessage] = useState('')
 
+<<<<<<< HEAD
   useEffect(() => {
     fetchUsers()
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -124,6 +144,9 @@ export default function AdminUserCrud() {
   // Ya no se cargan categorías desde API (se calculan automáticamente)
 
   const fetchUsers = async () => {
+=======
+  const fetchUsers = useCallback(async () => {
+>>>>>>> 5e89fd7f48b85234594ec16f9175f9cdbca92c39
     try {
       setLoading(true)
       // Cancelar request previo
@@ -148,7 +171,12 @@ export default function AdminUserCrud() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [currentPage, roleFilter, searchTerm])
+
+  useEffect(() => {
+    fetchUsers()
+    fetchCategories()
+  }, [fetchUsers])
 
   // Eliminado: fetchCategories (categorías calculadas automáticamente)
 

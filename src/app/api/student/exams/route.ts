@@ -140,7 +140,7 @@ export async function POST(request: NextRequest) {
     }
 
     const data = await request.json();
-    const { id_examen, respuestas, tiempo_empleado } = data;
+    const { id_examen, respuestas } = data;
 
     // Validaciones
     if (!id_examen || !Array.isArray(respuestas)) {

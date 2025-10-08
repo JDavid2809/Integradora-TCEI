@@ -2,7 +2,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
 type ChatRequest = { question: string };
-type ChatResponse = { reply: string; options?: string[] };
+
 
 export async function POST(req: NextRequest) {
   try {
@@ -35,6 +35,6 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ reply, options });
   } catch (err) {
-    return NextResponse.json({ reply: "Error en la API 😅", options: [] });
+    return NextResponse.json({ reply: `Error en la API: ${err}`, options: [] });
   }
 }

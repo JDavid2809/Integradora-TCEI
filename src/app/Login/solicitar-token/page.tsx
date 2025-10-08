@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { resendVerification } from "@/actions/auth/Auth-actions";
-import { set } from "zod";
 
 export default function Page() {
   const [email, setEmail] = useState("");

@@ -37,6 +37,6 @@ export async function POST(req: Request) {
 
     return new Response(JSON.stringify({ message: "Contraseña cambiada con éxito" }), { status: 200 })
   } catch (error) {
-    return new Response(JSON.stringify({ message: "Error en el servidor" }), { status: 500 })
+    return new Response(JSON.stringify({ message: `Error al cambiar la contraseña: ${error}` }), { status: 500 })
   }
 }

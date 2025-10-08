@@ -11,13 +11,16 @@ import Sidebar from "./Sidebar"
 import Header from "./Header"
 import BottomTabs from "./Tabs"
 import { Session } from "next-auth"
+import { CursoFromDB } from "@/types/courses"
 
 interface DashboardProps {
     onLogout: () => void
     user?: Session
+    studentCourses?: CursoFromDB[]
+    allCourses?: CursoFromDB[]
 }
 
-export default function Dashboard({ onLogout, user }: DashboardProps) {
+export default function Dashboard({ onLogout, user, studentCourses, allCourses }: DashboardProps) {
     const [activeSection, setActiveSection] = useState("dashboard")
     const [sidebarOpen, setSidebarOpen] = useState(false)
 
@@ -37,7 +40,7 @@ export default function Dashboard({ onLogout, user }: DashboardProps) {
             case "dashboard":
                 return <DashboardContent key="dashboard" />
             case "courses":
-                return <CoursesContent key="courses" />
+                return <CoursesContent key="courses" studentCourses={studentCourses} allCourses={allCourses} />
             case "schedule":
                 return <ScheduleContent key="schedule" />
             case "payments":

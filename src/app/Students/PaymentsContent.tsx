@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
-import { CreditCard, DollarSign, Calendar, Book } from 'lucide-react'
+import { CreditCard, DollarSign, Calendar } from 'lucide-react'
 import { StudentOwnPayment } from '@/types/api'
 
 export default function PaymentsContent() {

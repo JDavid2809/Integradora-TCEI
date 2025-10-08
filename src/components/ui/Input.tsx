@@ -27,9 +27,10 @@ export default function ConfirmPage({ token }: ConfirmPageProps) {
         setMensaje("¡Cuenta verificada! Redirigiendo al login...");
         setEstado("success");
         setTimeout(() => router.push("/Login"), 2000);
-      } catch (e: unknown) {
+      } catch (error) {
         setMensaje("Token inválido. Redirigiendo al login...");
         setEstado("error");
+        console.error("Error al verificar token:", error);
         setTimeout(() => router.push("/Login"), 2000);
       }
     };

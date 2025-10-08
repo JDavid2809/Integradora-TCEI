@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { 
   FileText, 
   Plus, 
@@ -104,11 +104,108 @@ export default function AdminExamCrud() {
     ],
   })
 
-  // Validación de preguntas
-  function validateQuestionForm() {
-    const newErrors: Record<string, string> = {};
-    if (!questionFormData.descripcion) newErrors.descripcion = 'Descripción de la pregunta es requerida';
-  const validAnswers = questionFormData.respuestas.filter((r: QuestionAnswerFormData) => r.descripcion.trim() !== '');
+  const [errors, setErrors] = useState<Record<string, string>>({})
+  const [successMessage, setSuccessMessage] = useState('')
+
+  const fetchExams = useCallback(async () => {
+    try {
+      setLoading(true)
+      const params = new URLSearchParams({
+        page: currentPage.toString(),
+        limit: '10',
+        ...(levelFilter !== 'ALL' && { nivel: levelFilter }),
+        ...(statusFilter !== 'ALL' && { activo: statusFilter }),
+        ...(searchTerm && { search: searchTerm })
+      })
+
+      const response = await fetch(`/api/admin/exams?${params}`)
+      const data = await response.json()
+
+      if (response.ok) {
+        setExams(data.exams)
+        setTotalPages(Math.ceil(data.total / 10))
+      } else {
+        console.error('Error fetching exams:', data.error)
+      }
+    } catch (error) {
+      console.error('Error fetching exams:', error)
+    } finally {
+      setLoading(false)
+    }
+  }, [currentPage, levelFilter, statusFilter, searchTerm])
+
+  useEffect(() => {
+    fetchExams()
+    fetchLevels()
+  }, [fetchExams])
+
+  const fetchLevels = async () => {
+    try {
+      const response = await fetch('/api/admin/system/levels')
+      const data = await response.json()
+      if (response.ok) {
+        setLevels(data.levels)
+      }
+    } catch (error) {
+      console.error('Error fetching levels:', error)
+    }
+  }
+
+  const fetchQuestions = async (examId: number) => {
+    try {
+      const response = await fetch(`/api/admin/exams/${examId}/questions`)
+      const data = await response.json()
+      if (response.ok) {
+        setQuestions(data.questions)
+      }
+    } catch (error) {
+      console.error('Error fetching questions:', error)
+    }
+  }
+
+  const handleCreateExam = () => {
+    setEditingExam(null)
+    setFormData({
+      nombre: '',
+      id_nivel: null,
+      b_activo: true
+    })
+    setErrors({})
+    setShowModal(true)
+  }
+
+  const handleEditExam = (exam: Exam) => {
+    setEditingExam(exam)
+    setFormData({
+      nombre: exam.nombre,
+      id_nivel: exam.id_nivel,
+      b_activo: exam.b_activo
+    })
+    setErrors({})
+    setShowModal(true)
+  }
+
+  const handleViewQuestions = (exam: Exam) => {
+    setSelectedExam(exam)
+    fetchQuestions(exam.id_examen)
+    setShowQuestionsModal(true)
+  }
+
+  const validateForm = (): boolean => {
+    const newErrors: Record<string, string> = {}
+
+    if (!formData.nombre) newErrors.nombre = 'Nombre del examen es requerido'
+
+    setErrors(newErrors)
+    return Object.keys(newErrors).length === 0
+  }
+
+  const validateQuestionForm = (): boolean => {
+    const newErrors: Record<string, string> = {}
+
+    if (!questionFormData.descripcion) newErrors.descripcion = 'Descripción de la pregunta es requerida'
+    
+    const validAnswers = questionFormData.respuestas.filter(r => r.descripcion.trim() !== '')
     if (validAnswers.length < 2) {
       newErrors.respuestas = 'Debe tener al menos 2 respuestas';
     }

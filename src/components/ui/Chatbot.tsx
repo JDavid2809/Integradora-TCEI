@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 
 type Msg = {
   id: string;
@@ -7,7 +7,9 @@ type Msg = {
   text: string;
 };
 
-const uid = () => Math.random().toString(36).slice(2, 9);
+// Generador de ID estático basado en contador para evitar problemas de hidratación
+let messageCounter = 0;
+const uid = () => `msg-${++messageCounter}-${Date.now()}`;
 
 export default function Chatbot() {
   const [open, setOpen] = useState(false);
@@ -16,17 +18,13 @@ export default function Chatbot() {
   const [typing, setTyping] = useState(false);
   const [options, setOptions] = useState<string[]>([]);
   const [showOptions, setShowOptions] = useState(true);
+  const [isInitialized, setIsInitialized] = useState(false);
   const listRef = useRef<HTMLDivElement | null>(null);
 
-  useEffect(() => {
-    sendMessage(""); // mensaje inicial
-  }, []);
-
-  useEffect(() => {
-    listRef.current?.scrollTo({ top: listRef.current.scrollHeight, behavior: "smooth" });
-  }, [messages, typing]);
-
-  const sendMessage = async (text: string) => {
+  const sendMessage = useCallback(async (text: string) => {
+    // Evitar múltiples peticiones mientras está escribiendo
+    if (typing) return;
+    
     if (text.trim()) {
       setMessages((prev) => [...prev, { id: uid(), sender: "You", text }]);
       setInput("");
@@ -43,7 +41,7 @@ export default function Chatbot() {
       });
       data = await res.json();
     } catch {
-      data = { reply: "Lo siento, no entendí. Aquí tienes algunas opciones:", options: options.length ? options : [] };
+      data = { reply: "Lo siento, no entendí. Aquí tienes algunas opciones:", options: [] };
     }
 
     const aiId = uid();
@@ -62,11 +60,26 @@ export default function Chatbot() {
         if (data.options?.length) setOptions(data.options);
       }
     }, 15);
-  };
+  }, [typing]); // Solo depende de typing
+
+  // Efecto para mensaje inicial - solo una vez
+  useEffect(() => {
+    if (open && !isInitialized) {
+      setIsInitialized(true);
+      sendMessage(""); // mensaje inicial
+    }
+  }, [open, isInitialized, sendMessage]);
+
+  useEffect(() => {
+    listRef.current?.scrollTo({ top: listRef.current.scrollHeight, behavior: "smooth" });
+  }, [messages, typing]);
 
   const resetChat = () => {
     setMessages([]);
-    sendMessage("");
+    setOptions([]);
+    setIsInitialized(false);
+    setTyping(false);
+    // El mensaje inicial se ejecutará automáticamente cuando isInitialized sea false
   };
 
   return (
@@ -158,8 +171,9 @@ export default function Chatbot() {
             {options.map((opt) => (
               <button
                 key={opt}
-                onClick={() => sendMessage(opt)}
-                className="bg-white px-4 py-2 rounded-2xl shadow hover:bg-blue-100 hover:scale-105 transition transform text-sm flex items-center gap-1 whitespace-nowrap"
+                onClick={() => !typing && sendMessage(opt)}
+                disabled={typing}
+                className="bg-white px-4 py-2 rounded-2xl shadow hover:bg-blue-100 hover:scale-105 transition transform text-sm flex items-center gap-1 whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 💡 {opt}
               </button>
@@ -171,7 +185,9 @@ export default function Chatbot() {
         <form
           onSubmit={(e) => {
             e.preventDefault();
-            if (input.trim()) sendMessage(input);
+            if (input.trim() && !typing) {
+              sendMessage(input);
+            }
           }}
           className="flex p-4 border-t border-gray-200 gap-2"
         >
@@ -179,10 +195,15 @@ export default function Chatbot() {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder="Escribe tu mensaje..."
-            className="flex-1 rounded-2xl border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#002469]"
+            disabled={typing}
+            className="flex-1 rounded-2xl border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#002469] disabled:opacity-50"
           />
-          <button type="submit" className="bg-[#002469] text-white px-5 py-2 rounded-2xl hover:bg-[#001a4d] transition">
-            Enviar
+          <button 
+            type="submit" 
+            disabled={typing || !input.trim()}
+            className="bg-[#002469] text-white px-5 py-2 rounded-2xl hover:bg-[#001a4d] transition disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {typing ? "..." : "Enviar"}
           </button>
         </form>
 

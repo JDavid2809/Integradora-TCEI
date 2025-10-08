@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import {  NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/authOptions";
 import { prisma } from "@/lib/prisma";
@@ -33,13 +33,14 @@ export async function GET() {
       return NextResponse.json({ error: "Estudiante no encontrado" }, { status: 404 });
     }
 
-    // Obtener cursos donde está inscrito
-    const enrolledCourses = await prisma.horario.findMany({
+    // Obtener cursos donde está inscrito (tabla Inscripcion)
+    const enrolledCourses = await prisma.inscripcion.findMany({
       where: {
-        id_estudiante: student.id_estudiante
+        student_id: student.id_estudiante,
+        status: "ACTIVE" // Solo inscripciones activas
       },
       include: {
-        curso: {
+        course: {
           include: {
             imparte: {
               include: {
@@ -58,37 +59,30 @@ export async function GET() {
               }
             }
           }
-        },
-        horario_detalle: {
-          include: {
-            imparte: {
-              include: {
-                horario_pred_detalle: true
-              }
-            }
-          }
         }
       }
     });
 
-    const coursesData = enrolledCourses.map(horario => ({
-      id_horario: horario.id_horario,
+    const coursesData = enrolledCourses.map(inscripcion => ({
+      id_inscripcion: inscripcion.id,
+      status: inscripcion.status,
+      payment_status: inscripcion.payment_status,
+      enrolled_at: inscripcion.enrolled_at,
       curso: {
-        id_curso: horario.curso.id_curso,
-        nombre: horario.curso.nombre,
-        modalidad: horario.curso.modalidad,
-        inicio: horario.curso.inicio,
-        fin: horario.curso.fin,
-        activo: horario.curso.b_activo
+        id_curso: inscripcion.course.id_curso,
+        nombre: inscripcion.course.nombre,
+        modalidad: inscripcion.course.modalidad,
+        inicio: inscripcion.course.inicio,
+        fin: inscripcion.course.fin,
+        activo: inscripcion.course.b_activo
       },
-      profesores: horario.curso.imparte.map(imp => ({
+      profesores: inscripcion.course.imparte.map((imp: any) => ({
         id_profesor: imp.profesor.id_profesor,
         nombre: `${imp.profesor.usuario.nombre} ${imp.profesor.usuario.apellido}`,
         email: imp.profesor.usuario.email,
         nivel: imp.nivel?.nombre || 'No especificado'
       })),
-      horarios: horario.horario_detalle,
-      comentario: horario.comentario
+      notes: inscripcion.notes
     }));
 
     return NextResponse.json({

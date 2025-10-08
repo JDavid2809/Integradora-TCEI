@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { 
   CreditCard, 
   Plus, 
@@ -112,13 +112,7 @@ export default function AdminPaymentCrud() {
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [successMessage, setSuccessMessage] = useState('')
 
-  useEffect(() => {
-    fetchPayments()
-    fetchStudents()
-    fetchCourseClasses()
-  }, [currentPage, typeFilter, dateFilter, searchTerm])
-
-  const fetchPayments = async () => {
+  const fetchPayments = useCallback(async () => {
     try {
       setLoading(true)
       const params = new URLSearchParams({
@@ -144,7 +138,13 @@ export default function AdminPaymentCrud() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [currentPage, typeFilter, dateFilter, searchTerm])
+
+  useEffect(() => {
+    fetchPayments()
+    fetchStudents()
+    fetchCourseClasses()
+  }, [fetchPayments])
 
   const fetchStudents = async () => {
     try {

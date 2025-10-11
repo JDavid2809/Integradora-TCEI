@@ -20,9 +20,9 @@ import {
 
 // Import CRUD components
 import AdminUserCrud from '@/components/AdminUserCrud'
-import AdminCourseCrud from '@/components/AdminCourseCrud'
-import AdminExamCrud from '@/components/AdminExamCrud'
+// Courses and Exams removed from Admin per specifications
 import AdminPaymentCrud from '@/components/AdminPaymentCrud'
+import AdminAttendanceCrud from '@/components/AdminAttendanceCrud'
 
 interface SystemStats {
   resumen: {
@@ -131,9 +131,8 @@ export default function AdminPage() {
   const navigationItems = [
     { id: 'dashboard', name: 'Dashboard', icon: BarChart3 },
     { id: 'users', name: 'Usuarios', icon: Users },
-    { id: 'courses', name: 'Cursos', icon: BookOpen },
-    { id: 'exams', name: 'Exámenes', icon: FileText },
     { id: 'payments', name: 'Pagos', icon: CreditCard },
+    { id: 'attendance', name: 'Asistencias', icon: UserCheck },
     { id: 'system', name: 'Sistema', icon: Settings }
   ]
 
@@ -255,12 +254,10 @@ export default function AdminPage() {
         return renderDashboard()
       case 'users':
         return <AdminUserCrud />
-      case 'courses':
-        return <AdminCourseCrud />
-      case 'exams':
-        return <AdminExamCrud />
       case 'payments':
         return <AdminPaymentCrud />
+      case 'attendance':
+        return <AdminAttendanceCrud />
       case 'system':
         return <AdminSystemSection navigateToPage={navigateToPage} />
       default:

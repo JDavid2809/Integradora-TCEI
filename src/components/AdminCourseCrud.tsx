@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { 
   BookOpen, 
   Plus, 
@@ -10,14 +10,16 @@ import {
   Filter,
   Calendar,
   Save,
-  X,
-  AlertTriangle,
-  CheckCircle,
   Clock,
   Users,
   MapPin,
   Globe
 } from 'lucide-react'
+import { useDebounce } from '@/hooks/useDebounce'
+import { Pagination } from './admin/common/Pagination'
+import { FeedbackAlert } from './admin/common/FeedbackAlert'
+import { Modal } from './admin/common/Modal'
+import { api } from '@/lib/apiClient'
 
 interface Course {
   id_curso: number
@@ -29,7 +31,7 @@ interface Course {
   precio?: number
   total_lecciones?: number
   _count?: {
-    inscripciones: number
+    horario: number
     imparte: number
   }
 }
@@ -50,29 +52,6 @@ interface Teacher {
   }
 }
 
-// Tipos para las respuestas de la API
-interface CoursesApiResponse {
-  courses: Course[]
-  total: number
-}
-
-interface LevelsApiResponse {
-  levels: Level[]
-}
-
-interface TeachersApiResponse {
-  users: Array<{
-    detalles?: { id_profesor: number }
-    nombre: string
-    apellido: string
-    email: string
-  }>
-}
-
-interface ValidationErrors {
-  [key: string]: string
-}
-
 interface CourseFormData {
   nombre: string
   modalidad: 'PRESENCIAL' | 'ONLINE'
@@ -81,117 +60,6 @@ interface CourseFormData {
   b_activo: boolean
   precio?: number
   total_lecciones?: number
-}
-
-// Funciones utilitarias
-const formatDate = (dateString: string | null): string => {
-  if (!dateString) return 'No definida'
-  return new Date(dateString).toLocaleDateString('es-ES', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric'
-  })
-}
-
-const getModalityIcon = (modalidad: string): React.ReactElement => {
-  return modalidad === 'ONLINE' ? <Globe className="w-4 h-4" /> : <MapPin className="w-4 h-4" />
-}
-
-const getModalityColor = (modalidad: string): string => {
-  return modalidad === 'ONLINE' ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800'
-}
-
-// Funciones de validación
-const validateCourseForm = (formData: CourseFormData): ValidationErrors => {
-  const errors: ValidationErrors = {}
-
-  if (!formData.nombre.trim()) {
-    errors.nombre = 'Nombre del curso es requerido'
-  }
-  if (!formData.inicio) {
-    errors.inicio = 'Fecha de inicio es requerida'
-  }
-  if (!formData.fin) {
-    errors.fin = 'Fecha de fin es requerida'
-  }
-  
-  if (formData.inicio && formData.fin && new Date(formData.inicio) >= new Date(formData.fin)) {
-    errors.fin = 'La fecha de fin debe ser posterior a la fecha de inicio'
-  }
-
-  return errors
-}
-
-// Funciones de API
-const fetchCoursesApi = async (params: URLSearchParams): Promise<CoursesApiResponse> => {
-  const response = await fetch(`/api/admin/courses?${params}`)
-  const data = await response.json()
-  
-  if (!response.ok) {
-    throw new Error(data.error || 'Error al obtener cursos')
-  }
-  
-  return data
-}
-
-const fetchLevelsApi = async (): Promise<Level[]> => {
-  const response = await fetch('/api/admin/system/levels')
-  const data: LevelsApiResponse = await response.json()
-  
-  if (!response.ok) {
-    throw new Error('Error al obtener niveles')
-  }
-  
-  return data.levels
-}
-
-const fetchTeachersApi = async (): Promise<Teacher[]> => {
-  const response = await fetch('/api/admin/users?role=PROFESOR&limit=100')
-  const data: TeachersApiResponse = await response.json()
-  
-  if (!response.ok) {
-    throw new Error('Error al obtener profesores')
-  }
-  
-  return data.users
-    .map((user) => ({
-      id_profesor: user.detalles?.id_profesor || 0,
-      nombre: user.nombre,
-      paterno: user.apellido,
-      materno: '',
-      usuario: { email: user.email }
-    }))
-    .filter((teacher) => teacher.id_profesor > 0)
-}
-
-const saveCourseApi = async (formData: CourseFormData, courseId?: number): Promise<void> => {
-  const url = courseId ? `/api/admin/courses/${courseId}` : '/api/admin/courses'
-  const method = courseId ? 'PUT' : 'POST'
-
-  const response = await fetch(url, {
-    method,
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(formData)
-  })
-
-  const data = await response.json()
-
-  if (!response.ok) {
-    throw new Error(data.error || 'Error al guardar curso')
-  }
-}
-
-const deleteCourseApi = async (courseId: number): Promise<void> => {
-  const response = await fetch(`/api/admin/courses/${courseId}`, {
-    method: 'DELETE'
-  })
-
-  if (!response.ok) {
-    const data = await response.json()
-    throw new Error(data.error || 'Error al eliminar curso')
-  }
 }
 
 export default function AdminCourseCrud() {
@@ -207,6 +75,9 @@ export default function AdminCourseCrud() {
   const [currentPage, setCurrentPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const abortRef = useRef<AbortController | null>(null)
+
+  const debouncedSearch = useDebounce(searchTerm, 400)
 
   const [formData, setFormData] = useState<CourseFormData>({
     nombre: '',
@@ -221,38 +92,47 @@ export default function AdminCourseCrud() {
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [successMessage, setSuccessMessage] = useState('')
 
-  const fetchCourses = useCallback(async () => {
+  useEffect(() => {
+    fetchCourses()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentPage, modalityFilter, statusFilter, debouncedSearch])
+
+  useEffect(() => { 
+    fetchLevels()
+    fetchTeachers()
+  }, [])
+
+  const fetchCourses = async () => {
     try {
       setLoading(true)
+      // Cancelar request previo
+      if (abortRef.current) abortRef.current.abort()
+      const controller = new AbortController()
+      abortRef.current = controller
+
       const params = new URLSearchParams({
         page: currentPage.toString(),
         limit: '10',
         ...(modalityFilter !== 'ALL' && { modalidad: modalityFilter }),
         ...(statusFilter !== 'ALL' && { activo: statusFilter }),
-        ...(searchTerm && { search: searchTerm })
+        ...(debouncedSearch && { search: debouncedSearch })
       })
 
-      const data = await fetchCoursesApi(params)
+      const data = await api<{ courses: Course[]; total: number }>(`/api/admin/courses?${params}`, { signal: controller.signal })
       setCourses(data.courses)
       setTotalPages(Math.ceil(data.total / 10))
-    } catch (error) {
+    } catch (error: any) {
+      if (error?.name === 'AbortError') return
       console.error('Error fetching courses:', error)
-      setErrors({ general: error instanceof Error ? error.message : 'Error desconocido' })
     } finally {
       setLoading(false)
     }
-  }, [currentPage, modalityFilter, statusFilter, searchTerm])
-
-  useEffect(() => {
-    fetchCourses()
-    fetchLevels()
-    fetchTeachers()
-  }, [fetchCourses])
+  }
 
   const fetchLevels = async () => {
     try {
-      const levels = await fetchLevelsApi()
-      setLevels(levels)
+      const data = await api<{ levels: Level[] }>('/api/admin/system/levels')
+      setLevels(data.levels)
     } catch (error) {
       console.error('Error fetching levels:', error)
     }
@@ -260,8 +140,22 @@ export default function AdminCourseCrud() {
 
   const fetchTeachers = async () => {
     try {
-      const teachers = await fetchTeachersApi()
-      setTeachers(teachers)
+      const response = await fetch('/api/admin/users?role=PROFESOR&limit=100')
+      const data = await response.json()
+      if (response.ok) {
+        setTeachers(data.users.map((user: {
+          detalles: { id_profesor: number };
+          nombre: string;
+          apellido: string;
+          email: string;
+        }) => ({
+          id_profesor: user.detalles?.id_profesor,
+          nombre: user.nombre,
+          paterno: user.apellido,
+          materno: '',
+          usuario: { email: user.email }
+        })).filter((teacher: Record<string, unknown>) => teacher.id_profesor))
+      }
     } catch (error) {
       console.error('Error fetching teachers:', error)
     }
@@ -298,7 +192,16 @@ export default function AdminCourseCrud() {
   }
 
   const validateForm = (): boolean => {
-    const newErrors = validateCourseForm(formData)
+    const newErrors: Record<string, string> = {}
+
+    if (!formData.nombre) newErrors.nombre = 'Nombre del curso es requerido'
+    if (!formData.inicio) newErrors.inicio = 'Fecha de inicio es requerida'
+    if (!formData.fin) newErrors.fin = 'Fecha de fin es requerida'
+    
+    if (formData.inicio && formData.fin && new Date(formData.inicio) >= new Date(formData.fin)) {
+      newErrors.fin = 'La fecha de fin debe ser posterior a la fecha de inicio'
+    }
+
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
   }
@@ -308,13 +211,19 @@ export default function AdminCourseCrud() {
 
     setIsSubmitting(true)
     try {
-      await saveCourseApi(formData, editingCourse?.id_curso)
+      const url = editingCourse ? `/api/admin/courses/${editingCourse.id_curso}` : '/api/admin/courses'
+      const method = editingCourse ? 'PUT' : 'POST'
+
+      await api(url, {
+        method,
+        body: JSON.stringify(formData)
+      })
       setSuccessMessage(editingCourse ? 'Curso actualizado exitosamente' : 'Curso creado exitosamente')
       setShowModal(false)
       fetchCourses()
       setTimeout(() => setSuccessMessage(''), 3000)
-    } catch (error) {
-      setErrors({ general: error instanceof Error ? error.message : 'Error desconocido' })
+    } catch (error: any) {
+      setErrors({ general: error?.message || 'Error al guardar curso' })
     } finally {
       setIsSubmitting(false)
     }
@@ -324,17 +233,31 @@ export default function AdminCourseCrud() {
     if (!confirm('¿Estás seguro de que quieres eliminar este curso?')) return
 
     try {
-      await deleteCourseApi(courseId)
+      await api(`/api/admin/courses/${courseId}`, { method: 'DELETE' })
       setSuccessMessage('Curso eliminado exitosamente')
       fetchCourses()
       setTimeout(() => setSuccessMessage(''), 3000)
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Error desconocido'
-      alert('Error al eliminar curso: ' + errorMessage)
+    } catch (error: any) {
+      alert(error?.message || 'Error al eliminar curso')
     }
   }
 
+  const getModalityIcon = (modalidad: string) => {
+    return modalidad === 'ONLINE' ? <Globe className="w-4 h-4" /> : <MapPin className="w-4 h-4" />
+  }
 
+  const getModalityColor = (modalidad: string) => {
+    return modalidad === 'ONLINE' ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800'
+  }
+
+  const formatDate = (dateString: string | null) => {
+    if (!dateString) return 'No definida'
+    return new Date(dateString).toLocaleDateString('es-ES', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    })
+  }
 
   return (
     <div className="p-6 space-y-6">
@@ -344,21 +267,12 @@ export default function AdminCourseCrud() {
           <BookOpen className="w-8 h-8 text-[#00246a]" />
           <h1 className="text-2xl font-bold text-[#00246a]">Gestión de Cursos</h1>
         </div>
-        <button
-          onClick={handleCreateCourse}
-          className="flex items-center gap-2 bg-[#00246a] text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
-        >
-          <Plus className="w-5 h-5" />
-          Nuevo Curso
-        </button>
+        {/* Botón de crear curso removido para Admin: solo lectura/edición/eliminación */}
       </div>
 
       {/* Success Message */}
       {successMessage && (
-        <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded flex items-center gap-2">
-          <CheckCircle className="w-5 h-5" />
-          {successMessage}
-        </div>
+        <FeedbackAlert type="success">{successMessage}</FeedbackAlert>
       )}
 
       {/* Filters */}
@@ -433,8 +347,8 @@ export default function AdminCourseCrud() {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {courses.map((course) => (
-                  <tr key={course.id_curso} className="hover:bg-gray-50">
+                {courses.map((course, idx) => (
+                  <tr key={course.id_curso ?? `course-${idx}`} className="hover:bg-gray-50">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm font-medium text-gray-900">
                         {course.nombre}
@@ -462,7 +376,7 @@ export default function AdminCourseCrud() {
                       <div className="space-y-1">
                         <div className="flex items-center gap-1">
                           <Users className="w-4 h-4 text-gray-400" />
-                          <span className="text-xs">{course._count?.inscripciones || 0} estudiantes</span>
+                          <span className="text-xs">{course._count?.horario || 0} estudiantes</span>
                         </div>
                         <div className="flex items-center gap-1">
                           <BookOpen className="w-4 h-4 text-gray-400" />
@@ -503,53 +417,8 @@ export default function AdminCourseCrud() {
         )}
 
         {/* Pagination */}
-        {!loading && totalPages > 1 && (
-          <div className="bg-white px-4 py-3 border-t border-gray-200 sm:px-6">
-            <div className="flex items-center justify-between">
-              <div className="flex-1 flex justify-between sm:hidden">
-                <button
-                  onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-                  disabled={currentPage === 1}
-                  className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
-                >
-                  Anterior
-                </button>
-                <button
-                  onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
-                  disabled={currentPage === totalPages}
-                  className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
-                >
-                  Siguiente
-                </button>
-              </div>
-              <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
-                <div>
-                  <p className="text-sm text-gray-700">
-                    Página <span className="font-medium">{currentPage}</span> de{' '}
-                    <span className="font-medium">{totalPages}</span>
-                  </p>
-                </div>
-                <div>
-                  <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
-                    <button
-                      onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-                      disabled={currentPage === 1}
-                      className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
-                    >
-                      Anterior
-                    </button>
-                    <button
-                      onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
-                      disabled={currentPage === totalPages}
-                      className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
-                    >
-                      Siguiente
-                    </button>
-                  </nav>
-                </div>
-              </div>
-            </div>
-          </div>
+        {!loading && (
+          <Pagination page={currentPage} totalPages={totalPages} onChange={setCurrentPage} />
         )}
       </div>
 
@@ -650,37 +519,6 @@ export default function AdminCourseCrud() {
                     }`}
                   />
                   {errors.fin && <p className="mt-1 text-sm text-red-600">{errors.fin}</p>}
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Precio ($)
-                  </label>
-                  <input
-                    type="number"
-                    min="0"
-                    step="0.01"
-                    value={formData.precio || ''}
-                    onChange={(e) => setFormData({ ...formData, precio: e.target.value ? parseFloat(e.target.value) : undefined })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00246a] focus:border-transparent"
-                    placeholder="Ej: 199.99 (opcional)"
-                  />
-                  <p className="mt-1 text-xs text-gray-500">Dejar vacío si el curso es gratuito</p>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Total de Lecciones
-                  </label>
-                  <input
-                    type="number"
-                    min="0"
-                    value={formData.total_lecciones || ''}
-                    onChange={(e) => setFormData({ ...formData, total_lecciones: e.target.value ? parseInt(e.target.value) : undefined })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00246a] focus:border-transparent"
-                    placeholder="Ej: 24 (opcional)"
-                  />
-                  <p className="mt-1 text-xs text-gray-500">Número de lecciones de contenido</p>
                 </div>
               </div>
 

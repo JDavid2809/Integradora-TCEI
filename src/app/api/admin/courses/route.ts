@@ -120,73 +120,12 @@ export async function GET(request: NextRequest) {
 // POST - Crear nuevo curso
 export async function POST(request: NextRequest) {
   try {
+    // Admin has read/update/delete permissions, but must NOT create courses per spec
     const isAuthorized = await checkAdminAuth()
     if (!isAuthorized) {
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 })
     }
-
-    const body = await request.json()
-    const { nombre, modalidad, inicio, fin, profesores, niveles, precio, total_lecciones } = body
-
-    if (!nombre || !modalidad) {
-      return NextResponse.json({ error: 'Faltan campos requeridos' }, { status: 400 })
-    }
-
-    if (!['PRESENCIAL', 'ONLINE'].includes(modalidad)) {
-      return NextResponse.json({ error: 'Modalidad inválida' }, { status: 400 })
-    }
-
-    const result = await prisma.$transaction(async (tx) => {
-      // Crear curso
-      const newCourse = await tx.curso.create({
-        data: {
-          nombre,
-          modalidad,
-          inicio: inicio ? new Date(inicio) : null,
-          fin: fin ? new Date(fin) : null,
-          precio: precio ? Number(precio) : null,
-          total_lecciones: total_lecciones ? Number(total_lecciones) : null,
-          b_activo: true
-        }
-      })
-
-      // Crear registros de imparte si se proporcionan profesores y niveles
-      if (profesores && niveles && Array.isArray(profesores) && Array.isArray(niveles)) {
-        const impartePromises = []
-        
-        for (const profesorId of profesores) {
-          for (const nivelId of niveles) {
-            impartePromises.push(
-              tx.imparte.create({
-                data: {
-                  id_profesor: profesorId,
-                  id_nivel: nivelId,
-                  id_curso: newCourse.id_curso,
-                  tipo: modalidad === 'PRESENCIAL' ? 'PRESENCIAL' : 'ONLINE'
-                }
-              })
-            )
-          }
-        }
-
-        await Promise.all(impartePromises)
-      }
-
-      return newCourse
-    })
-
-    return NextResponse.json({
-      message: 'Curso creado exitosamente',
-      course: {
-        id: result.id_curso,
-        nombre: result.nombre,
-        modalidad: result.modalidad,
-        inicio: result.inicio,
-        fin: result.fin,
-        activo: result.b_activo
-      }
-    }, { status: 201 })
-
+    return NextResponse.json({ error: 'Creación de cursos no permitida para ADMIN' }, { status: 403 })
   } catch (error) {
     console.error('Error al crear curso:', error)
     return NextResponse.json({ error: 'Error interno del servidor' }, { status: 500 })

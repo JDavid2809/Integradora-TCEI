@@ -113,6 +113,47 @@ This document describes the complete CRUD (Create, Read, Update, Delete) compone
 - `GET /api/admin/system/levels` - Get English levels
 - `GET /api/admin/system/age-categories` - Get age categories
 
+---
+
+## Endpoints y Seguridad (2025)
+
+### Endpoints admin revisados y estrictamente tipados:
+
+- `/api/admin/users` (GET, POST):
+  - Solo ADMIN puede acceder.
+  - GET: Paginación, búsqueda, filtro por rol.
+  - POST: Crea usuario (ADMIN, PROFESOR, ESTUDIANTE).
+- `/api/admin/attendance` (GET, POST):
+  - Solo ADMIN puede acceder.
+  - GET: Filtros por estudiante, curso, fechas. Paginación.
+  - POST: Registra asistencia para estudiante en clase.
+- `/api/admin/exams` (GET):
+  - Solo ADMIN puede acceder.
+  - POST: No permitido para ADMIN (política de seguridad).
+
+### Políticas y roles
+- Los endpoints validan el rol ADMIN antes de ejecutar acciones.
+- No se permite crear cursos ni exámenes desde el panel admin.
+- Inputs validados y tipados estrictamente.
+- Roles y permisos centralizados en `src/config/roles.ts`.
+
+### Ejemplo de respuesta paginada
+```json
+{
+  "users": [
+    { "id": 1, "email": "admin@demo.com", "rol": "ADMIN", ... }
+  ],
+  "pagination": { "page": 1, "limit": 10, "total": 20, "pages": 2 }
+}
+```
+
+### Auditoría y mejoras sugeridas
+- Agregar logs de auditoría en endpoints y acciones críticas.
+- Documentar flujos de permisos y roles en este archivo.
+- Ver README_ADMIN.md para detalles técnicos y de roles.
+
+---
+
 ## Integration with Main Admin Page
 
 The CRUD components are integrated into the main Admin page (`src/app/Admin/page.tsx`) through a navigation system:

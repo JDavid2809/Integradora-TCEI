@@ -12,6 +12,11 @@ declare module "next-auth" {
       image?: string | null;
       rol: "ADMIN" | "PROFESOR" | "ESTUDIANTE";
       verificado?: boolean;
+      extra?: {
+        id_profesor?: number;
+        id_estudiante?: number;
+        [key: string]: string | number | boolean | undefined;
+      } | null;
     };
   }
 
@@ -19,6 +24,11 @@ declare module "next-auth" {
     id: string; // 
     apellido?: string | null; // 
     rol: "ADMIN" | "PROFESOR" | "ESTUDIANTE";
+    extra?: {
+      id_profesor?: number;
+      id_estudiante?: number;
+      [key: string]: string | number | boolean | undefined;
+    } | null;
   }
 }
 
@@ -27,6 +37,11 @@ declare module "next-auth/jwt" {
     sub?: string; // 
     apellido?: string | null; // 
     rol: "ADMIN" | "PROFESOR" | "ESTUDIANTE";
+    extra?: {
+      id_profesor?: number;
+      id_estudiante?: number;
+      [key: string]: string | number | boolean | undefined;
+    } | null;
   }
 }
 console.log(NextAuth);

@@ -26,6 +26,8 @@ interface Course {
   inicio: string | null
   fin: string | null
   b_activo: boolean
+  precio?: number
+  total_lecciones?: number
   _count?: {
     inscripciones: number
     imparte: number
@@ -77,6 +79,8 @@ interface CourseFormData {
   inicio: string
   fin: string
   b_activo: boolean
+  precio?: number
+  total_lecciones?: number
 }
 
 // Funciones utilitarias
@@ -209,7 +213,9 @@ export default function AdminCourseCrud() {
     modalidad: 'PRESENCIAL',
     inicio: '',
     fin: '',
-    b_activo: true
+    b_activo: true,
+    precio: undefined,
+    total_lecciones: undefined
   })
 
   const [errors, setErrors] = useState<Record<string, string>>({})
@@ -268,7 +274,9 @@ export default function AdminCourseCrud() {
       modalidad: 'PRESENCIAL',
       inicio: '',
       fin: '',
-      b_activo: true
+      b_activo: true,
+      precio: undefined,
+      total_lecciones: undefined
     })
     setErrors({})
     setShowModal(true)
@@ -281,7 +289,9 @@ export default function AdminCourseCrud() {
       modalidad: course.modalidad,
       inicio: course.inicio ? new Date(course.inicio).toISOString().split('T')[0] : '',
       fin: course.fin ? new Date(course.fin).toISOString().split('T')[0] : '',
-      b_activo: course.b_activo
+      b_activo: course.b_activo,
+      precio: course.precio || undefined,
+      total_lecciones: course.total_lecciones || undefined
     })
     setErrors({})
     setShowModal(true)
@@ -640,6 +650,37 @@ export default function AdminCourseCrud() {
                     }`}
                   />
                   {errors.fin && <p className="mt-1 text-sm text-red-600">{errors.fin}</p>}
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Precio ($)
+                  </label>
+                  <input
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    value={formData.precio || ''}
+                    onChange={(e) => setFormData({ ...formData, precio: e.target.value ? parseFloat(e.target.value) : undefined })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00246a] focus:border-transparent"
+                    placeholder="Ej: 199.99 (opcional)"
+                  />
+                  <p className="mt-1 text-xs text-gray-500">Dejar vacío si el curso es gratuito</p>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Total de Lecciones
+                  </label>
+                  <input
+                    type="number"
+                    min="0"
+                    value={formData.total_lecciones || ''}
+                    onChange={(e) => setFormData({ ...formData, total_lecciones: e.target.value ? parseInt(e.target.value) : undefined })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00246a] focus:border-transparent"
+                    placeholder="Ej: 24 (opcional)"
+                  />
+                  <p className="mt-1 text-xs text-gray-500">Número de lecciones de contenido</p>
                 </div>
               </div>
 

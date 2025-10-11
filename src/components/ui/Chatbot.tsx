@@ -7,7 +7,6 @@ type Msg = {
   text: string;
 };
 
-// Generador de ID estático basado en contador para evitar problemas de hidratación
 let messageCounter = 0;
 const uid = () => `msg-${++messageCounter}-${Date.now()}`;
 
@@ -79,7 +78,7 @@ export default function Chatbot() {
     setOptions([]);
     setIsInitialized(false);
     setTyping(false);
-    // El mensaje inicial se ejecutará automáticamente cuando isInitialized sea false
+   
   };
 
   return (

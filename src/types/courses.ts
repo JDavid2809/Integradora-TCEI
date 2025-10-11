@@ -5,7 +5,10 @@ export interface CursoFromDB {
   modalidad: 'PRESENCIAL' | 'ONLINE'
   inicio: Date | null
   fin: Date | null
+  precio?: number | null
   b_activo: boolean | null
+  course_content?: string | null
+  total_lecciones_calculadas?: number
   imparte: {
     profesor: {
       usuario: {

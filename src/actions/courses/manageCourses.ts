@@ -6,6 +6,28 @@ import { authOptions } from "@/lib/authOptions"
 import { CourseSearchParams, PaginatedCourses } from "@/types/courses"
 import { createSlug } from '@/lib/slugUtils'
 
+// Función para contar lecciones desde el contenido del curso
+function countLessonsFromContent(courseContent: string | null): number {
+  if (!courseContent) return 0
+  
+  try {
+    const content = JSON.parse(courseContent)
+    if (Array.isArray(content)) {
+      return content.reduce((total, module) => {
+        if (module.lessons && Array.isArray(module.lessons)) {
+          return total + module.lessons.length
+        }
+        // Si no hay estructura de lessons, contar el módulo como 1 lección
+        return total + 1
+      }, 0)
+    }
+    return 0
+  } catch {
+    // Si no es JSON válido, retornar 0
+    return 0
+  }
+}
+
 // Interfaz para los filtros de búsqueda de cursos
 interface CourseWhereClause {
   b_activo: boolean
@@ -74,7 +96,16 @@ export async function getPaginatedCourses(params: CourseSearchParams = {}): Prom
     // Obtener cursos paginados
     const cursos = await prisma.curso.findMany({
       where: whereClause,
-      include: {
+      select: {
+        id_curso: true,
+        nombre: true,
+        descripcion: true,
+        modalidad: true,
+        inicio: true,
+        fin: true,
+        precio: true,
+        b_activo: true,
+        course_content: true,
         imparte: {
           include: {
             profesor: {
@@ -107,13 +138,20 @@ export async function getPaginatedCourses(params: CourseSearchParams = {}): Prom
       take: limit
     })
 
+    // Agregar lecciones calculadas a cada curso
+    const cursosConLecciones = cursos.map(curso => ({
+      ...curso,
+      precio: curso.precio ? Number(curso.precio) : null,
+      total_lecciones_calculadas: countLessonsFromContent(curso.course_content)
+    }))
+
     // Calcular información de paginación
     const totalPages = Math.ceil(totalCount / limit)
     const hasNextPage = page < totalPages
     const hasPrevPage = page > 1
 
     return {
-      cursos,
+      cursos: cursosConLecciones,
       totalCount,
       currentPage: page,
       totalPages,
@@ -245,7 +283,10 @@ export async function getStudentCourses(userId: number) {
       }
     })
 
-    return cursosInscritos.map(inscripcion => inscripcion.course)
+    return cursosInscritos.map(inscripcion => ({
+      ...inscripcion.course,
+      precio: inscripcion.course.precio ? Number(inscripcion.course.precio) : null
+    }))
   } catch (error) {
     console.error('Error fetching student courses:', error)
     throw new Error('Error al obtener los cursos del estudiante')
@@ -415,21 +456,38 @@ export async function getCourseBySlug(slug: string) {
       where: {
         b_activo: true
       },
-      include: {
-        imparte: {
-          include: {
-            profesor: {
-              include: {
-                usuario: {
-                  select: {
-                    nombre: true,
-                    apellido: true,
-                    email: true,
-                  }
-                }
+      select: {
+        id_curso: true,
+        nombre: true,
+        descripcion: true,
+        resumen: true,
+        modalidad: true,
+        inicio: true,
+        fin: true,
+        precio: true,
+        nivel_ingles: true,
+        what_you_learn: true,
+        features: true,
+        requirements: true,
+        target_audience: true,
+        course_content: true,
+        created_by: true,
+        created_at: true,
+        updated_at: true,
+        creator: {
+          select: {
+            id_profesor: true,
+            nivel_estudios: true,
+            observaciones: true,
+            edad: true,
+            telefono: true,
+            usuario: {
+              select: {
+                nombre: true,
+                apellido: true,
+                email: true
               }
-            },
-            nivel: true,
+            }
           }
         },
         inscripciones: {
@@ -438,7 +496,8 @@ export async function getCourseBySlug(slug: string) {
           },
           include: {
             student: {
-              include: {
+              select: {
+                id_estudiante: true,
                 usuario: {
                   select: {
                     nombre: true,
@@ -455,20 +514,53 @@ export async function getCourseBySlug(slug: string) {
               where: {
                 status: 'ACTIVE'
               }
+            },
+            reviews: {
+              where: {
+                is_active: true
+              }
             }
+          }
+        },
+        reviews: {
+          where: {
+            is_active: true
+          },
+          include: {
+            student: {
+              include: {
+                usuario: {
+                  select: {
+                    id: true,
+                    nombre: true,
+                    apellido: true
+                  }
+                }
+              }
+            }
+          },
+          orderBy: {
+            created_at: 'desc'
           }
         }
       }
     })
 
     // Buscar el curso cuyo nombre coincida con el slug
-    const curso = cursos.find(c => createSlug(c.nombre) === slug)
+    const curso = cursos.find((c) => createSlug(c.nombre) === slug)
 
     if (!curso) {
       throw new Error('Curso no encontrado')
     }
 
-    return curso
+    // Agregar lecciones calculadas desde el contenido
+    const cursoConLecciones = {
+      ...curso,
+      precio: curso.precio ? Number(curso.precio) : null,
+      total_lecciones_calculadas: countLessonsFromContent(curso.course_content)
+    }
+
+    return cursoConLecciones
   } catch (error) {
     console.error('Error fetching course by slug:', error)
     throw new Error('Error al obtener el curso')

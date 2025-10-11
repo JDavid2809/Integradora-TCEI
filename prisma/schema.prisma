@@ -6,26 +6,28 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
 model estudiante {
   id_estudiante           Int                       @id @default(autoincrement())
   nombre                  String                    @db.VarChar(100)
-  paterno                String?                  @db.VarChar(30)
-  materno                 String?                  @db.VarChar(30)
   email                   String                    @unique @db.VarChar(100)
   telefono                String?                   @db.VarChar(20)
   edad                    Int
-  descripcion             String?                  @db.VarChar(255)
   id_categoria_edad       Int?
   b_activo                Boolean?                  @default(true)
   id_usuario              Int                       @unique
+  materno                 String?                   @db.VarChar(30)
+  paterno                 String?                   @db.VarChar(30)
+  descripcion             String?                   @db.VarChar(255)
+  Inscripcion             Inscripcion[]
+  reviews                 Review[]
   categoria_edad          categoria_edad?           @relation(fields: [id_categoria_edad], references: [id_categoria_edad])
   usuario                 usuario                   @relation(fields: [id_usuario], references: [id], onDelete: Cascade)
   historial_academico     historial_academico[]
+  horario                 horario[]
   imparte_registro_remota imparte_registro_remota[]
   pago                    pago[]
   resultado_examen        resultado_examen[]
-  Inscripcion            Inscripcion[]           
-  horario                 horario[]             
 
   @@index([id_categoria_edad])
 }
@@ -74,8 +76,8 @@ model horario {
   id_estudiante   Int
   id_curso        Int
   comentario      String?
-  curso           curso             @relation(fields: [id_curso], references: [id_curso])
-  estudiante      estudiante        @relation(fields: [id_estudiante], references: [id_estudiante])
+  curso           curso             @relation(fields: [id_curso], references: [id_curso], onDelete: Cascade)
+  estudiante      estudiante        @relation(fields: [id_estudiante], references: [id_estudiante], onDelete: Cascade)
   horario_detalle horario_detalle[]
 
   @@index([id_estudiante])
@@ -97,7 +99,7 @@ model horario_pred {
   id_horario_pred      Int                    @id @default(autoincrement())
   id_curso             Int
   comentario           String?
-  curso                curso                  @relation(fields: [id_curso], references: [id_curso])
+  curso                curso                  @relation(fields: [id_curso], references: [id_curso], onDelete: Cascade)
   horario_pred_detalle horario_pred_detalle[]
 
   @@index([id_curso])
@@ -126,9 +128,9 @@ model imparte {
   historial_academico       historial_academico[]
   horario_detalle           horario_detalle[]
   horario_pred_detalle      horario_pred_detalle[]
-  curso                     curso                       @relation(fields: [id_curso], references: [id_curso])
-  nivel                     nivel                       @relation(fields: [id_nivel], references: [id_nivel])
-  profesor                  profesor                    @relation(fields: [id_profesor], references: [id_profesor])
+  curso                     curso                       @relation(fields: [id_curso], references: [id_curso], onDelete: Cascade)
+  nivel                     nivel                       @relation(fields: [id_nivel], references: [id_nivel], onDelete: Cascade)
+  profesor                  profesor                    @relation(fields: [id_profesor], references: [id_profesor], onDelete: Cascade)
   imparte_calendario_remota imparte_calendario_remota[]
   pago                      pago[]
 
@@ -165,12 +167,12 @@ model imparte_registro_remota {
 }
 
 model nivel {
-  id_nivel Int       @id @default(autoincrement())
-  nombre   String    @unique
-  b_activo Boolean?  @default(true)
-  examen   examen[]
-  imparte  imparte[]
-  class_schedules class_schedule[]  // Nueva relación
+  id_nivel        Int              @id @default(autoincrement())
+  nombre          String           @unique
+  b_activo        Boolean?         @default(true)
+  class_schedules class_schedule[]
+  examen          examen[]
+  imparte         imparte[]
 }
 
 model pago {
@@ -199,23 +201,24 @@ model pregunta {
 }
 
 model profesor {
-  id_profesor    Int       @id @default(autoincrement())
-  nombre         String    @db.VarChar(30)
-  paterno        String?   @db.VarChar(30)
-  materno        String?   @db.VarChar(30)
-  edad           Int?      @db.Integer
-  curp           String?   @db.VarChar(20)
-  rfc            String?   @db.VarChar(14)
-  direccion      String?   @db.VarChar(30)
-  telefono      String?   @db.VarChar(25)
-  nivel_estudios String?   @db.VarChar(30)
-  observaciones  String?   @db.VarChar(50)
-  b_activo       Boolean?  @default(true)
-  id_usuario     Int       @unique
-  imparte        imparte[]
-  usuario        usuario   @relation(fields: [id_usuario], references: [id], onDelete: Cascade)
-  attendance     attendance[]     // Nueva relación
-  class_schedules class_schedule[]  // Nueva relación
+  id_profesor     Int              @id @default(autoincrement())
+  nombre          String           @db.VarChar(30)
+  paterno         String?          @db.VarChar(30)
+  materno         String?          @db.VarChar(30)
+  curp            String?          @db.VarChar(20)
+  rfc             String?          @db.VarChar(14)
+  direccion       String?          @db.VarChar(30)
+  nivel_estudios  String?          @db.VarChar(30)
+  observaciones   String?          @db.VarChar(50)
+  b_activo        Boolean?         @default(true)
+  id_usuario      Int              @unique
+  edad            Int?
+  telefono        String?          @db.VarChar(25)
+  attendance      attendance[]
+  class_schedules class_schedule[]
+  created_courses curso[]          @relation("CourseCreator")
+  imparte         imparte[]
+  usuario         usuario          @relation(fields: [id_usuario], references: [id], onDelete: Cascade)
 }
 
 model respuesta {
@@ -256,112 +259,142 @@ model usuario {
   email         String         @unique
   password      String
   nombre        String
-  apellido      String
   rol           Rol
   id            Int            @id @default(autoincrement())
+  apellido      String
+  expiraEn      DateTime?
+  tokenVerif    String?
+  verificado    Boolean        @default(false)
   administrador Administrador?
   estudiante    estudiante?
   profesor      profesor?
-  verificado    Boolean       @default(false)
-
-  tokenVerif String?  
-  expiraEn   DateTime? 
-
 }
-
-
-
 
 model curso {
-  id_curso     Int            @id @default(autoincrement())
-  nombre       String         @db.VarChar(100)
-  modalidad    Modalidad
-  inicio       DateTime?      @db.Date
-  fin          DateTime?      @db.Date
-  b_activo     Boolean?       @default(true)
-  horario      horario[]
-  horario_pred horario_pred[]
-  imparte      imparte[]
-  inscripciones Inscripcion[]  // Nueva relación
-  class_schedules class_schedule[]  // Nueva relación
+  id_curso        Int              @id @default(autoincrement())
+  nombre          String           @db.VarChar(100)
+  modalidad       Modalidad
+  inicio          DateTime?        @db.Date
+  fin             DateTime?        @db.Date
+  b_activo        Boolean?         @default(true)
+  course_content  String?
+  created_at      DateTime?        @default(now())
+  created_by      Int?
+  descripcion     String?
+  features        String?
+  requirements    String?
+  resumen         String?
+  target_audience String?
+  updated_at      DateTime?        @default(now()) @updatedAt
+  what_you_learn  String?
+  precio          Decimal?         @db.Decimal(10, 2) // Precio del curso
+  nivel_ingles    String?          @db.VarChar(20)    // Nivel de inglés del curso (A1, A2, B1, B2, C1, C2, TODOS)
+  // Nuevos campos para detalles del curso
+  duracion_horas  Int?             // Horas totales del curso
+  total_lecciones Int?             // Número total de lecciones  
+  total_ejercicios Int?            // Número total de ejercicios
+  acceso_movil    Boolean?         @default(true)  // Acceso desde móvil
+  acceso_tv       Boolean?         @default(true)  // Acceso desde TV
+  recursos_descargables Boolean?   @default(true)  // Recursos descargables
+  certificado     Boolean?         @default(true)  // Incluye certificado
+  inscripciones   Inscripcion[]
+  reviews         Review[]
+  class_schedules class_schedule[]
+  creator         profesor?        @relation("CourseCreator", fields: [created_by], references: [id_profesor])
+  horario         horario[]
+  horario_pred    horario_pred[]
+  imparte         imparte[]
+
+  @@index([created_by])
 }
 
-// ================================
-// INSCRIPCIONES
-// ================================
-
 model Inscripcion {
-  id              Int      @id @default(autoincrement())
-  student_id      Int
-  course_id       Int
-  enrolled_at     DateTime @default(now())
-  status          EnrollmentStatus @default(ACTIVE)
-  payment_status  PaymentStatus @default(PENDING)
-  notes           String?
-  
-  // Relaciones
-  student         estudiante @relation(fields: [student_id], references: [id_estudiante])
-  course          curso @relation(fields: [course_id], references: [id_curso])
-  payments        payment[]
-  attendance      attendance[]
-  
-  @@unique([student_id, course_id]) // Un estudiante solo puede inscribirse una vez por curso
+  id             Int              @id @default(autoincrement())
+  student_id     Int
+  course_id      Int
+  enrolled_at    DateTime         @default(now())
+  status         EnrollmentStatus @default(ACTIVE)
+  payment_status PaymentStatus    @default(PENDING)
+  notes          String?
+  course         curso            @relation(fields: [course_id], references: [id_curso], onDelete: Cascade)
+  student        estudiante       @relation(fields: [student_id], references: [id_estudiante], onDelete: Cascade)
+  attendance     attendance[]
+  payments       payment[]
+
+  @@unique([student_id, course_id])
   @@index([student_id])
   @@index([course_id])
   @@index([status])
 }
 
 model payment {
-  id              Int           @id @default(autoincrement())
-  enrollment_id   Int
-  amount          Decimal       @db.Decimal(10, 2)
-  payment_date    DateTime      @default(now())
-  payment_method  PaymentMethod
-  status          PaymentStatus @default(PENDING)
-  reference       String?       // Referencia del pago
-  notes           String?
+  id             Int           @id @default(autoincrement())
+  enrollment_id  Int
+  amount         Decimal       @db.Decimal(10, 2)
+  payment_date   DateTime      @default(now())
+  payment_method PaymentMethod
+  status         PaymentStatus @default(PENDING)
+  reference      String?
+  notes          String?
+  enrollment     Inscripcion   @relation(fields: [enrollment_id], references: [id])
 
-  enrollment      Inscripcion @relation(fields: [enrollment_id], references: [id])
-  
   @@index([enrollment_id])
   @@index([status])
 }
 
 model attendance {
-  id              Int      @id @default(autoincrement())
-  inscripcion_id  Int
-  class_date      DateTime
-  status          AttendanceStatus
-  notes           String?
-  recorded_by     Int      // Profesor que registró
-  recorded_at     DateTime @default(now())
+  id             Int              @id @default(autoincrement())
+  class_date     DateTime
+  status         AttendanceStatus
+  notes          String?
+  recorded_by    Int
+  recorded_at    DateTime         @default(now())
+  inscripcion_id Int
+  Inscripcion    Inscripcion      @relation(fields: [inscripcion_id], references: [id])
+  teacher        profesor         @relation(fields: [recorded_by], references: [id_profesor])
 
-  Inscripcion     Inscripcion @relation(fields: [inscripcion_id], references: [id])
-  teacher         profesor @relation(fields: [recorded_by], references: [id_profesor])
-  
   @@unique([inscripcion_id, class_date])
   @@index([inscripcion_id])
   @@index([class_date])
 }
 
 model class_schedule {
-  id              Int      @id @default(autoincrement())
-  course_id       Int
-  teacher_id      Int
-  level_id        Int
-  day_of_week     DayOfWeek
-  start_time      String   // Formato "HH:MM"
+  id               Int       @id @default(autoincrement())
+  course_id        Int
+  teacher_id       Int
+  level_id         Int
+  day_of_week      DayOfWeek
+  start_time       String
   duration_minutes Int
-  classroom       String?
-  is_active       Boolean @default(true)
-  
-  course          curso @relation(fields: [course_id], references: [id_curso])
-  teacher         profesor @relation(fields: [teacher_id], references: [id_profesor])
-  level           nivel @relation(fields: [level_id], references: [id_nivel])
-  
+  classroom        String?
+  is_active        Boolean   @default(true)
+  course           curso     @relation(fields: [course_id], references: [id_curso], onDelete: Cascade)
+  level            nivel     @relation(fields: [level_id], references: [id_nivel], onDelete: Cascade)
+  teacher          profesor  @relation(fields: [teacher_id], references: [id_profesor], onDelete: Cascade)
+
   @@index([course_id])
   @@index([teacher_id])
   @@index([day_of_week])
+}
+
+model Review {
+  id         Int        @id @default(autoincrement())
+  course_id  Int
+  student_id Int
+  rating     Int
+  comment    String
+  created_at DateTime   @default(now())
+  updated_at DateTime   @default(now()) @updatedAt
+  is_active  Boolean    @default(true)
+  course     curso      @relation(fields: [course_id], references: [id_curso], onDelete: Cascade)
+  student    estudiante @relation(fields: [student_id], references: [id_estudiante], onDelete: Cascade)
+
+  @@unique([course_id, student_id])
+  @@index([course_id])
+  @@index([student_id])
+  @@index([rating])
+  @@index([created_at])
+  @@index([is_active])
 }
 
 enum TipoCapturo {
@@ -393,7 +426,6 @@ enum Recurrencia {
 
 enum PagoTipo {
   Mensualidad
-  // Inscripción
 }
 
 enum Rol {
@@ -407,36 +439,35 @@ enum Modalidad {
   ONLINE
 }
 
-// Nuevos enums para la estructura moderna
 enum EnrollmentStatus {
-  ACTIVE          // Inscrito y activo
-  COMPLETED       // Curso completado
-  DROPPED         // Abandonó el curso
-  SUSPENDED       // Suspendido temporalmente
-  TRANSFERRED     // Transferido a otro curso
+  ACTIVE
+  COMPLETED
+  DROPPED
+  SUSPENDED
+  TRANSFERRED
 }
 
 enum PaymentStatus {
-  PENDING         // Pago pendiente
-  PAID            // Pagado
-  OVERDUE         // Vencido
-  REFUNDED        // Reembolsado
-  CANCELLED       // Cancelado
+  PENDING
+  PAID
+  OVERDUE
+  REFUNDED
+  CANCELLED
 }
 
 enum PaymentMethod {
-  CASH            // Efectivo
-  CARD            // Tarjeta
-  TRANSFER        // Transferencia
-  ONLINE          // Pago en línea
-  OTHER           // Otro método
+  CASH
+  CARD
+  TRANSFER
+  ONLINE
+  OTHER
 }
 
 enum AttendanceStatus {
-  PRESENT         // Presente
-  ABSENT          // Ausente
-  LATE            // Llegó tarde
-  EXCUSED         // Falta justificada
+  PRESENT
+  ABSENT
+  LATE
+  EXCUSED
 }
 
 enum DayOfWeek {

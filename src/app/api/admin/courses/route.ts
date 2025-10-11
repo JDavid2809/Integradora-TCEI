@@ -126,7 +126,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json()
-    const { nombre, modalidad, inicio, fin, profesores, niveles } = body
+    const { nombre, modalidad, inicio, fin, profesores, niveles, precio, total_lecciones } = body
 
     if (!nombre || !modalidad) {
       return NextResponse.json({ error: 'Faltan campos requeridos' }, { status: 400 })
@@ -144,6 +144,8 @@ export async function POST(request: NextRequest) {
           modalidad,
           inicio: inicio ? new Date(inicio) : null,
           fin: fin ? new Date(fin) : null,
+          precio: precio ? Number(precio) : null,
+          total_lecciones: total_lecciones ? Number(total_lecciones) : null,
           b_activo: true
         }
       })

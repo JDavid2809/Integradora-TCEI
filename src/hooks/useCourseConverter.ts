@@ -42,11 +42,11 @@ export function useCourseConverter(paginatedData: PaginatedCourses) {
         duration: calculateDuration(),
         students: curso._count.inscripciones || 0,
         rating: 4.7, // Rating estático para evitar problemas de hidratación
-        price: '$199', // Precio por defecto
+        price: curso.precio ? `$${curso.precio.toFixed(2)}` : 'Gratis',
         level: curso.imparte[0]?.nivel?.nombre || 'A1',
         image: "/logos/logoIngles1.jpg",
         skills: ["Speaking", "Listening", "Grammar"], // Skills por defecto
-        lessons: 24, // Lecciones por defecto
+        lessons: curso.total_lecciones_calculadas || 0, // Lecciones calculadas desde course_content
         modalidad: curso.modalidad,
         inicio: formatDate(curso.inicio),
         fin: formatDate(curso.fin),

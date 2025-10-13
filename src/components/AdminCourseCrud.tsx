@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { 
   BookOpen, 
-  Plus, 
+  
   Edit, 
   Trash2, 
   Search, 
@@ -13,12 +13,13 @@ import {
   Clock,
   Users,
   MapPin,
-  Globe
+  Globe,
+  AlertTriangle,
+  X
 } from 'lucide-react'
 import { useDebounce } from '@/hooks/useDebounce'
 import { Pagination } from './admin/common/Pagination'
 import { FeedbackAlert } from './admin/common/FeedbackAlert'
-import { Modal } from './admin/common/Modal'
 import { api } from '@/lib/apiClient'
 
 interface Course {

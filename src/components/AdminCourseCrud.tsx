@@ -20,12 +20,12 @@ import {
 } from 'lucide-react'
 
 interface Course {
-  id_curso: number
+  id_curso: number | null | undefined
   nombre: string
   modalidad: 'PRESENCIAL' | 'ONLINE'
   inicio: string | null
   fin: string | null
-  b_activo: boolean
+  b_activo: boolean | null | undefined
   _count?: {
     inscripciones: number
     imparte: number
@@ -219,7 +219,7 @@ export default function AdminCourseCrud() {
     try {
       setLoading(true)
       const params = new URLSearchParams({
-        page: currentPage.toString(),
+        page: (currentPage || 1).toString(),
         limit: '10',
         ...(modalityFilter !== 'ALL' && { modalidad: modalityFilter }),
         ...(statusFilter !== 'ALL' && { activo: statusFilter }),
@@ -277,11 +277,11 @@ export default function AdminCourseCrud() {
   const handleEditCourse = (course: Course) => {
     setEditingCourse(course)
     setFormData({
-      nombre: course.nombre,
-      modalidad: course.modalidad,
+      nombre: course.nombre || '',
+      modalidad: course.modalidad || 'PRESENCIAL',
       inicio: course.inicio ? new Date(course.inicio).toISOString().split('T')[0] : '',
       fin: course.fin ? new Date(course.fin).toISOString().split('T')[0] : '',
-      b_activo: course.b_activo
+      b_activo: course.b_activo ?? true
     })
     setErrors({})
     setShowModal(true)
@@ -298,7 +298,7 @@ export default function AdminCourseCrud() {
 
     setIsSubmitting(true)
     try {
-      await saveCourseApi(formData, editingCourse?.id_curso)
+      await saveCourseApi(formData, editingCourse?.id_curso || undefined)
       setSuccessMessage(editingCourse ? 'Curso actualizado exitosamente' : 'Curso creado exitosamente')
       setShowModal(false)
       fetchCourses()
@@ -423,28 +423,28 @@ export default function AdminCourseCrud() {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {courses.map((course) => (
-                  <tr key={course.id_curso} className="hover:bg-gray-50">
+                {(courses || []).filter(Boolean).map((course, index) => (
+                  <tr key={`course-${course?.id_curso || index}-${index}`} className="hover:bg-gray-50">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm font-medium text-gray-900">
-                        {course.nombre}
+                        {course?.nombre || 'Sin nombre'}
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`inline-flex items-center gap-1 px-2 py-1 text-xs font-semibold rounded-full ${getModalityColor(course.modalidad)}`}>
-                        {getModalityIcon(course.modalidad)}
-                        {course.modalidad}
+                      <span className={`inline-flex items-center gap-1 px-2 py-1 text-xs font-semibold rounded-full ${getModalityColor(course?.modalidad || 'PRESENCIAL')}`}>
+                        {getModalityIcon(course?.modalidad || 'PRESENCIAL')}
+                        {course?.modalidad || 'PRESENCIAL'}
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                       <div className="space-y-1">
                         <div className="flex items-center gap-1">
                           <Calendar className="w-4 h-4 text-gray-400" />
-                          <span className="text-xs">Inicio: {formatDate(course.inicio)}</span>
+                          <span className="text-xs">Inicio: {formatDate(course?.inicio)}</span>
                         </div>
                         <div className="flex items-center gap-1">
                           <Clock className="w-4 h-4 text-gray-400" />
-                          <span className="text-xs">Fin: {formatDate(course.fin)}</span>
+                          <span className="text-xs">Fin: {formatDate(course?.fin)}</span>
                         </div>
                       </div>
                     </td>
@@ -452,32 +452,32 @@ export default function AdminCourseCrud() {
                       <div className="space-y-1">
                         <div className="flex items-center gap-1">
                           <Users className="w-4 h-4 text-gray-400" />
-                          <span className="text-xs">{course._count?.inscripciones || 0} estudiantes</span>
+                          <span className="text-xs">{course?._count?.inscripciones || 0} estudiantes</span>
                         </div>
                         <div className="flex items-center gap-1">
                           <BookOpen className="w-4 h-4 text-gray-400" />
-                          <span className="text-xs">{course._count?.imparte || 0} clases</span>
+                          <span className="text-xs">{course?._count?.imparte || 0} clases</span>
                         </div>
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                        course.b_activo ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                        (course?.b_activo ?? true) ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
                       }`}>
-                        {course.b_activo ? 'Activo' : 'Inactivo'}
+                        {(course?.b_activo ?? true) ? 'Activo' : 'Inactivo'}
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                       <div className="flex items-center gap-2">
                         <button
-                          onClick={() => handleEditCourse(course)}
+                          onClick={() => course && handleEditCourse(course)}
                           className="text-blue-600 hover:text-blue-900 p-1 rounded"
                           title="Editar"
                         >
                           <Edit className="w-4 h-4" />
                         </button>
                         <button
-                          onClick={() => handleDeleteCourse(course.id_curso)}
+                          onClick={() => course?.id_curso && handleDeleteCourse(course.id_curso)}
                           className="text-red-600 hover:text-red-900 p-1 rounded"
                           title="Eliminar"
                         >
@@ -603,7 +603,7 @@ export default function AdminCourseCrud() {
                     Estado
                   </label>
                   <select
-                    value={formData.b_activo.toString()}
+                    value={(formData.b_activo ?? true).toString()}
                     onChange={(e) => setFormData({ ...formData, b_activo: e.target.value === 'true' })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00246a] focus:border-transparent"
                   >

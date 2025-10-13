@@ -281,7 +281,7 @@ const handleSave = (formData: dataProfileStudent) => {
               </h2>
               
                 <textarea
-                  value={studentData?.descripcion}
+                  value={studentData?.descripcion || ""}
                   rows={5}
                   placeholder="Hola 😉, por favor selecciona editar  perfil y escribe sobre ti en la descripción"
                   className="w-full bg-gray-50 border border-gray-200 rounded-xl p-4 text-gray-900 focus:border-blue-500 focus:ring-4 focus:ring-blue-100 outline-none resize-none"

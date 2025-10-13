@@ -32,8 +32,14 @@ const [isSearchMode, setIsSearchMode] = useState(false) // Reemplaza showUserSea
 
 #### Activación/Desactivación:
 ```typescript
-// Botón toggle entre búsqueda y vista normal
-onClick={() => setIsSearchMode(!isSearchMode)}
+// Función helper que maneja la expansión automática
+const handleToggleSearchMode = () => {
+  // Si se está activando el modo búsqueda y la lista está minimizada, expandir automáticamente
+  if (!isSearchMode && isChatListMinimized) {
+    setIsChatListMinimized(false)
+  }
+  setIsSearchMode(!isSearchMode)
+}
 ```
 
 #### Auto-limpieza:
@@ -41,6 +47,21 @@ onClick={() => setIsSearchMode(!isSearchMode)}
 // Al desactivar búsqueda, se limpian automáticamente:
 - searchQuery: ''
 - searchResults: []
+```
+
+#### ✨ Expansión Automática (NUEVO):
+```typescript
+// Expansión automática durante búsqueda activa
+const handleUserSearch = async (query: string) => {
+  setSearchQuery(query)
+  
+  // Si hay una búsqueda y la lista está minimizada, expandir automáticamente
+  if (query.trim() && isChatListMinimized) {
+    setIsChatListMinimized(false)
+  }
+  
+  // ... resto de la lógica de búsqueda
+}
 ```
 
 ### 🎨 Mejoras Visuales
@@ -58,8 +79,8 @@ onClick={() => setIsSearchMode(!isSearchMode)}
 ### 📱 Experiencia de Usuario Mejorada
 
 #### Flujo Simplificado:
-1. **Clic en 🔍** → Activa modo búsqueda
-2. **Escribir consulta** → Resultados en tiempo real
+1. **Clic en 🔍** → Activa modo búsqueda (⭐ **Auto-expande si está minimizado**)
+2. **Escribir consulta** → Resultados en tiempo real (⭐ **Auto-expande al escribir**)
 3. **Clic en usuario** → Inicia/abre chat automáticamente
 4. **Clic en ❌** → Vuelve a la vista de salas
 
@@ -68,6 +89,7 @@ onClick={() => setIsSearchMode(!isSearchMode)}
 - ✅ **Más fluido**: Transición natural entre vistas
 - ✅ **Mejor UX**: Mantiene contexto del chat
 - ✅ **Más eficiente**: Usa el espacio disponible óptimamente
+- ✅ **⭐ Auto-expansión inteligente**: Expande automáticamente la lista cuando es necesario
 
 ### 🔍 Casos de Uso
 
@@ -78,6 +100,24 @@ Usuario quiere contactar a "mario@test.com"
 2. Escribe "mario"
 3. Clic en "Iniciar Chat"
 4. Listo - ya está chateando
+```
+
+#### ⭐ Búsqueda desde Lista Minimizada (NUEVO):
+```
+Usuario tiene la lista de chats minimizada y quiere buscar:
+1. Clic en 🔍 (en botones de acceso rápido)
+2. ✨ Lista se expande automáticamente
+3. Puede ver resultados de búsqueda con información completa
+4. Selecciona usuario e inicia chat
+```
+
+#### ⭐ Búsqueda Progresiva (NUEVO):
+```
+Usuario inicia escribiendo con lista minimizada:
+1. Comienza a escribir en la búsqueda compacta
+2. ✨ Al detectar texto, lista se expande automáticamente
+3. Puede ver los resultados detallados sin intervención manual
+4. Experiencia fluida sin interrupciones
 ```
 
 #### Navegación Fluida:

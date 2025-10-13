@@ -206,6 +206,12 @@ export default function ChatWindow({ isOpen, onClose, isMinimized, onToggleMinim
 
   const handleUserSearch = async (query: string) => {
     setSearchQuery(query)
+    
+    // Si hay una búsqueda y la lista está minimizada, expandir automáticamente
+    if (query.trim() && isChatListMinimized) {
+      setIsChatListMinimized(false)
+    }
+    
     try {
       console.log(`🔍 Searching users with query: "${query}"`)
       
@@ -238,6 +244,14 @@ export default function ChatWindow({ isOpen, onClose, isMinimized, onToggleMinim
         alert(`Error buscando usuarios: ${(error as Error).message}`)
       }
     }
+  }
+
+  const handleToggleSearchMode = () => {
+    // Si se está activando el modo búsqueda y la lista está minimizada, expandir automáticamente
+    if (!isSearchMode && isChatListMinimized) {
+      setIsChatListMinimized(false)
+    }
+    setIsSearchMode(!isSearchMode)
   }
 
   const handleStartPrivateChat = async (userId: number) => {
@@ -561,7 +575,7 @@ export default function ChatWindow({ isOpen, onClose, isMinimized, onToggleMinim
                     {!isChatListMinimized && (
                       <>
                         <button
-                          onClick={() => setIsSearchMode(!isSearchMode)}
+                          onClick={handleToggleSearchMode}
                           className={`p-2 rounded-lg transition-all duration-200 ${
                             isSearchMode 
                               ? 'bg-[#e30f28] text-white' 
@@ -595,7 +609,7 @@ export default function ChatWindow({ isOpen, onClose, isMinimized, onToggleMinim
               {isChatListMinimized && (
                 <div className="p-2 space-y-2 border-b border-gray-200">
                   <button
-                    onClick={() => setIsSearchMode(!isSearchMode)}
+                    onClick={handleToggleSearchMode}
                     className={`w-full p-2 rounded-lg transition-all duration-200 flex items-center justify-center ${
                       isSearchMode 
                         ? 'bg-[#e30f28] text-white' 

@@ -62,6 +62,8 @@ Se ha implementado la funcionalidad para minimizar la lista de chats en el siste
 - **Click en sala (minimizada)**: Abre la sala normalmente
 - **Hover en sala (minimizada)**: Muestra tooltip con nombre
 - **Click en accesos rápidos**: Abre modales correspondientes
+- **⭐ Búsqueda automática (NUEVO)**: Al activar búsqueda estando minimizado, se expande automáticamente
+- **⭐ Búsqueda progresiva (NUEVO)**: Al escribir en búsqueda estando minimizado, se expande automáticamente
 
 ### Responsive Design
 - La funcionalidad es completamente responsive
@@ -76,11 +78,14 @@ La funcionalidad ha sido probada para:
 - ✅ Tooltips informativos
 - ✅ Transiciones suaves
 - ✅ Compatibilidad con funcionalidades existentes
+- ✅ **⭐ Auto-expansión en búsqueda (NUEVO)**: Verificada expansión automática al buscar
+- ✅ **⭐ Búsqueda progresiva (NUEVO)**: Verificada expansión al escribir texto
 
 ## Uso
 1. En el sistema de chat, localizar el botón de minimización en la esquina superior derecha del área de salas
 2. Click para minimizar la lista de chats
 3. En estado minimizado, usar los botones de acceso rápido para buscar usuarios o crear salas
-4. Click en el botón de expandir para restaurar la vista completa
+4. **⭐ Búsqueda inteligente (NUEVO)**: Al activar búsqueda o escribir texto, la lista se expande automáticamente
+5. Click en el botón de expandir para restaurar la vista completa manualmente
 
-La funcionalidad mejora significativamente la experiencia de usuario al permitir un mejor aprovechamiento del espacio de pantalla sin sacrificar funcionalidad.
+La funcionalidad mejora significativamente la experiencia de usuario al permitir un mejor aprovechamiento del espacio de pantalla sin sacrificar funcionalidad. **La nueva característica de expansión automática durante búsquedas hace que la experiencia sea aún más fluida e intuitiva.**

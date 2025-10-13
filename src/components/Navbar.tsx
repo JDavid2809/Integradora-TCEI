@@ -382,7 +382,7 @@ export default function NavBar() {
     return (
         <>
         <motion.header
-            className="w-full px-4 pt-0 pb-0 fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md"
+            className="w-full px-4 pt-0 pb-0 fixed top-0 left-0 right-0 z-50 bg-white"
             initial={{ y: 0 }}
             animate={{ y: (isVisible || isMobileMenuOpen) ? 0 : -100 }}
             transition={{ duration: 0.3, ease: "easeInOut" }}

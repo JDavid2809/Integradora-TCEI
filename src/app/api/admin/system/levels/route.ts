@@ -55,6 +55,7 @@ export async function GET(request: NextRequest) {
     const levelsWithStats = levels.map(level => {
       const baseLevel = {
         id: level.id_nivel,
+        id_nivel: level.id_nivel, // Mantener compatibilidad
         nombre: level.nombre,
         activo: level.b_activo
       }
@@ -78,9 +79,7 @@ export async function GET(request: NextRequest) {
       return baseLevel
     })
 
-    return NextResponse.json({
-      levels: levelsWithStats
-    })
+    return NextResponse.json(levelsWithStats)
 
   } catch (error) {
     console.error('Error al obtener niveles:', error)

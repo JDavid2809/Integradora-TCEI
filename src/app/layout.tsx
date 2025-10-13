@@ -4,7 +4,7 @@ import "./globals.css";
 import NavBar from "../components/Navbar";
 import Providers from "../components/Providers";
 import { SearchProvider } from "../contexts/SearchContext";
-import Chatbot from "@/components/ui/Chatbot";
+import Chatbot from "@/components/ui/admin/Chatbot";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",

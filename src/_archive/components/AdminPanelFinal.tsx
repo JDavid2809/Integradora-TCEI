@@ -1,1 +1,0 @@
-// Archived copy. See original in src/components/AdminPanelFinal.tsx (moved here).

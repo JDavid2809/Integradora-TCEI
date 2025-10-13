@@ -253,20 +253,24 @@ model Administrador {
 }
 
 model usuario {
-  email         String         @unique
-  password      String
-  nombre        String
-  apellido      String
-  rol           Rol
-  id            Int            @id @default(autoincrement())
-  administrador Administrador?
-  estudiante    estudiante?
-  profesor      profesor?
-  verificado    Boolean       @default(false)
+  email               String              @unique
+  password            String
+  nombre              String
+  apellido            String
+  rol                 Rol
+  id                  Int                 @id @default(autoincrement())
+  administrador       Administrador?
+  estudiante          estudiante?
+  profesor            profesor?
+  verificado          Boolean             @default(false)
 
-  tokenVerif String?  
-  expiraEn   DateTime? 
+  tokenVerif          String?  
+  expiraEn            DateTime? 
 
+  // Relaciones del sistema de chat
+  chats_creados       chat_room[]         @relation("ChatCreador")
+  participaciones     chat_participant[]
+  mensajes            chat_message[]
 }
 
 
@@ -447,4 +451,74 @@ enum DayOfWeek {
   FRIDAY
   SATURDAY
   SUNDAY
+}
+
+// Sistema de Chat
+model chat_room {
+  id                 Int                @id @default(autoincrement())
+  nombre             String             @db.VarChar(100)
+  descripcion        String?            @db.VarChar(255)
+  tipo               TipoChatRoom       @default(GENERAL)
+  creado_por         Int
+  creado_en          DateTime           @default(now())
+  activo             Boolean            @default(true)
+  
+  // Relaciones
+  creador            usuario            @relation("ChatCreador", fields: [creado_por], references: [id])
+  participantes      chat_participant[]
+  mensajes           chat_message[]
+  
+  @@index([creado_por])
+}
+
+model chat_participant {
+  id                 Int                @id @default(autoincrement())
+  chat_room_id       Int
+  usuario_id         Int
+  unido_en           DateTime           @default(now())
+  ultimo_visto       DateTime?
+  activo             Boolean            @default(true)
+  
+  // Relaciones
+  chat_room          chat_room          @relation(fields: [chat_room_id], references: [id], onDelete: Cascade)
+  usuario            usuario            @relation(fields: [usuario_id], references: [id], onDelete: Cascade)
+  
+  @@unique([chat_room_id, usuario_id])
+  @@index([chat_room_id])
+  @@index([usuario_id])
+}
+
+model chat_message {
+  id                 Int                @id @default(autoincrement())
+  chat_room_id       Int
+  usuario_id         Int
+  contenido          String             @db.Text
+  tipo               TipoMensaje        @default(TEXTO)
+  archivo_url        String?            @db.VarChar(255)
+  archivo_nombre     String?            @db.VarChar(100)
+  enviado_en         DateTime           @default(now())
+  editado_en         DateTime?
+  eliminado          Boolean            @default(false)
+  
+  // Relaciones
+  chat_room          chat_room          @relation(fields: [chat_room_id], references: [id], onDelete: Cascade)
+  usuario            usuario            @relation(fields: [usuario_id], references: [id], onDelete: Cascade)
+  
+  @@index([chat_room_id])
+  @@index([usuario_id])
+  @@index([enviado_en])
+}
+
+enum TipoChatRoom {
+  GENERAL       // Chat general para todos
+  CLASE         // Chat específico de una clase
+  PRIVADO       // Chat privado entre usuarios
+  SOPORTE       // Chat de soporte con admin
+}
+
+enum TipoMensaje {
+  TEXTO
+  IMAGEN
+  ARCHIVO
+  SISTEMA       // Mensajes del sistema (usuario se unió, etc.)
 }

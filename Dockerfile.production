@@ -1,0 +1,88 @@
+# ========================================
+# Dockerfile para Producción - Next.js 15
+# ========================================
+
+# Usar la imagen oficial de Node.js 20 Alpine (ligera y segura)
+FROM node:20-alpine AS base
+
+# Instalar dependencias del sistema necesarias
+RUN apk add --no-cache libc6-compat dumb-init
+WORKDIR /app
+
+# ========================================
+# Stage 1: Preparar dependencias
+# ========================================
+FROM base AS deps
+
+# Copiar archivos de configuración de dependencias
+COPY production.package.json package.json
+COPY package-lock.json* ./
+
+# Instalar dependencias de producción
+RUN npm ci --only=production && npm cache clean --force
+
+# ========================================
+# Stage 2: Build de la aplicación
+# ========================================
+FROM base AS builder
+
+# Copiar dependencias desde la etapa anterior
+COPY --from=deps /app/node_modules ./node_modules
+
+# Copiar código fuente
+COPY . .
+
+# Copiar el package.json de producción
+COPY production.package.json package.json
+
+# Generar cliente de Prisma
+RUN npx prisma generate
+
+# Construir la aplicación
+RUN npm run build
+
+# ========================================
+# Stage 3: Imagen final de producción
+# ========================================
+FROM base AS production
+
+# Crear usuario no-root para seguridad
+RUN addgroup --system --gid 1001 nodejs
+RUN adduser --system --uid 1001 nextjs
+
+# Configurar el directorio de trabajo
+WORKDIR /app
+
+# Copiar archivos de producción necesarios
+COPY --from=builder /app/public ./public
+COPY --from=builder /app/.next/standalone ./
+COPY --from=builder /app/.next/static ./.next/static
+
+# Copiar scripts de utilidad
+COPY --from=builder /app/scripts ./scripts
+
+# Copiar configuración de Prisma
+COPY --from=builder /app/prisma ./prisma
+COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
+
+# Cambiar propiedad de archivos al usuario nextjs
+RUN chown -R nextjs:nodejs /app
+
+# Cambiar al usuario no-root
+USER nextjs
+
+# Exponer el puerto
+EXPOSE 3000
+
+# Variables de entorno
+ENV NODE_ENV=production
+ENV PORT=3000
+ENV HOSTNAME="0.0.0.0"
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+  CMD node scripts/health-check.js || exit 1
+
+# Comando para iniciar la aplicación
+ENTRYPOINT ["dumb-init", "--"]
+CMD ["node", "server.js"]

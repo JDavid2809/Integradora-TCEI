@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { ChevronDown, Menu, Search, X, Play, User, BookOpenText, GraduationCap, School, House, LogOut } from "lucide-react"
+import { ChevronDown, Menu, Search, X, Play, User, BookOpenText, GraduationCap, School, House, LogOut, MessageCircle } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 import Image from "next/image"
 import { useRouter } from "next/navigation"
@@ -9,6 +9,8 @@ import { useSession, signOut } from 'next-auth/react'
 import type { Session } from 'next-auth'
 import { useSearch } from '../contexts/SearchContext'
 import SearchResults from './SearchResults'
+import ChatWindow from './ChatWindow'
+import { ChatProvider } from '@/contexts/ChatContext'
 
 const navigationItems = [
     { name: "Inicio", icon: <House className="ml-2"/>, href:"/" },
@@ -299,6 +301,8 @@ export default function NavBar() {
     const [lastScrollY, setLastScrollY] = useState(0)
     const [isSearchOpen, setIsSearchOpen] = useState(false)
     const [showSearchResults, setShowSearchResults] = useState(false)
+    const [isChatOpen, setIsChatOpen] = useState(false)
+    const [isChatMinimized, setIsChatMinimized] = useState(false)
     const { data: session, status } = useSession()
     const { searchQuery, setSearchQuery, performSearch, clearSearch, currentPage } = useSearch()
     const router = useRouter()
@@ -332,6 +336,22 @@ export default function NavBar() {
         clearSearch()
         setIsSearchOpen(false)
         setShowSearchResults(false)
+    }
+
+    const toggleChat = () => {
+        setIsChatOpen(!isChatOpen)
+        if (!isChatOpen) {
+            setIsChatMinimized(false)
+        }
+    }
+
+    const closeChat = () => {
+        setIsChatOpen(false)
+        setIsChatMinimized(false)
+    }
+
+    const toggleChatMinimize = () => {
+        setIsChatMinimized(!isChatMinimized)
     }
 
     useEffect(() => {
@@ -439,6 +459,21 @@ export default function NavBar() {
                                     <Search className="h-5 w-5" />
                                 </motion.button>
                             </div>
+
+                            {/* Botón de Chat - Solo para usuarios autenticados */}
+                            {session?.user && (
+                                <motion.button
+                                    onClick={toggleChat}
+                                    className={`${isChatOpen ? 'bg-[#e30f28] text-white' : 'text-[#00246a] hover:bg-[#e30f28] hover:text-white'} rounded-full p-2 transition-all duration-200 relative`}
+                                    whileHover={{ scale: 1.1 }}
+                                    whileTap={{ scale: 0.9 }}
+                                    title="Chat"
+                                >
+                                    <MessageCircle className="h-5 w-5" />
+                                    {/* Indicador de mensajes no leídos (placeholder para futuro) */}
+                                    {/* <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">3</span> */}
+                                </motion.button>
+                            )}
 
                             {status === "loading" ? (
                                 <div className="w-8 h-8 bg-slate-200 rounded-full animate-pulse"></div>
@@ -586,6 +621,19 @@ export default function NavBar() {
                                             </motion.button>
 
                                             <motion.button
+                                                onClick={() => {
+                                                    toggleChat()
+                                                    setIsMobileMenuOpen(false)
+                                                }}
+                                                className="w-full flex items-center space-x-3 p-3 bg-purple-50 hover:bg-purple-100 rounded-lg transition-colors duration-200"
+                                                whileHover={{ scale: 1.02 }}
+                                                whileTap={{ scale: 0.98 }}
+                                            >
+                                                <MessageCircle className="h-5 w-5 text-purple-600" />
+                                                <span className="text-purple-600 font-medium">Chat</span>
+                                            </motion.button>
+
+                                            <motion.button
                                                 onClick={handleLogout}
                                                 className="w-full flex items-center space-x-3 p-3 bg-red-50 hover:bg-red-100 rounded-lg transition-colors duration-200"
                                                 whileHover={{ scale: 1.02 }}
@@ -654,6 +702,18 @@ export default function NavBar() {
             isOpen={showSearchResults} 
             onClose={() => setShowSearchResults(false)} 
         />
+
+        {/* Chat Window - Solo para usuarios autenticados */}
+        {session?.user && (
+            <ChatProvider>
+                <ChatWindow
+                    isOpen={isChatOpen}
+                    onClose={closeChat}
+                    isMinimized={isChatMinimized}
+                    onToggleMinimize={toggleChatMinimize}
+                />
+            </ChatProvider>
+        )}
         </>
     )
 }

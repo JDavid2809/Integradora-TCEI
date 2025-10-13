@@ -699,11 +699,16 @@ export default function AdminPaymentCrud() {
                   className="flex items-center gap-2 px-4 py-2 bg-[#00246a] text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
                 >
                   {isSubmitting ? (
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                      Guardando...
+                    </>
                   ) : (
-                    <Save className="w-4 h-4" />
+                    <>
+                      <Save className="w-4 h-4" />
+                      {editingPayment ? 'Actualizar' : 'Registrar Pago'}
+                    </>
                   )}
-                  {isSubmitting ? 'Guardando...' : (editingPayment ? 'Actualizar' : 'Registrar Pago')}
                 </button>
               </div>
             </form>

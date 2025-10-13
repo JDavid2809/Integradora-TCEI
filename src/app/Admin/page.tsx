@@ -19,10 +19,11 @@ import {
 } from 'lucide-react'
 
 // Import CRUD components
-import AdminUserCrud from '@/components/AdminUserCrud'
-// Courses and Exams removed from Admin per specifications
-import AdminPaymentCrud from '@/components/AdminPaymentCrud'
-import AdminAttendanceCrud from '@/components/AdminAttendanceCrud'
+import AdminUserCrud from '@/components/ui/admin/AdminUserCrud'
+import AdminCoursesCrud from '@/components/ui/admin/AdminCoursesCrud'
+import AdminExamsCrud from '@/components/ui/admin/AdminExamsCrud'
+import AdminPaymentCrud from '@/components/ui/admin/AdminPaymentCrud'
+import AdminAttendanceCrud from '@/components/ui/admin/AdminAttendanceCrud'
 
 interface SystemStats {
   resumen: {
@@ -131,6 +132,8 @@ export default function AdminPage() {
   const navigationItems = [
     { id: 'dashboard', name: 'Dashboard', icon: BarChart3 },
     { id: 'users', name: 'Usuarios', icon: Users },
+    { id: 'courses', name: 'Cursos', icon: BookOpen },
+    { id: 'exams', name: 'Exámenes', icon: FileText },
     { id: 'payments', name: 'Pagos', icon: CreditCard },
     { id: 'attendance', name: 'Asistencias', icon: UserCheck },
     { id: 'system', name: 'Sistema', icon: Settings }
@@ -254,6 +257,10 @@ export default function AdminPage() {
         return renderDashboard()
       case 'users':
         return <AdminUserCrud />
+      case 'courses':
+        return <AdminCoursesCrud />
+      case 'exams':
+        return <AdminExamsCrud />
       case 'payments':
         return <AdminPaymentCrud />
       case 'attendance':

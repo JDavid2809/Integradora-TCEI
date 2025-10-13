@@ -1,6 +1,7 @@
 
 type UserWhere = {
   rol?: Rol;
+  verificado?: boolean;
   OR?: Array<{
     nombre?: { contains: string; mode: 'insensitive' };
     apellido?: { contains: string; mode: 'insensitive' };
@@ -13,6 +14,8 @@ import { authOptions } from '@/lib/authOptions'
 import { prisma } from '@/lib/prisma'
 import { Rol } from '@prisma/client'
 import bcrypt from 'bcryptjs'
+import { randomBytes } from 'crypto'
+import { sendVerificationEmail } from '@/lib/mailer'
 
 // Middleware para verificar autorización de admin
 async function checkAdminAuth() {
@@ -35,6 +38,7 @@ export async function GET(request: NextRequest) {
 
     const { searchParams } = new URL(request.url);
     const role = searchParams.get('role');
+    const verification = searchParams.get('verification');
     const search = searchParams.get('search') || '';
     const page = parseInt(searchParams.get('page') || '1', 10);
     const limit = parseInt(searchParams.get('limit') || '10', 10);
@@ -43,6 +47,9 @@ export async function GET(request: NextRequest) {
     let whereClause: UserWhere = {};
     if (role && ['ADMIN', 'PROFESOR', 'ESTUDIANTE'].includes(role)) {
       whereClause.rol = role as Rol;
+    }
+    if (verification !== null && verification !== undefined) {
+      whereClause.verificado = verification === 'true';
     }
     if (search) {
       whereClause.OR = [
@@ -74,6 +81,7 @@ export async function GET(request: NextRequest) {
         nombre: user.nombre,
         apellido: user.apellido,
         rol: user.rol,
+        verificado: user.verificado,
         detalles: user.estudiante || user.profesor || user.administrador,
         activo: user.estudiante?.b_activo ?? user.profesor?.b_activo ?? user.administrador?.b_activo ?? true,
       })),
@@ -121,16 +129,23 @@ export async function POST(request: NextRequest) {
     // Encriptar contraseña
     const hashedPassword = await bcrypt.hash(password, 12)
 
+    // Generar token de verificación
+    const token = randomBytes(32).toString("hex")
+    const expiraEn = new Date(Date.now() + 60 * 60 * 24 * 1000) // 24 horas
+
     // Crear usuario y perfil específico en una transacción
     const result = await prisma.$transaction(async (tx) => {
-      // Crear usuario base
+      // Crear usuario base con token de verificación
       const newUser = await tx.usuario.create({
         data: {
           email,
           password: hashedPassword,
           nombre,
           apellido,
-          rol
+          rol,
+          tokenVerif: token,
+          expiraEn,
+          verificado: false
         }
       })
 
@@ -185,8 +200,25 @@ export async function POST(request: NextRequest) {
       return { user: newUser, profile }
     })
 
+    // Enviar correo de verificación
+    let emailSent = false
+    let emailError = null
+    try {
+      await sendVerificationEmail(email, token, nombre)
+      console.log(`Correo de verificación enviado a: ${email}`)
+      emailSent = true
+    } catch (error) {
+      console.error('Error al enviar correo de verificación:', error)
+      emailError = error instanceof Error ? error.message : 'Error desconocido'
+      // No fallar la creación del usuario si hay error en el correo
+    }
+
     return NextResponse.json({
-      message: 'Usuario creado exitosamente',
+      message: 'Usuario creado exitosamente.',
+      emailStatus: {
+        sent: emailSent,
+        error: emailError
+      },
       user: {
         id: result.user.id,
         email: result.user.email,

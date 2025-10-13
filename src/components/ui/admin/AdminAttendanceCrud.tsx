@@ -3,8 +3,8 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { Calendar, Users, Search, Filter, Edit, Trash2, Plus, Save, X, AlertTriangle, BookOpen } from 'lucide-react'
 import { useDebounce } from '@/hooks/useDebounce'
-import { Pagination } from './admin/common/Pagination'
-import { FeedbackAlert } from './admin/common/FeedbackAlert'
+import { Pagination } from '../../admin/common/Pagination'
+import { FeedbackAlert } from '../../admin/common/FeedbackAlert'
 import { api } from '@/lib/apiClient'
 
 interface AttendanceRecord {

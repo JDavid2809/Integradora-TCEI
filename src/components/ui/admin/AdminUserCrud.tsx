@@ -1,14 +1,10 @@
-'use client'
+"use client"
 
-<<<<<<< HEAD
-import React, { useState, useEffect, useRef } from 'react'
-import { Users, Edit, Trash2, UserPlus, Mail, Phone, Calendar, Save, Search, Filter, X, AlertTriangle } from 'lucide-react'
-import { useDebounce } from '@/hooks/useDebounce'
-import { Pagination } from './admin/common/Pagination'
-import { FeedbackAlert } from './admin/common/FeedbackAlert'
-import { api } from '@/lib/apiClient'
-=======
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect, useCallback, useRef } from 'react'
+import { useDebounce } from '../../../hooks/useDebounce'
+import api from '../../../lib/api'
+import FeedbackAlert from '../../FeedbackAlert'
+import Pagination from '../../Pagination'
 import { 
   Users, 
   Edit, 
@@ -22,9 +18,11 @@ import {
   Save,
   X,
   AlertTriangle,
-  CheckCircle
+  CheckCircle,
+  RotateCcw,
+  MailCheck,
+  MailX
 } from 'lucide-react'
->>>>>>> 5e89fd7f48b85234594ec16f9175f9cdbca92c39
 
 interface User {
   id: number
@@ -32,6 +30,7 @@ interface User {
   nombre: string
   apellido: string
   rol: 'ADMIN' | 'PROFESOR' | 'ESTUDIANTE'
+  verificado: boolean
   estudiante?: {
     id_estudiante: number
     telefono: string
@@ -106,9 +105,11 @@ export default function AdminUserCrud() {
   const [editingUser, setEditingUser] = useState<User | null>(null)
   const [searchTerm, setSearchTerm] = useState('')
   const [roleFilter, setRoleFilter] = useState<string>('ALL')
+  const [verificationFilter, setVerificationFilter] = useState<string>('ALL')
   const [currentPage, setCurrentPageState] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [emailStatus, setEmailStatus] = useState<{sent: boolean, error: string | null} | null>(null)
   const abortRef = useRef<AbortController | null>(null)
 
   // Función segura para cambiar página
@@ -134,19 +135,10 @@ export default function AdminUserCrud() {
 
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [successMessage, setSuccessMessage] = useState('')
+  const [warningMessage, setWarningMessage] = useState('')
+  const [resendingEmail, setResendingEmail] = useState<number | null>(null)
 
-<<<<<<< HEAD
-  useEffect(() => {
-    fetchUsers()
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentPage, roleFilter, debouncedSearch])
-
-  // Ya no se cargan categorías desde API (se calculan automáticamente)
-
-  const fetchUsers = async () => {
-=======
   const fetchUsers = useCallback(async () => {
->>>>>>> 5e89fd7f48b85234594ec16f9175f9cdbca92c39
     try {
       setLoading(true)
       // Cancelar request previo
@@ -158,6 +150,9 @@ export default function AdminUserCrud() {
         page: currentPage.toString(),
         limit: '10',
         ...(roleFilter !== 'ALL' && { role: roleFilter }),
+        ...(verificationFilter !== 'ALL' && { 
+          verification: verificationFilter === 'VERIFIED' ? 'true' : 'false' 
+        }),
         ...(debouncedSearch && { search: debouncedSearch })
       })
 
@@ -171,11 +166,10 @@ export default function AdminUserCrud() {
     } finally {
       setLoading(false)
     }
-  }, [currentPage, roleFilter, searchTerm])
+  }, [currentPage, roleFilter, verificationFilter, debouncedSearch])
 
   useEffect(() => {
     fetchUsers()
-    fetchCategories()
   }, [fetchUsers])
 
   // Eliminado: fetchCategories (categorías calculadas automáticamente)
@@ -244,6 +238,7 @@ export default function AdminUserCrud() {
     if (!validateForm()) return
 
     setIsSubmitting(true)
+    setEmailStatus(null)
     try {
       const url = editingUser ? `/api/admin/users/${editingUser.id}` : '/api/admin/users'
       const method = editingUser ? 'PUT' : 'POST'
@@ -256,14 +251,38 @@ export default function AdminUserCrud() {
           : { id_categoria_edad: undefined, edad: undefined })
       }
 
-      await api(url, {
+      const response = await api(url, {
         method,
         body: JSON.stringify(payload)
       })
-      setSuccessMessage(editingUser ? 'Usuario actualizado exitosamente' : 'Usuario creado exitosamente')
+
+      // Manejar la respuesta para mostrar información del correo
+      if (editingUser) {
+        setSuccessMessage('Usuario actualizado exitosamente')
+        setWarningMessage('')
+      } else {
+        // Creación de nuevo usuario
+        if (response.emailStatus) {
+          setEmailStatus(response.emailStatus)
+          if (response.emailStatus.sent) {
+            setSuccessMessage('Usuario creado exitosamente. El correo de verificación ha sido enviado.')
+            setWarningMessage('')
+          } else {
+            setSuccessMessage('Usuario creado exitosamente')
+            setWarningMessage(`El correo de verificación no pudo ser enviado. Error: ${response.emailStatus.error}`)
+          }
+        } else {
+          setSuccessMessage('Usuario creado exitosamente')
+          setWarningMessage('')
+        }
+      }
       setShowModal(false)
       fetchUsers()
-      setTimeout(() => setSuccessMessage(''), 3000)
+      setTimeout(() => {
+        setSuccessMessage('')
+        setWarningMessage('')
+        setEmailStatus(null)
+      }, 5000) // Extendido a 5 segundos para leer el mensaje completo
     } catch (error: unknown) {
       const message = error instanceof Error ? error.message : 'Error al guardar usuario'
       setErrors({ general: message })
@@ -283,6 +302,33 @@ export default function AdminUserCrud() {
     } catch (error: unknown) {
       const message = error instanceof Error ? error.message : 'Error al eliminar usuario'
       alert(message)
+    }
+  }
+
+  const handleResendVerification = async (userId: number, userEmail: string) => {
+    setResendingEmail(userId)
+    try {
+      const response = await api('/api/admin/users/resend-verification', {
+        method: 'POST',
+        body: JSON.stringify({ userId, email: userEmail })
+      })
+
+      if (response.success) {
+        setSuccessMessage('Correo de verificación reenviado exitosamente')
+      } else {
+        setWarningMessage(`Error al reenviar correo: ${response.error || 'Error desconocido'}`)
+      }
+      
+      setTimeout(() => {
+        setSuccessMessage('')
+        setWarningMessage('')
+      }, 5000)
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Error al reenviar correo de verificación'
+      setWarningMessage(message)
+      setTimeout(() => setWarningMessage(''), 5000)
+    } finally {
+      setResendingEmail(null)
     }
   }
 
@@ -317,6 +363,11 @@ export default function AdminUserCrud() {
         <FeedbackAlert type="success">{successMessage}</FeedbackAlert>
       )}
 
+      {/* Warning Message */}
+      {warningMessage && (
+        <FeedbackAlert type="warning">{warningMessage}</FeedbackAlert>
+      )}
+
       {/* Filters */}
       <div className="bg-white p-4 rounded-lg shadow-md">
         <div className="flex gap-4 items-center">
@@ -341,6 +392,17 @@ export default function AdminUserCrud() {
               <option key="ESTUDIANTE" value="ESTUDIANTE">Estudiantes</option>
               <option key="PROFESOR" value="PROFESOR">Profesores</option>
               <option key="ADMIN" value="ADMIN">Administradores</option>
+            </select>
+          </div>
+          <div className="flex items-center gap-2">
+            <select
+              value={verificationFilter}
+              onChange={(e) => setVerificationFilter(e.target.value)}
+              className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00246a] focus:border-transparent"
+            >
+              <option value="ALL">Todos los estados</option>
+              <option value="VERIFIED">Verificados</option>
+              <option value="NOT_VERIFIED">No verificados</option>
             </select>
           </div>
         </div>
@@ -414,15 +476,27 @@ export default function AdminUserCrud() {
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                        (user.estudiante?.b_activo ?? user.profesor?.b_activo ?? user.administrador?.b_activo ?? true)
-                          ? 'bg-green-100 text-green-800' 
-                          : 'bg-red-100 text-red-800'
-                      }`}>
-                        {(user.estudiante?.b_activo ?? user.profesor?.b_activo ?? user.administrador?.b_activo ?? true)
-                          ? 'Activo' 
-                          : 'Inactivo'}
-                      </span>
+                      <div className="flex flex-col gap-1">
+                        {/* Estado de actividad */}
+                        <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                          (user.estudiante?.b_activo ?? user.profesor?.b_activo ?? user.administrador?.b_activo ?? true)
+                            ? 'bg-green-100 text-green-800' 
+                            : 'bg-red-100 text-red-800'
+                        }`}>
+                          {(user.estudiante?.b_activo ?? user.profesor?.b_activo ?? user.administrador?.b_activo ?? true)
+                            ? 'Activo' 
+                            : 'Inactivo'}
+                        </span>
+                        
+                        {/* Estado de verificación */}
+                        <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                          user.verificado
+                            ? 'bg-blue-100 text-blue-800' 
+                            : 'bg-yellow-100 text-yellow-800'
+                        }`}>
+                          {user.verificado ? 'Verificado' : 'No verificado'}
+                        </span>
+                      </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                       <div className="flex items-center gap-2">
@@ -433,6 +507,23 @@ export default function AdminUserCrud() {
                         >
                           <Edit className="w-4 h-4" />
                         </button>
+                        
+                        {/* Botón de reenviar verificación solo para usuarios no verificados */}
+                        {!user.verificado && (
+                          <button
+                            onClick={() => handleResendVerification(user.id, user.email)}
+                            disabled={resendingEmail === user.id}
+                            className="text-orange-600 hover:text-orange-900 p-1 rounded disabled:opacity-50"
+                            title="Reenviar correo de verificación"
+                          >
+                            {resendingEmail === user.id ? (
+                              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-orange-600"></div>
+                            ) : (
+                              <RotateCcw className="w-4 h-4" />
+                            )}
+                          </button>
+                        )}
+                        
                         <button
                           onClick={() => handleDeleteUser(user.id)}
                           className="text-red-600 hover:text-red-900 p-1 rounded"

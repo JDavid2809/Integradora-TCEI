@@ -116,12 +116,46 @@ export async function GET(request: NextRequest) {
 // POST - Crear nuevo examen
 export async function POST(request: NextRequest) {
   try {
-    // Admin has read/update/delete permissions, but must NOT create exams per spec
     const isAuthorized = await checkAdminAuth()
     if (!isAuthorized) {
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 })
     }
-    return NextResponse.json({ error: 'Creación de exámenes no permitida para ADMIN' }, { status: 403 })
+
+    const body = await request.json()
+    const { nombre, id_nivel } = body
+
+    // Validaciones básicas
+    if (!nombre || !id_nivel) {
+      return NextResponse.json({ 
+        error: 'Nombre e ID de nivel son requeridos' 
+      }, { status: 400 })
+    }
+
+    // Verificar que el nivel existe
+    const nivel = await prisma.nivel.findUnique({
+      where: { id_nivel: parseInt(id_nivel) }
+    })
+
+    if (!nivel) {
+      return NextResponse.json({ 
+        error: 'El nivel especificado no existe' 
+      }, { status: 400 })
+    }
+
+    // Crear el examen
+    const newExam = await prisma.examen.create({
+      data: {
+        nombre,
+        id_nivel: parseInt(id_nivel),
+        b_activo: true
+      },
+      include: {
+        nivel: true,
+        pregunta: true
+      }
+    })
+
+    return NextResponse.json(newExam, { status: 201 })
 
   } catch (error) {
     console.error('Error al crear examen:', error)

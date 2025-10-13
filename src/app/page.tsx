@@ -5,6 +5,7 @@ import { authOptions } from '@/lib/authOptions'
 import { Benefits } from './views/Home/benefist'
 import { Testimonials } from './views/testimonials'
 import { Hero } from './views/Home/Hero'
+import { SplashScreen } from '@/components/Splash'
 
 export default async function Home() {
   // Verificar si hay una sesión activa
@@ -32,6 +33,7 @@ export default async function Home() {
 
   return (
     <div className="min-h-screen bg-slate-50 overflow-x-hidden">
+      <SplashScreen />
       <Hero />
       <Benefits/>
       <Testimonials/>

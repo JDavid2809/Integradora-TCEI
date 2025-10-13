@@ -1,116 +1,101 @@
 'use client'
 
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
+import { useDebounce } from '../../../hooks/useDebounce'
+import api from '../../../lib/api'
+import FeedbackAlert from '../../FeedbackAlert'
+import Pagination from '../../Pagination'
 import { 
   BookOpen, 
-  
   Edit, 
   Trash2, 
   Search, 
   Filter,
+  Plus,
   Calendar,
-  Save,
-  Clock,
   Users,
-  MapPin,
-  Globe,
+  Save,
+  X,
   AlertTriangle,
-  X
+  CheckCircle,
+  MapPin,
+  Monitor
 } from 'lucide-react'
-import { useDebounce } from '@/hooks/useDebounce'
-import { Pagination } from './admin/common/Pagination'
-import { FeedbackAlert } from './admin/common/FeedbackAlert'
-import { api } from '@/lib/apiClient'
 
 interface Course {
-  id_curso: number
+  id: number
   nombre: string
   modalidad: 'PRESENCIAL' | 'ONLINE'
   inicio: string | null
   fin: string | null
-  b_activo: boolean
-  precio?: number
-  total_lecciones?: number
-  _count?: {
-    horario: number
-    imparte: number
-  }
+  activo: boolean
+  profesores: Professor[]
+  estudiantes_inscritos: number
+  total_pagos: number
+  descripcion?: string
+}
+
+interface Professor {
+  id: number
+  nombre: string
+  apellido: string
+  email: string
 }
 
 interface Level {
-  id_nivel: number
+  id: number
   nombre: string
-  b_activo: boolean
-}
-
-interface Teacher {
-  id_profesor: number
-  nombre: string
-  paterno: string
-  materno: string
-  usuario: {
-    email: string
-  }
 }
 
 interface CourseFormData {
   nombre: string
+  descripcion: string
   modalidad: 'PRESENCIAL' | 'ONLINE'
   inicio: string
   fin: string
-  b_activo: boolean
-  precio?: number
-  total_lecciones?: number
+  profesores: number[]
+  niveles: number[]
+  activo: boolean
 }
 
-export default function AdminCourseCrud() {
+export default function AdminCoursesCrud() {
   const [courses, setCourses] = useState<Course[]>([])
-  const [, setLevels] = useState<Level[]>([])
-  const [, setTeachers] = useState<Teacher[]>([])
+  const [professors, setProfessors] = useState<Professor[]>([])
+  const [levels, setLevels] = useState<Level[]>([])
   const [loading, setLoading] = useState(true)
   const [showModal, setShowModal] = useState(false)
   const [editingCourse, setEditingCourse] = useState<Course | null>(null)
   const [searchTerm, setSearchTerm] = useState('')
   const [modalityFilter, setModalityFilter] = useState<string>('ALL')
   const [statusFilter, setStatusFilter] = useState<string>('ALL')
-  const [currentPage, setCurrentPage] = useState(1)
+  const [currentPage, setCurrentPageState] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const abortRef = useRef<AbortController | null>(null)
+
+  const setCurrentPage = (page: number) => {
+    const safePage = typeof page === 'number' && !isNaN(page) && page > 0 ? page : 1
+    setCurrentPageState(safePage)
+  }
 
   const debouncedSearch = useDebounce(searchTerm, 400)
 
   const [formData, setFormData] = useState<CourseFormData>({
     nombre: '',
+    descripcion: '',
     modalidad: 'PRESENCIAL',
     inicio: '',
     fin: '',
-    b_activo: true,
-    precio: undefined,
-    total_lecciones: undefined
+    profesores: [],
+    niveles: [],
+    activo: true
   })
 
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [successMessage, setSuccessMessage] = useState('')
 
-  useEffect(() => {
-    fetchCourses()
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentPage, modalityFilter, statusFilter, debouncedSearch])
-
-  useEffect(() => { 
-    fetchLevels()
-    fetchTeachers()
-  }, [])
-
-  const fetchCourses = async () => {
+  const fetchCourses = useCallback(async () => {
     try {
       setLoading(true)
-      // Cancelar request previo
-      if (abortRef.current) abortRef.current.abort()
-      const controller = new AbortController()
-      abortRef.current = controller
-
       const params = new URLSearchParams({
         page: currentPage.toString(),
         limit: '10',
@@ -119,59 +104,70 @@ export default function AdminCourseCrud() {
         ...(debouncedSearch && { search: debouncedSearch })
       })
 
-      const data = await api<{ courses: Course[]; total: number }>(`/api/admin/courses?${params}`, { signal: controller.signal })
-      setCourses(data.courses)
-      setTotalPages(Math.ceil(data.total / 10))
+      const data = await api<{ courses: Course[]; total: number }>(`/api/admin/courses?${params}`)
+      setCourses(data.courses || [])
+      const total = typeof data.total === 'number' && !isNaN(data.total) ? data.total : 0
+      setTotalPages(Math.max(1, Math.ceil(total / 10)))
     } catch (error: any) {
-      if (error?.name === 'AbortError') return
       console.error('Error fetching courses:', error)
     } finally {
       setLoading(false)
+    }
+  }, [currentPage, modalityFilter, statusFilter, debouncedSearch])
+
+  const fetchProfessors = async () => {
+    try {
+      const data = await api<Professor[]>('/api/admin/professors')
+      console.log('Professors API response:', data) // Debug log
+      
+      // Validar que data sea un array
+      if (Array.isArray(data)) {
+        setProfessors(data)
+      } else {
+        console.error('Professors API did not return an array:', data)
+        setProfessors([])
+      }
+    } catch (error) {
+      console.error('Error fetching professors:', error)
+      setProfessors([]) // Asegurar que siempre sea un array
     }
   }
 
   const fetchLevels = async () => {
     try {
-      const data = await api<{ levels: Level[] }>('/api/admin/system/levels')
-      setLevels(data.levels)
+      const data = await api<Level[]>('/api/admin/system/levels')
+      console.log('Levels API response:', data) // Debug log
+      
+      // Validar que data sea un array
+      if (Array.isArray(data)) {
+        setLevels(data)
+      } else {
+        console.error('Levels API did not return an array:', data)
+        setLevels([])
+      }
     } catch (error) {
       console.error('Error fetching levels:', error)
+      setLevels([]) // Asegurar que siempre sea un array
     }
   }
 
-  const fetchTeachers = async () => {
-    try {
-      const response = await fetch('/api/admin/users?role=PROFESOR&limit=100')
-      const data = await response.json()
-      if (response.ok) {
-        setTeachers(data.users.map((user: {
-          detalles: { id_profesor: number };
-          nombre: string;
-          apellido: string;
-          email: string;
-        }) => ({
-          id_profesor: user.detalles?.id_profesor,
-          nombre: user.nombre,
-          paterno: user.apellido,
-          materno: '',
-          usuario: { email: user.email }
-        })).filter((teacher: Record<string, unknown>) => teacher.id_profesor))
-      }
-    } catch (error) {
-      console.error('Error fetching teachers:', error)
-    }
-  }
+  useEffect(() => {
+    fetchCourses()
+    fetchProfessors()
+    fetchLevels()
+  }, [fetchCourses])
 
   const handleCreateCourse = () => {
     setEditingCourse(null)
     setFormData({
       nombre: '',
+      descripcion: '',
       modalidad: 'PRESENCIAL',
       inicio: '',
       fin: '',
-      b_activo: true,
-      precio: undefined,
-      total_lecciones: undefined
+      profesores: [],
+      niveles: [],
+      activo: true
     })
     setErrors({})
     setShowModal(true)
@@ -181,12 +177,13 @@ export default function AdminCourseCrud() {
     setEditingCourse(course)
     setFormData({
       nombre: course.nombre,
+      descripcion: course.descripcion || '',
       modalidad: course.modalidad,
-      inicio: course.inicio ? new Date(course.inicio).toISOString().split('T')[0] : '',
-      fin: course.fin ? new Date(course.fin).toISOString().split('T')[0] : '',
-      b_activo: course.b_activo,
-      precio: course.precio || undefined,
-      total_lecciones: course.total_lecciones || undefined
+      inicio: course.inicio || '',
+      fin: course.fin || '',
+      profesores: course.profesores.map(p => p.id),
+      niveles: [], // Se cargaría desde la API si está disponible
+      activo: course.activo
     })
     setErrors({})
     setShowModal(true)
@@ -196,11 +193,16 @@ export default function AdminCourseCrud() {
     const newErrors: Record<string, string> = {}
 
     if (!formData.nombre) newErrors.nombre = 'Nombre del curso es requerido'
+    if (!formData.descripcion) newErrors.descripcion = 'Descripción es requerida'
     if (!formData.inicio) newErrors.inicio = 'Fecha de inicio es requerida'
     if (!formData.fin) newErrors.fin = 'Fecha de fin es requerida'
-    
-    if (formData.inicio && formData.fin && new Date(formData.inicio) >= new Date(formData.fin)) {
-      newErrors.fin = 'La fecha de fin debe ser posterior a la fecha de inicio'
+    if (formData.profesores.length === 0) newErrors.profesores = 'Debe asignar al menos un profesor'
+
+    // Validar que la fecha de fin sea posterior a la de inicio
+    if (formData.inicio && formData.fin) {
+      if (new Date(formData.fin) <= new Date(formData.inicio)) {
+        newErrors.fin = 'La fecha de fin debe ser posterior a la fecha de inicio'
+      }
     }
 
     setErrors(newErrors)
@@ -212,19 +214,21 @@ export default function AdminCourseCrud() {
 
     setIsSubmitting(true)
     try {
-      const url = editingCourse ? `/api/admin/courses/${editingCourse.id_curso}` : '/api/admin/courses'
+      const url = editingCourse ? `/api/admin/courses/${editingCourse.id}` : '/api/admin/courses'
       const method = editingCourse ? 'PUT' : 'POST'
 
       await api(url, {
         method,
         body: JSON.stringify(formData)
       })
+      
       setSuccessMessage(editingCourse ? 'Curso actualizado exitosamente' : 'Curso creado exitosamente')
       setShowModal(false)
       fetchCourses()
       setTimeout(() => setSuccessMessage(''), 3000)
-    } catch (error: any) {
-      setErrors({ general: error?.message || 'Error al guardar curso' })
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Error al guardar curso'
+      setErrors({ general: message })
     } finally {
       setIsSubmitting(false)
     }
@@ -238,26 +242,26 @@ export default function AdminCourseCrud() {
       setSuccessMessage('Curso eliminado exitosamente')
       fetchCourses()
       setTimeout(() => setSuccessMessage(''), 3000)
-    } catch (error: any) {
-      alert(error?.message || 'Error al eliminar curso')
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Error al eliminar curso'
+      alert(message)
     }
   }
 
-  const getModalityIcon = (modalidad: string) => {
-    return modalidad === 'ONLINE' ? <Globe className="w-4 h-4" /> : <MapPin className="w-4 h-4" />
+  const getModalityColor = (modality: string) => {
+    switch (modality) {
+      case 'PRESENCIAL': return 'bg-blue-100 text-blue-800'
+      case 'ONLINE': return 'bg-green-100 text-green-800'
+      default: return 'bg-gray-100 text-gray-800'
+    }
   }
 
-  const getModalityColor = (modalidad: string) => {
-    return modalidad === 'ONLINE' ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800'
-  }
-
-  const formatDate = (dateString: string | null) => {
-    if (!dateString) return 'No definida'
-    return new Date(dateString).toLocaleDateString('es-ES', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
-    })
+  const getModalityIcon = (modality: string) => {
+    switch (modality) {
+      case 'PRESENCIAL': return <MapPin className="w-4 h-4" />
+      case 'ONLINE': return <Monitor className="w-4 h-4" />
+      default: return <BookOpen className="w-4 h-4" />
+    }
   }
 
   return (
@@ -268,7 +272,13 @@ export default function AdminCourseCrud() {
           <BookOpen className="w-8 h-8 text-[#00246a]" />
           <h1 className="text-2xl font-bold text-[#00246a]">Gestión de Cursos</h1>
         </div>
-        {/* Botón de crear curso removido para Admin: solo lectura/edición/eliminación */}
+        <button
+          onClick={handleCreateCourse}
+          className="flex items-center gap-2 bg-[#00246a] text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+        >
+          <Plus className="w-5 h-5" />
+          Nuevo Curso
+        </button>
       </div>
 
       {/* Success Message */}
@@ -283,7 +293,7 @@ export default function AdminCourseCrud() {
             <Search className="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
             <input
               type="text"
-              placeholder="Buscar por nombre del curso..."
+              placeholder="Buscar por nombre de curso..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00246a] focus:border-transparent"
@@ -334,10 +344,10 @@ export default function AdminCourseCrud() {
                     Modalidad
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Duración
+                    Fechas
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Estadísticas
+                    Estudiantes
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Estado
@@ -348,48 +358,50 @@ export default function AdminCourseCrud() {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {courses.map((course, idx) => (
-                  <tr key={course.id_curso ?? `course-${idx}`} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm font-medium text-gray-900">
-                        {course.nombre}
+                {courses.map((course) => (
+                  <tr key={course.id} className="hover:bg-gray-50">
+                    <td className="px-6 py-4">
+                      <div>
+                        <div className="text-sm font-medium text-gray-900">
+                          {course.nombre}
+                        </div>
+                        <div className="text-sm text-gray-500">
+                          {course.profesores.map(p => `${p.nombre} ${p.apellido}`).join(', ')}
+                        </div>
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`inline-flex items-center gap-1 px-2 py-1 text-xs font-semibold rounded-full ${getModalityColor(course.modalidad)}`}>
+                      <div className={`inline-flex items-center gap-2 px-2 py-1 text-xs font-semibold rounded-full ${getModalityColor(course.modalidad)}`}>
                         {getModalityIcon(course.modalidad)}
                         {course.modalidad}
-                      </span>
+                      </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    <td className="px-6 py-4 text-sm text-gray-900">
                       <div className="space-y-1">
-                        <div className="flex items-center gap-1">
-                          <Calendar className="w-4 h-4 text-gray-400" />
-                          <span className="text-xs">Inicio: {formatDate(course.inicio)}</span>
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <Clock className="w-4 h-4 text-gray-400" />
-                          <span className="text-xs">Fin: {formatDate(course.fin)}</span>
-                        </div>
+                        {course.inicio && (
+                          <div className="flex items-center gap-1">
+                            <Calendar className="w-4 h-4 text-gray-400" />
+                            {new Date(course.inicio).toLocaleDateString()}
+                          </div>
+                        )}
+                        {course.fin && (
+                          <div className="text-gray-500 text-xs">
+                            Hasta: {new Date(course.fin).toLocaleDateString()}
+                          </div>
+                        )}
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      <div className="space-y-1">
-                        <div className="flex items-center gap-1">
-                          <Users className="w-4 h-4 text-gray-400" />
-                          <span className="text-xs">{course._count?.horario || 0} estudiantes</span>
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <BookOpen className="w-4 h-4 text-gray-400" />
-                          <span className="text-xs">{course._count?.imparte || 0} clases</span>
-                        </div>
+                      <div className="flex items-center gap-1">
+                        <Users className="w-4 h-4 text-gray-400" />
+                        {course.estudiantes_inscritos || 0}
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                        course.b_activo ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                        course.activo ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
                       }`}>
-                        {course.b_activo ? 'Activo' : 'Inactivo'}
+                        {course.activo ? 'Activo' : 'Inactivo'}
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
@@ -402,7 +414,7 @@ export default function AdminCourseCrud() {
                           <Edit className="w-4 h-4" />
                         </button>
                         <button
-                          onClick={() => handleDeleteCourse(course.id_curso)}
+                          onClick={() => handleDeleteCourse(course.id)}
                           className="text-red-600 hover:text-red-900 p-1 rounded"
                           title="Eliminar"
                         >
@@ -419,14 +431,18 @@ export default function AdminCourseCrud() {
 
         {/* Pagination */}
         {!loading && (
-          <Pagination page={currentPage} totalPages={totalPages} onChange={setCurrentPage} />
+          <Pagination 
+            page={isNaN(currentPage) ? 1 : currentPage} 
+            totalPages={isNaN(totalPages) ? 1 : totalPages} 
+            onChange={setCurrentPage} 
+          />
         )}
       </div>
 
       {/* Modal */}
       {showModal && (
-        <div className="fixed inset-0 bg-black/45 bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 w-full max-w-4xl max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-xl font-bold text-[#00246a]">
                 {editingCourse ? 'Editar Curso' : 'Crear Nuevo Curso'}
@@ -446,9 +462,10 @@ export default function AdminCourseCrud() {
               </div>
             )}
 
-            <form onSubmit={(e) => { e.preventDefault(); handleSubmit(); }} className="space-y-4">
+            <form onSubmit={(e) => { e.preventDefault(); handleSubmit(); }} className="space-y-6">
+              {/* Basic Information */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="md:col-span-2">
+                <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Nombre del Curso *
                   </label>
@@ -475,20 +492,6 @@ export default function AdminCourseCrud() {
                   >
                     <option value="PRESENCIAL">Presencial</option>
                     <option value="ONLINE">Online</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Estado
-                  </label>
-                  <select
-                    value={formData.b_activo.toString()}
-                    onChange={(e) => setFormData({ ...formData, b_activo: e.target.value === 'true' })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00246a] focus:border-transparent"
-                  >
-                    <option value="true">Activo</option>
-                    <option value="false">Inactivo</option>
                   </select>
                 </div>
 
@@ -521,6 +524,71 @@ export default function AdminCourseCrud() {
                   />
                   {errors.fin && <p className="mt-1 text-sm text-red-600">{errors.fin}</p>}
                 </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Descripción *
+                </label>
+                <textarea
+                  value={formData.descripcion}
+                  onChange={(e) => setFormData({ ...formData, descripcion: e.target.value })}
+                  className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-[#00246a] focus:border-transparent ${
+                    errors.descripcion ? 'border-red-500' : 'border-gray-300'
+                  }`}
+                  rows={3}
+                  placeholder="Describe el contenido y objetivos del curso..."
+                />
+                {errors.descripcion && <p className="mt-1 text-sm text-red-600">{errors.descripcion}</p>}
+              </div>
+
+              {/* Profesores */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Profesores Asignados *
+                </label>
+                <div className="border border-gray-300 rounded-lg p-3 max-h-32 overflow-y-auto">
+                  {Array.isArray(professors) && professors.map(professor => (
+                    <label key={professor.id} className="flex items-center space-x-2 mb-2">
+                      <input
+                        type="checkbox"
+                        checked={formData.profesores.includes(professor.id)}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            setFormData({
+                              ...formData,
+                              profesores: [...formData.profesores, professor.id]
+                            })
+                          } else {
+                            setFormData({
+                              ...formData,
+                              profesores: formData.profesores.filter(id => id !== professor.id)
+                            })
+                          }
+                        }}
+                        className="rounded"
+                      />
+                      <span className="text-sm">
+                        {professor.nombre} {professor.apellido} ({professor.email})
+                      </span>
+                    </label>
+                  ))}
+                </div>
+                {errors.profesores && <p className="mt-1 text-sm text-red-600">{errors.profesores}</p>}
+              </div>
+
+              {/* Estado */}
+              <div className="flex items-center space-x-2">
+                <input
+                  type="checkbox"
+                  id="activo"
+                  checked={formData.activo}
+                  onChange={(e) => setFormData({ ...formData, activo: e.target.checked })}
+                  className="rounded"
+                />
+                <label htmlFor="activo" className="text-sm font-medium text-gray-700">
+                  Curso activo
+                </label>
               </div>
 
               {/* Action Buttons */}

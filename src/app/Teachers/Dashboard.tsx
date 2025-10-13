@@ -11,6 +11,7 @@ import Sidebar from "./Sidebar"
 import Header from "./Header"
 import BottomTabs from "./Tabs"
 import { Session } from "next-auth"
+import ActivityCRUD from "../ActivityTeacher/ActivityPro"
 
 interface DashboardProps {
     user: Session
@@ -44,6 +45,8 @@ export default function Dashboard({ user, onLogout }: DashboardProps) {
                 return <AttendanceContent key="attendance" />
             case "exams":
                 return <ExamsContent key="exams" />
+                case "activity":
+                    return <ActivityCRUD key="activity" />
             default:
                 return <DashboardContent key="dashboard" />
         }

@@ -1,0 +1,1 @@
+// Archived copy. See original in src/components/AdminUserCrudFinal.tsx (moved here).

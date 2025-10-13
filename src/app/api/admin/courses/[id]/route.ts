@@ -164,7 +164,7 @@ export async function PUT(
     const { id } = await params
     const courseId = parseInt(id)
     const body = await request.json()
-    const { nombre, modalidad, inicio, fin, activo } = body
+    const { nombre, modalidad, inicio, fin, activo, precio, total_lecciones } = body
 
     // Verificar que el curso existe
     const existingCourse = await prisma.curso.findUnique({
@@ -184,6 +184,8 @@ export async function PUT(
     if (inicio !== undefined) updateData.inicio = inicio ? new Date(inicio) : null
     if (fin !== undefined) updateData.fin = fin ? new Date(fin) : null
     if (activo !== undefined) updateData.b_activo = activo
+    if (precio !== undefined) updateData.precio = precio ? Number(precio) : null
+    if (total_lecciones !== undefined) updateData.total_lecciones = total_lecciones ? Number(total_lecciones) : null
 
     const updatedCourse = await prisma.curso.update({
       where: { id_curso: courseId },

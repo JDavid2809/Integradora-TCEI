@@ -146,7 +146,12 @@ export async function PUT(
 
     const result = await prisma.$transaction(async (tx) => {
       // Preparar datos para actualizar examen
-      const updateData: any = {}
+      // Tipado explícito para los datos de actualización de examen
+      const updateData: {
+        nombre?: string;
+        id_nivel?: number | null;
+        b_activo?: boolean;
+      } = {};
       if (nombre) updateData.nombre = nombre
       if (id_nivel !== undefined) updateData.id_nivel = id_nivel ? parseInt(id_nivel) : null
       if (activo !== undefined) updateData.b_activo = activo

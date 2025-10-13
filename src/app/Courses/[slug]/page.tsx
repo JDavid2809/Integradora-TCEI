@@ -2,7 +2,7 @@ import React, { Suspense } from 'react'
 import { notFound } from 'next/navigation'
 import { getCourseBySlug } from '@/actions/courses/manageCourses'
 
-import CourseDetails from './CourseDetails'
+import NewCourseDetails from './NewCourseDetails'
 
 // Componente de fallback mientras se carga
 function LoadingCourseDetails() {
@@ -36,7 +36,7 @@ export default async function CoursePage({ params }: CoursePageProps) {
         
         return (
             <Suspense fallback={<LoadingCourseDetails />}>
-                <CourseDetails courseData={courseData!} />
+                <NewCourseDetails courseData={courseData!} />
             </Suspense>
         )
     } catch (error) {
@@ -62,7 +62,7 @@ export async function generateMetadata({ params }: CoursePageProps) {
         return {
             title: `${courseData.nombre} - Cursos de Inglés`,
             description: `Aprende inglés con nuestro curso ${courseData.nombre} modalidad ${courseData.modalidad.toLowerCase()}. Instructor experto y metodología probada.`,
-            keywords: `inglés, curso, ${courseData.modalidad.toLowerCase()}, ${courseData.imparte[0]?.nivel?.nombre || 'todos los niveles'}`,
+            keywords: `inglés, curso, ${courseData.modalidad.toLowerCase()}, todos los niveles`,
         }
     } catch (error) {
         return {

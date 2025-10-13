@@ -296,8 +296,8 @@ export default function AdminPaymentCrud() {
           ...data.payments.map((payment: Payment) => [
             new Date(payment.fecha_pago).toLocaleDateString(),
             payment.estudiante ? `${payment.estudiante.nombre} ${payment.estudiante.paterno}` : 'N/A',
-            payment.imparte.curso.nombre,
-            `${payment.imparte.profesor.nombre} ${payment.imparte.profesor.paterno}`,
+            payment.imparte?.curso?.nombre || 'Sin curso',
+            `${payment.imparte?.profesor?.nombre || 'Sin profesor'} ${payment.imparte?.profesor?.paterno || ''}`,
             payment.imparte.nivel.nombre,
             payment.tipo,
             `$${parseFloat(payment.monto).toFixed(2)}`
@@ -391,8 +391,8 @@ export default function AdminPaymentCrud() {
               onChange={(e) => setTypeFilter(e.target.value)}
               className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00246a] focus:border-transparent"
             >
-              <option value="ALL">Todos los tipos</option>
-              <option value="Mensualidad">Mensualidad</option>
+              <option key="ALL" value="ALL">Todos los tipos</option>
+              <option key="Mensualidad" value="Mensualidad">Mensualidad</option>
             </select>
           </div>
           <div className="flex items-center gap-2">
@@ -459,7 +459,7 @@ export default function AdminPaymentCrud() {
                               {payment.estudiante.nombre} {payment.estudiante.paterno}
                             </div>
                             <div className="text-xs text-gray-500">
-                              {payment.estudiante.usuario.email}
+                              {payment.estudiante.usuario?.email || 'Sin email'}
                             </div>
                           </div>
                         </div>
@@ -472,10 +472,10 @@ export default function AdminPaymentCrud() {
                         <BookOpen className="w-4 h-4 text-gray-400" />
                         <div>
                           <div className="text-sm font-medium text-gray-900">
-                            {payment.imparte.curso.nombre}
+                            {payment.imparte?.curso?.nombre || 'Sin curso'}
                           </div>
                           <div className="text-xs text-gray-500">
-                            {payment.imparte.profesor.nombre} {payment.imparte.profesor.paterno} • {payment.imparte.nivel.nombre}
+                            {(payment.imparte?.profesor?.nombre || 'Sin profesor') + ' ' + (payment.imparte?.profesor?.paterno || '') + ' • ' + (payment.imparte?.nivel?.nombre || 'Sin nivel')}
                           </div>
                         </div>
                       </div>
@@ -639,7 +639,7 @@ export default function AdminPaymentCrud() {
                     onChange={(e) => setFormData({ ...formData, tipo: e.target.value as 'Mensualidad' })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00246a] focus:border-transparent"
                   >
-                    <option value="Mensualidad">Mensualidad</option>
+                    <option key="Mensualidad" value="Mensualidad">Mensualidad</option>
                   </select>
                 </div>
 
@@ -652,10 +652,10 @@ export default function AdminPaymentCrud() {
                     onChange={(e) => setFormData({ ...formData, id_estudiante: e.target.value ? parseInt(e.target.value) : null })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00246a] focus:border-transparent"
                   >
-                    <option value="">Seleccionar estudiante (opcional)</option>
-                    {students.map(student => (
-                      <option key={student.id_estudiante} value={student.id_estudiante}>
-                        {student.nombre} {student.paterno} - {student.usuario.email}
+                    <option key="empty-student" value="">Seleccionar estudiante (opcional)</option>
+                    {students.map((student, index) => (
+                      <option key={student.id_estudiante ?? `student-${index}`} value={student.id_estudiante}>
+                        {student.nombre} {student.paterno} - {student.usuario?.email || 'Sin email'}
                       </option>
                     ))}
                   </select>
@@ -672,11 +672,11 @@ export default function AdminPaymentCrud() {
                       errors.id_imparte ? 'border-red-500' : 'border-gray-300'
                     }`}
                   >
-                    <option value="">Seleccionar curso/clase</option>
-                    {courseClasses.map(courseClass => (
-                      <option key={courseClass.id_imparte} value={courseClass.id_imparte}>
-                        {courseClass.curso.nombre} - {courseClass.nivel.nombre} 
-                        (Prof. {courseClass.profesor.nombre} {courseClass.profesor.paterno})
+                    <option key="empty-course" value="">Seleccionar curso/clase</option>
+                    {courseClasses.map((courseClass, index) => (
+                      <option key={courseClass.id_imparte ?? `course-${index}`} value={courseClass.id_imparte}>
+                        {(courseClass.curso?.nombre || 'Sin curso') + ' - ' + (courseClass.nivel?.nombre || 'Sin nivel')}
+                        (Prof. {(courseClass.profesor?.nombre || 'Sin profesor') + ' ' + (courseClass.profesor?.paterno || '')})
                       </option>
                     ))}
                   </select>

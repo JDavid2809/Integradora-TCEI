@@ -4,9 +4,9 @@ import { authOptions } from '@/lib/authOptions'
 import { prisma } from '@/lib/prisma'
 
 interface RouteParams {
-  params: {
+  params: Promise<{
     roomId: string
-  }
+  }>
 }
 
 // GET - Obtener mensajes de una sala
@@ -25,7 +25,8 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       return NextResponse.json({ error: 'Usuario no encontrado' }, { status: 404 })
     }
 
-    const roomId = parseInt(params.roomId)
+    const { roomId: roomIdParam } = await params
+    const roomId = parseInt(roomIdParam)
     
     // Verificar que el usuario es participante de la sala o que la sala es pública
     const room = await prisma.chat_room.findFirst({
@@ -105,7 +106,8 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       return NextResponse.json({ error: 'Usuario no encontrado' }, { status: 404 })
     }
 
-    const roomId = parseInt(params.roomId)
+    const { roomId: roomIdParam } = await params
+    const roomId = parseInt(roomIdParam)
     const { contenido, tipo = 'TEXTO', archivo_url, archivo_nombre } = await request.json()
 
     if (!contenido?.trim()) {

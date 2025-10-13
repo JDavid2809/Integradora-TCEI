@@ -3,14 +3,11 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/authOptions'
 import { prisma } from '@/lib/prisma'
 
-interface RouteParams {
-  params: {
-    roomId: string
-  }
-}
-
 // POST - Marcar mensajes como leídos
-export async function POST(request: NextRequest, { params }: RouteParams) {
+export async function POST(
+  request: NextRequest,
+  { params }: { params: Promise<{ roomId: string }> }
+) {
   try {
     const session = await getServerSession(authOptions)
     if (!session?.user?.email) {
@@ -25,7 +22,8 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       return NextResponse.json({ error: 'Usuario no encontrado' }, { status: 404 })
     }
 
-    const roomId = parseInt(params.roomId)
+    const { roomId: roomIdParam } = await params
+    const roomId = parseInt(roomIdParam)
 
     // Actualizar último visto
     await prisma.chat_participant.updateMany({

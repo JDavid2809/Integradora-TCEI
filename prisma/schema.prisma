@@ -274,6 +274,7 @@ model usuario {
   chats_creados       chat_room[]         @relation("ChatCreador")
   participaciones     chat_participant[]
   mensajes            chat_message[]
+  lecturas_mensajes   chat_message_read[]
 }
 
 model curso {
@@ -528,14 +529,32 @@ model chat_message {
   enviado_en         DateTime           @default(now())
   editado_en         DateTime?
   eliminado          Boolean            @default(false)
+  entregado_en       DateTime?          // Cuando el mensaje fue entregado
+  visto_en           DateTime?          // Cuando el mensaje fue visto por última vez
   
   // Relaciones
   chat_room          chat_room          @relation(fields: [chat_room_id], references: [id], onDelete: Cascade)
   usuario            usuario            @relation(fields: [usuario_id], references: [id], onDelete: Cascade)
+  lecturas           chat_message_read[]
   
   @@index([chat_room_id])
   @@index([usuario_id])
   @@index([enviado_en])
+}
+
+model chat_message_read {
+  id                 Int                @id @default(autoincrement())
+  mensaje_id         Int
+  usuario_id         Int
+  leido_en           DateTime           @default(now())
+  
+  // Relaciones
+  mensaje            chat_message       @relation(fields: [mensaje_id], references: [id], onDelete: Cascade)
+  usuario            usuario            @relation(fields: [usuario_id], references: [id], onDelete: Cascade)
+  
+  @@unique([mensaje_id, usuario_id])
+  @@index([mensaje_id])
+  @@index([usuario_id])
 }
 
 enum TipoChatRoom {

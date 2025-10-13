@@ -15,13 +15,21 @@ import {
   HeadphonesIcon,
   Minimize2,
   Maximize2,
+  Maximize,
   Circle,
   UserPlus,
   LogOut,
   Search,
   User,
   Move,
-  CornerDownRight
+  CornerDownRight,
+  ChevronLeft,
+  ChevronRight,
+  Check,
+  CheckCheck,
+  Clock,
+  Wifi,
+  WifiOff
 } from 'lucide-react'
 import { useSession } from 'next-auth/react'
 
@@ -49,8 +57,11 @@ export default function ChatWindow({ isOpen, onClose, isMinimized, onToggleMinim
     joinChatRoom,
     leaveChatRoom,
     markAsRead,
+    markMessageAsDelivered,
+    markMessageAsRead,
     startPrivateChat,
-    searchUsers
+    searchUsers,
+    updateUserStatus
   } = useChat()
 
   const [newMessage, setNewMessage] = useState('')
@@ -58,11 +69,18 @@ export default function ChatWindow({ isOpen, onClose, isMinimized, onToggleMinim
   const [newRoomName, setNewRoomName] = useState('')
   const [newRoomDescription, setNewRoomDescription] = useState('')
   const [newRoomType, setNewRoomType] = useState<'GENERAL' | 'SOPORTE' | 'CLASE'>('GENERAL')
-  const [showUserSearch, setShowUserSearch] = useState(false)
+  const [isSearchMode, setIsSearchMode] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [searchResults, setSearchResults] = useState<any[]>([])
   const [showPrivateChat, setShowPrivateChat] = useState(false)
   const [selectedUser, setSelectedUser] = useState<any>(null)
+  const [isFullScreen, setIsFullScreen] = useState(false)
+  const [isChatListMinimized, setIsChatListMinimized] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('chatListMinimized') === 'true'
+    }
+    return false
+  })
 
   // Estados para posición y tamaño de la ventana
   const [position, setPosition] = useState(() => ({
@@ -99,6 +117,46 @@ export default function ChatWindow({ isOpen, onClose, isMinimized, onToggleMinim
       markAsRead(activeRoom.id)
     }
   }, [activeRoom])
+
+  // Guardar estado de minimización en localStorage
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('chatListMinimized', isChatListMinimized.toString())
+    }
+  }, [isChatListMinimized])
+
+  // Actualizar estado de conexión cuando se abre/cierra el chat
+  useEffect(() => {
+    if (session?.user) {
+      updateUserStatus(isOpen)
+    }
+  }, [isOpen, session])
+
+  // Marcar mensajes como leídos automáticamente cuando se ve la sala activa
+  useEffect(() => {
+    if (activeRoom && messages.length > 0) {
+      const unreadMessages = messages.filter(msg => 
+        msg.usuario_id !== Number(session?.user?.id) && 
+        !msg.lecturas?.some(lectura => lectura.usuario_id === Number(session?.user?.id))
+      )
+
+      // Marcar como leídos después de un pequeño delay
+      const timer = setTimeout(() => {
+        unreadMessages.forEach(msg => {
+          markMessageAsRead(msg.id)
+        })
+      }, 1000) // 1 segundo de delay para simular que el usuario leyó
+
+      return () => clearTimeout(timer)
+    }
+  }, [activeRoom, messages, session])
+
+  // Actualizar último visto cuando cambia la sala activa
+  useEffect(() => {
+    if (activeRoom && session?.user) {
+      markAsRead(activeRoom.id)
+    }
+  }, [activeRoom, session])
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -148,12 +206,37 @@ export default function ChatWindow({ isOpen, onClose, isMinimized, onToggleMinim
 
   const handleUserSearch = async (query: string) => {
     setSearchQuery(query)
-    if (query.trim()) {
-      const results = await searchUsers(query)
-      setSearchResults(results)
-    } else {
-      const allUsers = await searchUsers('')
-      setSearchResults(allUsers)
+    try {
+      console.log(`🔍 Searching users with query: "${query}"`)
+      
+      let results
+      if (query.trim()) {
+        results = await searchUsers(query)
+      } else {
+        results = await searchUsers('')
+      }
+
+      // En desarrollo, mostrar información adicional
+      if (process.env.NODE_ENV === 'development' && results) {
+        console.log(`✅ Search results:`, {
+          query,
+          count: Array.isArray(results) ? results.length : (results as any).users?.length || 0,
+          results: Array.isArray(results) ? results : (results as any).users || []
+        })
+      }
+
+      // Manejar tanto formato antiguo (array) como nuevo (objeto con debug)
+      const usersList = Array.isArray(results) ? results : (results as any).users || []
+      setSearchResults(usersList)
+      
+    } catch (error) {
+      console.error('Error searching users:', error)
+      setSearchResults([])
+      
+      // En desarrollo, mostrar más detalles del error
+      if (process.env.NODE_ENV === 'development') {
+        alert(`Error buscando usuarios: ${(error as Error).message}`)
+      }
     }
   }
 
@@ -162,7 +245,7 @@ export default function ChatWindow({ isOpen, onClose, isMinimized, onToggleMinim
       const room = await startPrivateChat(userId)
       if (room) {
         setActiveRoom(room)
-        setShowUserSearch(false)
+        setIsSearchMode(false)
         setShowPrivateChat(false)
         setSearchQuery('')
         setSearchResults([])
@@ -200,15 +283,81 @@ export default function ChatWindow({ isOpen, onClose, isMinimized, onToggleMinim
     return room?.participantes?.some(p => p.usuario_id === Number(session?.user?.id))
   }
 
-  useEffect(() => {
-    if (showUserSearch && !searchQuery) {
-      handleUserSearch('')
+  // Obtener el icono de estado del mensaje
+  const getMessageStatusIcon = (message: any) => {
+    const isMyMessage = message.usuario_id === Number(session?.user?.id)
+    
+    if (!isMyMessage) return null // Solo mostrar estado en mis mensajes
+    
+    if (message.lecturas && message.lecturas.length > 0) {
+      // Mensaje leído
+      return (
+        <div title="Leído">
+          <CheckCheck className="w-3 h-3 text-blue-500" />
+        </div>
+      )
+    } else if (message.entregado_en) {
+      // Mensaje entregado pero no leído
+      return (
+        <div title="Entregado">
+          <Check className="w-3 h-3 text-gray-400" />
+        </div>
+      )
+    } else {
+      // Mensaje enviado pero no entregado
+      return (
+        <div title="Enviado">
+          <Clock className="w-3 h-3 text-gray-300" />
+        </div>
+      )
     }
-  }, [showUserSearch])
+  }
+
+  // Obtener indicador de conexión
+  const getConnectionStatus = () => {
+    return isConnected ? (
+      <div title="Conectado">
+        <Wifi className="w-4 h-4 text-green-500" />
+      </div>
+    ) : (
+      <div title="Desconectado">
+        <WifiOff className="w-4 h-4 text-red-500" />
+      </div>
+    )
+  }
+
+  useEffect(() => {
+    if (!isSearchMode) {
+      setSearchQuery('')
+      setSearchResults([])
+    }
+  }, [isSearchMode])
+
+  // Manejar tecla Escape para salir de pantalla completa
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isFullScreen) {
+        setIsFullScreen(false)
+      }
+    }
+
+    if (isFullScreen) {
+      document.addEventListener('keydown', handleKeyDown)
+      // También deshabilitar scroll del body
+      document.body.style.overflow = 'hidden'
+    } else {
+      document.body.style.overflow = 'unset'
+    }
+
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown)
+      document.body.style.overflow = 'unset'
+    }
+  }, [isFullScreen])
 
   // Funciones para arrastrar la ventana
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
-    if (isMinimized || e.target !== e.currentTarget) return
+    if (isMinimized || isFullScreen || e.target !== e.currentTarget) return
     setIsDragging(true)
     setDragStart({
       x: e.clientX,
@@ -216,7 +365,7 @@ export default function ChatWindow({ isOpen, onClose, isMinimized, onToggleMinim
       startX: position.x,
       startY: position.y
     })
-  }, [position, isMinimized])
+  }, [position, isMinimized, isFullScreen])
 
   const handleMouseMove = useCallback((e: MouseEvent) => {
     if (isDragging) {
@@ -273,6 +422,7 @@ export default function ChatWindow({ isOpen, onClose, isMinimized, onToggleMinim
 
   // Funciones para redimensionar la ventana desde diferentes bordes
   const handleResizeMouseDown = useCallback((e: React.MouseEvent, direction: string) => {
+    if (isFullScreen) return // No redimensionar en modo pantalla completa
     e.preventDefault()
     e.stopPropagation()
     setIsResizing(true)
@@ -285,7 +435,7 @@ export default function ChatWindow({ isOpen, onClose, isMinimized, onToggleMinim
       startX: position.x,
       startY: position.y
     })
-  }, [size, position])
+  }, [size, position, isFullScreen])
 
   useEffect(() => {
     if (isDragging || isResizing) {
@@ -329,8 +479,16 @@ export default function ChatWindow({ isOpen, onClose, isMinimized, onToggleMinim
   return (
     <div 
       ref={chatWindowRef}
-      className={`fixed z-50 ${isDragging || isResizing ? 'select-none' : ''}`}
-      style={{
+      className={`fixed z-50 ${isDragging || isResizing ? 'select-none' : ''} ${
+        isFullScreen ? 'inset-0' : ''
+      }`}
+      style={isFullScreen ? {
+        left: 0,
+        top: 0,
+        width: '100vw',
+        height: '100vh',
+        transition: 'all 0.3s ease',
+      } : {
         left: `${position.x}px`,
         top: `${position.y}px`,
         width: `${size.width}px`,
@@ -338,15 +496,19 @@ export default function ChatWindow({ isOpen, onClose, isMinimized, onToggleMinim
         transition: isDragging || isResizing ? 'none' : 'all 0.2s ease',
       }}
     >
-      <div className={`bg-white rounded-xl shadow-2xl border-2 h-full flex flex-col overflow-hidden ${
+      <div className={`bg-white h-full flex flex-col overflow-hidden ${
+        isFullScreen ? 'rounded-none border-0' : 'rounded-xl shadow-2xl border-2'
+      } ${
         isDragging ? 'border-[#00246a] shadow-3xl' : 'border-gray-200'
       } ${isResizing ? 'border-[#e30f28]' : ''}`}>
         {/* Header */}
         <div 
-          className={`flex items-center justify-between p-4 border-b bg-gradient-to-r from-[#00246a] to-[#003875] text-white rounded-t-xl ${
-            isDragging ? 'cursor-grabbing' : 'cursor-move'
+          className={`flex items-center justify-between p-4 border-b bg-gradient-to-r from-[#00246a] to-[#003875] text-white ${
+            isFullScreen ? 'rounded-none' : 'rounded-t-xl'
+          } ${
+            isDragging && !isFullScreen ? 'cursor-grabbing' : !isFullScreen ? 'cursor-move' : 'cursor-default'
           }`}
-          onMouseDown={handleMouseDown}
+          onMouseDown={!isFullScreen ? handleMouseDown : undefined}
         >
           <div className="flex items-center gap-3">
             <div className="p-1.5 bg-white/20 rounded-lg">
@@ -355,7 +517,11 @@ export default function ChatWindow({ isOpen, onClose, isMinimized, onToggleMinim
             <div>
               <span className="font-semibold text-lg">Chat</span>
               <div className="flex items-center gap-2 text-sm text-white/80">
-                <Circle className={`w-2 h-2 fill-current ${isConnected ? 'text-green-400' : 'text-red-400'}`} />
+                {isConnected ? (
+                  <Wifi className="w-3 h-3 text-green-400" />
+                ) : (
+                  <WifiOff className="w-3 h-3 text-red-400" />
+                )}
                 <span>{isConnected ? 'Conectado' : 'Desconectado'}</span>
                 {participants.length > 0 && (
                   <>
@@ -368,10 +534,11 @@ export default function ChatWindow({ isOpen, onClose, isMinimized, onToggleMinim
           </div>
           <div className="flex items-center gap-2">
             <button
-              onClick={onToggleMinimize}
+              onClick={() => setIsFullScreen(!isFullScreen)}
               className="p-2 hover:bg-white/20 rounded-lg transition-colors"
+              title={isFullScreen ? "Salir de pantalla completa (Esc)" : "Ver en pantalla completa"}
             >
-              {isMinimized ? <Maximize2 className="w-4 h-4" /> : <Minimize2 className="w-4 h-4" />}
+              {isFullScreen ? <Minimize2 className="w-4 h-4" /> : <Maximize className="w-4 h-4" />}
             </button>
             <button
               onClick={onClose}
@@ -385,42 +552,164 @@ export default function ChatWindow({ isOpen, onClose, isMinimized, onToggleMinim
         {!isMinimized && (
           <div className="flex flex-1 min-h-0">
             {/* Sidebar de salas */}
-            <div className="w-64 border-r border-gray-200 flex flex-col bg-gray-50/50 min-w-0">
+            <div className={`${isChatListMinimized ? 'w-16' : 'w-64'} border-r border-gray-200 flex flex-col bg-gray-50/50 min-w-0 transition-all duration-300`}>
               {/* Header de salas */}
               <div className="p-4 border-b border-gray-200 bg-white flex-shrink-0">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="font-semibold text-[#00246a]">Salas de Chat</span>
+                  {!isChatListMinimized && <span className="font-semibold text-[#00246a]">Salas de Chat</span>}
                   <div className="flex items-center gap-1">
+                    {!isChatListMinimized && (
+                      <>
+                        <button
+                          onClick={() => setIsSearchMode(!isSearchMode)}
+                          className={`p-2 rounded-lg transition-all duration-200 ${
+                            isSearchMode 
+                              ? 'bg-[#e30f28] text-white' 
+                              : 'hover:bg-[#e30f28] hover:text-white text-[#00246a]'
+                          }`}
+                          title={isSearchMode ? "Cancelar búsqueda" : "Buscar usuarios"}
+                        >
+                          {isSearchMode ? <X className="w-4 h-4" /> : <Search className="w-4 h-4" />}
+                        </button>
+                        <button
+                          onClick={() => setShowCreateRoom(true)}
+                          className="p-2 hover:bg-[#e30f28] hover:text-white rounded-lg transition-all duration-200 text-[#00246a]"
+                          title="Crear sala"
+                        >
+                          <Plus className="w-4 h-4" />
+                        </button>
+                      </>
+                    )}
                     <button
-                      onClick={() => setShowUserSearch(true)}
+                      onClick={() => setIsChatListMinimized(!isChatListMinimized)}
                       className="p-2 hover:bg-[#e30f28] hover:text-white rounded-lg transition-all duration-200 text-[#00246a]"
-                      title="Buscar usuarios"
+                      title={isChatListMinimized ? "Expandir lista de chats" : "Minimizar lista de chats"}
                     >
-                      <Search className="w-4 h-4" />
-                    </button>
-                    <button
-                      onClick={() => setShowCreateRoom(true)}
-                      className="p-2 hover:bg-[#e30f28] hover:text-white rounded-lg transition-all duration-200 text-[#00246a]"
-                      title="Crear sala"
-                    >
-                      <Plus className="w-4 h-4" />
+                      {isChatListMinimized ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
                     </button>
                   </div>
                 </div>
               </div>
 
-              {/* Lista de salas */}
+              {/* Botones de acceso rápido cuando está minimizado */}
+              {isChatListMinimized && (
+                <div className="p-2 space-y-2 border-b border-gray-200">
+                  <button
+                    onClick={() => setIsSearchMode(!isSearchMode)}
+                    className={`w-full p-2 rounded-lg transition-all duration-200 flex items-center justify-center ${
+                      isSearchMode 
+                        ? 'bg-[#e30f28] text-white' 
+                        : 'hover:bg-[#e30f28] hover:text-white text-[#00246a]'
+                    }`}
+                    title={isSearchMode ? "Cancelar búsqueda" : "Buscar usuarios"}
+                  >
+                    {isSearchMode ? <X className="w-4 h-4" /> : <Search className="w-4 h-4" />}
+                  </button>
+                  <button
+                    onClick={() => setShowCreateRoom(true)}
+                    className="w-full p-2 hover:bg-[#e30f28] hover:text-white rounded-lg transition-all duration-200 text-[#00246a] flex items-center justify-center"
+                    title="Crear sala"
+                  >
+                    <Plus className="w-4 h-4" />
+                  </button>
+                </div>
+              )}
+
+              {/* Barra de búsqueda */}
+              {isSearchMode && (
+                <div className="p-2 border-b border-gray-200">
+                  {!isChatListMinimized ? (
+                    <input
+                      type="text"
+                      value={searchQuery}
+                      onChange={(e) => handleUserSearch(e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00246a] text-sm"
+                      placeholder="Buscar usuarios por nombre o email..."
+                      autoFocus
+                    />
+                  ) : (
+                    <div className="flex items-center justify-center">
+                      <input
+                        type="text"
+                        value={searchQuery}
+                        onChange={(e) => handleUserSearch(e.target.value)}
+                        className="w-full px-2 py-1 border border-gray-300 rounded text-xs focus:outline-none focus:ring-1 focus:ring-[#00246a]"
+                        placeholder="Buscar..."
+                        autoFocus
+                      />
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Lista de salas o resultados de búsqueda */}
               <div className="flex-1 overflow-y-auto p-2 space-y-1 min-h-0">
-                {loading ? (
+                {isSearchMode ? (
+                  // Mostrar resultados de búsqueda
+                  <div className="space-y-2">
+                    {searchResults.length === 0 ? (
+                      <div className="text-center py-8 text-gray-500">
+                        <User className="w-8 h-8 mx-auto mb-2 opacity-50" />
+                        <p className="text-sm font-medium mb-2">
+                          {searchQuery ? 'No se encontraron usuarios' : 'Escribe para buscar usuarios'}
+                        </p>
+                        {searchQuery && !isChatListMinimized && (
+                          <div className="text-xs space-y-1">
+                            <p>• Verifica que el nombre o email sea correcto</p>
+                            <p>• Solo se muestran usuarios verificados</p>
+                            {process.env.NODE_ENV === 'development' && (
+                              <p className="text-orange-500">
+                                • En desarrollo: También se muestran usuarios no verificados
+                              </p>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      searchResults.map(user => (
+                        <div
+                          key={user.id}
+                          className="p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+                        >
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                              <div className="w-8 h-8 bg-[#00246a] text-white rounded-full flex items-center justify-center text-sm font-medium">
+                                {user.nombre?.charAt(0)?.toUpperCase() || 'U'}
+                              </div>
+                              {!isChatListMinimized && (
+                                <div>
+                                  <p className="font-medium text-gray-900">{user.nombre}</p>
+                                  <p className="text-sm text-gray-500">{user.email}</p>
+                                  <p className="text-xs text-gray-400 capitalize">{user.role?.toLowerCase()}</p>
+                                </div>
+                              )}
+                            </div>
+                            <button
+                              onClick={() => handleStartPrivateChat(user.id)}
+                              className="px-3 py-1 bg-[#00246a] text-white text-sm rounded-lg hover:bg-[#003875] transition-colors"
+                              title={isChatListMinimized ? (user.hasExistingChat ? 'Abrir Chat' : 'Iniciar Chat') : undefined}
+                            >
+                              {isChatListMinimized ? '💬' : (user.hasExistingChat ? 'Abrir Chat' : 'Iniciar Chat')}
+                            </button>
+                          </div>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                ) : loading ? (
                   <div className="text-center py-8 text-gray-500">
-                    <MessageCircle className="w-8 h-8 animate-spin mx-auto mb-2" />
-                    <p className="text-sm">Cargando salas...</p>
+                    <MessageCircle className={`${isChatListMinimized ? 'w-6 h-6' : 'w-8 h-8'} animate-spin mx-auto mb-2`} />
+                    {!isChatListMinimized && <p className="text-sm">Cargando salas...</p>}
                   </div>
                 ) : chatRooms.length === 0 ? (
                   <div className="text-center py-8 text-gray-500">
-                    <MessageCircle className="w-8 h-8 mx-auto mb-2 opacity-50" />
-                    <p className="text-sm font-medium">No hay salas disponibles</p>
-                    <p className="text-xs text-gray-400 mt-1">Crea una nueva sala para empezar</p>
+                    <MessageCircle className={`${isChatListMinimized ? 'w-6 h-6' : 'w-8 h-8'} mx-auto mb-2 opacity-50`} />
+                    {!isChatListMinimized && (
+                      <>
+                        <p className="text-sm font-medium">No hay salas disponibles</p>
+                        <p className="text-xs text-gray-400 mt-1">Crea una nueva sala para empezar</p>
+                      </>
+                    )}
                   </div>
                 ) : (
                   <div className="space-y-1">
@@ -428,46 +717,66 @@ export default function ChatWindow({ isOpen, onClose, isMinimized, onToggleMinim
                       <div key={room.id} className="relative group">
                         <button
                           onClick={() => setActiveRoom(room)}
-                          className={`w-full p-3 text-left rounded-lg transition-all duration-200 ${
+                          className={`w-full ${isChatListMinimized ? 'p-2' : 'p-3'} text-left rounded-lg transition-all duration-200 ${
                             activeRoom?.id === room.id 
                               ? 'bg-gradient-to-r from-[#00246a]/10 to-[#e30f28]/10 border border-[#e30f28]/30' 
                               : 'hover:bg-white/80'
                           }`}
+                          title={isChatListMinimized ? room.nombre : undefined}
                         >
-                          <div className="flex items-start gap-3">
-                            <div className={`p-2 rounded-lg transition-all duration-200 ${
-                              activeRoom?.id === room.id 
-                                ? 'bg-[#e30f28] text-white' 
-                                : 'bg-gray-100 text-gray-600 group-hover:bg-[#00246a] group-hover:text-white'
-                            }`}>
-                              {getRoomIcon(room.tipo)}
+                          {isChatListMinimized ? (
+                            // Vista minimizada - solo icono
+                            <div className="flex items-center justify-center relative">
+                              <div className={`p-2 rounded-lg transition-all duration-200 ${
+                                activeRoom?.id === room.id 
+                                  ? 'bg-[#e30f28] text-white' 
+                                  : 'bg-gray-100 text-gray-600 group-hover:bg-[#00246a] group-hover:text-white'
+                              }`}>
+                                {getRoomIcon(room.tipo)}
+                              </div>
+                              {(room.mensajes_no_leidos ?? 0) > 0 && (
+                                <div className="absolute -top-1 -right-1 bg-[#e30f28] text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-medium">
+                                  {(room.mensajes_no_leidos ?? 0) > 9 ? '9+' : room.mensajes_no_leidos}
+                                </div>
+                              )}
                             </div>
-                            <div className="flex-1 min-w-0">
-                              <div className="flex items-center gap-2 mb-1">
-                                <span className={`font-medium text-sm truncate ${
-                                  activeRoom?.id === room.id ? 'text-[#00246a]' : 'text-gray-900'
-                                }`}>
-                                  {room.nombre}
-                                </span>
-                                {(room.mensajes_no_leidos ?? 0) > 0 && (
-                                  <span className="bg-[#e30f28] text-white text-xs rounded-full px-2 py-0.5 min-w-[20px] text-center font-medium">
-                                    {room.mensajes_no_leidos}
+                          ) : (
+                            // Vista expandida - completa
+                            <div className="flex items-start gap-3">
+                              <div className={`p-2 rounded-lg transition-all duration-200 ${
+                                activeRoom?.id === room.id 
+                                  ? 'bg-[#e30f28] text-white' 
+                                  : 'bg-gray-100 text-gray-600 group-hover:bg-[#00246a] group-hover:text-white'
+                              }`}>
+                                {getRoomIcon(room.tipo)}
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center gap-2 mb-1">
+                                  <span className={`font-medium text-sm truncate ${
+                                    activeRoom?.id === room.id ? 'text-[#00246a]' : 'text-gray-900'
+                                  }`}>
+                                    {room.nombre}
                                   </span>
-                                )}
-                              </div>
-                              <p className="text-xs text-gray-500 truncate">{room.descripcion || 'Sin descripción'}</p>
-                              <div className="flex items-center gap-1 mt-1">
-                                <Users className="w-3 h-3 text-gray-400" />
-                                <span className="text-xs text-gray-400">
-                                  {room.participantes?.length || 0} participantes
-                                </span>
+                                  {(room.mensajes_no_leidos ?? 0) > 0 && (
+                                    <span className="bg-[#e30f28] text-white text-xs rounded-full px-2 py-0.5 min-w-[20px] text-center font-medium">
+                                      {room.mensajes_no_leidos}
+                                    </span>
+                                  )}
+                                </div>
+                                <p className="text-xs text-gray-500 truncate">{room.descripcion || 'Sin descripción'}</p>
+                                <div className="flex items-center gap-1 mt-1">
+                                  <Users className="w-3 h-3 text-gray-400" />
+                                  <span className="text-xs text-gray-400">
+                                    {room.participantes?.length || 0} participantes
+                                  </span>
+                                </div>
                               </div>
                             </div>
-                          </div>
+                          )}
                         </button>
                         
-                        {/* Botones de acciones en hover */}
-                        {room.tipo !== 'PRIVADO' && (
+                        {/* Botones de acciones en hover - solo en vista expandida */}
+                        {!isChatListMinimized && room.tipo !== 'PRIVADO' && (
                           <div className="absolute right-2 top-2 opacity-0 group-hover:opacity-100 transition-opacity">
                             {isUserInRoom(room.id) ? (
                               <button
@@ -549,13 +858,14 @@ export default function ChatWindow({ isOpen, onClose, isMinimized, onToggleMinim
                               </p>
                             )}
                             <p className="text-sm">{message.contenido}</p>
-                            <p className={`text-xs mt-1 ${
+                            <div className={`flex items-center justify-between text-xs mt-1 ${
                               message.usuario_id === Number(session?.user?.id)
                                 ? 'text-white/70'
                                 : 'text-gray-500'
                             }`}>
-                              {formatTime(message.enviado_en)}
-                            </p>
+                              <span>{formatTime(message.enviado_en)}</span>
+                              {getMessageStatusIcon(message)}
+                            </div>
                           </div>
                         </div>
                       ))
@@ -599,7 +909,7 @@ export default function ChatWindow({ isOpen, onClose, isMinimized, onToggleMinim
         )}
 
         {/* Controles de redimensionamiento */}
-        {!isMinimized && (
+        {!isMinimized && !isFullScreen && (
           <>
             {/* Borde superior */}
             <div
@@ -767,73 +1077,7 @@ export default function ChatWindow({ isOpen, onClose, isMinimized, onToggleMinim
           </div>
         )}
 
-        {/* Modal para buscar usuarios */}
-        {showUserSearch && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-60">
-            <div className="bg-white rounded-lg p-6 w-96 max-w-[90vw] max-h-[80vh] flex flex-col">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-semibold text-[#00246a]">Buscar Usuarios</h3>
-                <button
-                  onClick={() => {
-                    setShowUserSearch(false)
-                    setSearchQuery('')
-                    setSearchResults([])
-                  }}
-                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-                >
-                  <X className="w-4 h-4" />
-                </button>
-              </div>
-              
-              <div className="mb-4">
-                <input
-                  type="text"
-                  value={searchQuery}
-                  onChange={(e) => handleUserSearch(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00246a]"
-                  placeholder="Buscar por nombre o email..."
-                />
-              </div>
 
-              <div className="flex-1 overflow-y-auto space-y-2">
-                {searchResults.length === 0 ? (
-                  <div className="text-center py-8 text-gray-500">
-                    <User className="w-8 h-8 mx-auto mb-2 opacity-50" />
-                    <p className="text-sm">
-                      {searchQuery ? 'No se encontraron usuarios' : 'Escribe para buscar usuarios'}
-                    </p>
-                  </div>
-                ) : (
-                  searchResults.map(user => (
-                    <div
-                      key={user.id}
-                      className="p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
-                    >
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 bg-[#00246a] text-white rounded-full flex items-center justify-center text-sm font-medium">
-                            {user.nombre?.charAt(0)?.toUpperCase() || 'U'}
-                          </div>
-                          <div>
-                            <p className="font-medium text-gray-900">{user.nombre}</p>
-                            <p className="text-sm text-gray-500">{user.email}</p>
-                            <p className="text-xs text-gray-400 capitalize">{user.role?.toLowerCase()}</p>
-                          </div>
-                        </div>
-                        <button
-                          onClick={() => handleStartPrivateChat(user.id)}
-                          className="px-3 py-1 bg-[#00246a] text-white text-sm rounded-lg hover:bg-[#003875] transition-colors"
-                        >
-                          {user.hasExistingChat ? 'Abrir Chat' : 'Iniciar Chat'}
-                        </button>
-                      </div>
-                    </div>
-                  ))
-                )}
-              </div>
-            </div>
-          </div>
-        )}
       </div>
     </div>
   )

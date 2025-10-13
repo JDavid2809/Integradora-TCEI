@@ -14,6 +14,22 @@ interface ChatMessage {
   enviado_en: string
   editado_en?: string
   eliminado: boolean
+  entregado_en?: string
+  visto_en?: string
+  lecturas?: ChatMessageRead[]
+  usuario: {
+    id: number
+    nombre: string
+    apellido: string
+    rol: string
+  }
+}
+
+interface ChatMessageRead {
+  id: number
+  mensaje_id: number
+  usuario_id: number
+  leido_en: string
   usuario: {
     id: number
     nombre: string
@@ -68,10 +84,15 @@ interface ChatContextType {
   joinChatRoom: (roomId: number) => Promise<boolean>
   leaveChatRoom: (roomId: number) => Promise<boolean>
   markAsRead: (roomId: number) => Promise<void>
+  markMessageAsDelivered: (messageId: number) => Promise<void>
+  markMessageAsRead: (messageId: number) => Promise<void>
   
   // Chat privado
   startPrivateChat: (targetUserId: number) => Promise<ChatRoom | null>
   searchUsers: (query: string) => Promise<any[]>
+  
+  // Estado de conexión
+  updateUserStatus: (isOnline: boolean) => Promise<void>
 }
 
 const ChatContext = createContext<ChatContextType | undefined>(undefined)
@@ -259,6 +280,74 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
     }
   }
 
+  // Marcar mensaje como entregado
+  const markMessageAsDelivered = async (messageId: number): Promise<void> => {
+    if (!session?.user) return
+    
+    try {
+      await api(`/api/chat/messages/${messageId}/delivered`, { method: 'PUT' })
+      
+      // Actualizar el mensaje en el estado local
+      setMessages(prev => prev.map(msg => 
+        msg.id === messageId 
+          ? { ...msg, entregado_en: new Date().toISOString() }
+          : msg
+      ))
+    } catch (error) {
+      console.error('Error marking message as delivered:', error)
+    }
+  }
+
+  // Marcar mensaje como leído
+  const markMessageAsRead = async (messageId: number): Promise<void> => {
+    if (!session?.user) return
+    
+    try {
+      await api(`/api/chat/messages/${messageId}/read`, { method: 'PUT' })
+      
+      // Actualizar el mensaje en el estado local
+      setMessages(prev => prev.map(msg => 
+        msg.id === messageId 
+          ? { 
+              ...msg, 
+              visto_en: new Date().toISOString(),
+              lecturas: [
+                ...(msg.lecturas || []),
+                {
+                  id: Date.now(), // Temporal ID
+                  mensaje_id: messageId,
+                  usuario_id: Number(session.user.id),
+                  leido_en: new Date().toISOString(),
+                  usuario: {
+                    id: Number(session.user.id),
+                    nombre: session.user.name || '',
+                    apellido: session.user.apellido || '',
+                    rol: session.user.rol || ''
+                  }
+                }
+              ]
+            }
+          : msg
+      ))
+    } catch (error) {
+      console.error('Error marking message as read:', error)
+    }
+  }
+
+  // Actualizar estado de usuario (conectado/desconectado)
+  const updateUserStatus = async (isOnline: boolean): Promise<void> => {
+    if (!session?.user) return
+    
+    try {
+      await api('/api/chat/status', {
+        method: 'PUT',
+        body: JSON.stringify({ isOnline })
+      })
+    } catch (error) {
+      console.error('Error updating user status:', error)
+    }
+  }
+
   // Polling para simular tiempo real (en producción usarías WebSockets)
   useEffect(() => {
     if (!session?.user || !activeRoom) return
@@ -308,8 +397,11 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
     joinChatRoom,
     leaveChatRoom,
     markAsRead,
+    markMessageAsDelivered,
+    markMessageAsRead,
     startPrivateChat,
-    searchUsers
+    searchUsers,
+    updateUserStatus
   }
 
   return (

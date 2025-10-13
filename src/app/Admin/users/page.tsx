@@ -181,12 +181,13 @@ export default function AdminUsersPage() {
               </label>
               <input
                 type="tel"
+                placeholder="55 1234 5678"
                 value={formData.detalles.telefono || ''}
                 onChange={(e) => setFormData({
                   ...formData,
                   detalles: { ...formData.detalles, telefono: e.target.value }
                 })}
-                className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00246a] focus:border-transparent"
+                className="w-full p-3 bg-gray-50 border-2 border-gray-300 rounded-lg text-gray-900 placeholder-black focus:ring-2 focus:ring-[#00246a] focus:border-[#00246a] focus:bg-white transition-colors"
               />
             </div>
             <div>
@@ -197,12 +198,13 @@ export default function AdminUsersPage() {
                 type="number"
                 min="1"
                 max="100"
+                placeholder="18"
                 value={formData.detalles.edad || ''}
                 onChange={(e) => setFormData({
                   ...formData,
                   detalles: { ...formData.detalles, edad: parseInt(e.target.value) || 0 }
                 })}
-                className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00246a] focus:border-transparent"
+                className="w-full p-3 bg-gray-50 border-2 border-gray-300 rounded-lg text-gray-900 placeholder-black focus:ring-2 focus:ring-[#00246a] focus:border-[#00246a] focus:bg-white transition-colors"
               />
             </div>
             <div>
@@ -211,12 +213,13 @@ export default function AdminUsersPage() {
               </label>
               <input
                 type="text"
+                placeholder="González"
                 value={formData.detalles.paterno || ''}
                 onChange={(e) => setFormData({
                   ...formData,
                   detalles: { ...formData.detalles, paterno: e.target.value }
                 })}
-                className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00246a] focus:border-transparent"
+                className="w-full p-3 bg-gray-50 border-2 border-gray-300 rounded-lg text-gray-900 placeholder-black focus:ring-2 focus:ring-[#00246a] focus:border-[#00246a] focus:bg-white transition-colors"
               />
             </div>
             <div>
@@ -225,12 +228,13 @@ export default function AdminUsersPage() {
               </label>
               <input
                 type="text"
+                placeholder="López"
                 value={formData.detalles.materno || ''}
                 onChange={(e) => setFormData({
                   ...formData,
                   detalles: { ...formData.detalles, materno: e.target.value }
                 })}
-                className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00246a] focus:border-transparent"
+                className="w-full p-3 bg-gray-50 border-2 border-gray-300 rounded-lg text-gray-900 placeholder-black focus:ring-2 focus:ring-[#00246a] focus:border-[#00246a] focus:bg-white transition-colors"
               />
             </div>
           </div>
@@ -245,12 +249,13 @@ export default function AdminUsersPage() {
               </label>
               <input
                 type="tel"
+                placeholder="55 1234 5678"
                 value={formData.detalles.telefono || ''}
                 onChange={(e) => setFormData({
                   ...formData,
                   detalles: { ...formData.detalles, telefono: e.target.value }
                 })}
-                className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00246a] focus:border-transparent"
+                className="w-full p-3 bg-gray-50 border-2 border-gray-300 rounded-lg text-gray-900 placeholder-black focus:ring-2 focus:ring-[#00246a] focus:border-[#00246a] focus:bg-white transition-colors"
               />
             </div>
             <div>
@@ -261,12 +266,13 @@ export default function AdminUsersPage() {
                 type="number"
                 min="18"
                 max="80"
+                placeholder="35"
                 value={formData.detalles.edad || ''}
                 onChange={(e) => setFormData({
                   ...formData,
                   detalles: { ...formData.detalles, edad: parseInt(e.target.value) || 0 }
                 })}
-                className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00246a] focus:border-transparent"
+                className="w-full p-3 bg-gray-50 border-2 border-gray-300 rounded-lg text-gray-900 placeholder-black focus:ring-2 focus:ring-[#00246a] focus:border-[#00246a] focus:bg-white transition-colors"
               />
             </div>
             <div>
@@ -275,12 +281,13 @@ export default function AdminUsersPage() {
               </label>
               <input
                 type="text"
+                placeholder="ABCD123456HMCRSR09"
                 value={formData.detalles.curp || ''}
                 onChange={(e) => setFormData({
                   ...formData,
                   detalles: { ...formData.detalles, curp: e.target.value }
                 })}
-                className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00246a] focus:border-transparent"
+                className="w-full p-3 bg-gray-50 border-2 border-gray-300 rounded-lg text-gray-900 placeholder-black focus:ring-2 focus:ring-[#00246a] focus:border-[#00246a] focus:bg-white transition-colors"
               />
             </div>
             <div>
@@ -289,12 +296,13 @@ export default function AdminUsersPage() {
               </label>
               <input
                 type="text"
+                placeholder="ABCD123456ABC"
                 value={formData.detalles.rfc || ''}
                 onChange={(e) => setFormData({
                   ...formData,
                   detalles: { ...formData.detalles, rfc: e.target.value }
                 })}
-                className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00246a] focus:border-transparent"
+                className="w-full p-3 bg-gray-50 border-2 border-gray-300 rounded-lg text-gray-900 placeholder-black focus:ring-2 focus:ring-[#00246a] focus:border-[#00246a] focus:bg-white transition-colors"
               />
             </div>
             <div className="md:col-span-2">
@@ -303,12 +311,13 @@ export default function AdminUsersPage() {
               </label>
               <input
                 type="text"
+                placeholder="Calle Principal #123, Colonia Centro, Ciudad"
                 value={formData.detalles.direccion || ''}
                 onChange={(e) => setFormData({
                   ...formData,
                   detalles: { ...formData.detalles, direccion: e.target.value }
                 })}
-                className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00246a] focus:border-transparent"
+                className="w-full p-3 bg-gray-50 border-2 border-gray-300 rounded-lg text-gray-900 placeholder-black focus:ring-2 focus:ring-[#00246a] focus:border-[#00246a] focus:bg-white transition-colors"
               />
             </div>
             <div>
@@ -317,12 +326,13 @@ export default function AdminUsersPage() {
               </label>
               <input
                 type="text"
+                placeholder="Licenciatura en Educación"
                 value={formData.detalles.nivel_estudios || ''}
                 onChange={(e) => setFormData({
                   ...formData,
                   detalles: { ...formData.detalles, nivel_estudios: e.target.value }
                 })}
-                className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00246a] focus:border-transparent"
+                className="w-full p-3 bg-gray-50 border-2 border-gray-300 rounded-lg text-gray-900 placeholder-black focus:ring-2 focus:ring-[#00246a] focus:border-[#00246a] focus:bg-white transition-colors"
               />
             </div>
             <div>
@@ -331,12 +341,13 @@ export default function AdminUsersPage() {
               </label>
               <input
                 type="text"
+                placeholder="Notas adicionales sobre el profesor"
                 value={formData.detalles.observaciones || ''}
                 onChange={(e) => setFormData({
                   ...formData,
                   detalles: { ...formData.detalles, observaciones: e.target.value }
                 })}
-                className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00246a] focus:border-transparent"
+                className="w-full p-3 bg-gray-50 border-2 border-gray-300 rounded-lg text-gray-900 placeholder-black focus:ring-2 focus:ring-[#00246a] focus:border-[#00246a] focus:bg-white transition-colors"
               />
             </div>
           </div>
@@ -351,12 +362,13 @@ export default function AdminUsersPage() {
               </label>
               <input
                 type="email"
+                placeholder="admin@ejemplo.com"
                 value={formData.detalles.email_unico || formData.email}
                 onChange={(e) => setFormData({
                   ...formData,
                   detalles: { ...formData.detalles, email_unico: e.target.value }
                 })}
-                className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00246a] focus:border-transparent"
+                className="w-full p-3 bg-gray-50 border-2 border-gray-300 rounded-lg text-gray-900 placeholder-black focus:ring-2 focus:ring-[#00246a] focus:border-[#00246a] focus:bg-white transition-colors"
               />
             </div>
             <div>
@@ -365,13 +377,13 @@ export default function AdminUsersPage() {
               </label>
               <input
                 type="text"
-                placeholder="/path/to/image.jpg"
+                placeholder="/images/perfil.jpg"
                 value={formData.detalles.image || ''}
                 onChange={(e) => setFormData({
                   ...formData,
                   detalles: { ...formData.detalles, image: e.target.value }
                 })}
-                className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00246a] focus:border-transparent"
+                className="w-full p-3 bg-gray-50 border-2 border-gray-300 rounded-lg text-gray-900 placeholder-black focus:ring-2 focus:ring-[#00246a] focus:border-[#00246a] focus:bg-white transition-colors"
               />
             </div>
           </div>
@@ -422,7 +434,7 @@ export default function AdminUsersPage() {
               placeholder="Nombre, email..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00246a] focus:border-transparent"
+              className="w-full p-3 bg-gray-50 border-2 border-gray-300 rounded-lg text-gray-900 placeholder-black focus:ring-2 focus:ring-[#00246a] focus:border-[#00246a] focus:bg-white transition-colors"
             />
           </div>
           <div>
@@ -432,7 +444,7 @@ export default function AdminUsersPage() {
             <select
               value={filterRole}
               onChange={(e) => setFilterRole(e.target.value)}
-              className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00246a] focus:border-transparent"
+              className="w-full p-3 bg-gray-50 border-2 border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-[#00246a] focus:border-[#00246a] focus:bg-white transition-colors"
             >
               <option value="">Todos los roles</option>
               <option value="ADMIN">Administradores</option>
@@ -586,9 +598,10 @@ export default function AdminUsersPage() {
                   <input
                     type="email"
                     required
+                    placeholder="usuario@ejemplo.com"
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00246a] focus:border-transparent"
+                    className="w-full p-3 bg-gray-50 border-2 border-gray-300 rounded-lg text-gray-900 placeholder-black focus:ring-2 focus:ring-[#00246a] focus:border-[#00246a] focus:bg-white transition-colors"
                   />
                 </div>
                 <div>
@@ -598,9 +611,10 @@ export default function AdminUsersPage() {
                   <input
                     type="password"
                     required={!editingUser}
+                    placeholder="Contraseña segura"
                     value={formData.password}
                     onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                    className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00246a] focus:border-transparent"
+                    className="w-full p-3 bg-gray-50 border-2 border-gray-300 rounded-lg text-gray-900 placeholder-black focus:ring-2 focus:ring-[#00246a] focus:border-[#00246a] focus:bg-white transition-colors"
                   />
                 </div>
                 <div>
@@ -610,9 +624,10 @@ export default function AdminUsersPage() {
                   <input
                     type="text"
                     required
+                    placeholder="Juan"
                     value={formData.nombre}
                     onChange={(e) => setFormData({ ...formData, nombre: e.target.value })}
-                    className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00246a] focus:border-transparent"
+                    className="w-full p-3 bg-gray-50 border-2 border-gray-300 rounded-lg text-gray-900 placeholder-black focus:ring-2 focus:ring-[#00246a] focus:border-[#00246a] focus:bg-white transition-colors"
                   />
                 </div>
                 <div>
@@ -622,9 +637,10 @@ export default function AdminUsersPage() {
                   <input
                     type="text"
                     required
+                    placeholder="Pérez"
                     value={formData.apellido}
                     onChange={(e) => setFormData({ ...formData, apellido: e.target.value })}
-                    className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00246a] focus:border-transparent"
+                    className="w-full p-3 bg-gray-50 border-2 border-gray-300 rounded-lg text-gray-900 placeholder-black focus:ring-2 focus:ring-[#00246a] focus:border-[#00246a] focus:bg-white transition-colors"
                   />
                 </div>
                 <div className="md:col-span-2">
@@ -639,7 +655,7 @@ export default function AdminUsersPage() {
                       rol: e.target.value as 'ADMIN' | 'PROFESOR' | 'ESTUDIANTE',
                       detalles: {} // Reset detalles when changing role
                     })}
-                    className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00246a] focus:border-transparent"
+                    className="w-full p-3 bg-gray-50 border-2 border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-[#00246a] focus:border-[#00246a] focus:bg-white transition-colors"
                   >
                     <option value="ESTUDIANTE">Estudiante</option>
                     <option value="PROFESOR">Profesor</option>

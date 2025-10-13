@@ -60,6 +60,13 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       include: {
         usuario: {
           select: { id: true, nombre: true, apellido: true, rol: true }
+        },
+        lecturas: {
+          include: {
+            usuario: {
+              select: { id: true, nombre: true, apellido: true, rol: true }
+            }
+          }
         }
       },
       orderBy: { enviado_en: 'asc' },
@@ -169,11 +176,19 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
         contenido: contenido.trim(),
         tipo,
         archivo_url,
-        archivo_nombre
+        archivo_nombre,
+        entregado_en: new Date() // Marcar como entregado inmediatamente
       },
       include: {
         usuario: {
           select: { id: true, nombre: true, apellido: true, rol: true }
+        },
+        lecturas: {
+          include: {
+            usuario: {
+              select: { id: true, nombre: true, apellido: true, rol: true }
+            }
+          }
         }
       }
     })

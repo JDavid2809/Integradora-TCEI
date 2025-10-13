@@ -177,7 +177,7 @@ export default function AdminPage() {
                   <span className="text-blue-600 text-xs">{usuario.rol.charAt(0)}</span>
                 </div>
                 <div className="flex-1">
-                  <p className="text-sm font-medium">{usuario.nombre}</p>
+                  <p className="text-sm font-medium text-gray-900">{usuario.nombre}</p>
                   <p className="text-xs text-gray-500">{usuario.tipo_perfil}</p>
                 </div>
               </div>

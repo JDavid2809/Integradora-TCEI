@@ -294,14 +294,10 @@ model curso {
   updated_at      DateTime?        @default(now()) @updatedAt
   what_you_learn  String?
   precio          Decimal?         @db.Decimal(10, 2) // Precio del curso
-  nivel_ingles    String?          @db.VarChar(20)    // Nivel de inglés del curso (A1, A2, B1, B2, C1, C2, TODOS)
-  // Nuevos campos para detalles del curso
-  duracion_horas  Int?             // Horas totales del curso
-  total_lecciones Int?             // Número total de lecciones  
-  total_ejercicios Int?            // Número total de ejercicios
-  acceso_movil    Boolean?         @default(true)  // Acceso desde móvil
-  acceso_tv       Boolean?         @default(true)  // Acceso desde TV
-  recursos_descargables Boolean?   @default(true)  // Recursos descargables
+  nivel_ingles    String?          @db.VarChar(20)    
+  
+  duracion_horas  Int?             
+
   certificado     Boolean?         @default(true)  // Incluye certificado
   inscripciones   Inscripcion[]
   reviews         Review[]

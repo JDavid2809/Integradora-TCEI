@@ -77,7 +77,14 @@ export const authOptions: NextAuthOptions = {
           apellido: user.apellido,
           email: user.email,
           rol: user.rol,
-          extra: extraData ? { ...extraData } : null,
+          extra: extraData ? Object.fromEntries(
+            Object.entries(extraData).map(([key, value]) => [
+              key, 
+              typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean' 
+                ? value 
+                : undefined
+            ])
+          ) : null,
         };
       } catch (error) {
         throw new Error(error!.toString());
@@ -94,6 +101,7 @@ export const authOptions: NextAuthOptions = {
       token.apellido = user.apellido;
       token.nombre = user.name;
       token.email = user.email;
+      token.extra = user.extra;
     }
 
     if (trigger === "update" && session) {
@@ -112,6 +120,7 @@ export const authOptions: NextAuthOptions = {
       session.user!.apellido = token.apellido;
       session.user!.name = token.nombre as string;
       session.user!.email = token.email;
+      session.user!.extra = token.extra;
     }
     return session;
   },

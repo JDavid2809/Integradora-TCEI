@@ -10,7 +10,39 @@ const prisma = new PrismaClient();
 
 async function main(){
     try {
-          const hashedPassword = await bcrypt.hash("12345", 10);
+        console.log('🗑️ Clearing database...');
+        
+        // Vaciar todas las tablas en el orden correcto (respetando las foreign keys)
+        console.log('  - Clearing enrollments and related data...');
+        await prisma.inscripcion.deleteMany({});
+        await prisma.payment.deleteMany({});
+        await prisma.attendance.deleteMany({});
+        await prisma.class_schedule.deleteMany({});
+        
+        console.log('  - Clearing course related data...');
+        await prisma.resultado_examen.deleteMany({});
+        await prisma.respuesta.deleteMany({});
+        await prisma.pregunta.deleteMany({});
+        await prisma.examen.deleteMany({});
+        await prisma.imparte.deleteMany({});
+        await prisma.horario.deleteMany({});
+        
+        console.log('  - Clearing main entities...');
+        await prisma.curso.deleteMany({});
+        await prisma.nivel.deleteMany({});
+        await prisma.categoria_edad.deleteMany({});
+        
+        console.log('  - Clearing users...');
+        await prisma.profesor.deleteMany({});
+        await prisma.estudiante.deleteMany({});
+        await prisma.administrador.deleteMany({});
+        await prisma.usuario.deleteMany({});
+        
+        console.log('✅ Database cleared successfully');
+        console.log('');
+        console.log('🌱 Starting fresh seed...');
+
+        const hashedPassword = await bcrypt.hash("12345", 10);
 
     // Usar upsert para evitar errores de duplicados
     const nuevoProfesor = await prisma.usuario.upsert({
@@ -177,48 +209,79 @@ async function main(){
       },
     });
 
-    // Inscribir al estudiante en algunos cursos
+    // Inscribir al estudiante en algunos cursos usando la nueva tabla Inscripcion
     if (nuevoEstudiante.estudiante) {
-      await prisma.horario.create({
+      await prisma.inscripcion.create({
         data: {
-          id_estudiante: nuevoEstudiante.estudiante.id_estudiante,
-          id_curso: curso1.id_curso,
-          comentario: "Inscripción inicial",
+          student_id: nuevoEstudiante.estudiante.id_estudiante,
+          course_id: curso1.id_curso,
+          enrolled_at: new Date(),
+          status: "ACTIVE",
+          payment_status: "PAID",
+          notes: "Inscripción inicial - Curso completamente pagado",
         },
       });
 
-      await prisma.horario.create({
+      await prisma.inscripcion.create({
         data: {
-          id_estudiante: nuevoEstudiante.estudiante.id_estudiante,
-          id_curso: curso2.id_curso,
-          comentario: "Inscripción inicial",
+          student_id: nuevoEstudiante.estudiante.id_estudiante,
+          course_id: curso2.id_curso,
+          enrolled_at: new Date(),
+          status: "ACTIVE", 
+          payment_status: "PENDING",
+          notes: "Inscripción inicial - Pago pendiente",
+        },
+      });
+
+      await prisma.inscripcion.create({
+        data: {
+          student_id: nuevoEstudiante.estudiante.id_estudiante,
+          course_id: curso3.id_curso,
+          enrolled_at: new Date(),
+          status: "SUSPENDED",
+          payment_status: "OVERDUE",
+          notes: "Suspendido por pago vencido",
         },
       });
     }
 
-    console.log('✅ Seed completed successfully');
-    console.log('📧 Users created/updated:');
-    console.log('  - Teacher: mario@gmail.com (password: 12345)');
-    console.log('  - Student: estudiante@test.com (password: 12345)'); 
-    console.log('  - Admin: admin@admin.com (password: 12345)');
+    console.log('');
+    console.log('🎉 Fresh database seed completed successfully!');
+    console.log('');
+    console.log('� Users created:');
+    console.log('  🧑‍🏫 Teacher: mario@gmail.com (password: 12345)');
+    console.log('  🎓 Student: estudiante@test.com (password: 12345)'); 
+    console.log('  👨‍💼 Admin: admin@admin.com (password: 12345)');
+    console.log('');
     console.log('📚 Courses created:');
-    console.log('  - English Conversation Mastery (A1)');
-    console.log('  - Business English Professional (A2)');
-    console.log('  - English Foundations (B1)');
-    console.log('📝 Student enrolled in 2 courses');
+    console.log('  📖 English Conversation Mastery (A1) - Presencial');
+    console.log('  💼 Business English Professional (A2) - Online');
+    console.log('  🔤 English Foundations (B1) - Presencial');
+    console.log('');
+    console.log('📝 Student enrollments:');
+    console.log('  ✅ Course 1: ACTIVE + PAID (Completamente inscrito)');
+    console.log('  ⏳ Course 2: ACTIVE + PENDING (Inscrito, pago pendiente)');
+    console.log('  ⚠️ Course 3: SUSPENDED + OVERDUE (Suspendido por pago vencido)');
+    console.log('');
+    console.log('🚀 Database is ready for testing!');
     
     } catch (error) {
-        console.error("Error during seeding:", error);
+        console.error("❌ Error during seeding:", error);
+        console.error("💡 Make sure your database is running and accessible");
+        process.exit(1);
     }
 }
 
 main()
-  .then( async ()=>{
+  .then(async () => {
+    console.log('🔌 Disconnecting from database...');
     await prisma.$disconnect();
+    console.log('✅ Disconnected successfully');
   })
   .catch(async (e) => {
-    console.error("Error in main function:", e);
+    console.error("❌ Error in main function:", e);
     await prisma.$disconnect();
+    process.exit(1);
   })
 
   

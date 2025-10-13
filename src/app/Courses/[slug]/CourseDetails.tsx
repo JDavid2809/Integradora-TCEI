@@ -9,7 +9,6 @@ import {
 
     Clock, 
     Users, 
-   
     BookOpen, 
     CheckCircle,
     Star,

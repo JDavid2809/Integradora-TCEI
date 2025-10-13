@@ -4,9 +4,9 @@ import { authOptions } from '@/lib/authOptions'
 import { prisma } from '@/lib/prisma'
 
 interface RouteParams {
-  params: {
+  params: Promise<{
     roomId: string
-  }
+  }>
 }
 
 // POST - Unirse a una sala
@@ -25,7 +25,8 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       return NextResponse.json({ error: 'Usuario no encontrado' }, { status: 404 })
     }
 
-    const roomId = parseInt(params.roomId)
+    const { roomId: roomIdParam } = await params
+    const roomId = parseInt(roomIdParam)
 
     // Verificar que la sala existe y está activa
     const room = await prisma.chat_room.findFirst({

@@ -21,44 +21,6 @@ const sectionTitles: Record<string, string> = {
 
 export default function Header({ activeSection, setSidebarOpen, user }: HeaderProps) {
     return (
-        <header className="bg-white shadow-sm border-b border-slate-200 h-16 flex items-center justify-between px-4 lg:px-6 mt-2 lg:mt-0">
-            <div className="flex items-center space-x-4">
-                <button
-                    onClick={() => setSidebarOpen(true)}
-                    className="lg:hidden p-2 hover:bg-slate-100 rounded-lg transition-colors duration-200"
-                >
-                    <Menu className="w-5 h-5 text-slate-600" />
-                </button>
-                <h2 className="text-lg lg:text-xl font-semibold text-blue-600">
-                    {sectionTitles[activeSection] || "Dashboard"}
-                </h2>
-            </div>
-
-            <div className="flex items-center space-x-2 lg:space-x-4">
-                {/* Settings button for mobile */}
-                <button className="lg:hidden p-2 hover:bg-slate-100 rounded-lg transition-colors duration-200">
-                    <Settings className="w-5 h-5 text-slate-600" />
-                </button>
-
-                {/* User info - hidden on small screens, visible on larger */}
-                <div className="hidden sm:flex items-center space-x-3 mt-5">
-                    <div className="text-right p-3">
-                        <p className="text-sm font-medium text-blue-600">{user.user.name} {" "}
-                            <span>{user.user.apellido?.charAt(0)}</span>
-                             </p>
-                             
-                        <p className="text-xs text-slate-500">{user.user.rol}</p>
-                    </div>
-                    <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-700 rounded-full flex items-center justify-center">
-                        <span className="text-white font-medium text-sm">{user.user.name!.charAt(0)}{user.user.apellido?.charAt(0)}</span>
-                    </div>
-                </div>
-
-                {/* User avatar only for mobile */}
-                <div className="sm:hidden w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-700 rounded-full flex items-center justify-center">
-                    <span className="text-white font-medium text-xs">{user.user.name!.charAt(0)}{user.user.apellido?.charAt(0)}</span>
-                </div>
-            </div>
-        </header>
+      <div></div>
     )
 }

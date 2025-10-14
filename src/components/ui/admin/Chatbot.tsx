@@ -19,6 +19,71 @@ export default function Chatbot() {
   const [showOptions, setShowOptions] = useState(true);
   const [isInitialized, setIsInitialized] = useState(false);
   const listRef = useRef<HTMLDivElement | null>(null);
+  
+  // Estado para la animación de imágenes con crossfade
+  const [currentFrame, setCurrentFrame] = useState(0);
+  const [nextFrame, setNextFrame] = useState(1);
+  const [isTransitioning, setIsTransitioning] = useState(false);
+  const [isAnimating, setIsAnimating] = useState(true);
+  const [imagesLoaded, setImagesLoaded] = useState(false);
+  
+  // Array de las 4 imágenes
+  const frames = [
+    '/logos/01_logo.png',
+    '/logos/02_logo.png', 
+    // '/logos/03_logo.png',
+    // '/logos/04_logo.png'
+  ];
+
+  // Precargar todas las imágenes para evitar flashazos
+  useEffect(() => {
+    const preloadImages = async () => {
+      const imagePromises = frames.map((src) => {
+        return new Promise((resolve, reject) => {
+          const img = new Image();
+          img.onload = resolve;
+          img.onerror = reject;
+          img.src = src;
+        });
+      });
+
+      try {
+        await Promise.all(imagePromises);
+        setImagesLoaded(true);
+      } catch (error) {
+        console.warn('Error preloading images:', error);
+        setImagesLoaded(true);
+      }
+    };
+
+    preloadImages();
+  }, [frames]);
+
+  // Efecto para la animación con crossfade perfecto
+  useEffect(() => {
+    if (!isAnimating || !imagesLoaded) return;
+    
+    const animationInterval = setInterval(() => {
+      setIsTransitioning(true);
+      
+      // Preparar el siguiente frame
+      setNextFrame((current) => (current + 1) % frames.length);
+      
+      // Después de un momento, hacer el cambio
+      setTimeout(() => {
+        setCurrentFrame((prev) => (prev + 1) % frames.length);
+        setIsTransitioning(false);
+      }, 500); // Mitad de la duración de la transición
+      
+    }, 2000); // Cambio cada 2 segundos
+
+    return () => clearInterval(animationInterval);
+  }, [isAnimating, frames.length, imagesLoaded]);
+
+  // Pausar animación cuando el chat está abierto
+  useEffect(() => {
+    setIsAnimating(!open);
+  }, [open]);
 
   const sendMessage = useCallback(async (text: string) => {
     // Evitar múltiples peticiones mientras está escribiendo
@@ -83,13 +148,69 @@ export default function Chatbot() {
 
   return (
     <>
-      {/* Botón flotante */}
+      {/* Botón flotante con animación de frames personalizados */}
       <button
         onClick={() => setOpen((v) => !v)}
-        className="fixed bottom-4 right-4 flex items-center justify-center w-16 h-16 rounded-full shadow-xl bg-gradient-to-br from-red-500 to-red-700 hover:scale-110 transition z-[99999]"
+        onMouseEnter={() => setIsAnimating(true)}
+        onMouseLeave={() => setIsAnimating(!open)}
+        className="group fixed bottom-4 right-4 w-20 h-20 rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-110 active:scale-95 z-[99999] overflow-hidden bg-gradient-to-br from-blue-50 to-blue-100 border-2 border-blue-200 hover:border-blue-300"
       >
-        💬
+        {/* Contenedor con crossfade perfecto (sin flashazos) */}
+        <div className="relative w-full h-full rounded-full overflow-hidden bg-gradient-to-br from-blue-50 to-blue-100">
+          {/* Mostrar solo cuando las imágenes estén cargadas */}
+          {imagesLoaded ? (
+            <>
+              {/* Imagen base (siempre visible) */}
+              <img
+                src={frames[currentFrame]}
+                alt={`Animation frame ${currentFrame + 1}`}
+                className="absolute inset-0 w-full h-full object-cover"
+                style={{ objectPosition: 'center' }}
+                loading="eager"
+              />
+              
+              {/* Imagen de transición (solo durante crossfade) */}
+              {isTransitioning && (
+                <img
+                  src={frames[nextFrame]}
+                  alt={`Next frame ${nextFrame + 1}`}
+                  className="absolute inset-0 w-full h-full object-cover animate-in fade-in duration-1000"
+                  style={{ objectPosition: 'center' }}
+                  loading="eager"
+                />
+              )}
+            </>
+          ) : (
+            // Placeholder mientras cargan las imágenes
+            <div className="absolute inset-0 bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center">
+              <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+            </div>
+          )}
+          
+          {/* Overlay muy sutil para unificar */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/3 via-transparent to-white/3"></div>
+        </div>
+        
+        {/* Badge de notificación animado */}
+        {!open && (
+          <div className="absolute -top-2 -right-2 w-6 h-6 bg-gradient-to-br from-red-400 to-red-600 rounded-full flex items-center justify-center shadow-lg border-2 border-white animate-bounce">
+            <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
+          </div>
+        )}
+        
+        {/* Indicador de estado */}
+        <div className="absolute bottom-1 right-1 w-3 h-3 bg-green-400 rounded-full border-2 border-white shadow-sm animate-pulse"></div>
+        
+        {/* Tooltip mejorado */}
+        <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-3 px-4 py-2 bg-gray-900/90 backdrop-blur-md text-white text-sm rounded-xl opacity-0 group-hover:opacity-100 transition-all duration-300 whitespace-nowrap pointer-events-none shadow-xl border border-gray-700/50">
+          {open ? '🔒 Close Assistant' : '💬 Open English Helper'}
+          <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-[6px] border-r-[6px] border-t-[6px] border-transparent border-t-gray-900/90"></div>
+        </div>
+        
+        {/* Efecto de pulso en el borde */}
+        <div className="absolute inset-0 rounded-full border-2 border-blue-400/50 opacity-0 group-hover:opacity-100 animate-ping"></div>
       </button>
+
 
       {/* Chat Box */}
       <div

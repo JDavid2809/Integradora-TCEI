@@ -1,5 +1,6 @@
 "use client";
 import React, { useState, useEffect, useRef, useCallback } from "react";
+import Image from "next/image";
 
 type Msg = {
   id: string;
@@ -83,12 +84,34 @@ export default function Chatbot() {
 
   return (
     <>
+      <style jsx>{`
+        @keyframes borderPulse {
+          0%, 100% {
+            border-color: #3b82f6;
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
+          }
+          50% {
+            border-color: #ef4444;
+            box-shadow: 0 0 20px rgba(239, 68, 68, 0.5);
+          }
+        }
+        .animate-border-pulse {
+          animation: borderPulse 2s ease-in-out infinite;
+        }
+      `}</style>
+      
       {/* Botón flotante */}
       <button
         onClick={() => setOpen((v) => !v)}
-        className="fixed bottom-4 right-4 flex items-center justify-center w-16 h-16 rounded-full shadow-xl bg-gradient-to-br from-red-500 to-red-700 hover:scale-110 transition z-[99999]"
+        className="fixed bottom-4 right-4 flex items-center justify-center w-20 h-20 rounded-full shadow-xl bg-white hover:scale-110 transition z-[99999] border-4 animate-border-pulse"
       >
-        💬
+        <Image 
+          src="/ChatBot.png" 
+          alt="ChatBot" 
+          width={48} 
+          height={48}
+          className="object-contain"
+        />
       </button>
 
       {/* Chat Box */}
@@ -99,8 +122,8 @@ export default function Chatbot() {
         {/* Header */}
         <div className="flex justify-between items-center p-4 border-b border-gray-200">
           <div>
-            <h2 className="font-bold text-lg text-[#002469]">Chatbot AI</h2>
-            <p className="text-sm text-gray-500">Tu asistente inteligente</p>
+            <h2 className="font-bold text-lg text-gray-700">Chatbot AI</h2>
+            <p className="text-sm text-gray-700">Tu asistente inteligente</p>
           </div>
           <div className="flex gap-2">
             <button
@@ -123,8 +146,14 @@ export default function Chatbot() {
           {messages.map((msg) => (
             <div key={msg.id} className={`flex gap-3 ${msg.sender === "You" ? "justify-end" : "justify-start"}`}>
               {msg.sender === "AI" && (
-                <div className="flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-tr from-blue-600 to-blue-400 text-white font-bold shadow-lg animate-pulse">
-                  AI
+                <div className="flex items-center justify-center w-10 h-10 rounded-full bg-white shadow-lg border-2 border-blue-400">
+                  <Image 
+                    src="/ChatBot.png" 
+                    alt="ChatBot" 
+                    width={30} 
+                    height={30}
+                    className="object-contain"
+                  />
                 </div>
               )}
               <div
@@ -145,8 +174,14 @@ export default function Chatbot() {
           ))}
           {typing && (
             <div className="flex gap-3">
-              <div className="flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-tr from-blue-600 to-blue-400 text-white font-bold shadow-lg animate-pulse">
-                AI
+              <div className="flex items-center justify-center w-10 h-10 rounded-full bg-white shadow-lg border-2 border-blue-400 animate-pulse">
+                <Image 
+                  src="/ChatBot.png" 
+                  alt="ChatBot" 
+                  width={30} 
+                  height={30}
+                  className="object-contain"
+                />
               </div>
               <p className="bg-blue-50 px-5 py-3 rounded-2xl shadow-lg max-w-[70%] animate-pulse">...</p>
             </div>
@@ -155,7 +190,7 @@ export default function Chatbot() {
 
         {/* Botón mostrar/ocultar opciones */}
         <div className="p-2 border-t border-gray-200 flex justify-between items-center bg-gray-50">
-          <span className="text-sm text-gray-500">Opciones rápidas</span>
+          <span className="text-sm text-gray-700">Opciones rápidas</span>
           <button
             onClick={() => setShowOptions(!showOptions)}
             className="text-xs text-blue-600 hover:text-blue-800 transition px-2 py-1 rounded hover:bg-blue-100"
@@ -172,7 +207,7 @@ export default function Chatbot() {
                 key={opt}
                 onClick={() => !typing && sendMessage(opt)}
                 disabled={typing}
-                className="bg-white px-4 py-2 rounded-2xl shadow hover:bg-blue-100 hover:scale-105 transition transform text-sm flex items-center gap-1 whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed"
+                className="bg-white px-4 py-2 rounded-2xl shadow hover:bg-blue-100 hover:scale-105 transition transform text-sm flex items-center gap-1 whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed text-gray-700"
               >
                 💡 {opt}
               </button>
@@ -207,7 +242,7 @@ export default function Chatbot() {
         </form>
 
         {/* Footer */}
-        <div className="p-2 text-xs text-gray-400 text-center">English App • Soporte: contacto@xdxdxd.com</div>
+        <div className="p-2 text-xs text-gray-700 text-center">English App • Soporte: contacto@xdxdxd.com</div>
       </div>
     </>
   );

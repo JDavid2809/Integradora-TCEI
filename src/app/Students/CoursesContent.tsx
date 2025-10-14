@@ -137,7 +137,10 @@ export default function CoursesContent({ studentCourses = [], allCourses = [] }:
                                         ></div>
                                     </div>
                                 </div>
-                                <button className="w-full bg-slate-100 hover:bg-slate-200 text-[#00246a] font-medium py-3 rounded-xl transition-colors duration-200">
+                                <button 
+                                    onClick={() => router.push(`/Students/courses/${course.id}`)}
+                                    className="w-full bg-slate-100 hover:bg-slate-200 text-[#00246a] font-medium py-3 rounded-xl transition-colors duration-200"
+                                >
                                     {course.progress === 100 ? "Revisar Curso" : "Continuar"}
                                 </button>
                             </div>

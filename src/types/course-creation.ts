@@ -113,6 +113,50 @@ export interface CourseWithDetails extends CourseFromDB {
   requirementsParsed: RequirementItem[]
   targetAudienceParsed: TargetAudienceItem[]
   courseContentParsed: CourseSection[]
+  inscripciones?: EnrolledStudent[]
+}
+
+// ========================================
+// ENROLLED STUDENTS
+// ========================================
+
+export interface EnrolledStudent {
+  id: number
+  student_id: number
+  course_id: number
+  enrolled_at: Date
+  status: 'ACTIVE' | 'COMPLETED' | 'DROPPED' | 'SUSPENDED' | 'TRANSFERRED'
+  payment_status: 'PENDING' | 'PAID' | 'OVERDUE' | 'REFUNDED' | 'CANCELLED'
+  notes: string | null
+  student: {
+    id_estudiante: number
+    nombre: string
+    paterno: string | null
+    materno: string | null
+    email: string
+    telefono: string | null
+    edad: number
+    descripcion: string | null
+    usuario: {
+      id: number
+      nombre: string
+      apellido: string
+      email: string
+    }
+  }
+  payments?: Array<{
+    id: number
+    amount: any  // Prisma Decimal
+    payment_date: Date
+    payment_method: string
+    status: string
+  }>
+  attendance?: Array<{
+    id: number
+    class_date: Date
+    status: string
+    notes: string | null
+  }>
 }
 
 // ========================================

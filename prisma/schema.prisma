@@ -246,13 +246,14 @@ model resultado_examen {
 }
 
 model Administrador {
-  id_administrador Int     @id @default(autoincrement())
-  id_usuario       Int     @unique
-  nombre           String? @db.VarChar(25)
-  image            String  @db.VarChar(50)
-  email_unico      String? @db.VarChar(200)
-  b_activo         Boolean @default(true)
-  usuario          usuario @relation(fields: [id_usuario], references: [id], onDelete: Cascade)
+  id_administrador    Int                   @id @default(autoincrement())
+  id_usuario          Int                   @unique
+  nombre              String?               @db.VarChar(25)
+  image               String                @db.VarChar(50)
+  email_unico         String?               @db.VarChar(200)
+  b_activo            Boolean               @default(true)
+  usuario             usuario               @relation(fields: [id_usuario], references: [id], onDelete: Cascade)
+  solicitudes_revisadas solicitud_profesor[]
 }
 
 model usuario {
@@ -569,4 +570,37 @@ enum TipoMensaje {
   IMAGEN
   ARCHIVO
   SISTEMA       // Mensajes del sistema (usuario se unió, etc.)
+}
+
+enum EstadoSolicitud {
+  PENDIENTE
+  APROBADA
+  RECHAZADA
+}
+
+model solicitud_profesor {
+  id_solicitud        Int              @id @default(autoincrement())
+  nombre              String           @db.VarChar(100)
+  apellido            String           @db.VarChar(100)
+  email               String           @unique @db.VarChar(100)
+  telefono            String?          @db.VarChar(20)
+  edad                Int?
+  curp                String?          @db.VarChar(20)
+  rfc                 String?          @db.VarChar(14)
+  direccion           String?          @db.VarChar(255)
+  nivel_estudios      String?          @db.VarChar(100)
+  observaciones       String?          @db.Text
+  documentos_adjuntos String?          @db.Text // JSON con rutas de archivos
+  estado              EstadoSolicitud  @default(PENDIENTE)
+  fecha_solicitud     DateTime         @default(now())
+  fecha_revision      DateTime?
+  id_revisor          Int?             // ID del admin que revisó
+  comentario_revision String?          @db.Text
+  
+  // Relación con el admin que revisó (opcional)
+  revisor             Administrador?   @relation(fields: [id_revisor], references: [id_administrador])
+  
+  @@index([email])
+  @@index([estado])
+  @@index([fecha_solicitud])
 }

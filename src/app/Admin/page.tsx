@@ -18,6 +18,7 @@ import {
 // Import CRUD components
 import AdminUserCrud from '@/components/ui/admin/AdminUserCrud'
 import AdminPaymentCrud from '@/components/ui/admin/AdminPaymentCrud'
+import TeacherRequestsSection from '@/components/ui/admin/TeacherRequestsSection'
 
 interface SystemStats {
   resumen: {
@@ -126,6 +127,7 @@ export default function AdminPage() {
   const navigationItems = [
     { id: 'dashboard', name: 'Dashboard', icon: BarChart3, label: 'Inicio' },
     { id: 'users', name: 'Usuarios', icon: Users, label: 'Usuarios' },
+    { id: 'solicitudes', name: 'Solicitudes', icon: GraduationCap, label: 'Solicitudes' },
     { id: 'payments', name: 'Pagos', icon: CreditCard, label: 'Pagos' },
     { id: 'system', name: 'Sistema', icon: Settings, label: 'Config' }
   ]
@@ -228,6 +230,10 @@ export default function AdminPage() {
     </div>
   )
 
+  const renderSolicitudesSection = () => (
+    <TeacherRequestsSection />
+  )
+
   const navigateToPage = (page: string) => {
     window.location.href = `/Admin/${page}`
   }
@@ -238,6 +244,8 @@ export default function AdminPage() {
         return renderDashboard()
       case 'users':
         return <AdminUserCrud />
+      case 'solicitudes':
+        return renderSolicitudesSection()
       case 'payments':
         return <AdminPaymentCrud />
       case 'system':

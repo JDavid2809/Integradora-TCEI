@@ -26,6 +26,7 @@ const studentOptions = [
 const platformOptions = [
     { name: "Iniciar sesión", href: "/Login" },
     { name: "Registrarse", href: "/Login" },
+    { name: "Solicitar ser profesor", href: "/solicitud-profesor" },
 ]
 
 // Dynamic account options based on user role

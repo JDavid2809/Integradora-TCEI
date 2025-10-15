@@ -590,12 +590,12 @@ export default function CourseDetails({ courseData }: CourseDetailsProps) {
                                             </span>
                                         </div>
                                     </div>
-
-                                    {courseData.precio && courseData.precio > 0 ? (
-                                        <BuyButton 
+                                    <BuyButton 
                                             courseId={courseData.id_curso}
                                             label="Comprar Curso"
                                         />
+                                    {/* {courseData.precio && courseData.precio > 0 ? (
+                                        
                                     ) : (
                                         <button
                                             onClick={handleEnroll}
@@ -650,7 +650,7 @@ export default function CourseDetails({ courseData }: CourseDetailsProps) {
                                                 </>
                                             )}
                                         </button>
-                                    )}
+                                    )} */}
 
                                     {enrollmentMessage && (
                                         <div className={`mb-4 p-3 rounded-lg text-sm text-center ${

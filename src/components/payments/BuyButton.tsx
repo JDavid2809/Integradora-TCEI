@@ -1,6 +1,6 @@
 import { createCheckoutSession } from '@/actions/customer-portal/customer-portal';
 
-export function BuyButton({ courseId, label = 'Comprar Curso'}: { courseId: number; label?: string }) {
+export function BuyButton({ courseId, label = 'Comprar Curso' }: { courseId: number; label?: string }) {
   return (
     <form action={createCheckoutSession.bind(null, courseId)}>
       <button

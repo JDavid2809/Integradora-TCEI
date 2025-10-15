@@ -12,6 +12,7 @@ declare module "next-auth" {
       image?: string | null;
       rol: "ADMIN" | "PROFESOR" | "ESTUDIANTE";
       verificado?: boolean;
+      debe_cambiar_password?: boolean;
       extra?: {
         id_profesor?: number;
         id_estudiante?: number;
@@ -24,6 +25,7 @@ declare module "next-auth" {
     id: string; // 
     apellido?: string | null; // 
     rol: "ADMIN" | "PROFESOR" | "ESTUDIANTE";
+    debe_cambiar_password?: boolean;
     extra?: {
       id_profesor?: number;
       id_estudiante?: number;
@@ -37,6 +39,7 @@ declare module "next-auth/jwt" {
     sub?: string; // 
     apellido?: string | null; // 
     rol: "ADMIN" | "PROFESOR" | "ESTUDIANTE";
+    debe_cambiar_password?: boolean;
     extra?: {
       id_profesor?: number;
       id_estudiante?: number;

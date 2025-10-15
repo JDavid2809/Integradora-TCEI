@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/authOptions";
 import { prisma } from "@/lib/prisma";
+import { sendTeacherCredentials } from "@/lib/mailer";
+import { normalizeEmail } from "@/lib/emailUtils";
 import bcrypt from 'bcryptjs';
 
 // Middleware para verificar que es admin
@@ -133,9 +135,12 @@ export async function POST(request: NextRequest) {
     }
 
     if (accion === 'aprobar') {
+      // Normalizar email de la solicitud
+      const normalizedEmail = normalizeEmail(solicitud.email);
+      
       // Verificar que no existe un usuario con ese email
       const usuarioExistente = await prisma.usuario.findUnique({
-        where: { email: solicitud.email }
+        where: { email: normalizedEmail }
       })
 
       if (usuarioExistente) {
@@ -154,10 +159,11 @@ export async function POST(request: NextRequest) {
         data: {
           nombre: solicitud.nombre,
           apellido: solicitud.apellido,
-          email: solicitud.email,
+          email: normalizedEmail, // Usar email normalizado
           password: hashedPassword,
           rol: 'PROFESOR',
-          verificado: false // Debe verificar su email
+          verificado: true, // ✅ Se marca como verificado automáticamente al ser aprobado por admin
+          debe_cambiar_password: true // ✅ Debe cambiar contraseña en el primer login
         }
       })
 
@@ -171,6 +177,21 @@ export async function POST(request: NextRequest) {
         }
       })
 
+      // 📧 Enviar credenciales por correo electrónico
+      try {
+        await sendTeacherCredentials(
+          normalizedEmail, // Usar email normalizado
+          nuevoProfesor.nombre,
+          nuevoProfesor.apellido,
+          normalizedEmail, // Usar email normalizado
+          passwordTemporal
+        );
+        console.log('📧 Email de credenciales enviado a:', normalizedEmail);
+      } catch (emailError) {
+        console.error('❌ Error al enviar email de credenciales:', emailError);
+        // No fallar todo el proceso si el email falla
+      }
+
       console.log('✅ Profesor aprobado y usuario creado:', nuevoProfesor.email)
 
       return NextResponse.json({
@@ -180,7 +201,8 @@ export async function POST(request: NextRequest) {
           email: nuevoProfesor.email,
           nombre: nuevoProfesor.nombre,
           apellido: nuevoProfesor.apellido,
-          password_temporal: passwordTemporal
+          verificado: true,
+          credenciales_enviadas: true
         }
       })
 

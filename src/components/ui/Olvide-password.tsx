@@ -24,7 +24,8 @@ export default function ForgotPassword({ sendResetPassword }: Props) {
       setMessage(msg)
       setEmail("")
     } catch (err) {
-      setError("Ocurrió un error. Intenta nuevamente."+ err)
+      const errorMessage = err instanceof Error ? err.message : "Ocurrió un error inesperado. Intenta nuevamente."
+      setError(errorMessage)
     } finally {
       setLoading(false)
     }

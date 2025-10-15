@@ -1,6 +1,7 @@
 import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
+import { normalizeEmail } from "@/lib/emailUtils";
 import { NextAuthOptions } from "next-auth";
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -18,10 +19,13 @@ export const authOptions: NextAuthOptions = {
           console.log('❌ Missing credentials');
           return null;
         }
+        
+        // Normalizar email a minúsculas
+        const normalizedEmail = normalizeEmail(credentials.email);
         console.time("findUser");
 
         const user = await prisma.usuario.findUnique({
-          where: { email: credentials.email },
+          where: { email: normalizedEmail },
           select: {
             id: true,
             nombre: true,
@@ -30,6 +34,7 @@ export const authOptions: NextAuthOptions = {
             rol: true,
             password: true,
             verificado: true,
+            debe_cambiar_password: true,
           },
         });
         console.timeEnd("findUser");
@@ -77,6 +82,7 @@ export const authOptions: NextAuthOptions = {
           apellido: user.apellido,
           email: user.email,
           rol: user.rol,
+          debe_cambiar_password: user.debe_cambiar_password,
           extra: extraData ? Object.fromEntries(
             Object.entries(extraData).map(([key, value]) => [
               key, 
@@ -102,6 +108,7 @@ export const authOptions: NextAuthOptions = {
       token.nombre = user.name;
       token.email = user.email;
       token.extra = user.extra;
+      token.debe_cambiar_password = user.debe_cambiar_password;
     }
 
     if (trigger === "update" && session) {
@@ -109,6 +116,7 @@ export const authOptions: NextAuthOptions = {
       if (session.nombre) token.nombre = session.nombre;
       if (session.apellido) token.apellido = session.apellido;
       if (session.email) token.email = session.email;
+      if (session.debe_cambiar_password !== undefined) token.debe_cambiar_password = session.debe_cambiar_password;
     }
 
     return token;
@@ -121,6 +129,7 @@ export const authOptions: NextAuthOptions = {
       session.user!.name = token.nombre as string;
       session.user!.email = token.email;
       session.user!.extra = token.extra;
+      session.user!.debe_cambiar_password = token.debe_cambiar_password;
     }
     return session;
   },

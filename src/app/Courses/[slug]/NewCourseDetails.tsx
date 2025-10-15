@@ -212,13 +212,21 @@ export default function CourseDetails({ courseData }: CourseDetailsProps) {
     const isEnrolled = isUserEnrolled
 
     // Verificar si el usuario es el profesor del curso
-    const isOwner = courseData.creator?.id_profesor === session?.user?.extra?.id_profesor
+    const isOwner = session?.user?.extra?.id_profesor && 
+                    courseData.creator?.id_profesor && 
+                    courseData.creator.id_profesor === session.user.extra.id_profesor
 
     // Verificar si el usuario puede inscribirse (no es profesor, admin, o creador)
     const canEnroll = session?.user?.extra?.id_estudiante && 
                      !session?.user?.extra?.id_profesor && 
-                     !session?.user?.extra?.id_admin && 
-                     !isOwner
+                     !session?.user?.extra?.id_admin &&
+                     !isUserEnrolled
+
+    // Verificar si es profesor (pero no dueño del curso)
+    const isTeacher = session?.user?.extra?.id_profesor && !isOwner
+
+    // Verificar si es admin
+    const isAdmin = session?.user?.extra?.id_admin
 
     // Función para agregar reseña
     const handleAddReview = async (rating: number, comment: string) => {
@@ -590,67 +598,98 @@ export default function CourseDetails({ courseData }: CourseDetailsProps) {
                                             </span>
                                         </div>
                                     </div>
-                                    <BuyButton 
+
+                                    {/* ✅ LÓGICA CORREGIDA */}
+                                    {isUserEnrolled ? (
+                                        // Ya está inscrito
+                                        <div className="mb-4 p-4 rounded-lg text-center bg-green-50 border border-green-200">
+                                            <div className="flex items-center justify-center gap-2 mb-2">
+                                                <CheckCircle className="w-5 h-5 text-green-600" />
+                                                <span className="font-semibold text-green-800">¡Ya tienes acceso!</span>
+                                            </div>
+                                            <p className="text-sm text-green-700">
+                                                Ya tienes acceso completo a este curso
+                                            </p>
+                                        </div>
+                                    ) : !session ? (
+                                        // No hay sesión - mostrar botón de login
+                                        <button
+                                            onClick={() => router.push('/Login')}
+                                            className="w-full font-bold py-4 px-6 rounded-lg transition-all duration-300 flex items-center justify-center gap-2 shadow-md hover:shadow-lg transform hover:-translate-y-0.5 bg-[#e30f28] hover:bg-[#c20e24] text-white mb-4"
+                                        >
+                                            <BookOpen className="w-5 h-5" />
+                                            Iniciar sesión para continuar
+                                        </button>
+                                    ) : isOwner ? (
+                                        // Es el instructor del curso
+                                        <div className="mb-4 p-4 rounded-lg text-center bg-blue-50 border border-blue-200">
+                                            <div className="flex items-center justify-center gap-2 mb-2">
+                                                <GraduationCap className="w-5 h-5 text-blue-600" />
+                                                <span className="font-semibold text-blue-800">Eres el instructor</span>
+                                            </div>
+                                            <p className="text-sm text-blue-700">
+                                                Este es tu curso
+                                            </p>
+                                        </div>
+                                    ) : isTeacher ? (
+                                        // Es profesor pero no el dueño
+                                        <div className="mb-4 p-4 rounded-lg text-center bg-amber-50 border border-amber-200">
+                                            <div className="flex items-center justify-center gap-2 mb-2">
+                                                <GraduationCap className="w-5 h-5 text-amber-600" />
+                                                <span className="font-semibold text-amber-800">Cuenta de profesor</span>
+                                            </div>
+                                            <p className="text-sm text-amber-700">
+                                                Los profesores no pueden inscribirse en cursos
+                                            </p>
+                                        </div>
+                                    ) : isAdmin ? (
+                                        // Es administrador
+                                        <div className="mb-4 p-4 rounded-lg text-center bg-purple-50 border border-purple-200">
+                                            <div className="flex items-center justify-center gap-2 mb-2">
+                                                <User className="w-5 h-5 text-purple-600" />
+                                                <span className="font-semibold text-purple-800">Cuenta de administrador</span>
+                                            </div>
+                                            <p className="text-sm text-purple-700">
+                                                Acceso desde panel administrativo
+                                            </p>
+                                        </div>
+                                    ) : courseData.precio && courseData.precio > 0 ? (
+                                        // ✅ Curso de PAGO - Mostrar botón de compra
+                                        <BuyButton 
                                             courseId={courseData.id_curso}
                                             label="Comprar Curso"
                                         />
-                                    {/* {courseData.precio && courseData.precio > 0 ? (
-                                        
-                                    ) : (
+                                    ) : canEnroll ? (
+                                        // ✅ Curso GRATIS - Botón de inscripción gratuita
                                         <button
                                             onClick={handleEnroll}
-                                            disabled={isEnrolling || isUserEnrolled || !canEnroll}
-                                            className={`w-full font-bold py-4 px-6 rounded-lg transition-all duration-300 flex items-center justify-center gap-2 shadow-md hover:shadow-lg transform hover:-translate-y-0.5 disabled:transform-none mb-4 ${
-                                                isUserEnrolled 
-                                                    ? 'bg-green-600 cursor-default text-white' 
-                                                    : !canEnroll
-                                                    ? 'bg-gray-400 cursor-not-allowed text-white'
-                                                    : 'bg-[#e30f28] hover:bg-[#c20e24] disabled:bg-gray-400 text-white'
-                                            }`}
+                                            disabled={isEnrolling}
+                                            className="w-full font-bold py-4 px-6 rounded-lg transition-all duration-300 flex items-center justify-center gap-2 shadow-md hover:shadow-lg transform hover:-translate-y-0.5 disabled:transform-none mb-4 bg-[#e30f28] hover:bg-[#c20e24] disabled:bg-gray-400 text-white"
                                         >
                                             {isEnrolling ? (
                                                 <>
                                                     <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
                                                     Inscribiendo...
                                                 </>
-                                            ) : !session ? (
-                                                <>
-                                                    <BookOpen className="w-5 h-5" />
-                                                    Iniciar sesión para inscribirse
-                                                </>
-                                            ) : isUserEnrolled ? (
-                                                <>
-                                                    <CheckCircle className="w-5 h-5" />
-                                                    ¡Estás inscrito!
-                                                </>
-                                            ) : isOwner ? (
-                                                <>
-                                                    <GraduationCap className="w-5 h-5" />
-                                                    Eres el instructor de este curso
-                                                </>
-                                            ) : session.user.extra?.id_profesor ? (
-                                                <>
-                                                    <GraduationCap className="w-5 h-5" />
-                                                    Los profesores no pueden inscribirse
-                                                </>
-                                            ) : session.user.extra?.id_admin ? (
-                                                <>
-                                                    <User className="w-5 h-5" />
-                                                    Panel administrativo
-                                                </>
-                                            ) : canEnroll ? (
+                                            ) : (
                                                 <>
                                                     <ShoppingCart className="w-5 h-5" />
                                                     Inscribirse Gratis
                                                 </>
-                                            ) : (
-                                                <>
-                                                    <BookOpen className="w-5 h-5" />
-                                                    No disponible
-                                                </>
                                             )}
                                         </button>
-                                    )} */}
+                                    ) : (
+                                        // No puede inscribirse por alguna razón
+                                        <div className="mb-4 p-4 rounded-lg text-center bg-gray-50 border border-gray-200">
+                                            <div className="flex items-center justify-center gap-2 mb-2">
+                                                <BookOpen className="w-5 h-5 text-gray-600" />
+                                                <span className="font-semibold text-gray-800">No disponible</span>
+                                            </div>
+                                            <p className="text-sm text-gray-700">
+                                                Este curso no está disponible para inscripción
+                                            </p>
+                                        </div>
+                                    )}
 
                                     {enrollmentMessage && (
                                         <div className={`mb-4 p-3 rounded-lg text-sm text-center ${
@@ -659,15 +698,6 @@ export default function CourseDetails({ courseData }: CourseDetailsProps) {
                                                 : 'bg-blue-50 text-blue-700 border border-blue-200'
                                         }`}>
                                             {enrollmentMessage}
-                                        </div>
-                                    )}
-
-                                    {isUserEnrolled && !enrollmentMessage && (
-                                        <div className="mb-4 p-3 rounded-lg text-sm text-center bg-green-50 text-green-700 border border-green-200">
-                                            <div className="flex items-center justify-center gap-2">
-                                                <CheckCircle className="w-4 h-4" />
-                                                <span>Ya tienes acceso completo a este curso</span>
-                                            </div>
                                         </div>
                                     )}
 
@@ -941,7 +971,7 @@ export default function CourseDetails({ courseData }: CourseDetailsProps) {
                                     }))}
                                     courseId={courseData.id_curso}
                                     isEnrolled={isEnrolled}
-                                    isOwner={isOwner}
+                                    isOwner={isOwner ? true : false}
                                     isAdmin={session?.user?.extra?.id_admin ? true : false}
                                     onAddReview={handleAddReview}
                                     onUpdateReview={handleUpdateReview}

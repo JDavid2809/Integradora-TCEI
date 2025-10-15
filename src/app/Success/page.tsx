@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation';
 import Stripe from 'stripe';
 import Link from 'next/link';
 import { createSlug } from '@/lib/slugUtils';
+import { prisma } from '@/lib/prisma';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
@@ -26,6 +27,20 @@ export default async function SuccessPage({
   const courseId = session.metadata?.course_id;
   const courseName = session.metadata?.course_name; // ✅ Obtener nombre del curso
   const courseSlug = courseName ? createSlug(courseName) : ''; // ✅ Crear slug del curso
+
+  // Verificar si el usuario ya tiene acceso al curso
+  const userEnrollment = await prisma.inscripcion.findFirst({
+    where: {
+      course_id: parseInt(courseId!),
+      student: {
+        usuario: {
+          email: session.customer_details?.email || undefined
+        }
+      }
+    }
+  })
+
+  console.log('✅ Enrollment status:', userEnrollment ? 'Enrolled' : 'Not enrolled yet')
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 flex items-center justify-center p-4">

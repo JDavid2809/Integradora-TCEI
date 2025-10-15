@@ -126,8 +126,8 @@ export default function TeacherRequestsSection({ className = '' }: TeacherReques
       // Mostrar mensaje de éxito
       alert(`Solicitud ${actionType === 'APROBAR' ? 'aprobada' : 'rechazada'} exitosamente`)
       
-      if (actionType === 'APROBAR' && result.password_temporal) {
-        alert(`Contraseña temporal generada: ${result.password_temporal}\nCompártela con el nuevo profesor para que pueda acceder.`)
+      if (actionType === 'APROBAR' && result.usuario_creado?.credenciales_enviadas) {
+        alert(`✅ Credenciales enviadas por correo electrónico a: ${result.usuario_creado.email}\n\nEl profesor recibirá sus credenciales de acceso en su bandeja de entrada.`)
       }
 
     } catch (error) {

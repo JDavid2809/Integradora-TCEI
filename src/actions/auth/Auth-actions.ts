@@ -6,6 +6,7 @@ import { prisma } from "@/lib/prisma";
 import { FormValues } from "@/types";
 import bcrypt from "bcryptjs";
 import { ResetEmail, sendVerificationEmail } from "@/lib/mailer";
+import { normalizeEmail } from "@/lib/emailUtils";
 
 
 export async function registerUser(formData: FormValues) {
@@ -16,11 +17,14 @@ export async function registerUser(formData: FormValues) {
       throw new Error("Todos los campos son obligatorios.");
     }
 
+    // Normalizar email a minúsculas
+    const normalizedEmail = normalizeEmail(email);
+
     if (!/^\d{10}$/.test(telefono)) throw new Error("Teléfono inválido.");
     if (!email.includes("@") || !email.includes(".")) throw new Error("Correo inválido.");
     if (password !== confirmPassword) throw new Error("Contraseñas no coinciden.");
 
-    const existingUser = await prisma.usuario.findUnique({ where: { email } });
+    const existingUser = await prisma.usuario.findUnique({ where: { email: normalizedEmail } });
     if (existingUser) throw new Error("Ya existe una cuenta con este correo.");
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -30,7 +34,7 @@ export async function registerUser(formData: FormValues) {
       data: {
         nombre,
         apellido: `${apellidoPaterno} ${apellidoMaterno}`,
-        email,
+        email: normalizedEmail, // Usar email normalizado
         password: hashedPassword,
         rol: "ESTUDIANTE",
         estudiante: {
@@ -38,7 +42,7 @@ export async function registerUser(formData: FormValues) {
             nombre,
             paterno: apellidoPaterno,
             materno: apellidoMaterno,
-            email,
+            email: normalizedEmail, // Usar email normalizado
             telefono,
             edad: 18,
             b_activo: true,
@@ -47,7 +51,6 @@ export async function registerUser(formData: FormValues) {
       },
     });
 
-
     const token = randomBytes(32).toString("hex");
     const expiraEn = new Date(Date.now() + 60 * 60 * 24 * 1000); // 24 horas
 
@@ -55,7 +58,7 @@ export async function registerUser(formData: FormValues) {
       where: { id: usuario.id },
       data: { tokenVerif: token, expiraEn },
     });
-    await sendVerificationEmail(email, token, usuario.nombre);
+    await sendVerificationEmail(normalizedEmail, token, usuario.nombre); // Usar email normalizado
 
 
     return { success: true, message: "Registro exitoso. Revisa tu correo para verificar tu cuenta." };
@@ -69,32 +72,40 @@ export async function registerUser(formData: FormValues) {
 
 
 export async function sendResetPassword(email: string) {
-  const user = await prisma.usuario.findUnique({ where: { email } })
-  if (!user) return "Si el correo existe, recibirás un enlace"
+  // Normalizar email a minúsculas
+  const normalizedEmail = normalizeEmail(email);
+  
+  const user = await prisma.usuario.findUnique({ where: { email: normalizedEmail } })
+  if (!user) {
+    throw new Error("No se encontró una cuenta asociada con este correo electrónico")
+  }
+
+  if (!user.verificado) {
+    throw new Error("Esta cuenta no ha sido verificada. Por favor, verifica tu email primero.")
+  }
 
   const token = randomBytes(32).toString("hex")
   const expiresAt = new Date(Date.now() + 60 * 60 * 1000) // 1 hora
 
   await prisma.usuario.update({
-    where: { email },
+    where: { email: normalizedEmail },
     data: { tokenVerif: token, expiraEn: expiresAt },
   })
 
-
-
   const Url = `${process.env.NEXT_PUBLIC_URL}/Login/restablecer-password?token=${token}`
 
-  await ResetEmail(email, user.nombre, Url)
+  await ResetEmail(normalizedEmail, user.nombre, Url)
 
-
-
-  return "Si el correo existe, recibirás un enlace"
+  return "Enlace de restablecimiento enviado a tu correo electrónico"
 }
 
 
 
 export async function resendVerification(email: string) {
-  const user = await prisma.usuario.findUnique({ where: { email } });
+  // Normalizar email a minúsculas
+  const normalizedEmail = normalizeEmail(email);
+  
+  const user = await prisma.usuario.findUnique({ where: { email: normalizedEmail } });
 
   if (!user) throw new Error("No existe una cuenta con este correo.");
   if (user.verificado) throw new Error("Esta cuenta ya está verificada.");
@@ -108,7 +119,7 @@ export async function resendVerification(email: string) {
     data: { tokenVerif: token, expiraEn },
   });
 
-  await sendVerificationEmail(user.email, token, user.nombre);
+  await sendVerificationEmail(normalizedEmail, token, user.nombre);
 
   return { success: true, message: "Hemos enviado un nuevo correo de verificación." };
 }

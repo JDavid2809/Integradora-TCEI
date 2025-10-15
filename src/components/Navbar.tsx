@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { ChevronDown, Menu, Search, X, Play, User, BookOpenText, GraduationCap, School, House, LogOut, MessageCircle } from "lucide-react"
+import { ChevronDown, Menu, Search, X, Play, User, BookOpenText, GraduationCap, School, House, LogOut, MessageCircle, Settings, Activity, Users, CreditCard } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 import Image from "next/image"
 import { useRouter } from "next/navigation"
@@ -12,12 +12,49 @@ import SearchResults from './SearchResults'
 import ChatWindow from './ChatWindow'
 import { ChatProvider } from '@/contexts/ChatContext'
 
-const navigationItems = [
+// Navegación para usuarios no autenticados
+const guestNavigationItems = [
     { name: "Inicio", icon: <House className="ml-2"/>, href:"/" },
     { name: "Cursos", icon: <School className="ml-2"/>, href:"/Courses" },
     { name: "Recursos", icon: <BookOpenText className="ml-2"/>, href:"/recursos" },
     { name: "Certificaciones", icon: <GraduationCap className="ml-2"/>, href:"/certificaciones" },
 ]
+
+// Navegación para estudiantes - Enlaces externos al dashboard
+const studentNavigationItems = [
+    { name: "Explorar Cursos", icon: <School className="ml-2"/>, href:"/Courses" },
+    { name: "Recursos", icon: <BookOpenText className="ml-2"/>, href:"/recursos" },
+    { name: "Certificaciones", icon: <GraduationCap className="ml-2"/>, href:"/certificaciones" },
+    { name: "Inicio", icon: <House className="ml-2"/>, href:"/" },
+]
+
+// Navegación para profesores - Enlaces externos al dashboard
+const teacherNavigationItems = [
+    { name: "Explorar Recursos", icon: <BookOpenText className="ml-2"/>, href:"/recursos" },
+    { name: "Ver Cursos", icon: <School className="ml-2"/>, href:"/Courses" },
+    { name: "Inicio", icon: <House className="ml-2"/>, href:"/" },
+]
+
+// Navegación para administradores - Enlaces externos al panel admin
+const adminNavigationItems = [
+    { name: "Ver Sitio", icon: <House className="ml-2"/>, href:"/" },
+    { name: "Ver Cursos", icon: <School className="ml-2"/>, href:"/Courses" },
+    { name: "Recursos", icon: <BookOpenText className="ml-2"/>, href:"/recursos" },
+]
+
+// Función para obtener los elementos de navegación según el rol del usuario
+const getNavigationItems = (userRole?: string) => {
+    switch (userRole) {
+        case 'ESTUDIANTE':
+            return studentNavigationItems
+        case 'PROFESOR':
+            return teacherNavigationItems
+        case 'ADMIN':
+            return adminNavigationItems
+        default:
+            return guestNavigationItems
+    }
+}
 
 const studentOptions = [
     { name: "Inscribirse ahora", href: "/inscribirse" },
@@ -308,6 +345,9 @@ export default function NavBar() {
     const { searchQuery, setSearchQuery, performSearch, clearSearch, currentPage } = useSearch()
     const router = useRouter()
 
+    // Obtener elementos de navegación dinámicamente basados en el rol del usuario
+    const navigationItems = getNavigationItems(session?.user?.rol)
+
     const handleNavigation = (href: string) => {
         router.push(href)
     }
@@ -404,16 +444,16 @@ export default function NavBar() {
                         </div>
 
                         <div className="hidden lg:flex items-center space-x-6">
-                            {navigationItems.map(({ name, icon, href }) => (
+                            {navigationItems.map((item) => (
                                 <motion.button
-                                    key={name}
+                                    key={item.name}
                                     className="text-[#00246a] hover:bg-[#e30f28] hover:text-white px-4 py-2 flex font-medium rounded-full transition-all duration-200"
                                     whileHover={{ scale: 1.05 }}
                                     whileTap={{ scale: 0.95 }}
-                                    onClick={() => handleNavigation(href)}
+                                    onClick={() => handleNavigation(item.href)}
                                 >
-                                    {name}
-                                    {icon}
+                                    {item.name}
+                                    {item.icon}
                                 </motion.button>
                             ))}
                         </div>
@@ -539,16 +579,16 @@ export default function NavBar() {
                                 </div>
 
                                 <nav className="space-y-4">
-                                    {navigationItems.map(({ name, icon, href }) => (
+                                    {navigationItems.map((item) => (
                                         <motion.div 
-                                            key={name} 
+                                            key={item.name} 
                                             className="font-medium py-2 px-2 flex hover:bg-[#e30f28] hover:text-white rounded-lg cursor-pointer text-[#00246a] transition-colors duration-200"
                                             whileHover={{ scale: 1.02 }}
                                             whileTap={{ scale: 0.98 }}
-                                            onClick={() => handleNavigation(href)}
+                                            onClick={() => handleNavigation(item.href)}
                                         >
-                                            {name}
-                                            {icon}
+                                            {item.name}
+                                            {item.icon}
                                         </motion.div>
                                     ))}
                                 </nav>

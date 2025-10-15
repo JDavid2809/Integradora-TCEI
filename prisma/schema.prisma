@@ -270,6 +270,7 @@ model usuario {
   estudiante    estudiante?
   profesor      profesor?
   verificado    Boolean        @default(false)
+  debe_cambiar_password Boolean @default(false) // Campo para contraseñas temporales
 
   tokenVerif String?
   expiraEn   DateTime?

@@ -5,6 +5,7 @@ import NavBar from "../components/Navbar";
 import Providers from "../components/Providers";
 import { SearchProvider } from "../contexts/SearchContext";
 import Chatbot from "@/components/ui/admin/Chatbot";
+import PasswordChangeWrapper from "@/components/ui/PasswordChangeWrapper";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -48,12 +49,14 @@ export default function RootLayout({
       >
         <Providers>
           <SearchProvider>
-            <NavBar /><br />
-            <main className="pt-[80px] pb-16 px-4 min-h-screen bg-white">
-              {children}
-              
-            <Chatbot />
-            </main>
+            <PasswordChangeWrapper>
+              <NavBar /><br />
+              <main className="pt-[80px] pb-16 px-4 min-h-screen bg-white">
+                {children}
+                
+              <Chatbot />
+              </main>
+            </PasswordChangeWrapper>
           </SearchProvider>
         </Providers>
       </body>

@@ -25,57 +25,61 @@ export default function StudentCourseView({ course, activities: initialActivitie
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+    <div className="min-h-screen bg-gray-50">
       
-      {/* Header */}
-      <div className="bg-white border-b-2 border-gray-200 shadow-sm sticky top-0 z-40">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex items-center gap-4 mb-4">
-            <button
-              onClick={() => router.push('/Students')}
-              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-            >
-              <ArrowLeft className="w-6 h-6 text-gray-700" />
-            </button>
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">{course.nombre}</h1>
-              <p className="text-sm text-gray-600">
-                {course.instructor.nombre} {course.instructor.apellido}
-              </p>
+      {/* Header Compacto */}
+      <div className="bg-white border-b border-gray-200 shadow-sm sticky top-0 z-40">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          
+          {/* Info del curso */}
+          <div className="flex items-center justify-between py-4 border-b border-gray-100">
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => router.push('/Students')}
+                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                <ArrowLeft className="w-5 h-5 text-gray-700" />
+              </button>
+              <div>
+                <h1 className="text-lg font-bold text-gray-900">{course.nombre}</h1>
+                <p className="text-xs text-gray-500">
+                  {course.instructor.nombre} {course.instructor.apellido}
+                </p>
+              </div>
             </div>
           </div>
 
           {/* Tabs */}
-          <div className="flex gap-2">
+          <div className="flex gap-1 pt-2">
             <button
               onClick={() => setCurrentTab('activities')}
-              className={`flex items-center gap-2 px-6 py-3 rounded-t-lg font-semibold transition-all ${
+              className={`flex items-center gap-2 px-4 py-2.5 rounded-t-lg font-medium transition-all ${
                 currentTab === 'activities'
-                  ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  ? 'bg-blue-600 text-white'
+                  : 'text-gray-600 hover:bg-gray-100'
               }`}
             >
-              <ListChecks className="w-5 h-5" />
+              <ListChecks className="w-4 h-4" />
               Actividades
             </button>
             
             <button
               onClick={() => setCurrentTab('details')}
-              className={`flex items-center gap-2 px-6 py-3 rounded-t-lg font-semibold transition-all ${
+              className={`flex items-center gap-2 px-4 py-2.5 rounded-t-lg font-medium transition-all ${
                 currentTab === 'details'
-                  ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  ? 'bg-blue-600 text-white'
+                  : 'text-gray-600 hover:bg-gray-100'
               }`}
             >
-              <BookOpen className="w-5 h-5" />
-              Detalles del Curso
+              <BookOpen className="w-4 h-4" />
+              Detalles
             </button>
           </div>
         </div>
       </div>
 
       {/* Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         {currentTab === 'activities' ? (
           <StudentActivityList
             activities={activities}

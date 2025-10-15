@@ -18,7 +18,9 @@ import {
     AlertCircle,
     TrendingUp,
     RefreshCw,
-    MoreVertical
+    MoreVertical,
+    Grid3x3,
+    List
 } from 'lucide-react'
 import { CourseActivityWithDetails } from '@/types/course-activity'
 import {
@@ -39,6 +41,7 @@ interface ActivityListProps {
 
 type FilterType = 'all' | 'published' | 'unpublished'
 type ActivityTypeFilter = 'all' | string
+type ViewMode = 'grid' | 'list'
 
 export default function ActivityList({
     courseId,
@@ -59,6 +62,7 @@ export default function ActivityList({
     const [showDeleteModal, setShowDeleteModal] = useState(false)
     const [activityToDelete, setActivityToDelete] = useState<CourseActivityWithDetails | null>(null)
     const [showMenu, setShowMenu] = useState<number | null>(null)
+    const [viewMode, setViewMode] = useState<ViewMode>('grid')
 
     // Mapeo de colores para clases de Tailwind (no soporta interpolación dinámica)
     const colorClasses = {
@@ -325,6 +329,34 @@ export default function ActivityList({
                         </select>
                     </div>
                 </div>
+
+                {/* Toggle de vista */}
+                <div className="flex justify-end mt-4 pt-4 border-t border-gray-200">
+                    <div className="inline-flex items-center gap-2 p-1 bg-gray-100 rounded-lg">
+                        <button
+                            onClick={() => setViewMode('grid')}
+                            className={`flex items-center gap-2 px-3 py-2 rounded-md transition-all ${
+                                viewMode === 'grid'
+                                    ? 'bg-white text-[#00246a] shadow-sm font-semibold'
+                                    : 'text-gray-600 hover:text-gray-900'
+                            }`}
+                        >
+                            <Grid3x3 className="w-4 h-4" />
+                            <span className="text-sm">Tarjetas</span>
+                        </button>
+                        <button
+                            onClick={() => setViewMode('list')}
+                            className={`flex items-center gap-2 px-3 py-2 rounded-md transition-all ${
+                                viewMode === 'list'
+                                    ? 'bg-white text-[#00246a] shadow-sm font-semibold'
+                                    : 'text-gray-600 hover:text-gray-900'
+                            }`}
+                        >
+                            <List className="w-4 h-4" />
+                            <span className="text-sm">Lista</span>
+                        </button>
+                    </div>
+                </div>
             </div>
 
             {/* Lista de actividades */}
@@ -349,8 +381,9 @@ export default function ActivityList({
                         </button>
                     )}
                 </div>
-            ) : (
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+            ) : viewMode === 'grid' ? (
+                // Vista de Tarjetas (Grid)
+                <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
                     {filteredActivities.map((activity) => {
                         const typeConfig = ActivityTypeConfig[activity.activity_type as keyof typeof ActivityTypeConfig]
                         const colors = colorClasses[typeConfig.color as keyof typeof colorClasses] || colorClasses.blue
@@ -360,55 +393,101 @@ export default function ActivityList({
                         return (
                             <div
                                 key={activity.id}
-                                className="bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-all"
+                                className={`bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 group ${
+                                    showMenu === activity.id ? 'overflow-visible' : 'overflow-hidden'
+                                }`}
                             >
-                                {/* Header de la card */}
-                                <div className="p-4 sm:p-6 border-b border-gray-100">
-                                    <div className="flex items-start justify-between gap-3 mb-3">
-                                        <div className="flex items-start gap-3 flex-1 min-w-0">
-                                            <div className={`w-10 h-10 sm:w-12 sm:h-12 ${colors.bg} rounded-lg flex items-center justify-center flex-shrink-0`}>
-                                                <FileText className={`w-5 h-5 sm:w-6 sm:h-6 ${colors.text}`} />
-                                            </div>
-                                            <div className="flex-1 min-w-0">
-                                                <h3 className="text-base sm:text-lg font-bold text-gray-900 mb-1 line-clamp-2">
-                                                    {activity.title}
-                                                </h3>
-                                                <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${colors.badge}`}>
-                                                    {typeConfig.label}
-                                                </span>
-                                            </div>
-                                        </div>
+                                {/* Header con color según tipo */}
+                                <div className={`h-24 relative ${
+                                    typeConfig.color === 'blue' ? 'bg-sky-400' :
+                                    typeConfig.color === 'purple' ? 'bg-purple-400' :
+                                    typeConfig.color === 'green' ? 'bg-emerald-400' :
+                                    typeConfig.color === 'orange' ? 'bg-orange-400' :
+                                    typeConfig.color === 'red' ? 'bg-rose-400' :
+                                    typeConfig.color === 'yellow' ? 'bg-amber-400' :
+                                    typeConfig.color === 'indigo' ? 'bg-indigo-400' :
+                                    typeConfig.color === 'pink' ? 'bg-pink-400' :
+                                    'bg-sky-400'
+                                } ${!activity.is_published ? 'opacity-60' : ''}`}>
+                                    {/* Pattern decorativo */}
+                                    <svg className="absolute inset-0 w-full h-full opacity-10">
+                                        <defs>
+                                            <pattern id={`grid-${activity.id}`} width="20" height="20" patternUnits="userSpaceOnUse">
+                                                <circle cx="10" cy="10" r="1" fill="white" />
+                                            </pattern>
+                                        </defs>
+                                        <rect width="100%" height="100%" fill={`url(#grid-${activity.id})`} />
+                                    </svg>
 
-                                        {/* Menú de acciones */}
+                                    {/* Menú de acciones */}
+                                    <div className="absolute top-3 right-3 z-[30]">
                                         <div className="relative">
                                             <button
-                                                onClick={() => setShowMenu(showMenu === activity.id ? null : activity.id)}
-                                                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                                                onClick={(e) => {
+                                                    e.stopPropagation()
+                                                    e.preventDefault()
+                                                    setShowMenu(showMenu === activity.id ? null : activity.id)
+                                                }}
+                                                className="p-2 bg-white/20 backdrop-blur-sm hover:bg-white/30 rounded-lg transition-all border border-white/30 touch-manipulation"
+                                                type="button"
                                             >
-                                                <MoreVertical className="w-5 h-5 text-gray-600" />
+                                                <div className="flex flex-col gap-1">
+                                                    <div className="w-1 h-1 bg-white rounded-full"></div>
+                                                    <div className="w-1 h-1 bg-white rounded-full"></div>
+                                                    <div className="w-1 h-1 bg-white rounded-full"></div>
+                                                </div>
                                             </button>
 
                                             {showMenu === activity.id && (
                                                 <>
                                                     <div
-                                                        className="fixed inset-0 z-10"
-                                                        onClick={() => setShowMenu(null)}
+                                                        className="fixed inset-0 z-[35] bg-black/10"
+                                                        onClick={(e) => {
+                                                            e.stopPropagation()
+                                                            e.preventDefault()
+                                                            setShowMenu(null)
+                                                        }}
                                                     />
-                                                    <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-20">
+                                                    <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-xl shadow-2xl border border-gray-200 py-1 z-[40] overflow-hidden">
                                                         <button
-                                                            onClick={() => {
+                                                            onClick={(e) => {
+                                                                e.stopPropagation()
+                                                                e.preventDefault()
+                                                                onViewSubmissions(activity.id, activity.title, activity.total_points)
+                                                                setShowMenu(null)
+                                                            }}
+                                                            className="w-full px-4 py-2.5 text-left text-sm font-medium text-gray-700 hover:bg-green-50 hover:text-green-700 flex items-center gap-2 transition-colors touch-manipulation"
+                                                            type="button"
+                                                        >
+                                                            <Users className="w-4 h-4" />
+                                                            Ver Entregas
+                                                        </button>
+                                                        <button
+                                                            onClick={(e) => {
+                                                                e.stopPropagation()
+                                                                e.preventDefault()
                                                                 onEdit(activity.id)
                                                                 setShowMenu(null)
                                                             }}
-                                                            className="w-full px-4 py-2 text-left text-sm hover:bg-gray-50 flex items-center gap-2"
+                                                            className="w-full px-4 py-2.5 text-left text-sm font-medium text-gray-700 hover:bg-blue-50 hover:text-blue-700 flex items-center gap-2 transition-colors touch-manipulation"
+                                                            type="button"
                                                         >
                                                             <Edit className="w-4 h-4" />
-                                                            Editar
+                                                            Editar Actividad
                                                         </button>
                                                         <button
-                                                            onClick={() => handleTogglePublish(activity.id)}
+                                                            onClick={(e) => {
+                                                                e.stopPropagation()
+                                                                e.preventDefault()
+                                                                handleTogglePublish(activity.id)
+                                                            }}
                                                             disabled={actioningActivity === activity.id}
-                                                            className="w-full px-4 py-2 text-left text-sm hover:bg-gray-50 flex items-center gap-2"
+                                                            className={`w-full px-4 py-2.5 text-left text-sm font-medium flex items-center gap-2 transition-colors touch-manipulation ${
+                                                                activity.is_published
+                                                                    ? 'text-gray-700 hover:bg-orange-50 hover:text-orange-700'
+                                                                    : 'text-gray-700 hover:bg-green-50 hover:text-green-700'
+                                                            }`}
+                                                            type="button"
                                                         >
                                                             {activity.is_published ? (
                                                                 <>
@@ -422,9 +501,15 @@ export default function ActivityList({
                                                                 </>
                                                             )}
                                                         </button>
+                                                        <div className="border-t border-gray-200 my-1"></div>
                                                         <button
-                                                            onClick={() => handleDeleteRequest(activity)}
-                                                            className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 flex items-center gap-2"
+                                                            onClick={(e) => {
+                                                                e.stopPropagation()
+                                                                e.preventDefault()
+                                                                handleDeleteRequest(activity)
+                                                            }}
+                                                            className="w-full px-4 py-2.5 text-left text-sm font-medium text-red-600 hover:bg-red-50 flex items-center gap-2 transition-colors touch-manipulation"
+                                                            type="button"
                                                         >
                                                             <Trash2 className="w-4 h-4" />
                                                             Eliminar
@@ -435,77 +520,303 @@ export default function ActivityList({
                                         </div>
                                     </div>
 
+                                    {/* Badge con icono flotante */}
+                                    <div className="absolute -bottom-6 left-6">
+                                        <div className="w-12 h-12 bg-white rounded-full shadow-lg flex items-center justify-center border-4 border-white">
+                                            <div className={`w-full h-full rounded-full ${colors.bg} flex items-center justify-center`}>
+                                                <FileText className={`w-6 h-6 ${colors.text}`} />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Contenido */}
+                                <div className="pt-8 px-6 pb-4">
+                                    <div className="flex items-start justify-between gap-3 mb-3">
+                                        <div className="flex-1 min-w-0">
+                                            <h3 className="text-lg font-bold text-gray-900 mb-2 line-clamp-2 hover:text-blue-600 transition-colors cursor-pointer">
+                                                {activity.title}
+                                            </h3>
+                                            <span className={`inline-block px-3 py-1 rounded-full text-xs font-semibold ${colors.badge}`}>
+                                                {typeConfig.label}
+                                            </span>
+                                        </div>
+                                    </div>
+
                                     {/* Descripción */}
                                     {activity.description && (
-                                        <p className="text-xs sm:text-sm text-gray-600 line-clamp-2 mb-3">
+                                        <p className="text-sm text-gray-600 line-clamp-2 mb-4 min-h-[2.5rem]">
                                             {activity.description}
                                         </p>
                                     )}
 
-                                    {/* Estados y fecha */}
-                                    <div className="flex flex-wrap items-center gap-2">
+                                    {/* Estados */}
+                                    <div className="flex flex-wrap items-center gap-2 mb-4">
                                         {activity.is_published ? (
-                                            <span className="inline-flex items-center gap-1 px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs font-medium">
-                                                <CheckCircle className="w-3 h-3" />
+                                            <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-green-100 text-green-700 rounded-full text-xs font-semibold">
+                                                <CheckCircle className="w-3.5 h-3.5" />
                                                 Publicada
                                             </span>
                                         ) : (
-                                            <span className="inline-flex items-center gap-1 px-2 py-1 bg-gray-100 text-gray-700 rounded-full text-xs font-medium">
-                                                <Clock className="w-3 h-3" />
+                                            <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-gray-100 text-gray-700 rounded-full text-xs font-semibold">
+                                                <Clock className="w-3.5 h-3.5" />
                                                 Borrador
                                             </span>
                                         )}
 
                                         {activity.due_date && (
                                             <span
-                                                className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${overdue
+                                                className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold ${
+                                                    overdue
                                                         ? 'bg-red-100 text-red-700'
                                                         : 'bg-blue-100 text-blue-700'
-                                                    }`}
+                                                }`}
                                             >
-                                                <Calendar className="w-3 h-3" />
+                                                <Calendar className="w-3.5 h-3.5" />
                                                 {formatDate(activity.due_date)}
-                                                {overdue && ' (Vencida)'}
                                             </span>
                                         )}
                                     </div>
-                                </div>
 
-                                {/* Footer - Estadísticas */}
-                                <div className="p-4 sm:p-6 bg-gray-50">
-                                    <div className="grid grid-cols-3 gap-3 sm:gap-4 mb-4">
-                                        <div className="text-center">
-                                            <div className="flex items-center justify-center gap-1 text-gray-600 mb-1">
-                                                <Users className="w-4 h-4" />
-                                            </div>
-                                            <p className="text-lg sm:text-xl font-bold text-gray-900">{submissionsCount}</p>
-                                            <p className="text-xs text-gray-600">Entregas</p>
+                                    {/* Stats mini-cards */}
+                                    <div className="grid grid-cols-3 gap-3 mb-4">
+                                        <div className="bg-blue-50 rounded-lg p-3 text-center">
+                                            <Users className="w-5 h-5 text-blue-600 mx-auto mb-1" />
+                                            <p className="text-lg font-bold text-blue-600">{submissionsCount}</p>
+                                            <p className="text-xs text-blue-700">Entregas</p>
                                         </div>
-
-                                        <div className="text-center">
-                                            <div className="flex items-center justify-center gap-1 text-gray-600 mb-1">
-                                                <BarChart3 className="w-4 h-4" />
-                                            </div>
-                                            <p className="text-lg sm:text-xl font-bold text-gray-900">{activity.total_points}</p>
-                                            <p className="text-xs text-gray-600">Puntos</p>
+                                        <div className="bg-green-50 rounded-lg p-3 text-center">
+                                            <BarChart3 className="w-5 h-5 text-green-600 mx-auto mb-1" />
+                                            <p className="text-lg font-bold text-green-600">{activity.total_points}</p>
+                                            <p className="text-xs text-green-700">Puntos</p>
                                         </div>
-
-                                        <div className="text-center">
-                                            <div className="flex items-center justify-center gap-1 text-gray-600 mb-1">
-                                                <TrendingUp className="w-4 h-4" />
-                                            </div>
-                                            <p className="text-lg sm:text-xl font-bold text-gray-900">{activity.max_attempts || 1}</p>
-                                            <p className="text-xs text-gray-600">Intentos</p>
+                                        <div className="bg-purple-50 rounded-lg p-3 text-center">
+                                            <TrendingUp className="w-5 h-5 text-purple-600 mx-auto mb-1" />
+                                            <p className="text-lg font-bold text-purple-600">{activity.max_attempts || 1}</p>
+                                            <p className="text-xs text-purple-700">Intentos</p>
                                         </div>
                                     </div>
+                                </div>
 
+                                {/* Footer */}
+                                <div className="px-6 py-4 bg-gradient-to-r from-gray-50 to-gray-100 border-t border-gray-200">
                                     <button
                                         onClick={() => onViewSubmissions(activity.id, activity.title, activity.total_points)}
-                                        className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-[#00246a] text-white rounded-lg hover:bg-blue-700 transition-colors text-sm sm:text-base"
+                                        className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 shadow-sm hover:shadow-md transition-all text-sm font-semibold"
                                     >
-                                        <Users className="w-4 h-4" />
-                                        Ver Entregas
+                                        <Eye className="w-4 h-4" />
+                                        Ver Actividad
                                     </button>
+                                </div>
+                            </div>
+                        )
+                    })}
+                </div>
+            ) : (
+                // Vista de Lista
+                <div className="space-y-3">
+                    {filteredActivities.map((activity) => {
+                        const typeConfig = ActivityTypeConfig[activity.activity_type as keyof typeof ActivityTypeConfig]
+                        const colors = colorClasses[typeConfig.color as keyof typeof colorClasses] || colorClasses.blue
+                        const overdue = isOverdue(activity.due_date)
+                        const submissionsCount = activity._count?.submissions || 0
+
+                        return (
+                            <div
+                                key={activity.id}
+                                className={`bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-md transition-all duration-200 ${
+                                    showMenu === activity.id ? 'overflow-visible' : 'overflow-hidden'
+                                }`}
+                            >
+                                <div className="flex flex-col lg:flex-row">
+                                    {/* Barra lateral de color según tipo */}
+                                    <div className={`w-full lg:w-2 ${
+                                        typeConfig.color === 'blue' ? 'bg-sky-400' :
+                                        typeConfig.color === 'purple' ? 'bg-purple-400' :
+                                        typeConfig.color === 'green' ? 'bg-emerald-400' :
+                                        typeConfig.color === 'orange' ? 'bg-orange-400' :
+                                        typeConfig.color === 'red' ? 'bg-rose-400' :
+                                        typeConfig.color === 'yellow' ? 'bg-amber-400' :
+                                        typeConfig.color === 'indigo' ? 'bg-indigo-400' :
+                                        typeConfig.color === 'pink' ? 'bg-pink-400' :
+                                        'bg-sky-400'
+                                    } ${!activity.is_published ? 'opacity-60' : ''}`} />
+
+                                    {/* Contenido principal */}
+                                    <div className="flex-1 p-4 sm:p-5">
+                                        <div className="flex flex-col lg:flex-row lg:items-center gap-4">
+                                            {/* Icono y título */}
+                                            <div className="flex items-start gap-4 flex-1 min-w-0">
+                                                <div className={`w-14 h-14 ${colors.bg} rounded-xl flex items-center justify-center flex-shrink-0 shadow-sm`}>
+                                                    <FileText className={`w-7 h-7 ${colors.text}`} />
+                                                </div>
+                                                
+                                                <div className="flex-1 min-w-0">
+                                                    <div className="flex items-start justify-between gap-3 mb-2">
+                                                        <h3 className="text-lg font-bold text-gray-900 hover:text-blue-600 transition-colors cursor-pointer line-clamp-1">
+                                                            {activity.title}
+                                                        </h3>
+                                                        <span className={`inline-block px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap ${colors.badge}`}>
+                                                            {typeConfig.label}
+                                                        </span>
+                                                    </div>
+                                                    
+                                                    {activity.description && (
+                                                        <p className="text-sm text-gray-600 line-clamp-1 mb-3">
+                                                            {activity.description}
+                                                        </p>
+                                                    )}
+
+                                                    {/* Estados y fecha */}
+                                                    <div className="flex flex-wrap items-center gap-2">
+                                                        {activity.is_published ? (
+                                                            <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-green-100 text-green-700 rounded-full text-xs font-semibold">
+                                                                <CheckCircle className="w-3.5 h-3.5" />
+                                                                Publicada
+                                                            </span>
+                                                        ) : (
+                                                            <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-gray-100 text-gray-700 rounded-full text-xs font-semibold">
+                                                                <Clock className="w-3.5 h-3.5" />
+                                                                Borrador
+                                                            </span>
+                                                        )}
+
+                                                        {activity.due_date && (
+                                                            <span
+                                                                className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold ${
+                                                                    overdue
+                                                                        ? 'bg-red-100 text-red-700'
+                                                                        : 'bg-blue-100 text-blue-700'
+                                                                }`}
+                                                            >
+                                                                <Calendar className="w-3.5 h-3.5" />
+                                                                {formatDate(activity.due_date)}
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            {/* Estadísticas */}
+                                            <div className="flex items-center gap-6 lg:gap-8 px-4 py-3 bg-gray-50 rounded-lg lg:bg-transparent lg:p-0">
+                                                <div className="text-center">
+                                                    <div className="flex items-center justify-center gap-1 text-gray-500 mb-1">
+                                                        <Users className="w-4 h-4" />
+                                                    </div>
+                                                    <p className="text-xl font-bold text-gray-900">{submissionsCount}</p>
+                                                    <p className="text-xs text-gray-600 font-medium">Entregas</p>
+                                                </div>
+
+                                                <div className="text-center">
+                                                    <div className="flex items-center justify-center gap-1 text-gray-500 mb-1">
+                                                        <BarChart3 className="w-4 h-4" />
+                                                    </div>
+                                                    <p className="text-xl font-bold text-gray-900">{activity.total_points}</p>
+                                                    <p className="text-xs text-gray-600 font-medium">Puntos</p>
+                                                </div>
+
+                                                <div className="text-center">
+                                                    <div className="flex items-center justify-center gap-1 text-gray-500 mb-1">
+                                                        <TrendingUp className="w-4 h-4" />
+                                                    </div>
+                                                    <p className="text-xl font-bold text-gray-900">{activity.max_attempts || 1}</p>
+                                                    <p className="text-xs text-gray-600 font-medium">Intentos</p>
+                                                </div>
+                                            </div>
+
+                                            {/* Acciones */}
+                                            <div className="flex items-center gap-2 lg:pl-4 lg:border-l border-gray-200">
+                                                <button
+                                                    onClick={() => onViewSubmissions(activity.id, activity.title, activity.total_points)}
+                                                    className="flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-semibold flex-1 lg:flex-none shadow-sm"
+                                                >
+                                                    <Eye className="w-4 h-4" />
+                                                    <span className="hidden sm:inline">Ver</span>
+                                                </button>
+                                                
+                                                <div className="relative z-[30]">
+                                                    <button
+                                                        onClick={(e) => {
+                                                            e.stopPropagation()
+                                                            e.preventDefault()
+                                                            setShowMenu(showMenu === activity.id ? null : activity.id)
+                                                        }}
+                                                        className="p-2.5 hover:bg-gray-100 rounded-lg transition-colors touch-manipulation"
+                                                        type="button"
+                                                    >
+                                                        <MoreVertical className="w-5 h-5 text-gray-600" />
+                                                    </button>
+
+                                                    {showMenu === activity.id && (
+                                                        <>
+                                                            <div
+                                                                className="fixed inset-0 z-[35] bg-black/10"
+                                                                onClick={(e) => {
+                                                                    e.stopPropagation()
+                                                                    e.preventDefault()
+                                                                    setShowMenu(null)
+                                                                }}
+                                                            />
+                                                            <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-xl shadow-2xl border border-gray-200 py-1 z-[40] overflow-hidden">
+                                                                <button
+                                                                    onClick={(e) => {
+                                                                        e.stopPropagation()
+                                                                        e.preventDefault()
+                                                                        onEdit(activity.id)
+                                                                        setShowMenu(null)
+                                                                    }}
+                                                                    className="w-full px-4 py-2.5 text-left text-sm font-medium text-gray-700 hover:bg-blue-50 hover:text-blue-700 flex items-center gap-2 transition-colors touch-manipulation"
+                                                                    type="button"
+                                                                >
+                                                                    <Edit className="w-4 h-4" />
+                                                                    Editar
+                                                                </button>
+                                                                <button
+                                                                    onClick={(e) => {
+                                                                        e.stopPropagation()
+                                                                        e.preventDefault()
+                                                                        handleTogglePublish(activity.id)
+                                                                    }}
+                                                                    disabled={actioningActivity === activity.id}
+                                                                    className={`w-full px-4 py-2.5 text-left text-sm font-medium flex items-center gap-2 transition-colors touch-manipulation ${
+                                                                        activity.is_published
+                                                                            ? 'text-gray-700 hover:bg-orange-50 hover:text-orange-700'
+                                                                            : 'text-gray-700 hover:bg-green-50 hover:text-green-700'
+                                                                    }`}
+                                                                    type="button"
+                                                                >
+                                                                    {activity.is_published ? (
+                                                                        <>
+                                                                            <EyeOff className="w-4 h-4" />
+                                                                            Despublicar
+                                                                        </>
+                                                                    ) : (
+                                                                        <>
+                                                                            <Eye className="w-4 h-4" />
+                                                                            Publicar
+                                                                        </>
+                                                                    )}
+                                                                </button>
+                                                                <div className="border-t border-gray-200 my-1"></div>
+                                                                <button
+                                                                    onClick={(e) => {
+                                                                        e.stopPropagation()
+                                                                        e.preventDefault()
+                                                                        handleDeleteRequest(activity)
+                                                                    }}
+                                                                    className="w-full px-4 py-2.5 text-left text-sm font-medium text-red-600 hover:bg-red-50 flex items-center gap-2 transition-colors touch-manipulation"
+                                                                    type="button"
+                                                                >
+                                                                    <Trash2 className="w-4 h-4" />
+                                                                    Eliminar
+                                                                </button>
+                                                            </div>
+                                                        </>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         )

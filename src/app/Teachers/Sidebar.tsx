@@ -1,6 +1,6 @@
 "use client"
 
-import { BookOpen, Home, GraduationCap, Calendar, LogOut, X, CheckSquare, SquareActivity } from "lucide-react"
+import { BookOpen, Home, GraduationCap, Calendar, LogOut, X, CheckSquare, SquareActivity, CalendarDays } from "lucide-react"
 import Image from "next/image"
 
 interface SidebarProps {
@@ -22,6 +22,7 @@ export default function Sidebar({
         { id: "dashboard", label: "Dashboard", icon: Home },
         { id: "courses", label: "Gestión de Cursos", icon: BookOpen },
         { id: "students", label: "Mis Estudiantes", icon: GraduationCap },
+        { id: "schedule", label: "Mi Horario", icon: CalendarDays },
         { id: "attendance", label: "Asistencia", icon: CheckSquare },
         { id: "exams", label: "Exámenes", icon: Calendar },
         { id: "activity", label : "Actividades", icon: SquareActivity}

@@ -211,8 +211,8 @@ export default function Chatbot() {
         }
       `}</style>
 
-      {/* Botón flotante - Solo en desktop */}
-      {!isMobile && (
+      {/* Botón flotante - Solo en desktop y cuando el chat está cerrado */}
+      {!isMobile && !open && (
         <div 
           className={`fixed z-[99999] transition-opacity duration-300 ${
             isHidden ? 'opacity-0 pointer-events-none' : 'opacity-100'

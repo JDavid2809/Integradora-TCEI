@@ -31,6 +31,7 @@ import {
     User,
     Smartphone
 } from 'lucide-react'
+import { BuyButton } from '@/components/payments/BuyButton'
 
 // Tipo para el curso con schema actual de la BD
 interface CourseDataFromDB {
@@ -585,64 +586,71 @@ export default function CourseDetails({ courseData }: CourseDetailsProps) {
                                     <div className="text-center mb-6">
                                         <div className="flex items-center justify-center gap-3 mb-2">
                                             <span className="text-3xl font-bold text-green-600">
-                                                {courseData.precio ? `$${courseData.precio.toFixed(2)}` : 'Gratis'}
+                                                {courseData.precio ? `$${Number(courseData.precio).toFixed(2)}` : 'Gratis'}
                                             </span>
                                         </div>
                                     </div>
 
-                                    <button
-                                        onClick={handleEnroll}
-                                        disabled={isEnrolling || isUserEnrolled || !canEnroll}
-                                        className={`w-full font-bold py-4 px-6 rounded-lg transition-all duration-300 flex items-center justify-center gap-2 shadow-md hover:shadow-lg transform hover:-translate-y-0.5 disabled:transform-none mb-4 ${
-                                            isUserEnrolled 
-                                                ? 'bg-green-600 cursor-default text-white' 
-                                                : !canEnroll
-                                                ? 'bg-gray-400 cursor-not-allowed text-white'
-                                                : 'bg-[#e30f28] hover:bg-[#c20e24] disabled:bg-gray-400 text-white'
-                                        }`}
-                                    >
-                                        {isEnrolling ? (
-                                            <>
-                                                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-                                                Inscribiendo...
-                                            </>
-                                        ) : !session ? (
-                                            <>
-                                                <BookOpen className="w-5 h-5" />
-                                                Iniciar sesión para inscribirse
-                                            </>
-                                        ) : isUserEnrolled ? (
-                                            <>
-                                                <CheckCircle className="w-5 h-5" />
-                                                ¡Estás inscrito!
-                                            </>
-                                        ) : isOwner ? (
-                                            <>
-                                                <GraduationCap className="w-5 h-5" />
-                                                Eres el instructor de este curso
-                                            </>
-                                        ) : session.user.extra?.id_profesor ? (
-                                            <>
-                                                <GraduationCap className="w-5 h-5" />
-                                                Los profesores no pueden inscribirse
-                                            </>
-                                        ) : session.user.extra?.id_admin ? (
-                                            <>
-                                                <User className="w-5 h-5" />
-                                                Panel administrativo
-                                            </>
-                                        ) : canEnroll ? (
-                                            <>
-                                                <ShoppingCart className="w-5 h-5" />
-                                                Inscribirse ahora
-                                            </>
-                                        ) : (
-                                            <>
-                                                <BookOpen className="w-5 h-5" />
-                                                No disponible
-                                            </>
-                                        )}
-                                    </button>
+                                    {courseData.precio && courseData.precio > 0 ? (
+                                        <BuyButton 
+                                            courseId={courseData.id_curso}
+                                            label="Comprar Curso"
+                                        />
+                                    ) : (
+                                        <button
+                                            onClick={handleEnroll}
+                                            disabled={isEnrolling || isUserEnrolled || !canEnroll}
+                                            className={`w-full font-bold py-4 px-6 rounded-lg transition-all duration-300 flex items-center justify-center gap-2 shadow-md hover:shadow-lg transform hover:-translate-y-0.5 disabled:transform-none mb-4 ${
+                                                isUserEnrolled 
+                                                    ? 'bg-green-600 cursor-default text-white' 
+                                                    : !canEnroll
+                                                    ? 'bg-gray-400 cursor-not-allowed text-white'
+                                                    : 'bg-[#e30f28] hover:bg-[#c20e24] disabled:bg-gray-400 text-white'
+                                            }`}
+                                        >
+                                            {isEnrolling ? (
+                                                <>
+                                                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                                                    Inscribiendo...
+                                                </>
+                                            ) : !session ? (
+                                                <>
+                                                    <BookOpen className="w-5 h-5" />
+                                                    Iniciar sesión para inscribirse
+                                                </>
+                                            ) : isUserEnrolled ? (
+                                                <>
+                                                    <CheckCircle className="w-5 h-5" />
+                                                    ¡Estás inscrito!
+                                                </>
+                                            ) : isOwner ? (
+                                                <>
+                                                    <GraduationCap className="w-5 h-5" />
+                                                    Eres el instructor de este curso
+                                                </>
+                                            ) : session.user.extra?.id_profesor ? (
+                                                <>
+                                                    <GraduationCap className="w-5 h-5" />
+                                                    Los profesores no pueden inscribirse
+                                                </>
+                                            ) : session.user.extra?.id_admin ? (
+                                                <>
+                                                    <User className="w-5 h-5" />
+                                                    Panel administrativo
+                                                </>
+                                            ) : canEnroll ? (
+                                                <>
+                                                    <ShoppingCart className="w-5 h-5" />
+                                                    Inscribirse Gratis
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <BookOpen className="w-5 h-5" />
+                                                    No disponible
+                                                </>
+                                            )}
+                                        </button>
+                                    )}
 
                                     {enrollmentMessage && (
                                         <div className={`mb-4 p-3 rounded-lg text-sm text-center ${

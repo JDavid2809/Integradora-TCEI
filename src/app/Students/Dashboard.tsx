@@ -18,10 +18,11 @@ interface DashboardProps {
     user?: Session
     studentCourses?: CursoFromDB[]
     allCourses?: CursoFromDB[]
+    initialSection?: string
 }
 
-export default function Dashboard({ onLogout, user, studentCourses, allCourses }: DashboardProps) {
-    const [activeSection, setActiveSection] = useState("dashboard")
+export default function Dashboard({ onLogout, user, studentCourses, allCourses, initialSection = 'dashboard' }: DashboardProps) {
+    const [activeSection, setActiveSection] = useState(initialSection)
     const [sidebarOpen, setSidebarOpen] = useState(false)
 
     const containerVariants = {

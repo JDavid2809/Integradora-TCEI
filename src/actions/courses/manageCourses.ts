@@ -5,6 +5,7 @@ import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/authOptions"
 import { CourseSearchParams, PaginatedCourses } from "@/types/courses"
 import { createSlug } from '@/lib/slugUtils'
+import { redirect } from 'next/navigation'
 
 // Función para contar lecciones desde el contenido del curso
 function countLessonsFromContent(courseContent: string | null): number {
@@ -550,7 +551,7 @@ export async function getCourseBySlug(slug: string) {
     const curso = cursos.find((c) => createSlug(c.nombre) === slug)
 
     if (!curso) {
-      throw new Error('Curso no encontrado')
+      redirect('/Courses')
     }
 
     // Agregar lecciones calculadas desde el contenido

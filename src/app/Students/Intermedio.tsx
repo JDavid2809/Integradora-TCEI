@@ -3,7 +3,7 @@ import React from 'react'
 import Dashboard from './Dashboard'
 import { Session } from 'next-auth'
 import { signOut } from 'next-auth/react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { CursoFromDB } from '@/types/courses'
 
 type Props = {
@@ -14,6 +14,8 @@ type Props = {
 
 export default function Intermedio({ user, studentCourses, allCourses }: Props) {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const initialSection = searchParams.get('section') || 'dashboard'
 
   const handleLogout = async () => {
     await signOut({ 
@@ -29,6 +31,7 @@ export default function Intermedio({ user, studentCourses, allCourses }: Props) 
       user={user} 
       studentCourses={studentCourses || []}
       allCourses={allCourses || []}
+      initialSection={initialSection}
     />
   )
 }

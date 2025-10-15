@@ -19,13 +19,13 @@ model estudiante {
   materno                 String?                   @db.VarChar(30)
   paterno                 String?                   @db.VarChar(30)
   descripcion             String?                   @db.VarChar(255)
-  Inscripcion             Inscripcion[]
   reviews                 Review[]
   categoria_edad          categoria_edad?           @relation(fields: [id_categoria_edad], references: [id_categoria_edad])
   usuario                 usuario                   @relation(fields: [id_usuario], references: [id], onDelete: Cascade)
   historial_academico     historial_academico[]
   horario                 horario[]
   imparte_registro_remota imparte_registro_remota[]
+  inscripciones           Inscripcion[]
   pago                    pago[]
   resultado_examen        resultado_examen[]
 
@@ -256,24 +256,21 @@ model Administrador {
 }
 
 model usuario {
-  email               String              @unique
-  password            String
-  nombre              String
-  apellido            String
-  rol                 Rol
-  id                  Int                 @id @default(autoincrement())
-  administrador       Administrador?
-  estudiante          estudiante?
-  profesor            profesor?
-  verificado          Boolean             @default(false)
-
-  tokenVerif          String?  
-  expiraEn            DateTime? 
-
-  // Relaciones del sistema de chat
-  chats_creados       chat_room[]         @relation("ChatCreador")
-  participaciones     chat_participant[]
-  mensajes            chat_message[]
+  email           String             @unique
+  password        String
+  nombre          String
+  rol             Rol
+  id              Int                @id @default(autoincrement())
+  apellido        String
+  expiraEn        DateTime?
+  tokenVerif      String?
+  verificado      Boolean            @default(false)
+  administrador   Administrador?
+  mensajes        chat_message[]
+  participaciones chat_participant[]
+  chats_creados   chat_room[]        @relation("ChatCreador")
+  estudiante      estudiante?
+  profesor        profesor?
 }
 
 model curso {
@@ -293,19 +290,17 @@ model curso {
   target_audience String?
   updated_at      DateTime?        @default(now()) @updatedAt
   what_you_learn  String?
-  precio          Decimal?         @db.Decimal(10, 2) // Precio del curso
-  nivel_ingles    String?          @db.VarChar(20)    
-  
-  duracion_horas  Int?             
-
-  certificado     Boolean?         @default(true)  // Incluye certificado
-  inscripciones   Inscripcion[]
+  certificado     Boolean?         @default(true)
+  duracion_horas  Int?
+  precio          Decimal?         @db.Decimal(10, 2)
+  nivel_ingles    String?          @db.VarChar(20)
   reviews         Review[]
   class_schedules class_schedule[]
   creator         profesor?        @relation("CourseCreator", fields: [created_by], references: [id_profesor])
   horario         horario[]
   horario_pred    horario_pred[]
   imparte         imparte[]
+  inscripciones   Inscripcion[]
 
   @@index([created_by])
 }
@@ -318,15 +313,16 @@ model Inscripcion {
   status         EnrollmentStatus @default(ACTIVE)
   payment_status PaymentStatus    @default(PENDING)
   notes          String?
+  attendance     attendance[]
   course         curso            @relation(fields: [course_id], references: [id_curso], onDelete: Cascade)
   student        estudiante       @relation(fields: [student_id], references: [id_estudiante], onDelete: Cascade)
-  attendance     attendance[]
   payments       payment[]
 
   @@unique([student_id, course_id])
   @@index([student_id])
   @@index([course_id])
   @@index([status])
+  @@map("Inscripcion")
 }
 
 model payment {
@@ -399,6 +395,55 @@ model Review {
   @@index([is_active])
 }
 
+model chat_room {
+  id            Int                @id @default(autoincrement())
+  nombre        String             @db.VarChar(100)
+  descripcion   String?            @db.VarChar(255)
+  tipo          TipoChatRoom       @default(GENERAL)
+  creado_por    Int
+  creado_en     DateTime           @default(now())
+  activo        Boolean            @default(true)
+  mensajes      chat_message[]
+  participantes chat_participant[]
+  creador       usuario            @relation("ChatCreador", fields: [creado_por], references: [id])
+
+  @@index([creado_por])
+}
+
+model chat_participant {
+  id           Int       @id @default(autoincrement())
+  chat_room_id Int
+  usuario_id   Int
+  unido_en     DateTime  @default(now())
+  ultimo_visto DateTime?
+  activo       Boolean   @default(true)
+  chat_room    chat_room @relation(fields: [chat_room_id], references: [id], onDelete: Cascade)
+  usuario      usuario   @relation(fields: [usuario_id], references: [id], onDelete: Cascade)
+
+  @@unique([chat_room_id, usuario_id])
+  @@index([chat_room_id])
+  @@index([usuario_id])
+}
+
+model chat_message {
+  id             Int         @id @default(autoincrement())
+  chat_room_id   Int
+  usuario_id     Int
+  contenido      String
+  tipo           TipoMensaje @default(TEXTO)
+  archivo_url    String?     @db.VarChar(255)
+  archivo_nombre String?     @db.VarChar(100)
+  enviado_en     DateTime    @default(now())
+  editado_en     DateTime?
+  eliminado      Boolean     @default(false)
+  chat_room      chat_room   @relation(fields: [chat_room_id], references: [id], onDelete: Cascade)
+  usuario        usuario     @relation(fields: [usuario_id], references: [id], onDelete: Cascade)
+
+  @@index([chat_room_id])
+  @@index([usuario_id])
+  @@index([enviado_en])
+}
+
 enum TipoCapturo {
   PROFESOR
   USER
@@ -455,6 +500,7 @@ enum PaymentStatus {
   OVERDUE
   REFUNDED
   CANCELLED
+  FREE
 }
 
 enum PaymentMethod {
@@ -482,72 +528,16 @@ enum DayOfWeek {
   SUNDAY
 }
 
-// Sistema de Chat
-model chat_room {
-  id                 Int                @id @default(autoincrement())
-  nombre             String             @db.VarChar(100)
-  descripcion        String?            @db.VarChar(255)
-  tipo               TipoChatRoom       @default(GENERAL)
-  creado_por         Int
-  creado_en          DateTime           @default(now())
-  activo             Boolean            @default(true)
-  
-  // Relaciones
-  creador            usuario            @relation("ChatCreador", fields: [creado_por], references: [id])
-  participantes      chat_participant[]
-  mensajes           chat_message[]
-  
-  @@index([creado_por])
-}
-
-model chat_participant {
-  id                 Int                @id @default(autoincrement())
-  chat_room_id       Int
-  usuario_id         Int
-  unido_en           DateTime           @default(now())
-  ultimo_visto       DateTime?
-  activo             Boolean            @default(true)
-  
-  // Relaciones
-  chat_room          chat_room          @relation(fields: [chat_room_id], references: [id], onDelete: Cascade)
-  usuario            usuario            @relation(fields: [usuario_id], references: [id], onDelete: Cascade)
-  
-  @@unique([chat_room_id, usuario_id])
-  @@index([chat_room_id])
-  @@index([usuario_id])
-}
-
-model chat_message {
-  id                 Int                @id @default(autoincrement())
-  chat_room_id       Int
-  usuario_id         Int
-  contenido          String             @db.Text
-  tipo               TipoMensaje        @default(TEXTO)
-  archivo_url        String?            @db.VarChar(255)
-  archivo_nombre     String?            @db.VarChar(100)
-  enviado_en         DateTime           @default(now())
-  editado_en         DateTime?
-  eliminado          Boolean            @default(false)
-  
-  // Relaciones
-  chat_room          chat_room          @relation(fields: [chat_room_id], references: [id], onDelete: Cascade)
-  usuario            usuario            @relation(fields: [usuario_id], references: [id], onDelete: Cascade)
-  
-  @@index([chat_room_id])
-  @@index([usuario_id])
-  @@index([enviado_en])
-}
-
 enum TipoChatRoom {
-  GENERAL       // Chat general para todos
-  CLASE         // Chat específico de una clase
-  PRIVADO       // Chat privado entre usuarios
-  SOPORTE       // Chat de soporte con admin
+  GENERAL
+  CLASE
+  PRIVADO
+  SOPORTE
 }
 
 enum TipoMensaje {
   TEXTO
   IMAGEN
   ARCHIVO
-  SISTEMA       // Mensajes del sistema (usuario se unió, etc.)
+  SISTEMA
 }

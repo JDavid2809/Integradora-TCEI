@@ -28,6 +28,7 @@ model estudiante {
   imparte_registro_remota imparte_registro_remota[]
   pago                    pago[]
   resultado_examen        resultado_examen[]
+  activity_submissions    activity_submission[] // Entregas de actividades
 
   @@index([id_categoria_edad])
 }
@@ -201,24 +202,26 @@ model pregunta {
 }
 
 model profesor {
-  id_profesor     Int              @id @default(autoincrement())
-  nombre          String           @db.VarChar(30)
-  paterno         String?          @db.VarChar(30)
-  materno         String?          @db.VarChar(30)
-  curp            String?          @db.VarChar(20)
-  rfc             String?          @db.VarChar(14)
-  direccion       String?          @db.VarChar(30)
-  nivel_estudios  String?          @db.VarChar(30)
-  observaciones   String?          @db.VarChar(50)
-  b_activo        Boolean?         @default(true)
-  id_usuario      Int              @unique
-  edad            Int?
-  telefono        String?          @db.VarChar(25)
-  attendance      attendance[]
-  class_schedules class_schedule[]
-  created_courses curso[]          @relation("CourseCreator")
-  imparte         imparte[]
-  usuario         usuario          @relation(fields: [id_usuario], references: [id], onDelete: Cascade)
+  id_profesor        Int                   @id @default(autoincrement())
+  nombre             String                @db.VarChar(30)
+  paterno            String?               @db.VarChar(30)
+  materno            String?               @db.VarChar(30)
+  curp               String?               @db.VarChar(20)
+  rfc                String?               @db.VarChar(14)
+  direccion          String?               @db.VarChar(30)
+  nivel_estudios     String?               @db.VarChar(30)
+  observaciones      String?               @db.VarChar(50)
+  b_activo           Boolean?              @default(true)
+  id_usuario         Int                   @unique
+  edad               Int?
+  telefono           String?               @db.VarChar(25)
+  attendance         attendance[]
+  class_schedules    class_schedule[]
+  created_courses    curso[]               @relation("CourseCreator")
+  imparte            imparte[]
+  usuario            usuario               @relation(fields: [id_usuario], references: [id], onDelete: Cascade)
+  created_activities course_activity[] // Actividades creadas
+  graded_submissions activity_submission[] @relation("GradedBy") // Entregas calificadas
 }
 
 model respuesta {
@@ -246,82 +249,86 @@ model resultado_examen {
 }
 
 model Administrador {
-  id_administrador Int     @id @default(autoincrement())
-  id_usuario       Int     @unique
-  nombre           String? @db.VarChar(25)
-  image            String  @db.VarChar(50)
-  email_unico      String? @db.VarChar(200)
-  b_activo         Boolean @default(true)
-  usuario          usuario @relation(fields: [id_usuario], references: [id], onDelete: Cascade)
+  id_administrador    Int                   @id @default(autoincrement())
+  id_usuario          Int                   @unique
+  nombre              String?               @db.VarChar(25)
+  image               String                @db.VarChar(50)
+  email_unico         String?               @db.VarChar(200)
+  b_activo            Boolean               @default(true)
+  usuario             usuario               @relation(fields: [id_usuario], references: [id], onDelete: Cascade)
+  solicitudes_revisadas solicitud_profesor[]
 }
 
 model usuario {
-  email               String              @unique
-  password            String
-  nombre              String
-  apellido            String
-  rol                 Rol
-  id                  Int                 @id @default(autoincrement())
-  administrador       Administrador?
-  estudiante          estudiante?
-  profesor            profesor?
-  verificado          Boolean             @default(false)
+  email         String         @unique
+  password      String
+  nombre        String
+  apellido      String
+  rol           Rol
+  id            Int            @id @default(autoincrement())
+  administrador Administrador?
+  estudiante    estudiante?
+  profesor      profesor?
+  verificado    Boolean        @default(false)
 
-  tokenVerif          String?  
-  expiraEn            DateTime? 
+  tokenVerif String?
+  expiraEn   DateTime?
 
   // Relaciones del sistema de chat
-  chats_creados       chat_room[]         @relation("ChatCreador")
-  participaciones     chat_participant[]
-  mensajes            chat_message[]
+  chats_creados     chat_room[]         @relation("ChatCreador")
+  participaciones   chat_participant[]
+  mensajes          chat_message[]
+  lecturas_mensajes chat_message_read[]
 }
 
 model curso {
-  id_curso        Int              @id @default(autoincrement())
-  nombre          String           @db.VarChar(100)
+  id_curso        Int       @id @default(autoincrement())
+  nombre          String    @db.VarChar(100)
   modalidad       Modalidad
-  inicio          DateTime?        @db.Date
-  fin             DateTime?        @db.Date
-  b_activo        Boolean?         @default(true)
+  inicio          DateTime? @db.Date
+  fin             DateTime? @db.Date
+  b_activo        Boolean?  @default(true)
   course_content  String?
-  created_at      DateTime?        @default(now())
+  created_at      DateTime? @default(now())
   created_by      Int?
   descripcion     String?
   features        String?
   requirements    String?
   resumen         String?
   target_audience String?
-  updated_at      DateTime?        @default(now()) @updatedAt
+  updated_at      DateTime? @default(now()) @updatedAt
   what_you_learn  String?
-  precio          Decimal?         @db.Decimal(10, 2) // Precio del curso
-  nivel_ingles    String?          @db.VarChar(20)    
-  
-  duracion_horas  Int?             
+  precio          Decimal?  @db.Decimal(10, 2) // Precio del curso
+  nivel_ingles    String?   @db.VarChar(20)
 
-  certificado     Boolean?         @default(true)  // Incluye certificado
+  duracion_horas Int?
+
+  certificado     Boolean?          @default(true) // Incluye certificado
   inscripciones   Inscripcion[]
   reviews         Review[]
   class_schedules class_schedule[]
-  creator         profesor?        @relation("CourseCreator", fields: [created_by], references: [id_profesor])
+  creator         profesor?         @relation("CourseCreator", fields: [created_by], references: [id_profesor])
   horario         horario[]
   horario_pred    horario_pred[]
   imparte         imparte[]
+  activities      course_activity[] // Actividades del curso
 
   @@index([created_by])
 }
 
 model Inscripcion {
-  id             Int              @id @default(autoincrement())
+  id             Int                   @id @default(autoincrement())
   student_id     Int
   course_id      Int
-  enrolled_at    DateTime         @default(now())
-  status         EnrollmentStatus @default(ACTIVE)
-  payment_status PaymentStatus    @default(PENDING)
+  enrolled_at    DateTime              @default(now())
+  status         EnrollmentStatus      @default(ACTIVE)
+  payment_status PaymentStatus         @default(PENDING)
   notes          String?
-  course         curso            @relation(fields: [course_id], references: [id_curso], onDelete: Cascade)
-  student        estudiante       @relation(fields: [student_id], references: [id_estudiante], onDelete: Cascade)
+  course         curso                 @relation(fields: [course_id], references: [id_curso], onDelete: Cascade)
+  student        estudiante            @relation(fields: [student_id], references: [id_estudiante], onDelete: Cascade)
   attendance     attendance[]
   payments       payment[]
+  submissions    activity_submission[] // Entregas de actividades
 
   @@unique([student_id, course_id])
   @@index([student_id])
@@ -484,70 +491,243 @@ enum DayOfWeek {
 
 // Sistema de Chat
 model chat_room {
-  id                 Int                @id @default(autoincrement())
-  nombre             String             @db.VarChar(100)
-  descripcion        String?            @db.VarChar(255)
-  tipo               TipoChatRoom       @default(GENERAL)
-  creado_por         Int
-  creado_en          DateTime           @default(now())
-  activo             Boolean            @default(true)
-  
+  id          Int          @id @default(autoincrement())
+  nombre      String       @db.VarChar(100)
+  descripcion String?      @db.VarChar(255)
+  tipo        TipoChatRoom @default(GENERAL)
+  creado_por  Int
+  creado_en   DateTime     @default(now())
+  activo      Boolean      @default(true)
+
   // Relaciones
-  creador            usuario            @relation("ChatCreador", fields: [creado_por], references: [id])
-  participantes      chat_participant[]
-  mensajes           chat_message[]
-  
+  creador       usuario            @relation("ChatCreador", fields: [creado_por], references: [id])
+  participantes chat_participant[]
+  mensajes      chat_message[]
+
   @@index([creado_por])
 }
 
 model chat_participant {
-  id                 Int                @id @default(autoincrement())
-  chat_room_id       Int
-  usuario_id         Int
-  unido_en           DateTime           @default(now())
-  ultimo_visto       DateTime?
-  activo             Boolean            @default(true)
-  
+  id           Int       @id @default(autoincrement())
+  chat_room_id Int
+  usuario_id   Int
+  unido_en     DateTime  @default(now())
+  ultimo_visto DateTime?
+  activo       Boolean   @default(true)
+
   // Relaciones
-  chat_room          chat_room          @relation(fields: [chat_room_id], references: [id], onDelete: Cascade)
-  usuario            usuario            @relation(fields: [usuario_id], references: [id], onDelete: Cascade)
-  
+  chat_room chat_room @relation(fields: [chat_room_id], references: [id], onDelete: Cascade)
+  usuario   usuario   @relation(fields: [usuario_id], references: [id], onDelete: Cascade)
+
   @@unique([chat_room_id, usuario_id])
   @@index([chat_room_id])
   @@index([usuario_id])
 }
 
 model chat_message {
-  id                 Int                @id @default(autoincrement())
-  chat_room_id       Int
-  usuario_id         Int
-  contenido          String             @db.Text
-  tipo               TipoMensaje        @default(TEXTO)
-  archivo_url        String?            @db.VarChar(255)
-  archivo_nombre     String?            @db.VarChar(100)
-  enviado_en         DateTime           @default(now())
-  editado_en         DateTime?
-  eliminado          Boolean            @default(false)
-  
+  id             Int         @id @default(autoincrement())
+  chat_room_id   Int
+  usuario_id     Int
+  contenido      String      @db.Text
+  tipo           TipoMensaje @default(TEXTO)
+  archivo_url    String?     @db.VarChar(255)
+  archivo_nombre String?     @db.VarChar(100)
+  enviado_en     DateTime    @default(now())
+  editado_en     DateTime?
+  eliminado      Boolean     @default(false)
+  entregado_en   DateTime? // Cuando el mensaje fue entregado
+  visto_en       DateTime? // Cuando el mensaje fue visto por última vez
+
   // Relaciones
-  chat_room          chat_room          @relation(fields: [chat_room_id], references: [id], onDelete: Cascade)
-  usuario            usuario            @relation(fields: [usuario_id], references: [id], onDelete: Cascade)
-  
+  chat_room chat_room           @relation(fields: [chat_room_id], references: [id], onDelete: Cascade)
+  usuario   usuario             @relation(fields: [usuario_id], references: [id], onDelete: Cascade)
+  lecturas  chat_message_read[]
+
   @@index([chat_room_id])
   @@index([usuario_id])
   @@index([enviado_en])
 }
 
+model chat_message_read {
+  id         Int      @id @default(autoincrement())
+  mensaje_id Int
+  usuario_id Int
+  leido_en   DateTime @default(now())
+
+  // Relaciones
+  mensaje chat_message @relation(fields: [mensaje_id], references: [id], onDelete: Cascade)
+  usuario usuario      @relation(fields: [usuario_id], references: [id], onDelete: Cascade)
+
+  @@unique([mensaje_id, usuario_id])
+  @@index([mensaje_id])
+  @@index([usuario_id])
+}
+
 enum TipoChatRoom {
-  GENERAL       // Chat general para todos
-  CLASE         // Chat específico de una clase
-  PRIVADO       // Chat privado entre usuarios
-  SOPORTE       // Chat de soporte con admin
+  GENERAL // Chat general para todos
+  CLASE // Chat específico de una clase
+  PRIVADO // Chat privado entre usuarios
+  SOPORTE // Chat de soporte con admin
 }
 
 enum TipoMensaje {
   TEXTO
   IMAGEN
   ARCHIVO
-  SISTEMA       // Mensajes del sistema (usuario se unió, etc.)
+  SISTEMA // Mensajes del sistema (usuario se unió, etc.)
+}
+
+// ============================================
+// SISTEMA DE ACTIVIDADES/TAREAS DE CURSOS
+// ============================================
+
+// 1. Actividades/Tareas del curso
+model course_activity {
+  id                Int          @id @default(autoincrement())
+  course_id         Int
+  title             String       @db.VarChar(200)
+  description       String?      @db.Text
+  instructions      String?      @db.Text
+  activity_type     ActivityType @default(ASSIGNMENT)
+  due_date          DateTime?
+  total_points      Int          @default(100)
+  min_passing_score Int? // Puntaje mínimo para aprobar
+  allow_late        Boolean      @default(false)
+  late_penalty      Int? // Penalización por entrega tardía (%)
+  max_attempts      Int?         @default(1)
+  is_published      Boolean      @default(false)
+  created_by        Int
+  created_at        DateTime     @default(now())
+  updated_at        DateTime     @updatedAt
+
+  // Relaciones
+  course      curso                 @relation(fields: [course_id], references: [id_curso], onDelete: Cascade)
+  teacher     profesor              @relation(fields: [created_by], references: [id_profesor])
+  attachments activity_attachment[]
+  submissions activity_submission[]
+
+  @@index([course_id])
+  @@index([created_by])
+  @@index([due_date])
+  @@index([is_published])
+  @@index([activity_type])
+}
+
+// 2. Archivos adjuntos de la actividad (materiales del profesor)
+model activity_attachment {
+  id          Int      @id @default(autoincrement())
+  activity_id Int
+  file_name   String   @db.VarChar(255)
+  file_url    String   @db.VarChar(500)
+  file_type   String   @db.VarChar(50) // pdf, docx, jpg, mp4, etc.
+  file_size   Int // en bytes
+  uploaded_at DateTime @default(now())
+
+  // Relaciones
+  activity course_activity @relation(fields: [activity_id], references: [id], onDelete: Cascade)
+
+  @@index([activity_id])
+}
+
+// 3. Entregas de estudiantes
+model activity_submission {
+  id              Int              @id @default(autoincrement())
+  activity_id     Int
+  student_id      Int
+  enrollment_id   Int
+  submission_text String?          @db.Text
+  submitted_at    DateTime         @default(now())
+  is_late         Boolean          @default(false)
+  attempt_number  Int              @default(1)
+  status          SubmissionStatus @default(SUBMITTED)
+
+  // Calificación
+  score     Int? // Puntaje obtenido
+  feedback  String?   @db.Text
+  graded_by Int?
+  graded_at DateTime?
+
+  // Relaciones
+  activity   course_activity   @relation(fields: [activity_id], references: [id], onDelete: Cascade)
+  student    estudiante        @relation(fields: [student_id], references: [id_estudiante], onDelete: Cascade)
+  enrollment Inscripcion       @relation(fields: [enrollment_id], references: [id], onDelete: Cascade)
+  grader     profesor?         @relation("GradedBy", fields: [graded_by], references: [id_profesor])
+  files      submission_file[]
+
+  @@unique([activity_id, student_id, attempt_number])
+  @@index([activity_id])
+  @@index([student_id])
+  @@index([enrollment_id])
+  @@index([status])
+  @@index([submitted_at])
+}
+
+// 4. Archivos enviados por el estudiante
+model submission_file {
+  id            Int      @id @default(autoincrement())
+  submission_id Int
+  file_name     String   @db.VarChar(255)
+  file_url      String   @db.VarChar(500)
+  file_type     String   @db.VarChar(50)
+  file_size     Int // en bytes
+  uploaded_at   DateTime @default(now())
+
+  // Relaciones
+  submission activity_submission @relation(fields: [submission_id], references: [id], onDelete: Cascade)
+
+  @@index([submission_id])
+}
+
+// Nuevos ENUMS para el sistema de actividades
+enum ActivityType {
+  ASSIGNMENT // Tarea
+  QUIZ // Cuestionario
+  PROJECT // Proyecto
+  READING // Lectura
+  VIDEO // Video
+  PRACTICE // Práctica
+  DISCUSSION // Discusión
+  EXAM // Examen
+}
+
+enum SubmissionStatus {
+  DRAFT // Borrador (no enviado)
+  SUBMITTED // Enviado
+  GRADED // Calificado
+  RETURNED // Devuelto para corrección
+  LATE // Entrega tardía
+  MISSING // No entregado
+}
+
+enum EstadoSolicitud {
+  PENDIENTE
+  APROBADA
+  RECHAZADA
+}
+
+model solicitud_profesor {
+  id_solicitud        Int              @id @default(autoincrement())
+  nombre              String           @db.VarChar(100)
+  apellido            String           @db.VarChar(100)
+  email               String           @unique @db.VarChar(100)
+  telefono            String?          @db.VarChar(20)
+  edad                Int?
+  curp                String?          @db.VarChar(20)
+  rfc                 String?          @db.VarChar(14)
+  direccion           String?          @db.VarChar(255)
+  nivel_estudios      String?          @db.VarChar(100)
+  observaciones       String?          @db.Text
+  documentos_adjuntos String?          @db.Text // JSON con rutas de archivos
+  estado              EstadoSolicitud  @default(PENDIENTE)
+  fecha_solicitud     DateTime         @default(now())
+  fecha_revision      DateTime?
+  id_revisor          Int?             // ID del admin que revisó
+  comentario_revision String?          @db.Text
+  
+  // Relación con el admin que revisó (opcional)
+  revisor             Administrador?   @relation(fields: [id_revisor], references: [id_administrador])
+  
+  @@index([email])
+  @@index([estado])
+  @@index([fecha_solicitud])
 }

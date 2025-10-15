@@ -1,5 +1,6 @@
 "use client";
 import React, { useState, useEffect, useRef, useCallback } from "react";
+import Image from "next/image";
 
 type Msg = {
   id: string;
@@ -20,28 +21,51 @@ export default function Chatbot() {
   const [isInitialized, setIsInitialized] = useState(false);
   const listRef = useRef<HTMLDivElement | null>(null);
   
-  // Estado para la animación de imágenes con crossfade
+  // Estado para la animación de imágenes simplificada
   const [currentFrame, setCurrentFrame] = useState(0);
-  const [nextFrame, setNextFrame] = useState(1);
-  const [isTransitioning, setIsTransitioning] = useState(false);
   const [isAnimating, setIsAnimating] = useState(true);
   const [imagesLoaded, setImagesLoaded] = useState(false);
   
-  // Array de las 4 imágenes
+  // Estados para controlar el comportamiento del botón
+  const [showTooltip, setShowTooltip] = useState(false);
+  const [isHidden, setIsHidden] = useState(false);
+  const [hasShownTooltip, setHasShownTooltip] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+  
+  // Detectar si es móvil para ocultarlo
+  useEffect(() => {
+    const checkMobile = () => {
+      if (typeof window === 'undefined') return;
+      const mobile = window.innerWidth <= 768 || /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+      setIsMobile(mobile);
+    };
+
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+  
+  // Array solo con las imágenes 03 y 04 para animación fluida
   const frames = [
     '/logos/01_logo.png',
-    '/logos/02_logo.png', 
-    // '/logos/03_logo.png',
-    // '/logos/04_logo.png'
+    '/logos/02_logo.png',
+    '/logos/01_logo.png',
+    '/logos/03_logo.png'
   ];
 
   // Precargar todas las imágenes para evitar flashazos
   useEffect(() => {
     const preloadImages = async () => {
+      // Solo precargar si estamos en el cliente
+      if (typeof window === 'undefined') {
+        setImagesLoaded(true);
+        return;
+      }
+
       const imagePromises = frames.map((src) => {
         return new Promise((resolve, reject) => {
-          const img = new Image();
-          img.onload = resolve;
+          const img = document.createElement('img');
+          img.onload = () => resolve(img);
           img.onerror = reject;
           img.src = src;
         });
@@ -57,25 +81,16 @@ export default function Chatbot() {
     };
 
     preloadImages();
-  }, [frames]);
+  }, []);
 
-  // Efecto para la animación con crossfade perfecto
+  // Efecto para animación continua tipo video - optimizada
   useEffect(() => {
     if (!isAnimating || !imagesLoaded) return;
     
     const animationInterval = setInterval(() => {
-      setIsTransitioning(true);
-      
-      // Preparar el siguiente frame
-      setNextFrame((current) => (current + 1) % frames.length);
-      
-      // Después de un momento, hacer el cambio
-      setTimeout(() => {
-        setCurrentFrame((prev) => (prev + 1) % frames.length);
-        setIsTransitioning(false);
-      }, 500); // Mitad de la duración de la transición
-      
-    }, 2000); // Cambio cada 2 segundos
+      // Cambio directo sin transiciones complejas
+      setCurrentFrame((prev) => (prev + 1) % frames.length);
+    }, 3000); // Cambio cada 3 segundos para que se aprecie bien cada imagen
 
     return () => clearInterval(animationInterval);
   }, [isAnimating, frames.length, imagesLoaded]);
@@ -84,6 +99,25 @@ export default function Chatbot() {
   useEffect(() => {
     setIsAnimating(!open);
   }, [open]);
+
+  // Efecto para mostrar tooltip SOLO UNA VEZ
+  useEffect(() => {
+    if (open || hasShownTooltip) return;
+
+    const showTooltipTimer = setTimeout(() => {
+      setShowTooltip(true);
+      setHasShownTooltip(true); // Marcar que ya se mostró
+      
+      // Auto-ocultar después de 6 segundos
+      const hideTooltipTimer = setTimeout(() => {
+        setShowTooltip(false);
+      }, 6000);
+
+      return () => clearTimeout(hideTooltipTimer);
+    }, 5000); // Aparece después de 5 segundos, solo una vez
+
+    return () => clearTimeout(showTooltipTimer);
+  }, [open, hasShownTooltip]);
 
   const sendMessage = useCallback(async (text: string) => {
     // Evitar múltiples peticiones mientras está escribiendo
@@ -148,80 +182,140 @@ export default function Chatbot() {
 
   return (
     <>
-      {/* Botón flotante con animación de frames personalizados */}
-      <button
-        onClick={() => setOpen((v) => !v)}
-        onMouseEnter={() => setIsAnimating(true)}
-        onMouseLeave={() => setIsAnimating(!open)}
-        className="group fixed bottom-4 right-4 w-20 h-20 rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-110 active:scale-95 z-[99999] overflow-hidden bg-gradient-to-br from-blue-50 to-blue-100 border-2 border-blue-200 hover:border-blue-300"
-      >
-        {/* Contenedor con crossfade perfecto (sin flashazos) */}
-        <div className="relative w-full h-full rounded-full overflow-hidden bg-gradient-to-br from-blue-50 to-blue-100">
-          {/* Mostrar solo cuando las imágenes estén cargadas */}
-          {imagesLoaded ? (
-            <>
-              {/* Imagen base (siempre visible) */}
-              <img
-                src={frames[currentFrame]}
-                alt={`Animation frame ${currentFrame + 1}`}
-                className="absolute inset-0 w-full h-full object-cover"
-                style={{ objectPosition: 'center' }}
-                loading="eager"
-              />
-              
-              {/* Imagen de transición (solo durante crossfade) */}
-              {isTransitioning && (
-                <img
-                  src={frames[nextFrame]}
-                  alt={`Next frame ${nextFrame + 1}`}
-                  className="absolute inset-0 w-full h-full object-cover animate-in fade-in duration-1000"
-                  style={{ objectPosition: 'center' }}
-                  loading="eager"
-                />
-              )}
-            </>
-          ) : (
-            // Placeholder mientras cargan las imágenes
-            <div className="absolute inset-0 bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center">
-              <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-            </div>
-          )}
-          
-          {/* Overlay muy sutil para unificar */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/3 via-transparent to-white/3"></div>
-        </div>
+      {/* Estilos simplificados */}
+      <style jsx>{`
+        @keyframes float-soft {
+          0%, 100% {
+            transform: translateY(0px);
+          }
+          50% {
+            transform: translateY(-3px);
+          }
+        }
+        @keyframes tooltip-bounce {
+          0%, 20%, 50%, 80%, 100% {
+            transform: translateY(0);
+          }
+          40% {
+            transform: translateY(-4px);
+          }
+          60% {
+            transform: translateY(-2px);
+          }
+        }
+        .float-soft {
+          animation: float-soft 4s ease-in-out infinite;
+        }
+        .tooltip-bounce {
+          animation: tooltip-bounce 1s ease-in-out;
+        }
+      `}</style>
+
+      {/* Botón flotante - Solo en desktop */}
+      {!isMobile && (
+        <div 
+          className={`fixed z-[99999] transition-opacity duration-300 ${
+            isHidden ? 'opacity-0 pointer-events-none' : 'opacity-100'
+          }`}
+          style={{
+            right: '20px',
+            bottom: '20px',
+            transform: 'scale(1)',
+            transition: 'transform 0.2s ease',
+          }}
+        >
         
-        {/* Badge de notificación animado */}
-        {!open && (
-          <div className="absolute -top-2 -right-2 w-6 h-6 bg-gradient-to-br from-red-400 to-red-600 rounded-full flex items-center justify-center shadow-lg border-2 border-white animate-bounce">
-            <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
+        {/* Tooltip que aparece SOLO UNA VEZ */}
+        {showTooltip && !open && !isHidden && (
+          <div className="absolute bottom-full right-0 mb-3 tooltip-bounce">
+            <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-4 py-2 rounded-2xl shadow-lg text-sm font-medium whitespace-nowrap relative pr-8 max-w-xs">
+              ¿Tienes dudas? ¡Pregúntame! 💬<br />
+              <span className="text-xs opacity-75">Arrastra para mover</span>
+              
+              {/* Botón para cerrar el tooltip */}
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setShowTooltip(false);
+                }}
+                className="absolute right-2 top-1/2 transform -translate-y-1/2 text-white hover:text-gray-200 font-bold text-lg leading-none"
+              >
+                ×
+              </button>
+              
+              <div className="absolute top-full right-4 w-0 h-0 border-l-4 border-r-4 border-t-8 border-l-transparent border-r-transparent border-t-purple-600"></div>
+            </div>
           </div>
         )}
-        
-        {/* Indicador de estado */}
-        <div className="absolute bottom-1 right-1 w-3 h-3 bg-green-400 rounded-full border-2 border-white shadow-sm animate-pulse"></div>
-        
-        {/* Tooltip mejorado */}
-        <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-3 px-4 py-2 bg-gray-900/90 backdrop-blur-md text-white text-sm rounded-xl opacity-0 group-hover:opacity-100 transition-all duration-300 whitespace-nowrap pointer-events-none shadow-xl border border-gray-700/50">
-          {open ? '🔒 Close Assistant' : '💬 Open English Helper'}
-          <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-[6px] border-r-[6px] border-t-[6px] border-transparent border-t-gray-900/90"></div>
-        </div>
-        
-        {/* Efecto de pulso en el borde */}
-        <div className="absolute inset-0 rounded-full border-2 border-blue-400/50 opacity-0 group-hover:opacity-100 animate-ping"></div>
-      </button>
 
+        {/* Botón ocultar solo cuando se necesite */}
+        {(
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              setIsHidden(true);
+              setTimeout(() => setIsHidden(false), 10000);
+            }}
+            className="absolute -top-1 -left-1 w-4 h-4 bg-gray-500 hover:bg-gray-600 text-white rounded-full text-xs flex items-center justify-center shadow-lg transition-all duration-200 opacity-0 hover:opacity-100 group-hover:opacity-100"
+            title="Ocultar por 10 segundos"
+          >
+            ×
+          </button>
+        )}
 
-      {/* Chat Box */}
+        <button
+          onClick={() => setOpen((v) => !v)}
+          className={`group flex items-center justify-center w-20 h-20 rounded-full shadow-xl bg-gradient-to-br from-white via-blue-50 to-blue-100 transition-all duration-200 select-none cursor-pointer hover:scale-105 hover:shadow-2xl ${!open ? 'animate-float-soft' : ''}`}
+          style={{
+            boxShadow: '0 8px 20px rgba(59, 130, 246, 0.25)',
+            willChange: 'auto' // Optimización de rendering
+          }}
+        >
+          {/* Contenedor simple de la imagen */}
+          <div className="relative w-16 h-16 overflow-hidden rounded-full bg-white shadow-inner">
+            {/* Animación de las imágenes */}
+            {imagesLoaded ? (
+              <Image 
+                src={frames[currentFrame]} 
+                alt="ChatBot Animation" 
+                width={64} 
+                height={64}
+                className="object-contain w-full h-full rounded-full"
+                priority
+                quality={95}
+              />
+            ) : (
+              <Image 
+                src="/ChatBot.png" 
+                alt="ChatBot" 
+                width={64} 
+                height={64}
+                className="object-contain animate-pulse rounded-full"
+                priority
+              />
+            )}
+          </div>
+        </button>
+      </div>
+      )}
+
+      {/* Chat Box - Solo en desktop */}
+      {!isMobile && (
       <div
-        className={`fixed bottom-4 right-4 w-[90vw] max-w-[440px] h-[90vh] bg-white rounded-3xl shadow-2xl border border-gray-200 flex flex-col transform transition-all duration-500 z-[99999]
-        ${open ? "opacity-100 scale-100 pointer-events-auto" : "opacity-0 scale-95 pointer-events-none"}`}
+        className={`fixed w-[90vw] max-w-[440px] h-[90vh] bg-white rounded-3xl shadow-2xl border border-gray-200 flex flex-col transform transition-all duration-500 z-[99998] ${
+          open ? "opacity-100 scale-100 pointer-events-auto" : "opacity-0 scale-95 pointer-events-none"
+        }`}
+        style={{
+          // Posición fija simple para evitar problemas SSR
+          right: '16px',
+          bottom: '16px',
+        }}
       >
         {/* Header */}
         <div className="flex justify-between items-center p-4 border-b border-gray-200">
           <div>
-            <h2 className="font-bold text-lg text-[#002469]">Chatbot AI</h2>
-            <p className="text-sm text-gray-500">Tu asistente inteligente</p>
+            <h2 className="font-bold text-lg text-gray-700">Chatbot AI</h2>
+            <p className="text-sm text-gray-700">Tu asistente inteligente</p>
           </div>
           <div className="flex gap-2">
             <button
@@ -244,8 +338,14 @@ export default function Chatbot() {
           {messages.map((msg) => (
             <div key={msg.id} className={`flex gap-3 ${msg.sender === "You" ? "justify-end" : "justify-start"}`}>
               {msg.sender === "AI" && (
-                <div className="flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-tr from-blue-600 to-blue-400 text-white font-bold shadow-lg animate-pulse">
-                  AI
+                <div className="flex items-center justify-center w-10 h-10 rounded-full bg-white shadow-lg border-2 border-blue-400">
+                  <Image 
+                    src="/ChatBot.png" 
+                    alt="ChatBot" 
+                    width={30} 
+                    height={30}
+                    className="object-contain"
+                  />
                 </div>
               )}
               <div
@@ -266,8 +366,14 @@ export default function Chatbot() {
           ))}
           {typing && (
             <div className="flex gap-3">
-              <div className="flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-tr from-blue-600 to-blue-400 text-white font-bold shadow-lg animate-pulse">
-                AI
+              <div className="flex items-center justify-center w-10 h-10 rounded-full bg-white shadow-lg border-2 border-blue-400 animate-pulse">
+                <Image 
+                  src="/ChatBot.png" 
+                  alt="ChatBot" 
+                  width={30} 
+                  height={30}
+                  className="object-contain"
+                />
               </div>
               <p className="bg-blue-50 px-5 py-3 rounded-2xl shadow-lg max-w-[70%] animate-pulse">...</p>
             </div>
@@ -276,7 +382,7 @@ export default function Chatbot() {
 
         {/* Botón mostrar/ocultar opciones */}
         <div className="p-2 border-t border-gray-200 flex justify-between items-center bg-gray-50">
-          <span className="text-sm text-gray-500">Opciones rápidas</span>
+          <span className="text-sm text-gray-700">Opciones rápidas</span>
           <button
             onClick={() => setShowOptions(!showOptions)}
             className="text-xs text-blue-600 hover:text-blue-800 transition px-2 py-1 rounded hover:bg-blue-100"
@@ -293,7 +399,7 @@ export default function Chatbot() {
                 key={opt}
                 onClick={() => !typing && sendMessage(opt)}
                 disabled={typing}
-                className="bg-white px-4 py-2 rounded-2xl shadow hover:bg-blue-100 hover:scale-105 transition transform text-sm flex items-center gap-1 whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed"
+                className="bg-white px-4 py-2 rounded-2xl shadow hover:bg-blue-100 hover:scale-105 transition transform text-sm flex items-center gap-1 whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed text-gray-700"
               >
                 💡 {opt}
               </button>
@@ -328,8 +434,9 @@ export default function Chatbot() {
         </form>
 
         {/* Footer */}
-        <div className="p-2 text-xs text-gray-400 text-center">English App • Soporte: contacto@xdxdxd.com</div>
+        <div className="p-2 text-xs text-gray-700 text-center">English App • Soporte: contacto@xdxdxd.com</div>
       </div>
+      )}
     </>
   );
 }

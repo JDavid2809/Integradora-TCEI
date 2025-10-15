@@ -418,10 +418,10 @@ export default function CourseList({ teacherId, onCreateNew, onEditCourse, onVie
                     
                     <button
                       onClick={() => onEditCourse(course.id_curso)}
-                      className="flex items-center gap-1 px-2 sm:px-3 py-1 bg-blue-100 text-blue-700 rounded text-xs font-medium hover:bg-blue-200 flex-1 sm:flex-none justify-center"
+                      className="flex items-center gap-1 px-2 sm:px-3 py-1 bg-blue-100 text-blue-700 rounded text-xs font-medium hover:bg-green-200 flex-1 sm:flex-none justify-center"
                     >
                       <Edit className="w-3 h-3" />
-                      <span className="hidden sm:inline">Editar</span>
+                      <span className="text-gray-700 hidden sm:inline">Editar</span>
                     </button>
                   </div>
                 </div>

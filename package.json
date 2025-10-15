@@ -6,7 +6,8 @@
     "dev": "next dev --turbopack",
     "build": "prisma generate && next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "seed:schedule": "node scripts/seed-schedule.js"
   },
   "prisma": {
     "seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts"
@@ -17,7 +18,7 @@
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
     "@hookform/resolvers": "^5.2.2",
-    "@prisma/client": "^6.14.0",
+    "@prisma/client": "^6.17.1",
     "bcryptjs": "^3.0.2",
     "clsx": "^2.1.1",
     "dotenv": "^17.2.1",
@@ -41,7 +42,7 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "15.4.3",
-    "prisma": "^6.14.0",
+    "prisma": "^6.17.1",
     "tailwindcss": "^4",
     "ts-node": "^10.9.2",
     "typescript": "^5.8.3"

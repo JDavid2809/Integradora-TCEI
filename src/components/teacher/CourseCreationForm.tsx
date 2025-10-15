@@ -409,7 +409,7 @@ export default function CourseCreationForm({
                 type="text"
                 value={basicInfo.nombre}
                 onChange={(e) => setBasicInfo(prev => ({ ...prev, nombre: e.target.value }))}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00246a] focus:border-transparent"
+                className="text-gray-700 w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00246a] focus:border-transparent"
                 placeholder="Ej: English Conversation Mastery"
               />
             </div>
@@ -422,7 +422,7 @@ export default function CourseCreationForm({
                 value={basicInfo.descripcion}
                 onChange={(e) => setBasicInfo(prev => ({ ...prev, descripcion: e.target.value }))}
                 rows={4}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00246a] focus:border-transparent"
+                className="text-gray-700 w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00246a] focus:border-transparent"
                 placeholder="Describe brevemente qué aprenderán los estudiantes en este curso..."
               />
             </div>
@@ -435,7 +435,7 @@ export default function CourseCreationForm({
                 value={basicInfo.resumen}
                 onChange={(e) => setBasicInfo(prev => ({ ...prev, resumen: e.target.value }))}
                 rows={3}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00246a] focus:border-transparent"
+                className="text-gray-700 w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00246a] focus:border-transparent"
                 placeholder="Un resumen conciso que aparecerá en la vista de cursos..."
               />
             </div>
@@ -448,7 +448,7 @@ export default function CourseCreationForm({
                 <select
                   value={basicInfo.modalidad}
                   onChange={(e) => setBasicInfo(prev => ({ ...prev, modalidad: e.target.value as 'PRESENCIAL' | 'ONLINE' }))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00246a] focus:border-transparent"
+                  className="text-gray-700 w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00246a] focus:border-transparent"
                 >
                   <option value="PRESENCIAL">Presencial</option>
                   <option value="ONLINE">Online</option>
@@ -462,7 +462,7 @@ export default function CourseCreationForm({
                 <select
                   value={basicInfo.nivel_ingles || ''}
                   onChange={(e) => setBasicInfo(prev => ({ ...prev, nivel_ingles: e.target.value || undefined }))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00246a] focus:border-transparent"
+                  className="text-gray-700 w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00246a] focus:border-transparent"
                 >
                   <option value="">Seleccionar nivel</option>
                   <option value="A1">A1 - Principiante</option>
@@ -483,7 +483,7 @@ export default function CourseCreationForm({
                   type="date"
                   value={basicInfo.inicio}
                   onChange={(e) => setBasicInfo(prev => ({ ...prev, inicio: e.target.value }))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00246a] focus:border-transparent"
+                  className="text-gray-700 w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00246a] focus:border-transparent"
                 />
               </div>
 
@@ -495,7 +495,7 @@ export default function CourseCreationForm({
                   type="date"
                   value={basicInfo.fin}
                   onChange={(e) => setBasicInfo(prev => ({ ...prev, fin: e.target.value }))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00246a] focus:border-transparent"
+                  className="text-gray-700 w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00246a] focus:border-transparent"
                 />
               </div>
 
@@ -509,7 +509,7 @@ export default function CourseCreationForm({
                   step="0.01"
                   value={basicInfo.precio || ''}
                   onChange={(e) => setBasicInfo(prev => ({ ...prev, precio: e.target.value ? parseFloat(e.target.value) : undefined }))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00246a] focus:border-transparent"
+                  className="text-gray-700 w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00246a] focus:border-transparent"
                   placeholder="0.00"
                 />
                 <p className="text-xs text-gray-500 mt-1">Dejar vacío para curso gratuito</p>
@@ -527,7 +527,7 @@ export default function CourseCreationForm({
             <div>
               <div className="flex items-center gap-2 mb-4">
                 <Target className="w-5 h-5 text-[#00246a]" />
-                <h3 className="text-lg font-semibold">Lo que aprenderás *</h3>
+                <h3 className="text-gray-700 text-lg font-semibold">Lo que aprenderás *</h3>
               </div>
               <div className="space-y-3">
                 {details.whatYouLearn.map((item, index) => (
@@ -536,7 +536,7 @@ export default function CourseCreationForm({
                       type="text"
                       value={item.text}
                       onChange={(e) => updateWhatYouLearn(item.id, e.target.value)}
-                      className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00246a] focus:border-transparent"
+                      className="text-gray-700 flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00246a] focus:border-transparent"
                       placeholder={`Objetivo de aprendizaje ${index + 1}`}
                     />
                     <button
@@ -561,7 +561,7 @@ export default function CourseCreationForm({
             <div>
               <div className="flex items-center gap-2 mb-4">
                 <CheckCircle className="w-5 h-5 text-[#00246a]" />
-                <h3 className="text-lg font-semibold">Requisitos *</h3>
+                <h3 className="text-gray-700 text-lg font-semibold">Requisitos *</h3>
               </div>
               <div className="space-y-3">
                 {details.requirements.map((item, index) => (
@@ -570,7 +570,7 @@ export default function CourseCreationForm({
                       type="text"
                       value={item.text}
                       onChange={(e) => updateRequirement(item.id, e.target.value)}
-                      className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00246a] focus:border-transparent"
+                      className="text-gray-700 flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00246a] focus:border-transparent"
                       placeholder={`Requisito ${index + 1}`}
                     />
                     <button
@@ -595,7 +595,7 @@ export default function CourseCreationForm({
             <div>
               <div className="flex items-center gap-2 mb-4">
                 <Users className="w-5 h-5 text-[#00246a]" />
-                <h3 className="text-lg font-semibold">¿Para quién es este curso?</h3>
+                <h3 className="text-gray-700 text-lg font-semibold">¿Para quién es este curso?</h3>
               </div>
               <div className="space-y-3">
                 {details.targetAudience.map((item, index) => (
@@ -604,7 +604,7 @@ export default function CourseCreationForm({
                       type="text"
                       value={item.text}
                       onChange={(e) => updateTargetAudience(item.id, e.target.value)}
-                      className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00246a] focus:border-transparent"
+                      className="text-gray-700 flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00246a] focus:border-transparent"
                       placeholder={`Audiencia objetivo ${index + 1}`}
                     />
                     <button
@@ -629,13 +629,13 @@ export default function CourseCreationForm({
             <div>
               <div className="flex items-center gap-2 mb-4">
                 <BookOpen className="w-5 h-5 text-[#00246a]" />
-                <h3 className="text-lg font-semibold">Contenido del curso</h3>
+                <h3 className="text-gray-700 text-lg font-semibold">Contenido del curso</h3>
                 <span className="text-sm text-gray-500">(Opcional)</span>
               </div>
               <div className="space-y-6">
                 {details.courseContent.map((section, sectionIndex) => (
                   <div key={section.id} className="border border-gray-200 rounded-lg p-4">
-                    <div className="flex items-center justify-between mb-4">
+                    <div className="text-gray-700 flex items-center justify-between mb-4">
                       <h4 className="text-md font-medium text-gray-800">
                         Módulo {sectionIndex + 1}
                       </h4>
@@ -652,14 +652,14 @@ export default function CourseCreationForm({
                         type="text"
                         value={section.title}
                         onChange={(e) => updateCourseSection(section.id, 'title', e.target.value)}
-                        className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00246a] focus:border-transparent"
+                        className="text-gray-700 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00246a] focus:border-transparent"
                         placeholder="Título del módulo"
                       />
                       <input
                         type="number"
                         value={section.lessons}
                         onChange={(e) => updateCourseSection(section.id, 'lessons', parseInt(e.target.value) || 0)}
-                        className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00246a] focus:border-transparent"
+                        className="text-gray-700 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00246a] focus:border-transparent"
                         placeholder="# de lecciones"
                         min="0"
                       />
@@ -667,7 +667,7 @@ export default function CourseCreationForm({
                         type="text"
                         value={section.duration}
                         onChange={(e) => updateCourseSection(section.id, 'duration', e.target.value)}
-                        className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00246a] focus:border-transparent"
+                        className="text-gray-700 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00246a] focus:border-transparent"
                         placeholder="Duración (ej: 2 semanas)"
                       />
                     </div>
@@ -680,14 +680,14 @@ export default function CourseCreationForm({
                             type="text"
                             value={topic.title}
                             onChange={(e) => updateTopic(section.id, topic.id, 'title', e.target.value)}
-                            className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00246a] focus:border-transparent text-sm"
+                            className="text-gray-700 flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00246a] focus:border-transparent text-sm"
                             placeholder="Título del tema"
                           />
                           <input
                             type="text"
                             value={topic.duration}
                             onChange={(e) => updateTopic(section.id, topic.id, 'duration', e.target.value)}
-                            className="w-24 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00246a] focus:border-transparent text-sm"
+                            className="text-gray-700 w-24 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00246a] focus:border-transparent text-sm"
                             placeholder="15 min"
                           />
                           <button
@@ -727,18 +727,18 @@ export default function CourseCreationForm({
             <h2 className="text-xl font-bold text-[#00246a] mb-4">Revisión del Curso</h2>
             
             <div className="bg-gray-50 p-6 rounded-lg">
-              <h3 className="text-lg font-semibold mb-4">{basicInfo.nombre}</h3>
+              <h3 className="text-gray-700 text-lg font-semibold mb-4">{basicInfo.nombre}</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                 <div>
-                  <span className="font-medium">Modalidad:</span>
-                  <div className="flex items-center gap-2 mt-1">
+                  <span className="text-gray-700 font-medium">Modalidad:</span>
+                  <div className="text-gray-700 flex items-center gap-2 mt-1">
                     {basicInfo.modalidad === 'ONLINE' ? <Globe className="w-4 h-4" /> : <MapPin className="w-4 h-4" />}
                     {basicInfo.modalidad}
                   </div>
                 </div>
                 <div>
-                  <span className="font-medium">Duración:</span>
-                  <div className="flex items-center gap-2 mt-1">
+                  <span className="text-gray-700 font-medium">Duración:</span>
+                  <div className="text-gray-700 flex items-center gap-2 mt-1">
                     <Clock className="w-4 h-4" />
                     {basicInfo.inicio} - {basicInfo.fin}
                   </div>
@@ -750,7 +750,7 @@ export default function CourseCreationForm({
               </div>
 
               <div className="mt-4">
-                <h4 className="font-medium mb-2">Lo que aprenderás:</h4>
+                <h4 className="text-gray-700 font-medium mb-2">Lo que aprenderás:</h4>
                 <ul className="list-disc list-inside space-y-1 text-sm text-gray-700">
                   {details.whatYouLearn.filter(item => item.text.trim()).map(item => (
                     <li key={item.id}>{item.text}</li>
@@ -759,7 +759,7 @@ export default function CourseCreationForm({
               </div>
 
               <div className="mt-4">
-                <h4 className="font-medium mb-2">Requisitos:</h4>
+                <h4 className="text-gray-700 font-medium mb-2">Requisitos:</h4>
                 <ul className="list-disc list-inside space-y-1 text-sm text-gray-700">
                   {details.requirements.filter(item => item.text.trim()).map(item => (
                     <li key={item.id}>{item.text}</li>
@@ -770,11 +770,11 @@ export default function CourseCreationForm({
               {/* Contenido del curso */}
               {details.courseContent.length > 0 && (
                 <div className="mt-4">
-                  <h4 className="font-medium mb-2">Contenido del curso:</h4>
+                  <h4 className="text-gray-700 font-medium mb-2">Contenido del curso:</h4>
                   <div className="space-y-3">
                     {details.courseContent.filter(section => section.title.trim()).map((section, index) => (
-                      <div key={section.id} className="bg-white p-3 rounded border">
-                        <h5 className="font-medium text-sm">
+                      <div key={section.id} className="text-gray-700 bg-white p-3 rounded border">
+                        <h5 className="text-gray-700 font-medium text-sm">
                           {index + 1}. {section.title}
                           {section.lessons > 0 && ` (${section.lessons} lecciones)`}
                           {section.duration && ` - ${section.duration}`}
@@ -814,7 +814,7 @@ export default function CourseCreationForm({
       </div>
 
       {/* Footer */}
-      <div className="bg-gray-50 px-6 py-4 rounded-b-lg flex justify-between">
+      <div className="text-gray-700 bg-gray-50 px-6 py-4 rounded-b-lg flex justify-between">
         <div>
           {currentStep > 1 && (
             <button
@@ -851,7 +851,7 @@ export default function CourseCreationForm({
               className="flex items-center gap-2 px-6 py-2 bg-[#00246a] text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
             >
               {isSubmitting ? (
-                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white" />
+                <div className="text-gray-700 animate-spin rounded-full h-4 w-4 border-b-2 border-white" />
               ) : (
                 <Save className="w-4 h-4" />
               )}

@@ -97,6 +97,79 @@ NEXTAUTH_SECRET=06bdddb2c8f1b7fe444aa421c8d860e5
 
 ---
 
+## Configuracion de stripe para pagos
+
+## Requisitos
+- Cuenta de Stripe (modo test): [https://dashboard.stripe.com/register](https://dashboard.stripe.com/register)
+- Stripe CLI instalado: [https://stripe.com/docs/stripe-cli](https://stripe.com/docs/stripe-cli)
+
+### 1. Obtener las claves de API de Stripe
+
+1. Ve al [Dashboard de Stripe](https://dashboard.stripe.com/test/apikeys)
+2. Asegúrate de estar en **modo test** (esquina superior izquierda)
+3. Copia las siguientes claves:
+   - **Publishable key** (empieza con `pk_test_...`)
+   - **Secret key** (empieza con `sk_test_...`)
+
+
+### 2. Configurar variables de entorno
+
+Agrega las siguientes variables a tu archivo `.env`:
+
+```env
+# Stripe Keys (modo test)
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_...
+STRIPE_SECRET_KEY=sk_test_...
+STRIPE_WEBHOOK_SECRET=whsec_...
+```
+ ⚠️ **Importante:** El `STRIPE_WEBHOOK_SECRET` lo obtendrás en el siguiente paso.
+
+### 3- Login en Stripe CLI
+- Autenticarse
+```
+stripe login
+```
+
+### 4. Iniciar el webhook listener (desarrollo)
+
+En una **terminal separada**, ejecuta:
+
+```bash
+stripe listen --forward-to localhost:3000/api/webhooks/stripe
+```
+
+**Output esperado:**
+```
+> Ready! Your webhook signing secret is whsec_abc123...
+> Waiting for events...
+```
+
+**Copia el `webhook signing secret`** que aparece y agrégalo a tu `.env`:
+
+```env
+STRIPE_WEBHOOK_SECRET=whsec_abc123...
+```
+
+---
+
+### 5. Reiniciar la aplicación
+
+```bash
+# Detener el servidor (Ctrl + C)
+# Reiniciar
+npm run dev
+```
+
+### 6 Datos de tarjeta para test (TARJETA FICTICIA)
+- NumberCard: 4242424242424242 
+- Fecha-caducidad: 02/33 - Puede ser cual sea
+- CVC: 478 - Puede ser cual sea
+- Nombre: testnuevo - Puede ser cual sea
+
+Ahora tu aplicación puede recibir eventos de Stripe en tiempo real.
+---
+
+
 ## Notas importantes
 
 * El nombre de la base de datos (por ejemplo, `english-DB`) debe existir o será creado por Prisma cuando ejecutes las migraciones.

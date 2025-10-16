@@ -5,6 +5,7 @@ import { redirect } from 'next/navigation';
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/authOptions'
 import { prisma } from '@/lib/prisma'
+import { createSlug } from '@/lib/slugUtils' // ✅ Importar la función de slug
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
@@ -28,6 +29,9 @@ export async function createCheckoutSession(courseId: number) {
     throw new Error('This course is not available for purchase or is free');
   }
 
+  // ✅ Crear slug del curso para la URL de cancelación
+  const courseSlug = createSlug(curso.nombre);
+
   const checkoutSession = await stripe.checkout.sessions.create({
     mode: 'payment',
     payment_method_types: ['card'],
@@ -48,12 +52,13 @@ export async function createCheckoutSession(courseId: number) {
       },
     ],
     success_url: `${process.env.NEXT_PUBLIC_URL}/Success?session_id={CHECKOUT_SESSION_ID}`,
-    cancel_url: `${process.env.NEXT_PUBLIC_URL}/Courses/${courseId}?canceled=true`,
+    // ✅ Corregir URL de cancelación para usar el slug del curso
+    cancel_url: `${process.env.NEXT_PUBLIC_URL}/Courses/${courseSlug}?canceled=true`,
 
     metadata: {
       course_id: courseId.toString(),
       course_name: curso.nombre,
-      userId: session.user.id, // ✅ Importante: ID del usuario
+      userId: session.user.id,
       userEmail: session.user.email || '',
     },
 

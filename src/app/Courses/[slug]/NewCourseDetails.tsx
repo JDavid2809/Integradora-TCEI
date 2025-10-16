@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react'
 import Image from 'next/image'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { useSession } from 'next-auth/react'
 import ReviewSection from '@/components/ReviewSection'
 import { createReview, updateReview, deleteReview } from '@/actions/reviews/reviewActions'
@@ -29,7 +29,8 @@ import {
     Award,
     Mail,
     User,
-    Smartphone
+    Smartphone,
+    AlertCircle
 } from 'lucide-react'
 import { BuyButton } from '@/components/payments/BuyButton'
 
@@ -99,14 +100,37 @@ interface CourseDetailsProps {
 export default function CourseDetails({ courseData }: CourseDetailsProps) {
     const router = useRouter()
     const { data: session } = useSession()
+    const searchParams = useSearchParams()
     
     const [isEnrolling, setIsEnrolling] = useState(false)
     const [enrollmentMessage, setEnrollmentMessage] = useState<string>('')
     const [activeTab, setActiveTab] = useState('overview')
     const [reviews, setReviews] = useState(courseData.reviews || [])
-    
-    // Verificar si el usuario está inscrito basado en la sesión actual
     const [isUserEnrolled, setIsUserEnrolled] = useState(false)
+
+    // ✅ Estado para controlar la visibilidad de la alerta de cancelación
+    const [showCancelAlert, setShowCancelAlert] = useState(false)
+
+    // ✅ Detectar si el pago fue cancelado
+    const wasCanceled = searchParams?.get('canceled') === 'true'
+
+    // ✅ Efecto para mostrar y ocultar la alerta de cancelación
+    React.useEffect(() => {
+        if (wasCanceled) {
+            setShowCancelAlert(true)
+            
+            // Ocultar después de 5 segundos
+            const timer = setTimeout(() => {
+                setShowCancelAlert(false)
+                // Limpiar el parámetro de la URL sin recargar la página
+                const url = new URL(window.location.href)
+                url.searchParams.delete('canceled')
+                window.history.replaceState({}, '', url.toString())
+            }, 4000)
+
+            return () => clearTimeout(timer)
+        }
+    }, [wasCanceled])
     
     // Efecto para verificar inscripción cuando cambie la sesión
     React.useEffect(() => {
@@ -598,6 +622,28 @@ export default function CourseDetails({ courseData }: CourseDetailsProps) {
                                             </span>
                                         </div>
                                     </div>
+
+                                    {/* ✅ Alerta de cancelación con animación de salida */}
+                                    {showCancelAlert && (
+                                        <div className={`mb-4 p-4 rounded-lg text-center bg-red-50 border-2 border-red-300 shadow-md transition-all duration-500 ${
+                                            showCancelAlert ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2'
+                                        }`}>
+                                            <div className="flex items-center justify-center gap-2 mb-2">
+                                                <AlertCircle className="w-5 h-5 text-red-600" />
+                                                <span className="font-bold text-red-800">Pago cancelado</span>
+                                            </div>
+                                            <p className="text-sm text-red-700 font-medium">
+                                                No se procesó ningún cargo. Puedes intentar de nuevo cuando quieras.
+                                            </p>
+                                            {/* ✅ Barra de progreso opcional */}
+                                            <div className="mt-3 w-full bg-red-200 rounded-full h-1 overflow-hidden">
+                                                <div 
+                                                    className="bg-red-600 h-full rounded-full transition-all duration-[5000ms] ease-linear"
+                                                    style={{ width: showCancelAlert ? '0%' : '100%' }}
+                                                ></div>
+                                            </div>
+                                        </div>
+                                    )}
 
                                     {/* ✅ LÓGICA CORREGIDA */}
                                     {isUserEnrolled ? (

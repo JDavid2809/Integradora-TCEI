@@ -242,6 +242,42 @@ export async function getCourseDetails(courseId: number, teacherId: number): Pro
             usuario: true
           }
         },
+        inscripciones: {
+          where: {
+            status: {
+              in: ['ACTIVE', 'SUSPENDED']
+            }
+          },
+          include: {
+            student: {
+              include: {
+                usuario: {
+                  select: {
+                    id: true,
+                    nombre: true,
+                    apellido: true,
+                    email: true
+                  }
+                }
+              }
+            },
+            payments: {
+              orderBy: {
+                payment_date: 'desc'
+              },
+              take: 1
+            },
+            attendance: {
+              orderBy: {
+                class_date: 'desc'
+              },
+              take: 5
+            }
+          },
+          orderBy: {
+            enrolled_at: 'desc'
+          }
+        },
         _count: {
           select: {
             inscripciones: true,

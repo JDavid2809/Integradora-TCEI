@@ -333,115 +333,125 @@ export default function AdminPaymentCrud() {
   }
 
   return (
-    <div className="p-6 space-y-6">
-      {/* Header */}
-      <div className="flex justify-between items-center">
+    <div className="p-3 md:p-6 space-y-4 md:space-y-6">
+      {/* Header - Responsive */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div className="flex items-center gap-3">
-          <CreditCard className="w-8 h-8 text-[#00246a]" />
+          <CreditCard className="w-6 h-6 md:w-8 md:h-8 text-[#00246a]" />
           <div>
-            <h1 className="text-2xl font-bold text-[#00246a]">Gestión de Pagos</h1>
-            <p className="text-sm text-gray-600">
+            <h1 className="text-xl md:text-2xl font-bold text-[#00246a]">Gestión de Pagos</h1>
+            <p className="text-xs md:text-sm text-gray-600">
               Total registrado: <span className="font-semibold text-green-600">{formatCurrency(totalAmount)}</span>
             </p>
           </div>
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
           <button
             onClick={handleExportPayments}
-            className="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors"
+            className="flex items-center justify-center gap-2 bg-green-600 text-white px-3 md:px-4 py-2 rounded-lg hover:bg-green-700 transition-colors text-sm md:text-base"
           >
-            <Download className="w-5 h-5" />
-            Exportar
+            <Download className="w-4 h-4 md:w-5 md:h-5" />
+            <span className="hidden xs:inline">Exportar</span>
+            <span className="xs:hidden">CSV</span>
           </button>
           <button
             onClick={handleCreatePayment}
-            className="flex items-center gap-2 bg-[#00246a] text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+            className="flex items-center justify-center gap-2 bg-[#00246a] text-white px-3 md:px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors text-sm md:text-base"
           >
-            <Plus className="w-5 h-5" />
-            Nuevo Pago
+            <Plus className="w-4 h-4 md:w-5 md:h-5" />
+            <span className="hidden xs:inline">Nuevo Pago</span>
+            <span className="xs:hidden">Nuevo</span>
           </button>
         </div>
       </div>
 
       {/* Success Message */}
       {successMessage && (
-        <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded flex items-center gap-2">
-          <CheckCircle className="w-5 h-5" />
-          {successMessage}
+        <div className="bg-green-100 border border-green-400 text-green-700 px-3 md:px-4 py-2 md:py-3 rounded flex items-start gap-2 text-sm md:text-base">
+          <CheckCircle className="w-4 h-4 md:w-5 md:h-5 flex-shrink-0 mt-0.5" />
+          <span>{successMessage}</span>
         </div>
       )}
 
-      {/* Filters */}
-      <div className="bg-white p-4 rounded-lg shadow-md">
-        <div className="flex gap-4 items-center flex-wrap">
-          <div className="flex-1 min-w-64 relative">
-            <Search className="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+      {/* Filters - Responsive */}
+      <div className="bg-white p-3 md:p-4 rounded-lg shadow-md">
+        <div className="space-y-3 lg:space-y-0 lg:flex lg:gap-4 lg:items-center">
+          {/* Search - Full width on mobile */}
+          <div className="flex-1 relative">
+            <Search className="w-4 h-4 md:w-5 md:h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
             <input
               type="text"
-              placeholder="Buscar por estudiante, curso o profesor..."
+              placeholder="Buscar pagos..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00246a] focus:border-transparent"
+              className="w-full pl-9 md:pl-10 pr-4 py-2 text-sm md:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00246a] focus:border-transparent"
             />
           </div>
-          <div className="flex items-center gap-2">
-            <Filter className="w-5 h-5 text-gray-400" />
-            <select
-              value={typeFilter}
-              onChange={(e) => setTypeFilter(e.target.value)}
-              className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00246a] focus:border-transparent"
-            >
-              <option key="ALL" value="ALL">Todos los tipos</option>
-              <option key="Mensualidad" value="Mensualidad">Mensualidad</option>
-            </select>
-          </div>
-          <div className="flex items-center gap-2">
-            <Calendar className="w-5 h-5 text-gray-400" />
-            <input
-              type="month"
-              value={dateFilter}
-              onChange={(e) => setDateFilter(e.target.value)}
-              className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00246a] focus:border-transparent"
-            />
+          
+          {/* Filter controls - Stack on mobile */}
+          <div className="flex flex-col sm:flex-row gap-2 lg:gap-3">
+            <div className="flex items-center gap-2">
+              <Filter className="w-4 h-4 md:w-5 md:h-5 text-gray-400 flex-shrink-0" />
+              <select
+                value={typeFilter}
+                onChange={(e) => setTypeFilter(e.target.value)}
+                className="flex-1 px-3 py-2 text-sm md:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00246a] focus:border-transparent"
+              >
+                <option value="ALL">Todos los tipos</option>
+                <option value="Mensualidad">Mensualidad</option>
+              </select>
+            </div>
+            
+            <div className="flex items-center gap-2">
+              <Calendar className="w-4 h-4 md:w-5 md:h-5 text-gray-400 flex-shrink-0" />
+              <input
+                type="month"
+                value={dateFilter}
+                onChange={(e) => setDateFilter(e.target.value)}
+                className="flex-1 px-3 py-2 text-sm md:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00246a] focus:border-transparent"
+              />
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Payments Table */}
+      {/* Payments Table/Cards - Responsive */}
       <div className="bg-white rounded-lg shadow-md overflow-hidden">
         {loading ? (
-          <div className="p-8 text-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#00246a] mx-auto"></div>
-            <p className="mt-2 text-gray-600">Cargando pagos...</p>
+          <div className="p-6 md:p-8 text-center">
+            <div className="animate-spin rounded-full h-6 w-6 md:h-8 md:w-8 border-b-2 border-[#00246a] mx-auto"></div>
+            <p className="mt-2 text-gray-600 text-sm md:text-base">Cargando pagos...</p>
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Fecha
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Estudiante
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Curso/Clase
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Tipo
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Monto
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Acciones
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {payments.map((payment) => (
-                  <tr key={payment.id_pago} className="hover:bg-gray-50">
+          <>
+            {/* Desktop Table - Hidden on mobile */}
+            <div className="hidden lg:block overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Fecha
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Estudiante
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Curso/Clase
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Tipo
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Monto
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Acciones
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {payments.map((payment) => (
+                    <tr key={payment.id_pago} className="hover:bg-gray-50">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center gap-1">
                         <Calendar className="w-4 h-4 text-gray-400" />
@@ -512,32 +522,115 @@ export default function AdminPaymentCrud() {
                       </div>
                     </td>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Mobile Cards - Visible on mobile/tablet */}
+            <div className="lg:hidden space-y-4 p-4">
+              {payments.map((payment) => (
+                <div key={payment.id_pago} className="border border-gray-200 rounded-lg p-4 space-y-3">
+                  {/* Payment Header */}
+                  <div className="flex justify-between items-start">
+                    <div className="flex items-center gap-2">
+                      <Calendar className="w-4 h-4 text-gray-400 flex-shrink-0" />
+                      <span className="text-sm font-medium text-gray-900">
+                        {formatDate(payment.fecha_pago)}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <DollarSign className="w-4 h-4 text-green-600" />
+                      <span className="text-sm font-bold text-green-600">
+                        {formatCurrency(payment.monto)}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Student Info */}
+                  {payment.estudiante && (
+                    <div className="flex items-start gap-2">
+                      <User className="w-4 h-4 text-gray-400 flex-shrink-0 mt-0.5" />
+                      <div className="min-w-0">
+                        <div className="text-sm font-medium text-gray-900 truncate">
+                          {payment.estudiante.nombre} {payment.estudiante.paterno}
+                        </div>
+                        <div className="text-xs text-gray-500 truncate">
+                          {payment.estudiante.usuario?.email || 'Sin email'}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Course Info */}
+                  <div className="flex items-start gap-2">
+                    <BookOpen className="w-4 h-4 text-gray-400 flex-shrink-0 mt-0.5" />
+                    <div className="min-w-0">
+                      <div className="text-sm font-medium text-gray-900 truncate">
+                        {payment.imparte?.curso?.nombre || 'Sin curso'}
+                      </div>
+                      <div className="text-xs text-gray-500 truncate">
+                        Prof. {payment.imparte?.profesor?.nombre || 'Sin profesor'} {payment.imparte?.profesor?.paterno || ''} • {payment.imparte?.nivel?.nombre || 'Sin nivel'}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Type Badge */}
+                  <div className="flex items-center justify-between">
+                    <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
+                      {payment.tipo}
+                    </span>
+
+                    {/* Actions */}
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => handleEditPayment(payment)}
+                        className="flex items-center gap-1 text-blue-600 hover:text-blue-900 px-2 py-1 rounded text-xs"
+                      >
+                        <Edit className="w-3 h-3" />
+                        Editar
+                      </button>
+                      <button
+                        onClick={() => handleDeletePayment(payment.id_pago)}
+                        className="flex items-center gap-1 text-red-600 hover:text-red-900 px-2 py-1 rounded text-xs"
+                      >
+                        <Trash2 className="w-3 h-3" />
+                        Eliminar
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </>
         )}
 
-        {/* Pagination */}
+        {/* Responsive Pagination */}
         {!loading && totalPages > 1 && (
-          <div className="bg-white px-4 py-3 border-t border-gray-200 sm:px-6">
+          <div className="bg-white px-3 md:px-4 py-3 border-t border-gray-200">
             <div className="flex items-center justify-between">
+              {/* Mobile pagination */}
               <div className="flex-1 flex justify-between sm:hidden">
                 <button
                   onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
                   disabled={currentPage === 1}
-                  className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
+                  className="relative inline-flex items-center px-3 py-2 border border-gray-300 text-xs font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
                 >
                   Anterior
                 </button>
+                <span className="text-xs text-gray-700 flex items-center">
+                  {currentPage} de {totalPages}
+                </span>
                 <button
                   onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
                   disabled={currentPage === totalPages}
-                  className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
+                  className="relative inline-flex items-center px-3 py-2 border border-gray-300 text-xs font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
                 >
                   Siguiente
                 </button>
               </div>
+
+              {/* Desktop pagination */}
               <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
                 <div>
                   <p className="text-sm text-gray-700">
@@ -569,149 +662,153 @@ export default function AdminPaymentCrud() {
         )}
       </div>
 
-      {/* Modal */}
+      {/* Responsive Modal */}
       {showModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-bold text-[#00246a]">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            {/* Modal Header */}
+            <div className="flex justify-between items-center p-4 md:p-6 border-b">
+              <h2 className="text-lg md:text-xl font-bold text-[#00246a]">
                 {editingPayment ? 'Editar Pago' : 'Registrar Nuevo Pago'}
               </h2>
               <button
                 onClick={() => setShowModal(false)}
                 className="text-gray-400 hover:text-gray-600"
               >
-                <X className="w-6 h-6" />
+                <X className="w-5 h-5 md:w-6 md:h-6" />
               </button>
             </div>
 
-            {errors.general && (
-              <div className="mb-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded flex items-center gap-2">
-                <AlertTriangle className="w-5 h-5" />
-                {errors.general}
-              </div>
-            )}
+            {/* Modal Content */}
+            <div className="p-4 md:p-6">
+              {errors.general && (
+                <div className="mb-4 bg-red-100 border border-red-400 text-red-700 px-3 md:px-4 py-2 md:py-3 rounded flex items-start gap-2 text-sm">
+                  <AlertTriangle className="w-4 h-4 md:w-5 md:h-5 flex-shrink-0 mt-0.5" />
+                  <span>{errors.general}</span>
+                </div>
+              )}
 
-            <form onSubmit={(e) => { e.preventDefault(); handleSubmit(); }} className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Monto *
-                  </label>
-                  <div className="relative">
-                    <DollarSign className="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-                    <input
-                      type="number"
-                      step="0.01"
-                      min="0"
-                      value={formData.monto}
-                      onChange={(e) => setFormData({ ...formData, monto: e.target.value })}
-                      className={`w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-[#00246a] focus:border-transparent ${
-                        errors.monto ? 'border-red-500' : 'border-gray-300'
-                      }`}
-                      placeholder="0.00"
-                    />
+              <form onSubmit={(e) => { e.preventDefault(); handleSubmit(); }} className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Monto *
+                    </label>
+                    <div className="relative">
+                      <DollarSign className="w-4 h-4 md:w-5 md:h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                      <input
+                        type="number"
+                        step="0.01"
+                        min="0"
+                        value={formData.monto}
+                        onChange={(e) => setFormData({ ...formData, monto: e.target.value })}
+                        className={`w-full pl-9 md:pl-10 pr-4 py-2 text-sm md:text-base border rounded-lg focus:ring-2 focus:ring-[#00246a] focus:border-transparent ${
+                          errors.monto ? 'border-red-500' : 'border-gray-300'
+                        }`}
+                        placeholder="0.00"
+                      />
+                    </div>
+                    {errors.monto && <p className="mt-1 text-xs text-red-600">{errors.monto}</p>}
                   </div>
-                  {errors.monto && <p className="mt-1 text-sm text-red-600">{errors.monto}</p>}
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Fecha de Pago *
+                    </label>
+                    <input
+                      type="date"
+                      value={formData.fecha_pago}
+                      onChange={(e) => setFormData({ ...formData, fecha_pago: e.target.value })}
+                      className={`w-full px-3 py-2 text-sm md:text-base border rounded-lg focus:ring-2 focus:ring-[#00246a] focus:border-transparent ${
+                        errors.fecha_pago ? 'border-red-500' : 'border-gray-300'
+                      }`}
+                    />
+                    {errors.fecha_pago && <p className="mt-1 text-xs text-red-600">{errors.fecha_pago}</p>}
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Tipo de Pago
+                    </label>
+                    <select
+                      value={formData.tipo}
+                      onChange={(e) => setFormData({ ...formData, tipo: e.target.value as 'Mensualidad' })}
+                      className="w-full px-3 py-2 text-sm md:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00246a] focus:border-transparent"
+                    >
+                      <option value="Mensualidad">Mensualidad</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Estudiante
+                    </label>
+                    <select
+                      value={formData.id_estudiante || ''}
+                      onChange={(e) => setFormData({ ...formData, id_estudiante: e.target.value ? parseInt(e.target.value) : null })}
+                      className="w-full px-3 py-2 text-sm md:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00246a] focus:border-transparent"
+                    >
+                      <option value="">Seleccionar estudiante (opcional)</option>
+                      {students.map((student, index) => (
+                        <option key={student.id_estudiante ?? `student-${index}`} value={student.id_estudiante}>
+                          {student.nombre} {student.paterno} - {student.usuario?.email || 'Sin email'}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div className="md:col-span-2">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Curso/Clase *
+                    </label>
+                    <select
+                      value={formData.id_imparte}
+                      onChange={(e) => setFormData({ ...formData, id_imparte: parseInt(e.target.value) })}
+                      className={`w-full px-3 py-2 text-sm md:text-base border rounded-lg focus:ring-2 focus:ring-[#00246a] focus:border-transparent ${
+                        errors.id_imparte ? 'border-red-500' : 'border-gray-300'
+                      }`}
+                    >
+                      <option value="">Seleccionar curso/clase</option>
+                      {courseClasses.map((courseClass, index) => (
+                        <option key={courseClass.id_imparte ?? `course-${index}`} value={courseClass.id_imparte}>
+                          {(courseClass.curso?.nombre || 'Sin curso') + ' - ' + (courseClass.nivel?.nombre || 'Sin nivel')}
+                          (Prof. {(courseClass.profesor?.nombre || 'Sin profesor') + ' ' + (courseClass.profesor?.paterno || '')})
+                        </option>
+                      ))}
+                    </select>
+                    {errors.id_imparte && <p className="mt-1 text-xs text-red-600">{errors.id_imparte}</p>}
+                  </div>
                 </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Fecha de Pago *
-                  </label>
-                  <input
-                    type="date"
-                    value={formData.fecha_pago}
-                    onChange={(e) => setFormData({ ...formData, fecha_pago: e.target.value })}
-                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-[#00246a] focus:border-transparent ${
-                      errors.fecha_pago ? 'border-red-500' : 'border-gray-300'
-                    }`}
-                  />
-                  {errors.fecha_pago && <p className="mt-1 text-sm text-red-600">{errors.fecha_pago}</p>}
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Tipo de Pago
-                  </label>
-                  <select
-                    value={formData.tipo}
-                    onChange={(e) => setFormData({ ...formData, tipo: e.target.value as 'Mensualidad' })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00246a] focus:border-transparent"
+                {/* Responsive Action Buttons */}
+                <div className="flex flex-col sm:flex-row justify-end gap-3 pt-4 border-t">
+                  <button
+                    type="button"
+                    onClick={() => setShowModal(false)}
+                    className="w-full sm:w-auto px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors text-sm md:text-base"
                   >
-                    <option key="Mensualidad" value="Mensualidad">Mensualidad</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Estudiante
-                  </label>
-                  <select
-                    value={formData.id_estudiante || ''}
-                    onChange={(e) => setFormData({ ...formData, id_estudiante: e.target.value ? parseInt(e.target.value) : null })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00246a] focus:border-transparent"
+                    Cancelar
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2 bg-[#00246a] text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 text-sm md:text-base"
                   >
-                    <option key="empty-student" value="">Seleccionar estudiante (opcional)</option>
-                    {students.map((student, index) => (
-                      <option key={student.id_estudiante ?? `student-${index}`} value={student.id_estudiante}>
-                        {student.nombre} {student.paterno} - {student.usuario?.email || 'Sin email'}
-                      </option>
-                    ))}
-                  </select>
+                    {isSubmitting ? (
+                      <>
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                        Guardando...
+                      </>
+                    ) : (
+                      <>
+                        <Save className="w-4 h-4" />
+                        {editingPayment ? 'Actualizar' : 'Registrar Pago'}
+                      </>
+                    )}
+                  </button>
                 </div>
-
-                <div className="md:col-span-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Curso/Clase *
-                  </label>
-                  <select
-                    value={formData.id_imparte}
-                    onChange={(e) => setFormData({ ...formData, id_imparte: parseInt(e.target.value) })}
-                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-[#00246a] focus:border-transparent ${
-                      errors.id_imparte ? 'border-red-500' : 'border-gray-300'
-                    }`}
-                  >
-                    <option key="empty-course" value="">Seleccionar curso/clase</option>
-                    {courseClasses.map((courseClass, index) => (
-                      <option key={courseClass.id_imparte ?? `course-${index}`} value={courseClass.id_imparte}>
-                        {(courseClass.curso?.nombre || 'Sin curso') + ' - ' + (courseClass.nivel?.nombre || 'Sin nivel')}
-                        (Prof. {(courseClass.profesor?.nombre || 'Sin profesor') + ' ' + (courseClass.profesor?.paterno || '')})
-                      </option>
-                    ))}
-                  </select>
-                  {errors.id_imparte && <p className="mt-1 text-sm text-red-600">{errors.id_imparte}</p>}
-                </div>
-              </div>
-
-              {/* Action Buttons */}
-              <div className="flex justify-end gap-3 pt-4 border-t">
-                <button
-                  type="button"
-                  onClick={() => setShowModal(false)}
-                  className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
-                >
-                  Cancelar
-                </button>
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="flex items-center gap-2 px-4 py-2 bg-[#00246a] text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
-                >
-                  {isSubmitting ? (
-                    <>
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                      Guardando...
-                    </>
-                  ) : (
-                    <>
-                      <Save className="w-4 h-4" />
-                      {editingPayment ? 'Actualizar' : 'Registrar Pago'}
-                    </>
-                  )}
-                </button>
-              </div>
-            </form>
+              </form>
+            </div>
           </div>
         </div>
       )}

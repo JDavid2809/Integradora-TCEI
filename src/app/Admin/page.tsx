@@ -18,6 +18,7 @@ import {
 // Import CRUD components
 import AdminUserCrud from '@/components/ui/admin/AdminUserCrud'
 import AdminPaymentCrud from '@/components/ui/admin/AdminPaymentCrud'
+import TeacherRequestsSection from '@/components/ui/admin/TeacherRequestsSection'
 
 interface SystemStats {
   resumen: {
@@ -124,10 +125,11 @@ export default function AdminPage() {
   console.log('✅ Admin access granted:', session.user.email, 'Role:', session.user.rol)
 
   const navigationItems = [
-    { id: 'dashboard', name: 'Dashboard', icon: BarChart3 },
-    { id: 'users', name: 'Usuarios', icon: Users },
-    { id: 'payments', name: 'Pagos', icon: CreditCard },
-    { id: 'system', name: 'Sistema', icon: Settings }
+    { id: 'dashboard', name: 'Dashboard', icon: BarChart3, label: 'Inicio' },
+    { id: 'users', name: 'Usuarios', icon: Users, label: 'Usuarios' },
+    { id: 'solicitudes', name: 'Solicitudes', icon: GraduationCap, label: 'Solicitudes' },
+    { id: 'payments', name: 'Pagos', icon: CreditCard, label: 'Pagos' },
+    { id: 'system', name: 'Sistema', icon: Settings, label: 'Config' }
   ]
 
   const renderDashboard = () => (
@@ -177,7 +179,7 @@ export default function AdminPage() {
                   <span className="text-blue-600 text-xs">{usuario.rol.charAt(0)}</span>
                 </div>
                 <div className="flex-1">
-                  <p className="text-sm font-medium">{usuario.nombre}</p>
+                  <p className="text-sm font-medium text-gray-900">{usuario.nombre}</p>
                   <p className="text-xs text-gray-500">{usuario.tipo_perfil}</p>
                 </div>
               </div>
@@ -228,6 +230,10 @@ export default function AdminPage() {
     </div>
   )
 
+  const renderSolicitudesSection = () => (
+    <TeacherRequestsSection />
+  )
+
   const navigateToPage = (page: string) => {
     window.location.href = `/Admin/${page}`
   }
@@ -238,6 +244,8 @@ export default function AdminPage() {
         return renderDashboard()
       case 'users':
         return <AdminUserCrud />
+      case 'solicitudes':
+        return renderSolicitudesSection()
       case 'payments':
         return <AdminPaymentCrud />
       case 'system':
@@ -248,26 +256,27 @@ export default function AdminPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-slate-50 pb-20 md:pb-0">
       {/* Header */}
       <div className="bg-white shadow-sm border-b">
-        <div className="px-6 py-4">
+        <div className="px-4 md:px-6 py-4">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold text-[#00246a]">Panel de Administración</h1>
-              <p className="text-gray-600">Bienvenido, {session.user.name} {session.user.apellido}</p>
+              <h1 className="text-xl md:text-2xl font-bold text-[#00246a]">Panel Admin</h1>
+              <p className="text-sm md:text-base text-gray-600 hidden md:block">
+                Bienvenido, {session.user.name} {session.user.apellido}
+              </p>
             </div>
             <div className="flex items-center space-x-4">
-              <span className="text-sm text-gray-500">Rol: {session.user.rol}</span>
-              
+              <span className="text-xs md:text-sm text-gray-500">Rol: {session.user.rol}</span>
             </div>
           </div>
         </div>
       </div>
 
       <div className="flex">
-        {/* Sidebar */}
-        <div className="w-64 bg-white shadow-sm h-screen sticky top-0">
+        {/* Sidebar - Solo visible en desktop */}
+        <div className="hidden md:block w-64 bg-white shadow-sm h-screen sticky top-0">
           <nav className="p-4">
             <div className="space-y-2">
               {navigationItems.map(item => {
@@ -292,190 +301,128 @@ export default function AdminPage() {
         </div>
 
         {/* Main content */}
-        <div className="flex-1 p-6">
+        <div className="flex-1 p-4 md:p-6">
           {renderContent()}
+        </div>
+      </div>
+
+      {/* Bottom Navigation - Solo visible en móvil */}
+      <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t shadow-lg z-50">
+        <div className="flex items-center justify-around">
+          {navigationItems.map(item => {
+            const IconComponent = item.icon
+            const isActive = activeSection === item.id
+            return (
+              <button
+                key={item.id}
+                onClick={() => setActiveSection(item.id)}
+                className={`flex-1 flex flex-col items-center justify-center py-3 px-2 transition-colors ${
+                  isActive ? 'text-[#00246a]' : 'text-gray-500'
+                }`}
+              >
+                <div className={`relative ${isActive ? 'scale-110' : ''} transition-transform`}>
+                  {isActive && (
+                    <div className="absolute -top-1 left-1/2 transform -translate-x-1/2 w-1 h-1 bg-red-500 rounded-full"></div>
+                  )}
+                  <IconComponent className={`w-6 h-6 ${isActive ? 'stroke-[2.5]' : 'stroke-2'}`} />
+                </div>
+                <span className={`text-xs mt-1 ${isActive ? 'font-semibold' : 'font-normal'}`}>
+                  {item.label}
+                </span>
+              </button>
+            )
+          })}
         </div>
       </div>
     </div>
   )
 }
 
-// Componentes de sección con enlaces a páginas específicas
-// function AdminUsersSection() {
-//   return (
-//     <div className="bg-white p-6 rounded-lg shadow-md">
-//       <h2 className="text-xl font-bold text-[#00246a] mb-4">Gestión de Usuarios</h2>
-//       <p className="text-gray-600">
-//         Aquí puedes crear, leer, actualizar y eliminar usuarios (estudiantes, profesores, administradores).
-//       </p>
-//       <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
-//         <div className="p-4 border border-gray-200 rounded-lg">
-//           <div className="flex items-center gap-2 mb-2">
-//             <UserPlus className="w-5 h-5 text-green-600" />
-//             <h3 className="font-semibold text-green-600">Crear Usuarios</h3>
-//           </div>
-//           <p className="text-sm text-gray-600">Alumnos, profesores, otros administradores</p>
-//         </div>
-//         <div className="p-4 border border-gray-200 rounded-lg">
-//           <div className="flex items-center gap-2 mb-2">
-//             <Eye className="w-5 h-5 text-blue-600" />
-//             <h3 className="font-semibold text-blue-600">Leer Contenido</h3>
-//           </div>
-//           <p className="text-sm text-gray-600">Ver todos los datos del sistema</p>
-//         </div>
-//         <div className="p-4 border border-gray-200 rounded-lg">
-//           <div className="flex items-center gap-2 mb-2">
-//             <Edit className="w-5 h-5 text-orange-600" />
-//             <h3 className="font-semibold text-orange-600">Actualizar Datos</h3>
-//           </div>
-//           <p className="text-sm text-gray-600">Modificar perfiles, configuraciones</p>
-//         </div>
-//       </div>
-//     </div>
-//   )
-// }
-
-// function AdminCoursesSection({ navigateToPage }: { navigateToPage: (page: string) => void }) {
-//   return (
-//     <div className="bg-white p-6 rounded-lg shadow-md">
-//       <div className="flex justify-between items-center mb-4">
-//         <h2 className="text-xl font-bold text-[#00246a]">Gestión de Cursos</h2>
-//         <button
-//           onClick={() => navigateToPage('courses')}
-//           className="bg-[#00246a] text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
-//         >
-//           Ir a Cursos <ArrowRight className="w-4 h-4" />
-//         </button>
-//       </div>
-//       <p className="text-gray-600">
-//         Administra cursos y contenidos educativos.
-//       </p>
-//       <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-//         <div className="p-4 border border-gray-200 rounded-lg">
-//           <div className="flex items-center gap-2 mb-2">
-//             <CheckCircle className="w-5 h-5 text-green-600" />
-//             <h3 className="font-semibold text-green-600">Crear Cursos</h3>
-//           </div>
-//           <p className="text-sm text-gray-600">Nuevos cursos con profesores y niveles</p>
-//         </div>
-//         <div className="p-4 border border-gray-200 rounded-lg">
-//           <div className="flex items-center gap-2 mb-2">
-//             <Trash2 className="w-5 h-5 text-red-600" />
-//             <h3 className="font-semibold text-red-600">Eliminar Cursos</h3>
-//           </div>
-//           <p className="text-sm text-gray-600">Remover cursos obsoletos</p>
-//         </div>
-//       </div>
-//     </div>
-//   )
-// }
-
-// function AdminExamsSection({ navigateToPage }: { navigateToPage: (page: string) => void }) {
-//   return (
-//     <div className="bg-white p-6 rounded-lg shadow-md">
-//       <div className="flex justify-between items-center mb-4">
-//         <h2 className="text-xl font-bold text-[#00246a]">Gestión de Exámenes</h2>
-//         <button
-//           onClick={() => navigateToPage('exams')}
-//           className="bg-[#00246a] text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
-//         >
-//           Ir a Exámenes <ArrowRight className="w-4 h-4" />
-//         </button>
-//       </div>
-//       <p className="text-gray-600">
-//         Crear y administrar exámenes y evaluaciones.
-//       </p>
-//       <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-//         <div className="p-4 border border-gray-200 rounded-lg">
-//           <div className="flex items-center gap-2 mb-2">
-//             <CheckCircle className="w-5 h-5 text-green-600" />
-//             <h3 className="font-semibold text-green-600">Crear Exámenes</h3>
-//           </div>
-//           <p className="text-sm text-gray-600">Exámenes con preguntas múltiples</p>
-//         </div>
-//         <div className="p-4 border border-gray-200 rounded-lg">
-//           <div className="flex items-center gap-2 mb-2">
-//             <Trash2 className="w-5 h-5 text-red-600" />
-//             <h3 className="font-semibold text-red-600">Eliminar Evaluaciones</h3>
-//           </div>
-//           <p className="text-sm text-gray-600">Remover exámenes obsoletos</p>
-//         </div>
-//       </div>
-//     </div>
-//   )
-// }
-
-// function AdminPaymentsSection({ navigateToPage }: { navigateToPage: (page: string) => void }) {
-//   return (
-//     <div className="bg-white p-6 rounded-lg shadow-md">
-//       <div className="flex justify-between items-center mb-4">
-//         <h2 className="text-xl font-bold text-[#00246a]">Gestión de Pagos</h2>
-//         <button
-//           onClick={() => navigateToPage('payments')}
-//           className="bg-[#00246a] text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
-//         >
-//           Ir a Pagos <ArrowRight className="w-4 h-4" />
-//         </button>
-//       </div>
-//       <p className="text-gray-600">
-//         Administra registros de pagos y transacciones.
-//       </p>
-//       <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-//         <div className="p-4 border border-gray-200 rounded-lg">
-//           <div className="flex items-center gap-2 mb-2">
-//             <CheckCircle className="w-5 h-5 text-green-600" />
-//             <h3 className="font-semibold text-green-600">Registrar Pagos</h3>
-//           </div>
-//           <p className="text-sm text-gray-600">Nuevos registros de pago por curso</p>
-//         </div>
-//         <div className="p-4 border border-gray-200 rounded-lg">
-//           <div className="flex items-center gap-2 mb-2">
-//             <Trash2 className="w-5 h-5 text-red-600" />
-//             <h3 className="font-semibold text-red-600">Eliminar Registros</h3>
-//           </div>
-//           <p className="text-sm text-gray-600">Remover registros erróneos</p>
-//         </div>
-//       </div>
-//     </div>
-//   )
-// }
-
 function AdminSystemSection({ navigateToPage }: { navigateToPage: (page: string) => void }) {
   return (
-    <div className="bg-white p-6 rounded-lg shadow-md">
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-bold text-[#00246a]">Configuración del Sistema</h2>
+    <div className="bg-white p-3 md:p-6 rounded-lg shadow-md">
+      {/* Header - Responsive */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 md:gap-4 mb-4 md:mb-6">
+        <div>
+          <h2 className="text-lg md:text-xl font-bold text-[#00246a]">Configuración del Sistema</h2>
+          <p className="text-xs md:text-sm text-gray-600 mt-1 hidden sm:block">
+            Administra configuraciones del sistema.
+          </p>
+        </div>
         <button
           onClick={() => navigateToPage('system')}
-          className="bg-[#00246a] text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
+          className="w-full sm:w-auto bg-[#00246a] text-white px-3 md:px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center gap-2 text-sm md:text-base"
         >
-          Ir a Configuraciones <ArrowRight className="w-4 h-4" />
+          <span className="hidden xs:inline">Ir a Configuraciones</span>
+          <span className="xs:hidden">Configuraciones</span>
+          <ArrowRight className="w-3 h-3 md:w-4 md:h-4" />
         </button>
       </div>
-      <p className="text-gray-600">
+
+      {/* Mobile description - Only visible on small screens */}
+      <p className="text-sm text-gray-600 mb-4 sm:hidden">
         Administra configuraciones del sistema.
       </p>
-      <div className="mt-4 space-y-4">
-        <div className="p-4 border border-gray-200 rounded-lg">
+
+      {/* Configuration Cards - Responsive Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
+        <div className="p-3 md:p-4 border border-gray-200 rounded-lg hover:shadow-md transition-shadow cursor-pointer">
           <div className="flex items-center gap-2 mb-2">
-            <Target className="w-5 h-5 text-purple-600" />
-            <h3 className="font-semibold text-purple-600">Niveles de Inglés</h3>
+            <Target className="w-4 h-4 md:w-5 md:h-5 text-purple-600 flex-shrink-0" />
+            <h3 className="font-semibold text-purple-600 text-sm md:text-base">Niveles de Inglés</h3>
           </div>
-          <p className="text-sm text-gray-600">Configurar niveles del sistema (A1, A2, B1, etc.)</p>
+          <p className="text-xs md:text-sm text-gray-600 leading-relaxed">
+            Configurar niveles del sistema (A1, A2, B1, etc.)
+          </p>
         </div>
-        <div className="p-4 border border-gray-200 rounded-lg">
+
+        <div className="p-3 md:p-4 border border-gray-200 rounded-lg hover:shadow-md transition-shadow cursor-pointer">
           <div className="flex items-center gap-2 mb-2">
-            <Users className="w-5 h-5 text-blue-600" />
-            <h3 className="font-semibold text-blue-600">Categorías de Edad</h3>
+            <Users className="w-4 h-4 md:w-5 md:h-5 text-blue-600 flex-shrink-0" />
+            <h3 className="font-semibold text-blue-600 text-sm md:text-base">Categorías de Edad</h3>
           </div>
-          <p className="text-sm text-gray-600">Gestionar rangos de edad para estudiantes</p>
+          <p className="text-xs md:text-sm text-gray-600 leading-relaxed">
+            Gestionar rangos de edad para estudiantes
+          </p>
         </div>
-        <div className="p-4 border border-gray-200 rounded-lg">
+
+        <div className="p-3 md:p-4 border border-gray-200 rounded-lg hover:shadow-md transition-shadow cursor-pointer md:col-span-2 lg:col-span-1">
           <div className="flex items-center gap-2 mb-2">
-            <Activity className="w-5 h-5 text-orange-600" />
-            <h3 className="font-semibold text-orange-600">Estado del Sistema</h3>
+            <Activity className="w-4 h-4 md:w-5 md:h-5 text-orange-600 flex-shrink-0" />
+            <h3 className="font-semibold text-orange-600 text-sm md:text-base">Estado del Sistema</h3>
           </div>
-          <p className="text-sm text-gray-600">Ver estadísticas de uso de configuraciones</p>
+          <p className="text-xs md:text-sm text-gray-600 leading-relaxed">
+            Ver estadísticas de uso de configuraciones
+          </p>
+        </div>
+      </div>
+
+      {/* Optional: Quick Actions for Mobile */}
+      <div className="mt-4 md:hidden">
+        <div className="flex flex-col space-y-2">
+          <button className="flex items-center justify-between p-3 bg-purple-50 border border-purple-200 rounded-lg text-purple-700 hover:bg-purple-100 transition-colors">
+            <div className="flex items-center gap-2">
+              <Target className="w-4 h-4" />
+              <span className="text-sm font-medium">Gestionar Niveles</span>
+            </div>
+            <ArrowRight className="w-4 h-4" />
+          </button>
+          
+          <button className="flex items-center justify-between p-3 bg-blue-50 border border-blue-200 rounded-lg text-blue-700 hover:bg-blue-100 transition-colors">
+            <div className="flex items-center gap-2">
+              <Users className="w-4 h-4" />
+              <span className="text-sm font-medium">Gestionar Edades</span>
+            </div>
+            <ArrowRight className="w-4 h-4" />
+          </button>
+          
+          <button className="flex items-center justify-between p-3 bg-orange-50 border border-orange-200 rounded-lg text-orange-700 hover:bg-orange-100 transition-colors">
+            <div className="flex items-center gap-2">
+              <Activity className="w-4 h-4" />
+              <span className="text-sm font-medium">Ver Estado</span>
+            </div>
+            <ArrowRight className="w-4 h-4" />
+          </button>
         </div>
       </div>
     </div>

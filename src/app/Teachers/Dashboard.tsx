@@ -7,6 +7,7 @@ import CoursesContent from "./CoursesContent"
 import StudentsContent from "./StudentsContent"
 import AttendanceContent from "./AttendanceContent"
 import ExamsContent from "./ExamsContent"
+import TeacherScheduleContent from "./Schedule"
 import Sidebar from "./Sidebar"
 import Header from "./Header"
 import BottomTabs from "./Tabs"
@@ -41,12 +42,14 @@ export default function Dashboard({ user, onLogout }: DashboardProps) {
                 return <CoursesContent key="courses" />
             case "students":
                 return <StudentsContent key="students" />
+            case "schedule":
+                return <TeacherScheduleContent key="schedule" />
             case "attendance":
                 return <AttendanceContent key="attendance" />
             case "exams":
                 return <ExamsContent key="exams" />
-                case "activity":
-                    return <ActivityCRUD key="activity" />
+            case "activity":
+                return <ActivityCRUD key="activity" />
             default:
                 return <DashboardContent key="dashboard" />
         }
@@ -57,7 +60,7 @@ export default function Dashboard({ user, onLogout }: DashboardProps) {
             variants={containerVariants}
             initial="hidden"
             animate="visible"
-            className="min-h-screen bg-slate-50 flex flex-col lg:flex-row pt-[76px] lg:pt-0"
+            className="min-h-screen bg-slate-50 flex flex-col lg:flex-row "
         >
             {/* Desktop Sidebar */}
             <div className="hidden lg:block lg:w-64 lg:flex-shrink-0">

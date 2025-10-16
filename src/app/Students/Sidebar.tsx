@@ -19,7 +19,7 @@ export default function Sidebar({
     onLogout,
 }: SidebarProps) {
     const menuItems = [
-        { id: "dashboard", label: "Dashboard", icon: Home },
+        { id: "dashboard", label: "Inicio", icon: Home },
         { id: "courses", label: "Mis Cursos", icon: BookOpen },
         { id: "schedule", label: "Mi Horario", icon: Calendar },
         { id: "payments", label: "Mis Pagos", icon: CheckSquare },

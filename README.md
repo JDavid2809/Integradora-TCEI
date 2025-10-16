@@ -71,10 +71,29 @@ npm run dev
 ```bash
 npx prisma migrate dev
 npx prisma generate
+npx prisma studio
+
 ```
 
 * `migrate dev` crea y aplica las migraciones en la base.
 * `generate` genera el cliente Prisma para el proyecto.
+
+---
+
+## ⚠️ Después de descargar cambios (git pull)
+
+**Para evitar errores de sincronización, ejecuta siempre:**
+
+```bash
+npx prisma migrate dev # Aplica cambios del schema
+npx prisma generate    # Regenera el cliente Prisma
+```
+
+**Para ver el calendario con datos de ejemplo:**
+
+```bash
+npm run seed:schedule  # Agrega horarios y actividades de muestra
+```
 
 ---
 
@@ -84,6 +103,7 @@ npx prisma generate
 npx prisma init        # Solo la primera vez, para inicializar Prisma
 npx prisma migrate dev # Aplica migraciones
 npx prisma generate    # Genera cliente Prisma
+npx prisma studio      # Abre interfaz visual de la BD
 ```
 
 ---
@@ -175,6 +195,30 @@ Ahora tu aplicación puede recibir eventos de Stripe en tiempo real.
 * El nombre de la base de datos (por ejemplo, `english-DB`) debe existir o será creado por Prisma cuando ejecutes las migraciones.
 * El usuario y contraseña deben coincidir con las variables `POSTGRES_USER` y `POSTGRES_PASSWORD` definidas en el `docker-compose.yml`.
 * `NEXTAUTH_SECRET` es la clave para cifrar sesiones en NextAuth y debe mantenerse secreta.
+
+## 🚨 Problemas comunes y soluciones
+
+### Error: "Cannot find module @prisma/client"
+```bash
+npx prisma generate
+```
+
+### Error: "Table doesn't exist" o problemas de schema
+```bash
+npx prisma migrate dev
+npx prisma generate
+```
+
+### Los calendarios no muestran datos
+```bash
+npm run seed:schedule
+```
+
+### Resetear completamente la base de datos
+```bash
+npx prisma migrate reset
+npm run seed:schedule
+```
 
 ---
 

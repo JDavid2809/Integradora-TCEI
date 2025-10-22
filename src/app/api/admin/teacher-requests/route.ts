@@ -167,13 +167,27 @@ export async function POST(request: NextRequest) {
         }
       })
 
+      // ✅ Crear el registro en la tabla profesor
+      const registroProfesor = await prisma.profesor.create({
+        data: {
+          id_usuario: nuevoProfesor.id,
+          nombre: solicitud.nombre,
+          paterno: solicitud.apellido,
+          materno: null, // Opcional
+          nivel_estudios: solicitud.nivel_estudios || 'No especificado',
+          edad: solicitud.edad || null,
+          telefono: solicitud.telefono || null,
+          observaciones: `Profesor aprobado por admin el ${new Date().toLocaleDateString()}`
+        }
+      })
+
       // Actualizar la solicitud
       await prisma.solicitud_profesor.update({
         where: { id_solicitud: parseInt(id_solicitud) },
         data: {
           estado: 'APROBADA',
           fecha_revision: new Date(),
-          comentario_revision: comentario_revision || `Solicitud aprobada. Usuario creado con ID: ${nuevoProfesor.id}`
+          comentario_revision: comentario_revision || `Solicitud aprobada. Usuario creado con ID: ${nuevoProfesor.id}, Profesor ID: ${registroProfesor.id_profesor}`
         }
       })
 
@@ -198,6 +212,7 @@ export async function POST(request: NextRequest) {
         message: 'Solicitud aprobada exitosamente',
         usuario_creado: {
           id_usuario: nuevoProfesor.id,
+          id_profesor: registroProfesor.id_profesor,
           email: nuevoProfesor.email,
           nombre: nuevoProfesor.nombre,
           apellido: nuevoProfesor.apellido,

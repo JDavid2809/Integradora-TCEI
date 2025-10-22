@@ -21,6 +21,11 @@ export default async function TeacherCourseActivitiesPage({ params }: PageProps)
     redirect('/login')
   }
 
+  // Verificar que tiene información de profesor
+  if (!session.user.extra?.id_profesor) {
+    redirect('/teacher/courses')
+  }
+
   const courseId = parseInt(id)
   if (isNaN(courseId)) {
     redirect('/teacher/courses')
@@ -30,7 +35,7 @@ export default async function TeacherCourseActivitiesPage({ params }: PageProps)
   const course = await prisma.curso.findFirst({
     where: {
       id_curso: courseId,
-      created_by: parseInt(session.user.id)
+      created_by: session.user.extra.id_profesor // Usar id_profesor, no user.id
     },
     select: {
       id_curso: true,
@@ -45,7 +50,7 @@ export default async function TeacherCourseActivitiesPage({ params }: PageProps)
   return (
     <CourseActivitiesPage
       courseId={course.id_curso}
-      teacherId={parseInt(session.user.id)}
+      teacherId={session.user.extra.id_profesor} // Usar id_profesor, no user.id
       courseName={course.nombre}
     />
   )

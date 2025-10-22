@@ -1,11 +1,12 @@
 'use server';
 
-import Stripe from 'stripe';
+
 import { redirect } from 'next/navigation';
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/authOptions'
 import { prisma } from '@/lib/prisma'
 import { createSlug } from '@/lib/slugUtils' // ✅ Importar la función de slug
+import Stripe from 'stripe';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 

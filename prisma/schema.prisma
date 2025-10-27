@@ -317,7 +317,9 @@ model curso {
   @@index([created_by])
 }
 
+
 model Inscripcion {
+  
   id             Int                   @id @default(autoincrement())
   student_id     Int
   course_id      Int

@@ -330,39 +330,7 @@ export function Hero() {
           </motion.div>
         </div>
       </div>
-
-      <div className="absolute bottom-0 left-0 w-full overflow-hidden leading-none" style={{ height: "150px" }}>
-        <motion.svg
-          className="absolute bottom-0 left-0 w-full"
-          style={{ height: "150px" }}
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 1200 150"
-          preserveAspectRatio="none"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1, delay: 1.5 }}
-        >
-          <motion.path
-            d="M0,60 C150,130 350,20 600,100 C850,180 1050,40 1200,110"
-            fill="none"
-            stroke="#00246A"
-            strokeWidth="5"
-            strokeLinecap="round"
-            animate={{
-              d: [
-                "M0,60 C150,130 350,20 600,100 C850,180 1050,40 1200,110",
-                "M0,110 C150,40 350,150 600,60 C850,20 1050,140 1200,70",
-                "M0,60 C150,130 350,20 600,100 C850,180 1050,40 1200,110",
-              ],
-            }}
-            transition={{
-              duration: 8,
-              repeat: Number.POSITIVE_INFINITY,
-              ease: "easeInOut",
-            }}
-          />
-        </motion.svg>
-      </div>
     </section>
+    
   )
 }

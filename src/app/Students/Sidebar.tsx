@@ -1,14 +1,17 @@
-"use client"
+"use client";
 
-import { BookOpen, Home, GraduationCap, Calendar, LogOut, X, CheckSquare } from "lucide-react"
-import Image from "next/image"
+import { useEffect, useCallback, useState } from "react";
+import { BookOpen, Home, GraduationCap, Calendar, X, CheckSquare } from "lucide-react";
+import Image from "next/image";
+import { driver } from "driver.js";
+import "driver.js/dist/driver.css";
 
 interface SidebarProps {
-    activeSection: string
-    setActiveSection: (section: string) => void
-    sidebarOpen: boolean
-    setSidebarOpen: (open: boolean) => void
-    onLogout: () => void
+    activeSection: string;
+    setActiveSection: (section: string) => void;
+    sidebarOpen: boolean;
+    setSidebarOpen: (open: boolean) => void;
+    onLogout: () => void;
 }
 
 export default function Sidebar({
@@ -18,18 +21,108 @@ export default function Sidebar({
     setSidebarOpen,
     onLogout,
 }: SidebarProps) {
+    const [isDesktop, setIsDesktop] = useState(true);
+
+    useEffect(() => {
+        const handleResize = () => {
+            setIsDesktop(window.innerWidth >= 1024);
+        };
+        handleResize();
+        window.addEventListener("resize", handleResize);
+        return () => window.removeEventListener("resize", handleResize);
+    }, []);
+
     const menuItems = [
         { id: "dashboard", label: "Inicio", icon: Home },
         { id: "courses", label: "Mis Cursos", icon: BookOpen },
         { id: "schedule", label: "Mi Horario", icon: Calendar },
         { id: "payments", label: "Mis Pagos", icon: CheckSquare },
         { id: "exams", label: "Mis Exámenes", icon: GraduationCap },
-    ]
+    ];
+
+    const startSidebarTour = useCallback(() => {
+        const steps = [
+            {
+                element: "#navegacion",
+                popover: {
+                    title: "Tu barra de navegación",
+                    description:
+                        "Aquí se encuentran las secciones principales. Usa esta barra para acceder fácilmente a tu panel, cursos, horario, pagos y exámenes.",
+                    position: "right",
+                },
+            },
+            {
+                element: "#menu-dashboard",
+                popover: {
+                    title: "Inicio",
+                    description: "Aquí puedes acceder a tu panel principal.",
+                    position: "right",
+                },
+            },
+            {
+                element: "#menu-courses",
+                popover: {
+                    title: "Mis Cursos",
+                    description: "Accede a los cursos en los que estás inscrito.",
+                    position: "right",
+                },
+            },
+            {
+                element: "#menu-schedule",
+                popover: {
+                    title: "Mi Horario",
+                    description: "Consulta tu horario y próximas clases.",
+                    position: "right",
+                },
+            },
+            {
+                element: "#menu-payments",
+                popover: {
+                    title: "Mis Pagos",
+                    description: "Revisa tus pagos y facturación.",
+                    position: "right",
+                },
+            },
+            {
+                element: "#menu-exams",
+                popover: {
+                    title: "Mis Exámenes",
+                    description: "Consulta tus evaluaciones y resultados.",
+                    position: "right",
+                },
+            },
+        ];
+
+        const driverObj = driver({
+            showProgress: true,
+            allowClose: true,
+            popoverClass: "driverjs-theme",
+            steps,
+        });
+
+        driverObj.drive();
+    }, []);
+
+    useEffect(() => {
+        const hasSeenTour = localStorage.getItem("hasSeenSidebarTour");
+        if (hasSeenTour || !isDesktop) return; 
+
+        const timeout = setTimeout(() => {
+            startSidebarTour();
+            localStorage.setItem("hasSeenSidebarTour", "true");
+        }, 600);
+
+        return () => clearTimeout(timeout);
+    }, [startSidebarTour, isDesktop]);
+
+    if (!isDesktop) return null;
 
     return (
         <div
-            className={`fixed top-[76px] bottom-0 left-0 w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:top-0 lg:h-screen ${sidebarOpen ? "translate-x-0 z-[45]" : "-translate-x-full z-[-1]"
-                } lg:z-auto overflow-y-auto`}
+            className={`fixed top-[76px] bottom-0 left-0 w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out 
+            lg:translate-x-0 lg:static lg:top-0 lg:h-screen 
+            ${sidebarOpen ? "translate-x-0 z-[45]" : "-translate-x-full z-[-1]"} 
+            lg:z-auto overflow-y-auto`}
         >
             <div className="flex flex-col h-full">
                 {/* Header */}
@@ -55,13 +148,14 @@ export default function Sidebar({
                 </div>
 
                 {/* Navigation */}
-                <nav className="flex-1 mt-6 px-3 overflow-y-auto">
+                <nav className="flex-1 mt-6 px-3 overflow-y-auto" id="navegacion">
                     {menuItems.map((item) => (
                         <button
                             key={item.id}
+                            id={`menu-${item.id}`}
                             onClick={() => {
-                                setActiveSection(item.id)
-                                setSidebarOpen(false)
+                                setActiveSection(item.id);
+                                setSidebarOpen(false);
                             }}
                             className={`w-full flex items-center space-x-3 px-3 py-3 rounded-xl text-left transition-all duration-200 mb-1 ${activeSection === item.id
                                 ? "bg-[#e30f28]/10 text-[#e30f28] border-r-2 border-[#e30f28]"
@@ -73,18 +167,7 @@ export default function Sidebar({
                         </button>
                     ))}
                 </nav>
-
-                {/* Logout Button */}
-                <div className="p-3 flex-shrink-0">
-                    <button
-                        onClick={onLogout}
-                        className="w-full flex items-center space-x-3 px-3 py-3 rounded-xl text-slate-600 hover:bg-red-50 hover:text-red-600 transition-all duration-200"
-                    >
-                        <LogOut className="w-5 h-5" />
-                        <span className="font-medium">Cerrar Sesión</span>
-                    </button>
-                </div>
             </div>
         </div>
-    )
+    );
 }

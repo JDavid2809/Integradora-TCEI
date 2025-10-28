@@ -21,6 +21,7 @@ export default function Sidebar({
     const menuItems = [
         { id: "dashboard", label: "Inicio", icon: Home },
         { id: "courses", label: "Mis Cursos", icon: BookOpen },
+        { id: "assistant", label: "Asistente virtual", icon: CheckSquare },
         { id: "schedule", label: "Mi Horario", icon: Calendar },
         { id: "payments", label: "Mis Pagos", icon: CheckSquare },
         { id: "exams", label: "Mis Exámenes", icon: GraduationCap },

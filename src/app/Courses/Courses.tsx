@@ -129,26 +129,26 @@ export default function Courses({ paginatedData }: CoursesProps) {
     const CourseCard = ({ course, isRecommended = false }: { course: CourseForDisplay; isRecommended?: boolean }) => (
         <div className="group relative">
             {/* Diseño estilo Udemy con animaciones solo en desktop */}
-            <div className="relative bg-white rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 md:hover:-translate-y-2 border border-gray-100 hover:border-gray-200 h-full flex flex-col">
+            <div className="relative bg-white rounded-xl overflow-hidden shadow-md hover:shadow-2xl transition-all duration-400 transform hover:-translate-y-3 border border-gray-100 hover:border-gray-200 h-full flex flex-col card-hover">
                 
                 {/* Imagen optimizada */}
-                <div className="relative h-40 sm:h-48 overflow-hidden flex-shrink-0">
+                    <div className="relative h-44 sm:h-52 overflow-hidden flex-shrink-0 image-container">
                     <Image
                         src={course.image}
                         alt={course.title}
                         width={400}   
                         height={200} 
-                        className="w-full h-full object-cover transition-transform duration-300 md:group-hover:scale-105"
+                            className="w-full h-full object-cover transition-transform duration-500 md:group-hover:scale-105 shimmer-img"
                     />
                     
                     {/* Overlay sutil */}
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 md:group-hover:opacity-100 transition-opacity duration-300"></div>
                     
                     {/* Badges estilo Udemy - DINÁMICOS */}
-                    <div className="absolute top-2 left-2">
+                    <div className="absolute top-3 left-3">
                         {/* Bestseller dinámico basado en estudiantes */}
-                        {course.students > 15 && (
-                            <div className="bg-[#a435f0] text-white px-2 py-1 rounded text-xs font-bold mb-1">
+                            {course.students > 15 && (
+                            <div className="bg-gradient-to-r from-pink-500 to-violet-600 text-white px-3 py-1 rounded-full text-xs font-bold mb-1 badge-pulse">
                                 Bestseller
                             </div>
                         )}
@@ -164,8 +164,8 @@ export default function Courses({ paginatedData }: CoursesProps) {
                     </div>
 
                     {/* Precio estilo Udemy con indicador de popularidad */}
-                    <div className="absolute top-2 right-2">
-                        <div className="bg-white text-gray-900 px-2 py-1 rounded font-bold text-sm shadow-sm">
+                    <div className="absolute top-3 right-3 flex flex-col items-end">
+                        <div className="bg-white text-gray-900 px-3 py-1 rounded-full font-bold text-sm shadow-sm ring-1 ring-gray-100">
                             {course.price}
                         </div>
                         {/* Indicador de popularidad */}
@@ -177,8 +177,8 @@ export default function Courses({ paginatedData }: CoursesProps) {
                     </div>
 
                     {/* Modalidad */}
-                    <div className="absolute bottom-2 right-2">
-                        <div className={`px-2 py-1 rounded text-xs font-medium ${getModalidadColor(course.modalidad)}`}>
+                    <div className="absolute bottom-3 right-3">
+                        <div className={`px-2 py-1 rounded text-xs font-medium ${getModalidadColor(course.modalidad)} modal-badge`}>
                             {course.modalidad}
                         </div>
                     </div>
@@ -187,8 +187,9 @@ export default function Courses({ paginatedData }: CoursesProps) {
                     <div className="absolute inset-0 hidden md:flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                         <button 
                             onClick={() => handlerDetailsCourses(course.title)} 
-                            className="bg-white text-[#002469] px-4 py-2 rounded-lg font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 text-sm"
+                            className="bg-white text-[#002469] px-4 py-2 rounded-lg font-semibold shadow-lg hover:shadow-xl transform hover:scale-110 transition-all duration-300 text-sm flex items-center gap-2"
                         >
+                            <Play className="w-4 h-4 text-[#002469] animate-pulse-slow" />
                             Vista previa
                         </button>
                     </div>
@@ -197,7 +198,7 @@ export default function Courses({ paginatedData }: CoursesProps) {
                 {/* Contenido estilo Udemy - flex para ocupar altura restante */}
                 <div className="p-3 flex flex-col flex-grow">
                     {/* Título - altura fija con ellipsis */}
-                    <h3 className="text-sm sm:text-base font-bold text-gray-900 mb-2 leading-tight group-hover:text-[#002469] transition-colors duration-200 h-10 overflow-hidden">
+                    <h3 className="text-sm sm:text-base font-bold text-gray-900 mb-2 leading-tight group-hover:text-[#002469] transition-colors duration-200 h-12 overflow-hidden">
                         <span className="line-clamp-2">
                             {highlightText(course.title, filters.search)}
                         </span>
@@ -241,7 +242,7 @@ export default function Courses({ paginatedData }: CoursesProps) {
                     </div>
 
                     {/* Descripción dinámica - altura flexible */}
-                    <p className="text-xs text-gray-600 mb-3 flex-grow overflow-hidden">
+                    <p className="text-sm text-gray-600 mb-3 flex-grow overflow-hidden">
                         <span className="line-clamp-3">
                             {highlightText(course.description, filters.search)}
                         </span>
@@ -261,15 +262,15 @@ export default function Courses({ paginatedData }: CoursesProps) {
 
                     {/* Skills dinámicas - compactas */}
                     <div className="mb-3">
-                        <div className="flex flex-wrap gap-1">
-                            {course.skills.slice(0, 2).map((skill, index) => (
-                                <span key={index} className="bg-blue-50 text-blue-700 px-1.5 py-0.5 rounded text-xs font-medium">
+                        <div className="flex flex-wrap gap-2">
+                            {course.skills.slice(0, 3).map((skill, index) => (
+                                <span key={index} className="bg-gradient-to-r from-blue-50 to-indigo-50 text-blue-700 px-2 py-1 rounded-full text-xs font-medium shadow-sm">
                                     {skill}
                                 </span>
                             ))}
-                            {course.skills.length > 2 && (
+                            {course.skills.length > 3 && (
                                 <span className="text-gray-500 text-xs py-0.5">
-                                    +{course.skills.length - 2}
+                                    +{course.skills.length - 3}
                                 </span>
                             )}
                         </div>
@@ -278,7 +279,7 @@ export default function Courses({ paginatedData }: CoursesProps) {
                     {/* Botón principal estilo Udemy - fijo al final */}
                     <button 
                         onClick={() => handlerDetailsCourses(course.title)} 
-                        className="w-full bg-[#002469] hover:bg-blue-800 text-white font-medium py-2.5 px-3 rounded-lg transition-colors duration-200 flex items-center justify-center gap-2 text-sm mt-auto"
+                        className="w-full bg-gradient-to-r from-[#002469] to-blue-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold py-3 px-3 rounded-xl transition-transform duration-300 transform hover:-translate-y-1 flex items-center justify-center gap-3 text-sm mt-auto shadow-lg"
                     >
                         <Play className="w-4 h-4" />
                         Ver curso
@@ -309,6 +310,30 @@ export default function Courses({ paginatedData }: CoursesProps) {
                     display: inline-block;
                     width: 100%;
                 }
+
+                /* Card hover subtle effect */
+                .card-hover { will-change: transform; }
+
+                .badge-pulse { animation: pulse 2s infinite; }
+
+                @keyframes pulse {
+                  0% { transform: scale(1); opacity: 1 }
+                  50% { transform: scale(1.04); opacity: 0.95 }
+                  100% { transform: scale(1); opacity: 1 }
+                }
+
+                .shimmer-img { position: relative; }
+                .shimmer-img::after {
+                  content: '';
+                  position: absolute;
+                  inset: 0;
+                  background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.06) 50%, rgba(255,255,255,0) 100%);
+                  transform: translateX(-100%);
+                  transition: transform 0.9s ease-in-out;
+                }
+                .group:hover .shimmer-img::after { transform: translateX(100%); }
+
+                .animate-pulse-slow { animation: pulse 1.6s infinite; }
             `}</style>
             
             <div className="container mx-auto px-4 py-8 max-w-7xl">

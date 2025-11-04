@@ -3,6 +3,16 @@ import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 import { normalizeEmail } from "@/lib/emailUtils";
 import { NextAuthOptions } from "next-auth";
+
+// Validar variables de entorno críticas
+if (!process.env.NEXTAUTH_SECRET) {
+  throw new Error('NEXTAUTH_SECRET is not configured')
+}
+
+if (!process.env.DATABASE_URL) {
+  throw new Error('DATABASE_URL is not configured')
+}
+
 export const authOptions: NextAuthOptions = {
   providers: [
     CredentialsProvider({

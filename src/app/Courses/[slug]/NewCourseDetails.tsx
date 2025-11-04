@@ -57,6 +57,10 @@ interface CourseDataFromDB {
     total_lecciones_calculadas?: number
     creator?: {
         id_profesor: number
+        nivel_estudios?: string | null
+        observaciones?: string | null
+        edad?: number | null
+        telefono?: string | null
         usuario: {
             nombre: string
             apellido: string
@@ -370,27 +374,54 @@ export default function CourseDetails({ courseData }: CourseDetailsProps) {
 
     // Obtener título del instructor basado en su nivel de estudios
     const getInstructorTitle = (): string => {
-        if (courseData.creator && 'nivel_estudios' in courseData.creator && courseData.creator.nivel_estudios) {
-            return String(courseData.creator.nivel_estudios)
+        if (courseData.creator?.nivel_estudios) {
+            return courseData.creator.nivel_estudios
         }
         return 'Profesor Certificado de Inglés'
     }
 
     // Obtener biografía del instructor
     const getInstructorBio = (): string => {
-        if (courseData.creator && 'observaciones' in courseData.creator && courseData.creator.observaciones) {
-            return String(courseData.creator.observaciones)
+        if (courseData.creator?.observaciones) {
+            return courseData.creator.observaciones
         }
         return 'Especialista en enseñanza de inglés como segunda lengua con certificación TESOL. Experto en metodologías comunicativas y aprendizaje dinámico.'
     }
 
     // Obtener experiencia basada en la edad o datos disponibles
     const getInstructorExperience = (): string => {
-        if (courseData.creator && 'edad' in courseData.creator && courseData.creator.edad && typeof courseData.creator.edad === 'number' && courseData.creator.edad > 25) {
+        if (courseData.creator?.edad && courseData.creator.edad > 25) {
             const years = Math.min(courseData.creator.edad - 22, 15) // Estimación conservadora
             return `${years} años de experiencia`
         }
         return '5+ años de experiencia'
+    }
+
+    // Generar achievements profesionales y seguros
+    const getInstructorAchievements = (): string[] => {
+        const achievements: string[] = []
+        
+        // Nivel de estudios (si está disponible)
+        if (courseData.creator?.nivel_estudios) {
+            achievements.push(courseData.creator.nivel_estudios)
+        } else {
+            achievements.push("Certificación TESOL")
+        }
+        
+        // Experiencia
+        achievements.push(getInstructorExperience())
+        
+        // Estudiantes
+        achievements.push(`${courseData._count.inscripciones}+ estudiantes`)
+        
+        // Metodología basada en los datos del curso
+        if (courseData.modalidad === 'ONLINE') {
+            achievements.push("Especialista en educación virtual")
+        } else {
+            achievements.push("Experto en clases presenciales")
+        }
+        
+        return achievements
     }
 
     // Obtener nivel de dificultad basado en las lecciones
@@ -473,7 +504,7 @@ export default function CourseDetails({ courseData }: CourseDetailsProps) {
         ],
         features: features.length > 0 ? features : [
             { icon: Video, title: "Clases en vivo", description: "Sesiones interactivas con tu instructor" },
-            { icon: Download, title: "Material descargable", description: "PDFs, audios y ejercicios para practicar" },
+            // { icon: Download, title: "Material descargable", description: "PDFs, audios y ejercicios para practicar" },
             { icon: Smartphone, title: "Acceso móvil", description: "Estudia desde cualquier dispositivo" },
             { icon: MessageCircle, title: "Soporte 24/7", description: "Ayuda cuando la necesites" },
             { icon: Trophy, title: "Certificado", description: "Certificado digital al finalizar" }
@@ -486,13 +517,8 @@ export default function CourseDetails({ courseData }: CourseDetailsProps) {
             students: `${courseData._count.inscripciones}+ estudiantes`,
             rating: 4.8, // Esto podría calcularse de las reseñas en el futuro
             bio: getInstructorBio(),
-            phone: (courseData.creator && 'telefono' in courseData.creator && courseData.creator.telefono) ? String(courseData.creator.telefono) : null,
-            achievements: [
-                (courseData.creator && 'nivel_estudios' in courseData.creator && courseData.creator.nivel_estudios) ? String(courseData.creator.nivel_estudios) : "Certificación TESOL", 
-                "Cambridge Certificate", 
-                getInstructorExperience(), 
-                `${courseData._count.inscripciones}+ estudiantes`
-            ].filter(Boolean)
+            phone: null, // Eliminamos el teléfono por seguridad
+            achievements: getInstructorAchievements()
         }
     }
 
@@ -749,21 +775,18 @@ export default function CourseDetails({ courseData }: CourseDetailsProps) {
 
                                     <div className="space-y-3 text-sm">
                                         <h4 className="font-semibold text-gray-900 mb-3">Este curso incluye:</h4>
-                                        <div className="flex items-center gap-3">
-                                            <Video className="w-4 h-4 text-gray-600" />
-                                            <span className="text-gray-700">Contenido multimedia interactivo</span>
-                                        </div>
+                                        
                                         <div className="flex items-center gap-3">
                                             <BookOpen className="w-4 h-4 text-gray-600" />
                                             <span className="text-gray-700">{courseData.total_lecciones_calculadas || 20} lecciones organizadas por módulos</span>
                                         </div>
                                         <div className="flex items-center gap-3">
                                             <Target className="w-4 h-4 text-gray-600" />
-                                            <span className="text-gray-700">{Math.round((courseData.total_lecciones_calculadas || 20) * 8)}+ ejercicios interactivos</span>
+                                            <span className="text-gray-700"> ejercicios interactivos</span>
                                         </div>
                                         <div className="flex items-center gap-3">
                                             <Download className="w-4 h-4 text-gray-600" />
-                                            <span className="text-gray-700">Material descargable (PDFs, audios, plantillas)</span>
+                                            <span className="text-gray-700">Material descargable </span>
                                         </div>
                                         <div className="flex items-center gap-3">
                                             <Clock className="w-4 h-4 text-gray-600" />

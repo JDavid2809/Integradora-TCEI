@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import React, { useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import DashboardContent from "./DashboardContent"
 import CoursesContent from "./CoursesContent"
@@ -10,8 +10,10 @@ import ExamsContent from "./ExamsContent"
 import Sidebar from "./Sidebar"
 import Header from "./Header"
 import BottomTabs from "./Tabs"
+import AssistantContent from "./AssistantContent"
 import { Session } from "next-auth"
 import { CursoFromDB } from "@/types/courses"
+import Activitys from "./Activitys"
 
 interface DashboardProps {
     onLogout: () => void
@@ -42,12 +44,17 @@ export default function Dashboard({ onLogout, user, studentCourses, allCourses, 
                 return <DashboardContent key="dashboard" />
             case "courses":
                 return <CoursesContent key="courses" studentCourses={studentCourses} allCourses={allCourses} />
+            case "assistant":
+                // Lazy-load the assistant content (client component)
+                return <React.Suspense key="assistant" fallback={<div>Cargando asistente...</div>}><AssistantContent /></React.Suspense>
             case "schedule":
                 return <ScheduleContent key="schedule" />
             case "payments":
                 return <PaymentsContent key="payments" />
             case "exams":
                 return <ExamsContent key="exams" />
+            case "activities":
+                return <Activitys key="activities" />
             default:
                 return <DashboardContent key="dashboard" />
         }

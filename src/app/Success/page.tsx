@@ -4,7 +4,13 @@ import Link from 'next/link';
 import { createSlug } from '@/lib/slugUtils';
 import { prisma } from '@/lib/prisma';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
+// Lazy initialization to avoid build-time errors
+function getStripe() {
+  if (!process.env.STRIPE_SECRET_KEY) {
+    throw new Error('STRIPE_SECRET_KEY is not configured')
+  }
+  return new Stripe(process.env.STRIPE_SECRET_KEY)
+}
 
 export default async function SuccessPage({
   searchParams,
@@ -18,6 +24,7 @@ export default async function SuccessPage({
   }
 
   // Retrieve session details
+  const stripe = getStripe()
   const session = await stripe.checkout.sessions.retrieve(params.session_id);
 
   if (session.payment_status !== 'paid') {

@@ -8,10 +8,19 @@ import { Hero } from './views/Home/Hero'
 import { SplashScreen } from '@/components/Splash'
 import { Footer } from '@/components/Footer'
 
+// Marcar como ruta dinámica
+export const dynamic = 'force-dynamic'
 
 export default async function Home() {
   // Verificar si hay una sesión activa
-  const session = await getServerSession(authOptions)
+  let session = null
+  
+  try {
+    session = await getServerSession(authOptions)
+  } catch (error) {
+    console.error('❌ Error getting session:', error)
+    // Si hay error al obtener la sesión, continuar sin sesión
+  }
   
   if (session?.user) {
     // Si hay sesión, redirigir al dashboard correspondiente

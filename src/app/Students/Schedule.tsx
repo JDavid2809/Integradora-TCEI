@@ -1,7 +1,9 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { motion } from "framer-motion"
+import { driver } from "driver.js"
+import "driver.js/dist/driver.css"
 import { 
   Calendar, 
   Clock, 
@@ -218,7 +220,7 @@ function MonthlyCalendar({ schedules }: { schedules: CourseSchedule[] }) {
     <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
       <div className="p-6 border-b border-slate-100">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold text-[#00246a] flex items-center gap-2">
+          <h3 id="calendar-header" className="text-lg font-semibold text-[#00246a] flex items-center gap-2">
             <CalendarDays className="w-5 h-5" />
             Calendario Mensual
           </h3>
@@ -226,6 +228,7 @@ function MonthlyCalendar({ schedules }: { schedules: CourseSchedule[] }) {
           <div className="flex items-center gap-2">
             {/* Filtros */}
             <button
+              id="filter-button"
               onClick={() => setShowFilters(!showFilters)}
               className={`p-2 rounded-lg transition-colors ${
                 showFilters ? 'bg-blue-100 text-blue-600' : 'hover:bg-slate-100 text-slate-600'
@@ -236,26 +239,28 @@ function MonthlyCalendar({ schedules }: { schedules: CourseSchedule[] }) {
             </button>
             
             {/* Navegación de meses */}
-            <button
-              onClick={prevMonth}
-              className="p-2 hover:bg-slate-100 rounded-lg transition-colors"
-              title="Mes anterior"
-            >
-              <ChevronLeft className="w-5 h-5 text-slate-600" />
-            </button>
-            <span className="text-sm font-medium text-slate-700 min-w-[150px] text-center">
-              {currentDate.toLocaleDateString('es-ES', { 
-                month: 'long',
-                year: 'numeric'
-              })}
-            </span>
-            <button
-              onClick={nextMonth}
-              className="p-2 hover:bg-slate-100 rounded-lg transition-colors"
-              title="Mes siguiente"
-            >
-              <ChevronRight className="w-5 h-5 text-slate-600" />
-            </button>
+            <div id="month-navigation" className="flex items-center gap-2">
+              <button
+                onClick={prevMonth}
+                className="p-2 hover:bg-slate-100 rounded-lg transition-colors"
+                title="Mes anterior"
+              >
+                <ChevronLeft className="w-5 h-5 text-slate-600" />
+              </button>
+              <span className="text-sm font-medium text-slate-700 min-w-[150px] text-center">
+                {currentDate.toLocaleDateString('es-ES', { 
+                  month: 'long',
+                  year: 'numeric'
+                })}
+              </span>
+              <button
+                onClick={nextMonth}
+                className="p-2 hover:bg-slate-100 rounded-lg transition-colors"
+                title="Mes siguiente"
+              >
+                <ChevronRight className="w-5 h-5 text-slate-600" />
+              </button>
+            </div>
           </div>
         </div>
         
@@ -265,6 +270,7 @@ function MonthlyCalendar({ schedules }: { schedules: CourseSchedule[] }) {
             {visibleCourses.length} {visibleCourses.length === 1 ? 'visible' : 'visibles'}
           </div>
           <button
+            id="today-button"
             onClick={goToToday}
             className="text-sm bg-[#e30f28] text-white px-4 py-2 rounded-lg hover:bg-[#e30f28]/90 transition-colors"
           >
@@ -321,7 +327,7 @@ function MonthlyCalendar({ schedules }: { schedules: CourseSchedule[] }) {
       </div>
 
       {/* Días del calendario */}
-      <div className="grid grid-cols-7">
+      <div id="calendar-grid" className="grid grid-cols-7">
         {calendarDays.map((date, index) => {
           const dayClasses = getDayClasses(date)
           const dayActivities = getDayActivities(date)
@@ -394,7 +400,7 @@ function MonthlyCalendar({ schedules }: { schedules: CourseSchedule[] }) {
       </div>
 
       {/* Leyenda y estadísticas */}
-      <div className="p-4 border-t border-slate-100 bg-slate-50">
+      <div id="calendar-legend" className="p-4 border-t border-slate-100 bg-slate-50">
         <div className="flex flex-wrap gap-4 justify-center text-xs mb-3">
           <div className="flex items-center gap-1">
             <div className="w-3 h-3 bg-blue-500 rounded"></div>
@@ -702,6 +708,107 @@ export default function ScheduleContent() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
+  // Tour con driver.js
+  const startScheduleTour = useCallback(() => {
+    const steps = [
+      {
+        element: "#schedule-header",
+        popover: {
+          title: "Tu Horario de Clases",
+          description: "Bienvenido a tu horario. Aquí puedes ver todas tus clases programadas, actividades pendientes y gestionar tu calendario académico.",
+          position: "bottom",
+        },
+      },
+      {
+        element: "#upcoming-activities",
+        popover: {
+          title: "Actividades Próximas",
+          description: "Aquí se muestran tus tareas, exámenes y proyectos más urgentes. Las actividades están codificadas por color según su prioridad: rojo (urgente), naranja (próximo), amarillo (esta semana), azul (normal).",
+          position: "bottom",
+        },
+      },
+      {
+        element: "#calendar-header",
+        popover: {
+          title: "Calendario Mensual",
+          description: "Vista general de tu mes académico. Cada día muestra las clases y actividades programadas.",
+          position: "bottom",
+        },
+      },
+      {
+        element: "#filter-button",
+        popover: {
+          title: "Filtrar Cursos",
+          description: "Usa este botón para filtrar qué cursos quieres ver en el calendario. Útil cuando tienes muchas clases y quieres enfocarte en uno específico.",
+          position: "left",
+        },
+      },
+      {
+        element: "#month-navigation",
+        popover: {
+          title: "Navegación de Meses",
+          description: "Navega entre meses para planificar con anticipación o revisar clases pasadas.",
+          position: "bottom",
+        },
+      },
+      {
+        element: "#today-button",
+        popover: {
+          title: "Ir a Hoy",
+          description: "Haz clic aquí para volver rápidamente al día actual en el calendario.",
+          position: "left",
+        },
+      },
+      {
+        element: "#calendar-grid",
+        popover: {
+          title: "Vista de Calendario",
+          description: "Haz clic en cualquier día del calendario para ver los detalles completos de tus clases y actividades. Las clases aparecen en azul y las actividades en naranja.",
+          position: "top",
+        },
+      },
+      {
+        element: "#calendar-legend",
+        popover: {
+          title: "Leyenda del Calendario",
+          description: "Aquí puedes ver el significado de los colores y obtener estadísticas rápidas de tu mes académico.",
+          position: "top",
+        },
+      },
+      {
+        element: "#traditional-schedule",
+        popover: {
+          title: "Horario Tradicional",
+          description: "Vista detallada de tus clases organizadas por curso. Incluye información de horarios, profesores y aulas asignadas.",
+          position: "top",
+        },
+      },
+    ];
+
+    const driverObj = driver({
+      showProgress: true,
+      allowClose: true,
+      popoverClass: "driverjs-theme",
+      steps,
+    });
+
+    driverObj.drive();
+  }, []);
+
+  // Ejecutar el tour solo una vez
+  useEffect(() => {
+    const hasSeenScheduleTour = localStorage.getItem("hasSeenScheduleTour");
+    // Solo ejecutar el tour si hay datos cargados y el usuario no lo ha visto
+    if (hasSeenScheduleTour || loading || error || !scheduleData || scheduleData.horarios.length === 0) return;
+
+    const timeout = setTimeout(() => {
+      startScheduleTour();
+      localStorage.setItem("hasSeenScheduleTour", "true");
+    }, 1000);
+
+    return () => clearTimeout(timeout);
+  }, [startScheduleTour, loading, error, scheduleData]);
+
   useEffect(() => {
     const fetchSchedule = async () => {
       try {
@@ -791,7 +898,7 @@ export default function ScheduleContent() {
       className="space-y-6"
     >
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div id="schedule-header" className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold text-[#00246a]">Mi Horario</h2>
           <p className="text-slate-600">
@@ -804,13 +911,17 @@ export default function ScheduleContent() {
       </div>
 
       {/* Actividades próximas */}
-      <UpcomingActivities schedules={scheduleData.horarios} />
+      <div id="upcoming-activities">
+        <UpcomingActivities schedules={scheduleData.horarios} />
+      </div>
 
       {/* Calendario mensual */}
       <MonthlyCalendar schedules={scheduleData.horarios} />
 
       {/* Horario tradicional */}
-      <TraditionalSchedule schedules={scheduleData.horarios} />
+      <div id="traditional-schedule">
+        <TraditionalSchedule schedules={scheduleData.horarios} />
+      </div>
     </motion.div>
   )
 }

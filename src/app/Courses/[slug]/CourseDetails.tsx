@@ -207,14 +207,21 @@ export default function CourseDetails({ courseData }: CourseDetailsProps) {
         instructor: {
             name: courseData.imparte[0] ? 
                 `${courseData.imparte[0].profesor.usuario.nombre} ${courseData.imparte[0].profesor.usuario.apellido}` : 
-                'María García',
-            title: "Profesora Certificada de Inglés",
-            experience: "8 años de experiencia",
-            students: "2,500+ estudiantes",
-            rating: 4.8,
-            bio: "Especialista en enseñanza de inglés como segunda lengua con certificación TESOL. Experta en metodologías comunicativas y aprendizaje dinámico.",
-            email: courseData.imparte[0]?.profesor.usuario.email || 'maria.garcia@tcei.edu',
-            achievements: ["Certificación TESOL", "Cambridge Certificate", "8 años experiencia", "2,500+ estudiantes graduados"]
+                'Instructor por asignar',
+            title: courseData.imparte[0] ? "Profesor Certificado de Inglés" : "Instructor por asignar",
+            experience: courseData.imparte[0] ? "Experiencia comprobada" : "N/A",
+            students: `${courseData._count.inscripciones}+ estudiantes`,
+            rating: 4.8, // Podría calcularse dinámicamente desde reviews
+            bio: courseData.imparte[0] ? 
+                `Especialista en enseñanza de inglés nivel ${courseData.imparte[0].nivel.nombre}. Experto en metodologías comunicativas y aprendizaje dinámico para la modalidad ${courseData.modalidad.toLowerCase()}.` :
+                "Instructor especializado por asignar.",
+            email: courseData.imparte[0]?.profesor.usuario.email || 'instructor@tcei.edu',
+            achievements: courseData.imparte[0] ? [
+                "Certificación Profesional", 
+                `Nivel ${courseData.imparte[0].nivel.nombre} Especializado`, 
+                "Metodología Moderna", 
+                `${courseData._count.inscripciones}+ estudiantes activos`
+            ] : ["Instructor por asignar"]
         },
         features: [
             { icon: Video, title: "Clases en vivo", description: "Sesiones interactivas con tu instructor" },
@@ -236,7 +243,8 @@ export default function CourseDetails({ courseData }: CourseDetailsProps) {
     const course: DetailedCourseForDisplay = {
         id: courseData.id_curso,
         title: courseData.nombre,
-        description: `Curso completo de inglés modalidad ${courseData.modalidad.toLowerCase()}. Desarrolla tus habilidades comunicativas con metodología moderna y práctica.`,
+        description: courseData.descripcion || 
+            `Curso completo de inglés modalidad ${courseData.modalidad.toLowerCase()}. Desarrolla tus habilidades comunicativas con metodología moderna y práctica.`,
         instructor: extendedCourseData.instructor,
         level: courseData.imparte[0]?.nivel?.nombre || 'A1',
         modalidad: courseData.modalidad,

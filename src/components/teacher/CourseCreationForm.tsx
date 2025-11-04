@@ -63,6 +63,12 @@ export default function CourseCreationForm({
   })
 
   // ========================================
+  // FUNCIONES AUXILIARES
+  // ========================================
+
+  const generateId = () => Math.random().toString(36).substr(2, 9)
+
+  // ========================================
   // CARGAR DATOS PARA EDICIÓN
   // ========================================
 
@@ -85,12 +91,21 @@ export default function CourseCreationForm({
               nivel_ingles: courseDetails.nivel_ingles || undefined
             })
 
-            // Cargar detalles
+            // Cargar detalles con verificación de estructura
             setDetails({
-              whatYouLearn: courseDetails.whatYouLearnParsed || [],
+              whatYouLearn: (courseDetails.whatYouLearnParsed || []).map((item: any) => ({
+                id: item.id || generateId(),
+                text: item.text || item.title || ''
+              })),
               features: courseDetails.featuresParsed || [],
-              requirements: courseDetails.requirementsParsed || [],
-              targetAudience: courseDetails.targetAudienceParsed || [],
+              requirements: (courseDetails.requirementsParsed || []).map((item: any) => ({
+                id: item.id || generateId(),
+                text: item.text || item.title || ''
+              })),
+              targetAudience: (courseDetails.targetAudienceParsed || []).map((item: any) => ({
+                id: item.id || generateId(),
+                text: item.text || item.title || ''
+              })),
               courseContent: courseDetails.courseContentParsed || []
             })
           }
@@ -108,8 +123,6 @@ export default function CourseCreationForm({
   // ========================================
   // FUNCIONES AUXILIARES
   // ========================================
-
-  const generateId = () => Math.random().toString(36).substr(2, 9)
 
   const addWhatYouLearn = () => {
     setDetails(prev => ({
@@ -277,8 +290,8 @@ export default function CourseCreationForm({
   }
 
   const validateStep2 = () => {
-    return details.whatYouLearn.some(item => item.text.trim()) &&
-           details.requirements.some(item => item.text.trim())
+    return details.whatYouLearn.some(item => item.text && item.text.trim()) &&
+           details.requirements.some(item => item.text && item.text.trim())
   }
 
   // ========================================
@@ -296,14 +309,14 @@ export default function CourseCreationForm({
         details: {
           ...details,
           // Filtrar elementos vacíos
-          whatYouLearn: details.whatYouLearn.filter(item => item.text.trim()),
-          requirements: details.requirements.filter(item => item.text.trim()),
-          targetAudience: details.targetAudience.filter(item => item.text.trim()),
+          whatYouLearn: details.whatYouLearn.filter(item => item.text && item.text.trim()),
+          requirements: details.requirements.filter(item => item.text && item.text.trim()),
+          targetAudience: details.targetAudience.filter(item => item.text && item.text.trim()),
           courseContent: details.courseContent
-            .filter(section => section.title.trim())
+            .filter(section => section.title && section.title.trim())
             .map(section => ({
               ...section,
-              topics: section.topics.filter(topic => topic.title.trim())
+              topics: section.topics.filter(topic => topic.title && topic.title.trim())
             }))
         }
       }
@@ -752,7 +765,7 @@ export default function CourseCreationForm({
               <div className="mt-4">
                 <h4 className="text-gray-700 font-medium mb-2">Lo que aprenderás:</h4>
                 <ul className="list-disc list-inside space-y-1 text-sm text-gray-700">
-                  {details.whatYouLearn.filter(item => item.text.trim()).map(item => (
+                  {details.whatYouLearn.filter(item => item.text && item.text.trim()).map(item => (
                     <li key={item.id}>{item.text}</li>
                   ))}
                 </ul>
@@ -761,7 +774,7 @@ export default function CourseCreationForm({
               <div className="mt-4">
                 <h4 className="text-gray-700 font-medium mb-2">Requisitos:</h4>
                 <ul className="list-disc list-inside space-y-1 text-sm text-gray-700">
-                  {details.requirements.filter(item => item.text.trim()).map(item => (
+                  {details.requirements.filter(item => item.text && item.text.trim()).map(item => (
                     <li key={item.id}>{item.text}</li>
                   ))}
                 </ul>

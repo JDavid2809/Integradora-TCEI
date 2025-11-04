@@ -30,9 +30,10 @@ export default function Chatbot() {
   const [showTooltip, setShowTooltip] = useState(false);
   const [isHidden, setIsHidden] = useState(false);
   const [hasShownTooltip, setHasShownTooltip] = useState(false);
+  const [tooltipDisabled, setTooltipDisabled] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   
-  // Detectar si es móvil para ocultarlo
+  // Detectar si es móvil para ocultarlo y cargar preferencias
   useEffect(() => {
     const checkMobile = () => {
       if (typeof window === 'undefined') return;
@@ -40,7 +41,29 @@ export default function Chatbot() {
       setIsMobile(mobile);
     };
 
+    // Cargar preferencias del usuario desde localStorage
+    const loadUserPreferences = () => {
+      if (typeof window === 'undefined') return;
+      
+      const tooltipDisabledPref = localStorage.getItem('chatbot-tooltip-disabled');
+      const lastTooltipShown = localStorage.getItem('chatbot-last-tooltip');
+      
+      if (tooltipDisabledPref === 'true') {
+        setTooltipDisabled(true);
+        setHasShownTooltip(true);
+      } else if (lastTooltipShown) {
+        const lastShown = parseInt(lastTooltipShown);
+        const now = Date.now();
+        const fiveMinutes = 5 * 60 * 1000; // 5 minutos en milisegundos
+        
+        if (now - lastShown < fiveMinutes) {
+          setHasShownTooltip(true);
+        }
+      }
+    };
+
     checkMobile();
+    loadUserPreferences();
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
@@ -100,24 +123,29 @@ export default function Chatbot() {
     setIsAnimating(!open);
   }, [open]);
 
-  // Efecto para mostrar tooltip SOLO UNA VEZ
+  // Efecto para mostrar tooltip inteligente
   useEffect(() => {
-    if (open || hasShownTooltip) return;
+    if (open || hasShownTooltip || tooltipDisabled) return;
 
     const showTooltipTimer = setTimeout(() => {
       setShowTooltip(true);
-      setHasShownTooltip(true); // Marcar que ya se mostró
+      setHasShownTooltip(true);
       
-      // Auto-ocultar después de 6 segundos
+      // Guardar timestamp en localStorage
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('chatbot-last-tooltip', Date.now().toString());
+      }
+      
+      // Auto-ocultar después de 8 segundos
       const hideTooltipTimer = setTimeout(() => {
         setShowTooltip(false);
-      }, 6000);
+      }, 8000);
 
       return () => clearTimeout(hideTooltipTimer);
-    }, 5000); // Aparece después de 5 segundos, solo una vez
+    }, 10000); // Aparece después de 10 segundos (más tiempo)
 
     return () => clearTimeout(showTooltipTimer);
-  }, [open, hasShownTooltip]);
+  }, [open, hasShownTooltip, tooltipDisabled]);
 
   const sendMessage = useCallback(async (text: string) => {
     // Evitar múltiples peticiones mientras está escribiendo
@@ -225,25 +253,54 @@ export default function Chatbot() {
           }}
         >
         
-        {/* Tooltip que aparece SOLO UNA VEZ */}
+        {/* Tooltip inteligente con opciones */}
         {showTooltip && !open && !isHidden && (
           <div className="absolute bottom-full right-0 mb-3 tooltip-bounce">
-            <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-4 py-2 rounded-2xl shadow-lg text-sm font-medium whitespace-nowrap relative pr-8 max-w-xs">
-              ¿Tienes dudas? ¡Pregúntame! 💬<br />
-              <span className="text-xs opacity-75">Arrastra para mover</span>
+            <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-4 rounded-2xl shadow-lg text-sm font-medium max-w-xs">
+              <div className="flex items-start justify-between mb-2">
+                <div>
+                  <div className="font-semibold mb-1">¿Tienes dudas? 💬</div>
+                  <div className="text-xs opacity-90">Pregúntame cualquier cosa</div>
+                </div>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setShowTooltip(false);
+                  }}
+                  className="text-white hover:text-gray-200 font-bold text-lg leading-none ml-2"
+                >
+                  ×
+                </button>
+              </div>
               
-              {/* Botón para cerrar el tooltip */}
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setShowTooltip(false);
-                }}
-                className="absolute right-2 top-1/2 transform -translate-y-1/2 text-white hover:text-gray-200 font-bold text-lg leading-none"
-              >
-                ×
-              </button>
+              {/* Botones de acción */}
+              <div className="flex gap-2 mt-3">
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setOpen(true);
+                    setShowTooltip(false);
+                  }}
+                  className="bg-white text-blue-600 px-3 py-1 rounded-lg text-xs font-semibold hover:bg-gray-100 transition"
+                >
+                  Abrir Chat
+                </button>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setTooltipDisabled(true);
+                    setShowTooltip(false);
+                    if (typeof window !== 'undefined') {
+                      localStorage.setItem('chatbot-tooltip-disabled', 'true');
+                    }
+                  }}
+                  className="bg-white/20 text-white px-3 py-1 rounded-lg text-xs hover:bg-white/30 transition"
+                >
+                  No mostrar más
+                </button>
+              </div>
               
-              <div className="absolute top-full right-4 w-0 h-0 border-l-4 border-r-4 border-t-8 border-l-transparent border-r-transparent border-t-purple-600"></div>
+              <div className="absolute top-full right-6 w-0 h-0 border-l-4 border-r-4 border-t-8 border-l-transparent border-r-transparent border-t-purple-600"></div>
             </div>
           </div>
         )}

@@ -3,7 +3,13 @@ import { headers } from 'next/headers'
 import Stripe from 'stripe'
 import { prisma } from '@/lib/prisma'
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
+// Lazy initialization to avoid build-time errors
+function getStripe() {
+  if (!process.env.STRIPE_SECRET_KEY) {
+    throw new Error('STRIPE_SECRET_KEY is not configured')
+  }
+  return new Stripe(process.env.STRIPE_SECRET_KEY)
+}
 
 export async function POST(request: NextRequest) {
   const body = await request.text()
@@ -18,6 +24,7 @@ export async function POST(request: NextRequest) {
   let event: Stripe.Event
 
   try {
+    const stripe = getStripe()
     event = stripe.webhooks.constructEvent(
       body,
       signature,

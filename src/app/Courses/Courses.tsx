@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Search, BookOpen, Play, Award, Globe, X, ChevronLeft, ChevronRight, Users, Clock } from "lucide-react"
+import { Search, BookOpen, Play, X, ChevronLeft, ChevronRight, Users, Clock } from "lucide-react"
 import Image from "next/image"
 import { useRouter, useSearchParams } from 'next/navigation'
 import { CoursesProps, CourseForDisplay, EnglishLevel, CourseFilters } from '@/types/courses'
@@ -24,24 +24,22 @@ const modalidadOptions = [
     { value: "ONLINE", label: "Online" },
 ]
 
-
-
 const getLevelColor = (level: string) => {
     const colors = {
-        A1: "bg-green-100 text-green-800 border-green-200",
-        A2: "bg-blue-100 text-blue-800 border-blue-200",
-        B1: "bg-yellow-100 text-yellow-800 border-yellow-200",
-        B2: "bg-orange-100 text-orange-800 border-orange-200",
-        C1: "bg-purple-100 text-purple-800 border-purple-200",
-        C2: "bg-red-100 text-red-800 border-red-200",
+        A1: "bg-emerald-100 text-emerald-700",
+        A2: "bg-blue-100 text-blue-700",
+        B1: "bg-amber-100 text-amber-700",
+        B2: "bg-orange-100 text-orange-700",
+        C1: "bg-purple-100 text-purple-700",
+        C2: "bg-rose-100 text-rose-700",
     }
-    return colors[level as keyof typeof colors] || "bg-gray-100 text-gray-800 border-gray-200"
+    return colors[level as keyof typeof colors] || "bg-gray-100 text-gray-700"
 }
 
 const getModalidadColor = (modalidad: string) => {
     return modalidad === 'ONLINE' 
-        ? "bg-blue-100 text-blue-800 border-blue-200"
-        : "bg-green-100 text-green-800 border-green-200"
+        ? "bg-blue-100 text-blue-700"
+        : "bg-emerald-100 text-emerald-700"
 }
 
 export default function Courses({ paginatedData }: CoursesProps) {
@@ -54,32 +52,26 @@ export default function Courses({ paginatedData }: CoursesProps) {
         page: 1
     })
 
-    // Función para navegar a los detalles del curso usando slug
     const handlerDetailsCourses = (courseName: string) => {
         const slug = createSlug(courseName)
         router.push(`/Courses/${slug}`)
     }
 
-    // Función para construir URL con parámetros
     const buildURL = (newFilters: CourseFilters) => {
         const params = new URLSearchParams()
-        
         if (newFilters.search) params.set('search', newFilters.search)
         if (newFilters.level !== 'all') params.set('level', newFilters.level)
         if (newFilters.modalidad !== 'all') params.set('modalidad', newFilters.modalidad)
         if (newFilters.page > 1) params.set('page', newFilters.page.toString())
-        
         const queryString = params.toString()
         return queryString ? `/Courses?${queryString}` : '/Courses'
     }
 
-    // Efecto para sincronizar filtros con URL
     useEffect(() => {
         const searchFromUrl = searchParams?.get('search') || ''
         const levelFromUrl = searchParams?.get('level') || 'all'
         const modalidadFromUrl = searchParams?.get('modalidad') || 'all'
         const pageFromUrl = parseInt(searchParams?.get('page') || '1', 10)
-        
         setFilters({
             search: searchFromUrl,
             level: levelFromUrl,
@@ -88,28 +80,19 @@ export default function Courses({ paginatedData }: CoursesProps) {
         })
     }, [searchParams])
 
-    // Convertir cursos usando hook personalizado
-    const { convertedCourses, recommendedCourses } = useCourseConverter(paginatedData)
+    const { convertedCourses } = useCourseConverter(paginatedData)
 
-    // Función para resaltar texto de búsqueda
     const highlightText = (text: string, searchTerm: string) => {
         if (!searchTerm) return text
-        
         const regex = new RegExp(`(${searchTerm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi')
         const parts = text.split(regex)
-        
         return parts.map((part, index) => 
             regex.test(part) ? 
-                <span key={index} className="bg-yellow-200 text-yellow-800 font-medium px-1 rounded">
-                    {part}
-                </span> : part
+                <span key={index} className="bg-yellow-200 font-semibold">{part}</span> : part
         )
     }
 
-    // Los cursos ya vienen filtrados y paginados del servidor
     const displayedCourses = convertedCourses
-
-    // Usar datos de paginación del servidor
     const totalPages = paginatedData.totalPages
     const currentPage = paginatedData.currentPage
     const totalCount = paginatedData.totalCount
@@ -126,283 +109,245 @@ export default function Courses({ paginatedData }: CoursesProps) {
         router.push(buildURL(updatedFilters))
     }
 
-    const CourseCard = ({ course, isRecommended = false }: { course: CourseForDisplay; isRecommended?: boolean }) => (
-        <div className="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden group border border-gray-100">
-            <div className="relative overflow-hidden">
+    const CourseCard = ({ course }: { course: CourseForDisplay }) => (
+        <div 
+            onClick={() => handlerDetailsCourses(course.title)}
+            className="group bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg hover:border-gray-300 transition-all duration-300 cursor-pointer h-full flex flex-col"
+        >
+            {/* Imagen */}
+            <div className="relative h-48 overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200">
                 <Image
                     src={course.image}
                     alt={course.title}
-                    width={400}   
-                    height={200} 
-                    className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-500"
+                    width={400}
+                    height={200}
+                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                    priority={false}
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
-
-                {isRecommended && (
-                    <div className="absolute top-4 left-4 bg-[#e30f28] text-white px-3 py-1 rounded-full text-sm font-semibold flex items-center gap-1 shadow-lg">
-                        <Award className="w-3 h-3" />
-                        Recomendado
+                {/* Overlay on hover */}
+                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300"></div>
+                
+                {/* Rating badge */}
+                {course.rating && (
+                    <div className="absolute top-3 right-3 bg-white/95 backdrop-blur-sm rounded-full px-3 py-1 flex items-center gap-1 shadow-md">
+                        <span className="text-yellow-400 text-sm">★</span>
+                        <span className="text-gray-900 font-semibold text-sm">{course.rating}</span>
                     </div>
                 )}
-
-                <div className={`absolute top-4 right-4 px-3 py-1 rounded-full text-sm font-semibold border ${getLevelColor(course.level)} shadow-lg`}>
-                    {course.level}
-                </div>
-
-                <div className={`absolute bottom-4 left-4 px-3 py-1 rounded-full text-sm font-semibold border ${getModalidadColor(course.modalidad)} shadow-lg`}>
-                    {course.modalidad}
-                </div>
             </div>
 
-            <div className="p-6">
-                <div className="flex items-start justify-between gap-3 mb-3">
-                    <h3 className="text-xl font-bold text-[#00246a] group-hover:text-[#e30f28] transition-colors duration-300 line-clamp-2">
-                        {highlightText(course.title, filters.search)}
-                    </h3>
-                    <div className="text-2xl font-bold text-[#e30f28] shrink-0">{course.price}</div>
+            {/* Contenido */}
+            <div className="p-4 flex flex-col flex-grow">
+                {/* Nivel badge */}
+                <div className="mb-3">
+                    <span className={`inline-block text-xs font-semibold px-2.5 py-1 rounded-full ${getLevelColor(course.level)}`}>
+                        {course.level}
+                    </span>
                 </div>
 
-                <p className="text-gray-600 mb-4 line-clamp-2">
-                    {highlightText(course.description, filters.search)}
+                {/* Título */}
+                <h3 className="font-semibold text-gray-900 text-sm line-clamp-2 mb-2 group-hover:text-[#002469] transition-colors">
+                    {highlightText(course.title, filters.search)}
+                </h3>
+
+                {/* Instructor */}
+                <p className="text-gray-600 text-xs mb-3 truncate">
+                    {course.instructor}
                 </p>
 
-                <div className="flex items-center gap-2 mb-4 text-sm text-gray-500">
-                    <BookOpen className="w-4 h-4" />
-                    <span>{highlightText(course.instructor, filters.search)}</span>
-                </div>
-
-                <div className="flex items-center justify-between mb-4 text-sm text-gray-500">
+                {/* Stats */}
+                <div className="flex gap-4 text-xs text-gray-600 mb-4">
                     <div className="flex items-center gap-1">
-                        <Users className="w-4 h-4" />
-                        <span>{course.students} estudiantes</span>
+                        <Users className="w-3.5 h-3.5 text-gray-400" />
+                        <span>{course.students}</span>
                     </div>
                     <div className="flex items-center gap-1">
-                        <Clock className="w-4 h-4" />
+                        <Clock className="w-3.5 h-3.5 text-gray-400" />
                         <span>{course.duration}</span>
                     </div>
                 </div>
 
-                <div className="text-xs text-gray-500 mb-4">
-                    <div>Inicio: {course.inicio}</div>
-                    <div>Fin: {course.fin}</div>
+                {/* Divider */}
+                <div className="border-t border-gray-100 my-3"></div>
+
+                {/* Footer */}
+                <div className="flex items-center justify-between mt-auto">
+                    <span className="font-bold text-[#002469] text-base">{course.price}</span>
+                    <span className={`text-xs font-medium px-2 py-1 rounded ${getModalidadColor(course.modalidad)}`}>
+                        {course.modalidad}
+                    </span>
                 </div>
-                    
-                <button 
-                    onClick={() => handlerDetailsCourses(course.title)} 
-                    className="w-full bg-[#e30f28] hover:bg-[#c20e24] text-white font-semibold py-3 px-6 rounded-xl transition-all duration-300 flex items-center justify-center gap-2 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
-                >
-                    <Play className="w-4 h-4" />
-                    Ver curso
-                </button>
             </div>
         </div>
     )
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-red-50">
-            <div className="container mx-auto px-4 py-12 max-w-7xl">
-                {/* Header */}
-                <div className="text-center mb-16">
-                    <div className="inline-flex items-center gap-2 bg-[#00246a] text-white px-6 py-2 rounded-full text-sm font-semibold mb-6">
-                        <Globe className="w-4 h-4" />
-                        Cursos de Inglés
-                    </div>
-                    <h1 className="text-5xl font-bold text-[#00246a] mb-4">Domina el Inglés</h1>
-                    <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-                        Aprende inglés con los mejores instructores nativos y metodología probada. Desde principiante hasta nivel
-                        avanzado.
-                    </p>
-                    
-                    {/* Indicador de búsqueda activa */}
-                    {filters.search && (
-                        <div className="mt-6 inline-flex items-center gap-2 bg-yellow-100 border border-yellow-300 text-yellow-800 px-4 py-2 rounded-full text-sm font-medium">
-                            <Search className="w-4 h-4" />
-                            Mostrando resultados para: &ldquo;{filters.search}&rdquo;
-                            <button
-                                onClick={() => router.push('/Courses')}
-                                className="ml-2 hover:bg-yellow-200 p-1 rounded-full transition-colors duration-200"
-                            >
-                                <X className="w-3 h-3" />
-                            </button>
-                        </div>
-                    )}
-                </div>
-
-                {/* Sección de Cursos Recomendados */}
-                {recommendedCourses.length > 0 && (
-                    <section className="mb-20">
-                        <div className="text-center mb-12">
-                            <h2 className="text-4xl font-bold text-[#00246a] mb-4">Cursos recomendados para ti</h2>
-                            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-                                Los cursos que se adaptan a tus necesidades y objetivos de aprendizaje. Mejora tu inglés con cursos
-                                diseñados por expertos.
+        <div className="min-h-screen bg-gray-50">
+            {/* Header Section */}
+            <div className="bg-white border-b border-gray-200">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                    <div className="flex items-start justify-between">
+                        <div>
+                            <h1 className="text-3xl font-bold text-gray-900 mb-2">Cursos de Inglés</h1>
+                            <p className="text-gray-600">
+                                Descubre {totalCount} cursos profesionales diseñados para tu aprendizaje
                             </p>
                         </div>
-
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                            {recommendedCourses.map((course) => (
-                                <CourseCard key={course.id} course={course} isRecommended={true} />
-                            ))}
-                        </div>
-                    </section>
-                )}
-
-                {/* Separador */}
-                <div className="relative mb-16">
-                    <div className="absolute inset-0 flex items-center">
-                        <div className="w-full border-t-2 border-gray-200"></div>
-                    </div>
-                    <div className="relative flex justify-center">
-                        <span className="bg-gradient-to-r from-blue-50 to-red-50 px-8 py-3 text-gray-600 rounded-full border-2 border-gray-200 font-semibold">
-                            Explora todos nuestros cursos
-                        </span>
                     </div>
                 </div>
+            </div>
 
-                {/* Sección de Todos los Cursos */}
-                <section>
-                    <div className="text-center mb-8">
-                        <h2 className="text-4xl font-bold text-[#00246a] mb-4">Catálogo Completo</h2>
-                        <p className="text-lg text-gray-600">Encuentra el curso perfecto para tu nivel de inglés</p>
+            {/* Main Content */}
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                {/* Search and Filters */}
+                <div className="bg-white border border-gray-200 rounded-lg p-6 mb-8 shadow-sm">
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        {/* Search Input */}
+                        <div className="relative md:col-span-2">
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
+                            <input
+                                type="text"
+                                placeholder="Buscar por nombre, instructor..."
+                                value={filters.search}
+                                onChange={(e) => updateFilters({ search: e.target.value })}
+                                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#002469] focus:border-transparent text-sm"
+                            />
+                        </div>
+
+                        {/* Level Filter */}
+                        <select
+                            value={filters.level}
+                            onChange={(e) => updateFilters({ level: e.target.value })}
+                            className="px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#002469] focus:border-transparent text-sm"
+                        >
+                            {englishLevels.map((level) => (
+                                <option key={level.value} value={level.value}>
+                                    {level.label}
+                                </option>
+                            ))}
+                        </select>
+
+                        {/* Modalidad Filter */}
+                        <select
+                            value={filters.modalidad}
+                            onChange={(e) => updateFilters({ modalidad: e.target.value })}
+                            className="px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#002469] focus:border-transparent text-sm"
+                        >
+                            {modalidadOptions.map((modalidad) => (
+                                <option key={modalidad.value} value={modalidad.value}>
+                                    {modalidad.label}
+                                </option>
+                            ))}
+                        </select>
                     </div>
 
-                    {/* Filtros y Búsqueda */}
-                    <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-8 mb-8">
-                        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-                            <div className="relative">
-                                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                                <input
-                                    type="text"
-                                    placeholder="Buscar por nombre, instructor..."
-                                    value={filters.search}
-                                    onChange={(e) => updateFilters({ search: e.target.value })}
-                                    className="w-full pl-12 pr-4 py-4 border-2 border-gray-200 rounded-xl focus:border-[#e30f28] focus:outline-none transition-colors text-gray-700 placeholder-gray-400"
-                                />
-                            </div>
-
-                            <div className="relative">
-                                <select
-                                    value={filters.level}
-                                    onChange={(e) => updateFilters({ level: e.target.value })}
-                                    className="w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:border-[#e30f28] focus:outline-none transition-colors text-gray-700 bg-white appearance-none cursor-pointer"
-                                >
-                                    {englishLevels.map((level) => (
-                                        <option key={level.value} value={level.value}>
-                                            {level.label}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
-
-                            <div className="relative">
-                                <select
-                                    value={filters.modalidad}
-                                    onChange={(e) => updateFilters({ modalidad: e.target.value })}
-                                    className="w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:border-[#e30f28] focus:outline-none transition-colors text-gray-700 bg-white appearance-none cursor-pointer"
-                                >
-                                    {modalidadOptions.map((modalidad) => (
-                                        <option key={modalidad.value} value={modalidad.value}>
-                                            {modalidad.label}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
-
-                            <button 
+                    {/* Clear Button - Show only if filters are active */}
+                    {(filters.search || filters.level !== 'all' || filters.modalidad !== 'all') && (
+                        <div className="mt-4">
+                            <button
                                 onClick={() => router.push('/Courses')}
-                                className="bg-[#00246a] hover:bg-[#001a4f] text-white font-semibold py-4 px-6 rounded-xl transition-all duration-300 flex items-center justify-center gap-2 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+                                className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
                             >
                                 <X className="w-4 h-4" />
-                                Limpiar
+                                Limpiar filtros
                             </button>
                         </div>
-                    </div>
+                    )}
+                </div>
 
-                    {/* Estadísticas de resultados */}
-                    <div className="flex items-center justify-between mb-8">
-                        <p className="text-gray-600 font-medium">
-                            Mostrando <span className="text-[#e30f28] font-bold">{displayedCourses.length}</span> de{" "}
-                            <span className="text-[#e30f28] font-bold">{totalCount}</span> cursos
-                            {totalPages > 1 && (
-                                <span className="text-gray-500 ml-2">
-                                    (Página {currentPage} de {totalPages})
-                                </span>
-                            )}
-                        </p>
-                        <div className="flex items-center gap-2 text-sm text-gray-500">
-                            <Globe className="w-4 h-4" />
-                            Todos los cursos incluyen certificado
-                        </div>
-                    </div>
-
-                    {/* Grid de Cursos */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                        {displayedCourses.map((course) => (
-                            <CourseCard key={course.id} course={course} />
-                        ))}
-                    </div>
-
-                    {/* Paginación */}
+                {/* Results Info */}
+                <div className="mb-6 text-sm text-gray-600">
+                    Mostrando <span className="font-semibold text-gray-900">{displayedCourses.length}</span> de{" "}
+                    <span className="font-semibold text-gray-900">{totalCount}</span> cursos
                     {totalPages > 1 && (
-                        <div className="flex items-center justify-center gap-2 mt-12">
-                            <button
-                                onClick={() => changePage(currentPage - 1)}
-                                disabled={!hasPrevPage}
-                                className="flex items-center gap-2 px-4 py-2 border border-gray-200 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                            >
-                                <ChevronLeft className="w-4 h-4" />
-                                Anterior
-                            </button>
-                            
-                            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                                <button
-                                    key={page}
-                                    onClick={() => changePage(page)}
-                                    className={`px-4 py-2 rounded-lg transition-colors ${
-                                        page === currentPage
-                                            ? 'bg-[#e30f28] text-white'
-                                            : 'border border-gray-200 hover:bg-gray-50'
-                                    }`}
-                                >
-                                    {page}
-                                </button>
-                            ))}
-                            
-                            <button
-                                onClick={() => changePage(currentPage + 1)}
-                                disabled={!hasNextPage}
-                                className="flex items-center gap-2 px-4 py-2 border border-gray-200 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                            >
-                                Siguiente
-                                <ChevronRight className="w-4 h-4" />
-                            </button>
-                        </div>
+                        <span className="ml-4 text-gray-500">
+                            Página {currentPage} de {totalPages}
+                        </span>
                     )}
+                </div>
 
-                    {/* Mensaje cuando no hay resultados */}
-                    {displayedCourses.length === 0 && (
-                        <div className="text-center py-16">
-                            <div className="bg-gray-100 rounded-full w-24 h-24 flex items-center justify-center mx-auto mb-6">
-                                <Search className="w-12 h-12 text-gray-400" />
-                            </div>
-                            <h3 className="text-2xl font-bold text-gray-700 mb-3">
-                                {filters.search ? `No se encontraron cursos para "${filters.search}"` : 'No se encontraron cursos'}
-                            </h3>
-                            <p className="text-gray-500 mb-6">
-                                {filters.search 
-                                    ? 'Intenta con otros términos de búsqueda o ajusta los filtros' 
-                                    : 'Intenta ajustar tus criterios de búsqueda'
-                                }
-                            </p>
-                            <button
-                                onClick={() => router.push('/Courses')}
-                                className="bg-[#e30f28] hover:bg-[#c20e24] text-white font-semibold py-3 px-6 rounded-xl transition-all duration-300"
-                            >
-                                Limpiar Filtros
-                            </button>
+                {/* Courses Grid */}
+                {displayedCourses.length > 0 ? (
+                    <>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+                            {displayedCourses.map((course) => (
+                                <CourseCard key={course.id} course={course} />
+                            ))}
                         </div>
-                    )}
-                </section>
+
+                        {/* Pagination */}
+                        {totalPages > 1 && (
+                            <div className="flex items-center justify-center gap-2 py-8">
+                                <button
+                                    onClick={() => changePage(currentPage - 1)}
+                                    disabled={!hasPrevPage}
+                                    className="inline-flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                                >
+                                    <ChevronLeft className="w-4 h-4" />
+                                    Anterior
+                                </button>
+
+                                <div className="flex items-center gap-1">
+                                    {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
+                                        let page: number;
+                                        if (totalPages <= 5) {
+                                            page = i + 1;
+                                        } else if (currentPage <= 3) {
+                                            page = i + 1;
+                                        } else if (currentPage >= totalPages - 2) {
+                                            page = totalPages - 4 + i;
+                                        } else {
+                                            page = currentPage - 2 + i;
+                                        }
+
+                                        return (
+                                            <button
+                                                key={page}
+                                                onClick={() => changePage(page)}
+                                                className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                                                    page === currentPage
+                                                        ? 'bg-[#002469] text-white'
+                                                        : 'text-gray-700 hover:bg-gray-100 border border-gray-300'
+                                                }`}
+                                            >
+                                                {page}
+                                            </button>
+                                        );
+                                    })}
+                                </div>
+
+                                <button
+                                    onClick={() => changePage(currentPage + 1)}
+                                    disabled={!hasNextPage}
+                                    className="inline-flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                                >
+                                    Siguiente
+                                    <ChevronRight className="w-4 h-4" />
+                                </button>
+                            </div>
+                        )}
+                    </>
+                ) : (
+                    <div className="text-center py-16">
+                        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-100 mb-4">
+                            <Search className="w-8 h-8 text-gray-400" />
+                        </div>
+                        <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                            No se encontraron cursos
+                        </h3>
+                        <p className="text-gray-600 mb-6">
+                            {filters.search 
+                                ? `No hay cursos que coincidan con "${filters.search}"` 
+                                : "Intenta ajustando tus criterios de búsqueda"}
+                        </p>
+                        <button
+                            onClick={() => router.push('/Courses')}
+                            className="inline-flex items-center gap-2 px-6 py-3 bg-[#002469] hover:bg-blue-700 text-white rounded-lg font-semibold transition-colors"
+                        >
+                            Ver todos los cursos
+                        </button>
+                    </div>
+                )}
             </div>
         </div>
     )

@@ -1,14 +1,68 @@
 "use client"
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { motion } from 'framer-motion'
 import { Users, Mail, Phone, User, BookOpen } from 'lucide-react'
 import { TeacherCourseStudent } from '@/types/api'
+import { driver } from "driver.js"
+import "driver.js/dist/driver.css"
 
 export default function StudentsContent() {
     const [students, setStudents] = useState<TeacherCourseStudent[]>([])
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState<string | null>(null)
+
+    const startStudentsTour = useCallback(() => {
+        const steps = [
+            {
+                element: "#students-header",
+                popover: {
+                    title: "Gestión de Estudiantes",
+                    description: "Bienvenido a la sección de estudiantes. Aquí puedes ver todos los alumnos inscritos en tus cursos, su información de contacto y su desempeño académico.",
+                    position: "bottom",
+                },
+            },
+            {
+                element: "#students-count",
+                popover: {
+                    title: "Contador de Estudiantes",
+                    description: "Este indicador muestra el número total de estudiantes que tienes asignados en todos tus cursos.",
+                    position: "bottom",
+                },
+            },
+            {
+                element: "#students-grid",
+                popover: {
+                    title: "Tarjetas de Estudiantes",
+                    description: "Cada tarjeta muestra información completa del estudiante: datos personales, curso inscrito, nivel, y estadísticas de rendimiento como asistencia y promedio.",
+                    position: "top",
+                },
+            },
+        ];
+
+        const driverObj = driver({
+            showProgress: true,
+            allowClose: true,
+            popoverClass: "driverjs-theme",
+            steps,
+        });
+
+        driverObj.drive();
+    }, []);
+
+    // Ejecutar el tour solo una vez
+    useEffect(() => {
+        const hasSeenStudentsTour = localStorage.getItem("hasSeenTeacherStudentsTour");
+        // Solo ejecutar si hay estudiantes cargados y no hay error
+        if (hasSeenStudentsTour || loading || error || students.length === 0) return;
+
+        const timeout = setTimeout(() => {
+            startStudentsTour();
+            localStorage.setItem("hasSeenTeacherStudentsTour", "true");
+        }, 1000);
+
+        return () => clearTimeout(timeout);
+    }, [startStudentsTour, loading, error, students.length]);
 
     useEffect(() => {
         const fetchStudents = async () => {
@@ -60,10 +114,10 @@ export default function StudentsContent() {
             animate={{ opacity: 1, y: 0 }}
             className="p-6"
         >
-            <div className="flex items-center mb-6">
+            <div id="students-header" className="flex items-center mb-6">
                 <Users className="w-8 h-8 text-blue-600 mr-3" />
                 <h2 className="text-2xl font-bold text-slate-800">Mis Estudiantes</h2>
-                <span className="ml-4 bg-blue-100 text-blue-800 text-sm px-3 py-1 rounded-full">
+                <span id="students-count" className="ml-4 bg-blue-100 text-blue-800 text-sm px-3 py-1 rounded-full">
                     {students.length} estudiantes
                 </span>
             </div>
@@ -74,7 +128,7 @@ export default function StudentsContent() {
                     <p className="text-gray-500 text-lg">No tienes estudiantes asignados</p>
                 </div>
             ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div id="students-grid" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {students.map((student) => (
                         <motion.div
                             key={student.id_estudiante}

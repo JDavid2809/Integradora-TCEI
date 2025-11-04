@@ -101,6 +101,7 @@ export async function getPaginatedCourses(params: CourseSearchParams = {}): Prom
         id_curso: true,
         nombre: true,
         descripcion: true,
+        resumen: true,
         modalidad: true,
         inicio: true,
         fin: true,

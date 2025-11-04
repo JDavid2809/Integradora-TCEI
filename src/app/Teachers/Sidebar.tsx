@@ -1,7 +1,10 @@
 "use client"
 
-import { BookOpen, Home, GraduationCap, Calendar, LogOut, X, CheckSquare, SquareActivity, CalendarDays } from "lucide-react"
+import { useEffect, useCallback, useState } from "react"
+import { BookOpen, Home, GraduationCap, Calendar, X, CheckSquare, SquareActivity, CalendarDays } from "lucide-react"
 import Image from "next/image"
+import { driver } from "driver.js"
+import "driver.js/dist/driver.css"
 
 interface SidebarProps {
     activeSection: string
@@ -18,6 +21,17 @@ export default function Sidebar({
     setSidebarOpen,
     onLogout,
 }: SidebarProps) {
+    const [isDesktop, setIsDesktop] = useState(true)
+
+    useEffect(() => {
+        const handleResize = () => {
+            setIsDesktop(window.innerWidth >= 1024)
+        }
+        handleResize()
+        window.addEventListener("resize", handleResize)
+        return () => window.removeEventListener("resize", handleResize)
+    }, [])
+
     const menuItems = [
         { id: "dashboard", label: "Inicio", icon: Home },
         { id: "courses", label: "Gestión de Cursos", icon: BookOpen },
@@ -27,6 +41,99 @@ export default function Sidebar({
         { id: "exams", label: "Exámenes", icon: Calendar },
         { id: "activity", label: "Actividades", icon: SquareActivity }
     ]
+
+    const startSidebarTour = useCallback(() => {
+        const steps = [
+            {
+                element: "#teacher-navigation",
+                popover: {
+                    title: "Panel de Navegación del Profesor",
+                    description:
+                        "Bienvenido a tu panel de profesor. Aquí encontrarás todas las herramientas para gestionar tus cursos, estudiantes y actividades académicas.",
+                    position: "right",
+                },
+            },
+            {
+                element: "#menu-dashboard",
+                popover: {
+                    title: "Panel de Inicio",
+                    description: "Accede a tu dashboard principal con una vista general de tus cursos, estadísticas y actividad reciente.",
+                    position: "right",
+                },
+            },
+            {
+                element: "#menu-courses",
+                popover: {
+                    title: "Gestión de Cursos",
+                    description: "Administra todos tus cursos: crea contenido, organiza lecciones y gestiona materiales educativos.",
+                    position: "right",
+                },
+            },
+            {
+                element: "#menu-students",
+                popover: {
+                    title: "Mis Estudiantes",
+                    description: "Visualiza y gestiona la información de tus estudiantes, revisa su progreso y desempeño académico.",
+                    position: "right",
+                },
+            },
+            {
+                element: "#menu-schedule",
+                popover: {
+                    title: "Mi Horario",
+                    description: "Consulta tu horario de clases, planifica sesiones y gestiona tu calendario académico.",
+                    position: "right",
+                },
+            },
+            {
+                element: "#menu-attendance",
+                popover: {
+                    title: "Asistencia",
+                    description: "Registra y controla la asistencia de tus estudiantes en cada sesión de clase.",
+                    position: "right",
+                },
+            },
+            {
+                element: "#menu-exams",
+                popover: {
+                    title: "Exámenes",
+                    description: "Crea, programa y califica exámenes. Gestiona las evaluaciones de tus estudiantes.",
+                    position: "right",
+                },
+            },
+            {
+                element: "#menu-activity",
+                popover: {
+                    title: "Actividades",
+                    description: "Crea y gestiona actividades, tareas y proyectos para tus estudiantes. Revisa entregas y asigna calificaciones.",
+                    position: "right",
+                },
+            },
+        ]
+
+        const driverObj = driver({
+            showProgress: true,
+            allowClose: true,
+            popoverClass: "driverjs-theme",
+            steps,
+        })
+
+        driverObj.drive()
+    }, [])
+
+    useEffect(() => {
+        const hasSeenTeacherTour = localStorage.getItem("hasSeenTeacherSidebarTour")
+        if (hasSeenTeacherTour || !isDesktop) return
+
+        const timeout = setTimeout(() => {
+            startSidebarTour()
+            localStorage.setItem("hasSeenTeacherSidebarTour", "true")
+        }, 600)
+
+        return () => clearTimeout(timeout)
+    }, [startSidebarTour, isDesktop])
+
+    if (!isDesktop) return null
 
     return (
         <div
@@ -57,10 +164,11 @@ export default function Sidebar({
                 </div>
 
                 {/* Navigation */}
-                <nav className="flex-1 mt-6 px-3 overflow-y-auto">
+                <nav className="flex-1 mt-6 px-3 overflow-y-auto" id="teacher-navigation">
                     {menuItems.map((item) => (
                         <button
                             key={item.id}
+                            id={`menu-${item.id}`}
                             onClick={() => {
                                 setActiveSection(item.id)
                                 setSidebarOpen(false)
@@ -75,19 +183,6 @@ export default function Sidebar({
                         </button>
                     ))}
                 </nav>
-
-                {/* Logout Button */}
-                <div className="p-3 flex-shrink-0">
-                    <button
-                        onClick={onLogout}
-                        className="w-full flex items-center space-x-3 px-3 py-3 rounded-xl text-slate-600 hover:bg-red-50 hover:text-red-600 transition-all duration-200"
-                    >
-                        <LogOut className="w-5 h-5" />
-                        <span
-                             
-                            className="font-medium">Cerrar Sesión</span>
-                    </button>
-                </div>
             </div>
         </div>
     )

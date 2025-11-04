@@ -2,6 +2,8 @@
 export interface CursoFromDB {
   id_curso: number
   nombre: string
+  descripcion?: string | null
+  resumen?: string | null
   modalidad: 'PRESENCIAL' | 'ONLINE'
   inicio: Date | null
   fin: Date | null
@@ -29,6 +31,8 @@ export interface CursoFromDB {
 export interface DetailedCursoFromDB {
   id_curso: number
   nombre: string
+  descripcion?: string | null
+  resumen?: string | null
   modalidad: 'PRESENCIAL' | 'ONLINE'
   inicio: Date | null
   fin: Date | null
@@ -116,7 +120,7 @@ export interface CourseForDisplay {
   instructor: string
   duration: string
   students: number
-  rating: number
+  rating: number | null // Permitir null para cursos sin suficientes estudiantes
   price: string
   level: string
   image: string

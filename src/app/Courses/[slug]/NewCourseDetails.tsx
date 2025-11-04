@@ -504,7 +504,7 @@ export default function CourseDetails({ courseData }: CourseDetailsProps) {
         ],
         features: features.length > 0 ? features : [
             { icon: Video, title: "Clases en vivo", description: "Sesiones interactivas con tu instructor" },
-            { icon: Download, title: "Material descargable", description: "PDFs, audios y ejercicios para practicar" },
+            // { icon: Download, title: "Material descargable", description: "PDFs, audios y ejercicios para practicar" },
             { icon: Smartphone, title: "Acceso móvil", description: "Estudia desde cualquier dispositivo" },
             { icon: MessageCircle, title: "Soporte 24/7", description: "Ayuda cuando la necesites" },
             { icon: Trophy, title: "Certificado", description: "Certificado digital al finalizar" }
@@ -775,21 +775,18 @@ export default function CourseDetails({ courseData }: CourseDetailsProps) {
 
                                     <div className="space-y-3 text-sm">
                                         <h4 className="font-semibold text-gray-900 mb-3">Este curso incluye:</h4>
-                                        <div className="flex items-center gap-3">
-                                            <Video className="w-4 h-4 text-gray-600" />
-                                            <span className="text-gray-700">Contenido multimedia interactivo</span>
-                                        </div>
+                                        
                                         <div className="flex items-center gap-3">
                                             <BookOpen className="w-4 h-4 text-gray-600" />
                                             <span className="text-gray-700">{courseData.total_lecciones_calculadas || 20} lecciones organizadas por módulos</span>
                                         </div>
                                         <div className="flex items-center gap-3">
                                             <Target className="w-4 h-4 text-gray-600" />
-                                            <span className="text-gray-700">{Math.round((courseData.total_lecciones_calculadas || 20) * 8)}+ ejercicios interactivos</span>
+                                            <span className="text-gray-700"> ejercicios interactivos</span>
                                         </div>
                                         <div className="flex items-center gap-3">
                                             <Download className="w-4 h-4 text-gray-600" />
-                                            <span className="text-gray-700">Material descargable (PDFs, audios, plantillas)</span>
+                                            <span className="text-gray-700">Material descargable </span>
                                         </div>
                                         <div className="flex items-center gap-3">
                                             <Clock className="w-4 h-4 text-gray-600" />

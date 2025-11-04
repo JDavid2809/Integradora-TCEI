@@ -22,6 +22,8 @@ import {
 } from 'lucide-react'
 import { TeacherCourseListItem } from '@/types/course-creation'
 import { getTeacherCourses, toggleCourseStatus, deleteCourse } from '@/actions/teacher/courseActions'
+import { driver } from "driver.js"
+import "driver.js/dist/driver.css"
 
 interface CourseListProps {
   teacherId: number
@@ -117,6 +119,91 @@ export default function CourseList({ teacherId, onCreateNew, onEditCourse, onVie
     loadCourses()
   }, [teacherId, loadCourses])
 
+  // Tour con driver.js
+  const startCourseListTour = useCallback(() => {
+    const steps = [
+      {
+        element: "#course-list-header",
+        popover: {
+          title: "Gestión de Cursos",
+          description: "Bienvenido a tu panel de gestión de cursos. Aquí puedes crear, editar, activar/desactivar y eliminar tus cursos. Mantén todo organizado desde un solo lugar.",
+          position: "bottom",
+        },
+      },
+      {
+        element: "#create-course-button",
+        popover: {
+          title: "Crear Nuevo Curso",
+          description: "Haz clic aquí para crear un nuevo curso. Podrás definir el nombre, descripción, fechas, modalidad y todos los detalles necesarios.",
+          position: "left",
+        },
+      },
+      {
+        element: "#refresh-button",
+        popover: {
+          title: "Actualizar Lista",
+          description: "Usa este botón para actualizar la lista de cursos y ver los cambios más recientes.",
+          position: "left",
+        },
+      },
+      {
+        element: "#search-bar",
+        popover: {
+          title: "Búsqueda de Cursos",
+          description: "Busca cursos específicos por nombre o descripción. La búsqueda se actualiza en tiempo real.",
+          position: "bottom",
+        },
+      },
+      {
+        element: "#status-filter",
+        popover: {
+          title: "Filtrar por Estado",
+          description: "Filtra tus cursos por su estado: todos, solo activos o solo inactivos. Útil para organizar tu vista.",
+          position: "bottom",
+        },
+      },
+      {
+        element: "#stats-cards",
+        popover: {
+          title: "Estadísticas Rápidas",
+          description: "Visualiza de un vistazo: total de cursos creados, cursos activos y cantidad total de estudiantes inscritos.",
+          position: "bottom",
+        },
+      },
+      {
+        element: "#courses-grid",
+        popover: {
+          title: "Lista de Cursos",
+          description: "Aquí aparecen todos tus cursos con información detallada: estado, fechas, modalidad, estudiantes inscritos y acciones disponibles (ver, editar, eliminar, activar/desactivar).",
+          position: "top",
+        },
+      },
+    ];
+
+    const driverObj = driver({
+      showProgress: true,
+      allowClose: true,
+      popoverClass: "driverjs-theme",
+      steps,
+    });
+
+    driverObj.drive();
+  }, []);
+
+  // Ejecutar el tour solo una vez
+  useEffect(() => {
+    const hasSeenCourseListTour = localStorage.getItem("hasSeenTeacherCourseListTour");
+    // Solo ejecutar si hay cursos cargados y no está en loading
+    if (hasSeenCourseListTour || isLoading) return;
+
+    const timeout = setTimeout(() => {
+      startCourseListTour();
+      localStorage.setItem("hasSeenTeacherCourseListTour", "true");
+    }, 1200);
+
+    return () => clearTimeout(timeout);
+  }, [startCourseListTour, isLoading]);
+
   // Filtrar cursos
   const filteredCourses = courses.filter(course => {
     const matchesSearch = course.nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -191,7 +278,7 @@ export default function CourseList({ teacherId, onCreateNew, onEditCourse, onVie
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+      <div id="course-list-header" className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h1 className="text-xl sm:text-2xl font-bold text-[#00246a]">Mis Cursos</h1>
           <p className="text-sm sm:text-base text-gray-600">Gestiona tus cursos creados</p>
@@ -199,6 +286,7 @@ export default function CourseList({ teacherId, onCreateNew, onEditCourse, onVie
         
         <div className="flex flex-wrap gap-2 sm:gap-3 w-full sm:w-auto">
           <button
+            id="refresh-button"
             onClick={refreshCourses}
             disabled={isRefreshing}
             className="flex items-center gap-2 px-3 sm:px-4 py-2 text-sm sm:text-base text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 flex-1 sm:flex-none justify-center"
@@ -208,6 +296,7 @@ export default function CourseList({ teacherId, onCreateNew, onEditCourse, onVie
           </button>
           
           <button
+            id="create-course-button"
             onClick={onCreateNew}
             className="flex items-center gap-2 px-3 sm:px-4 py-2 text-sm sm:text-base bg-[#00246a] text-white rounded-lg hover:bg-blue-700 flex-1 sm:flex-none justify-center"
           >
@@ -219,7 +308,7 @@ export default function CourseList({ teacherId, onCreateNew, onEditCourse, onVie
 
       {/* Filters */}
       <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
-        <div className="flex-1">
+        <div id="search-bar" className="flex-1">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
             <input
@@ -232,7 +321,7 @@ export default function CourseList({ teacherId, onCreateNew, onEditCourse, onVie
           </div>
         </div>
         
-        <div className="flex items-center gap-2">
+        <div id="status-filter" className="flex items-center gap-2">
           <Filter className="w-4 h-4 text-gray-500 flex-shrink-0" />
           <select
             value={statusFilter}
@@ -247,7 +336,7 @@ export default function CourseList({ teacherId, onCreateNew, onEditCourse, onVie
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
+      <div id="stats-cards" className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
         <div className="bg-blue-50 p-3 sm:p-4 rounded-lg">
           <div className="flex items-center gap-3">
             <BookOpen className="w-6 h-6 sm:w-8 sm:h-8 text-blue-600 flex-shrink-0" />
@@ -307,7 +396,7 @@ export default function CourseList({ teacherId, onCreateNew, onEditCourse, onVie
           )}
         </div>
       ) : (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+        <div id="courses-grid" className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
           {filteredCourses.map((course) => (
             <div key={course.id_curso} className="bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow">
               {/* Course Header */}

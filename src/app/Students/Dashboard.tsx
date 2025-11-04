@@ -13,6 +13,7 @@ import BottomTabs from "./Tabs"
 import AssistantContent from "./AssistantContent"
 import { Session } from "next-auth"
 import { CursoFromDB } from "@/types/courses"
+import Activitys from "./Activitys"
 
 interface DashboardProps {
     onLogout: () => void
@@ -52,6 +53,8 @@ export default function Dashboard({ onLogout, user, studentCourses, allCourses, 
                 return <PaymentsContent key="payments" />
             case "exams":
                 return <ExamsContent key="exams" />
+            case "activities":
+                return <Activitys key="activities" />
             default:
                 return <DashboardContent key="dashboard" />
         }

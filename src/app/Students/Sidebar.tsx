@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useCallback, useState } from "react";
-import { BookOpen, Home, GraduationCap, Calendar, X, CheckSquare } from "lucide-react";
+import { BookOpen, Home, GraduationCap, Calendar, X, CheckSquare, BrainCircuit } from "lucide-react";
 import Image from "next/image";
 import { driver } from "driver.js";
 import "driver.js/dist/driver.css";
@@ -35,10 +35,11 @@ export default function Sidebar({
     const menuItems = [
         { id: "dashboard", label: "Inicio", icon: Home },
         { id: "courses", label: "Mis Cursos", icon: BookOpen },
-        { id: "assistant", label: "Asistente virtual", icon: CheckSquare },
-        { id: "schedule", label: "Mi Horario", icon: Calendar },
-        { id: "payments", label: "Mis Pagos", icon: CheckSquare },
+        { id: "activities", label: "Mis Actividades", icon: CheckSquare },
         { id: "exams", label: "Mis Exámenes", icon: GraduationCap },
+        { id: "assistant", label: "Asistente virtual", icon: BrainCircuit },
+        { id: "schedule", label: "Mi Horario", icon: Calendar },
+        
     ];
 
     const startSidebarTour = useCallback(() => {
@@ -69,18 +70,10 @@ export default function Sidebar({
                 },
             },
             {
-                element: "#menu-schedule",
+                element: "#menu-assistant",
                 popover: {
-                    title: "Mi Horario",
-                    description: "Consulta tu horario y próximas clases.",
-                    position: "right",
-                },
-            },
-            {
-                element: "#menu-payments",
-                popover: {
-                    title: "Mis Pagos",
-                    description: "Revisa tus pagos y facturación.",
+                    title: "Tu asistente virtual",
+                    description: "El es tu asistente virtual la cual te ayudara a mejorar tu aprendizaje.",
                     position: "right",
                 },
             },

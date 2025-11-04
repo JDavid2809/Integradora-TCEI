@@ -2,7 +2,7 @@
 
 import { useEffect, useCallback, useState } from "react";
 import { motion } from "framer-motion";
-import { BookOpen, Home, GraduationCap, CheckSquare, Calendar } from "lucide-react";
+import { BookOpen, Home, GraduationCap, CheckSquare, Calendar, BrainCircuit } from "lucide-react";
 import { driver } from "driver.js";
 import "driver.js/dist/driver.css";
 
@@ -24,8 +24,9 @@ export default function BottomTabs({ activeSection, setActiveSection }: BottomTa
     const tabItems = [
         { id: "dashboard", label: "Inicio", icon: Home },
         { id: "courses", label: "Cursos", icon: BookOpen },
+        { id: "activities", label: "Actividades", icon: CheckSquare },
+        { id: "assistant", label: "Asistente virtual", icon: BrainCircuit },
         { id: "schedule", label: "Horario", icon: Calendar },
-        { id: "payments", label: "Pagos", icon: CheckSquare },
         { id: "exams", label: "Exámenes", icon: GraduationCap },
     ];
 
@@ -57,18 +58,26 @@ export default function BottomTabs({ activeSection, setActiveSection }: BottomTa
                 },
             },
             {
-                element: "#tab-schedule",
+                element: "#tab-activities",
                 popover: {
-                    title: "Horario",
-                    description: "Consulta tus clases y actividades programadas.",
+                    title: "Actividades",
+                    description: "Consulta tus actividades y tareas aquí.",
                     position: "top",
                 },
             },
             {
-                element: "#tab-payments",
+                element: "#menu-assistant",
                 popover: {
-                    title: "Pagos",
-                    description: "Revisa tus pagos, facturas y estados de cuenta.",
+                    title: "Tu asistente virtual",
+                    description: "El es tu asistente virtual la cual te ayudara a mejorar tu aprendizaje.",
+                    position: "right",
+                },
+            },
+            {
+                element: "#tab-schedule",
+                popover: {
+                    title: "Horario",
+                    description: "Consulta tus clases y actividades programadas.",
                     position: "top",
                 },
             },

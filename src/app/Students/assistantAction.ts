@@ -47,7 +47,7 @@ export async function generateAssistantResponse({ prompt, system, model, languag
     const body: OpenRouterRequest = {
       model: model || 'deepseek/deepseek-prover-v2:free',
       messages: [],
-    }
+    }  
     // Si no se provee system desde el cliente, usar el prompt por defecto según el idioma
     const chosenLang: 'es' | 'en' = language === 'es' ? 'es' : 'en'
     if (system) {
@@ -59,7 +59,7 @@ export async function generateAssistantResponse({ prompt, system, model, languag
 
     // Intentar llamada; si OpenRouter responde 404 "No endpoints found" reintentar con modelos fallback
     const FALLBACK_MODELS: string[] = [
-      'openai/gpt-4o',
+      //'openai/gpt-4o',
       'google/gemma-3n-e2b-it:free',
       'meta-llama/llama-3.3-70b-instruct:free',
       'deepseek/deepseek-prover-v2:free',

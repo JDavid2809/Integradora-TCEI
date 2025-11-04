@@ -8,7 +8,13 @@ import { prisma } from '@/lib/prisma'
 import { createSlug } from '@/lib/slugUtils' // ✅ Importar la función de slug
 import Stripe from 'stripe';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
+// Lazy initialization to avoid build-time errors
+function getStripe() {
+  if (!process.env.STRIPE_SECRET_KEY) {
+    throw new Error('STRIPE_SECRET_KEY is not configured')
+  }
+  return new Stripe(process.env.STRIPE_SECRET_KEY)
+}
 
 export async function createCheckoutSession(courseId: number) {
   const session = await getServerSession(authOptions);
@@ -33,6 +39,7 @@ export async function createCheckoutSession(courseId: number) {
   // ✅ Crear slug del curso para la URL de cancelación
   const courseSlug = createSlug(curso.nombre);
 
+  const stripe = getStripe()
   const checkoutSession = await stripe.checkout.sessions.create({
     mode: 'payment',
     payment_method_types: ['card'],

@@ -59,7 +59,7 @@ export async function generateAssistantResponse({ prompt, system, model, languag
 
     // Intentar llamada; si OpenRouter responde 404 "No endpoints found" reintentar con modelos fallback
     const FALLBACK_MODELS: string[] = [
-      'openai/gpt-4o',
+      // 'openai/gpt-4o',
       'google/gemma-3n-e2b-it:free',
       'meta-llama/llama-3.3-70b-instruct:free',
       'deepseek/deepseek-prover-v2:free',

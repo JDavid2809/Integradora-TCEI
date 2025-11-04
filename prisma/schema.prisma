@@ -29,6 +29,7 @@ model estudiante {
   pago                    pago[]
   resultado_examen        resultado_examen[]
   activity_submissions    activity_submission[] // Entregas de actividades
+  certificados            Certificado[] // Certificados obtenidos
 
   @@index([id_categoria_edad])
 }
@@ -313,6 +314,7 @@ model curso {
   horario_pred    horario_pred[]
   imparte         imparte[]
   activities      course_activity[] // Actividades del curso
+  certificados    Certificado[]     // Certificados emitidos
 
   @@index([created_by])
 }
@@ -332,6 +334,7 @@ model Inscripcion {
   attendance     attendance[]
   payments       payment[]
   submissions    activity_submission[] // Entregas de actividades
+  certificado    Certificado? // Certificado de finalización
 
   @@unique([student_id, course_id])
   @@index([student_id])
@@ -733,4 +736,51 @@ model solicitud_profesor {
   @@index([email])
   @@index([estado])
   @@index([fecha_solicitud])
+}
+
+// ============================================
+// SISTEMA DE CERTIFICADOS
+// ============================================
+
+model Certificado {
+  id                  Int      @id @default(autoincrement())
+  token_uuid          String   @unique @default(uuid()) // Token único estilo Udemy: UC-{uuid}
+  estudiante_id       Int
+  curso_id            Int
+  inscripcion_id      Int      @unique
+  
+  // Información del certificado
+  nombre_estudiante   String   @db.VarChar(200)
+  nombre_curso        String   @db.VarChar(200)
+  nombre_instructor   String   @db.VarChar(200)
+  duracion_horas      Int?
+  nivel_ingles        String?  @db.VarChar(20)
+  
+  // Fechas
+  fecha_inicio        DateTime
+  fecha_finalizacion  DateTime
+  fecha_emision       DateTime @default(now())
+  
+  // Validación y verificación
+  codigo_verificacion String   @unique @db.VarChar(50) // Código corto para verificación rápida
+  url_verificacion    String   @unique @db.VarChar(255) // URL completa del certificado
+  es_valido           Boolean  @default(true)
+  fecha_revocacion    DateTime?
+  motivo_revocacion   String?  @db.Text
+  
+  // Estadísticas
+  veces_visto         Int      @default(0)
+  ultima_visualizacion DateTime?
+  
+  // Relaciones
+  estudiante          estudiante   @relation(fields: [estudiante_id], references: [id_estudiante], onDelete: Cascade)
+  curso               curso        @relation(fields: [curso_id], references: [id_curso], onDelete: Cascade)
+  inscripcion         Inscripcion  @relation(fields: [inscripcion_id], references: [id])
+  
+  @@index([estudiante_id])
+  @@index([curso_id])
+  @@index([token_uuid])
+  @@index([codigo_verificacion])
+  @@index([fecha_emision])
+  @@index([es_valido])
 }

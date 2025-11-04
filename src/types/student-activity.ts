@@ -8,6 +8,7 @@ export interface StudentCourseDetail {
   modalidad: 'PRESENCIAL' | 'ONLINE'
   inicio: Date | null
   fin: Date | null
+  inscripcionId: number // ID de la inscripción del estudiante
   instructor: {
     nombre: string
     apellido: string

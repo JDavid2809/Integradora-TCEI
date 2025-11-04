@@ -120,6 +120,7 @@ export async function getStudentCourseDetails(courseId: number): Promise<Student
       modalidad: course.modalidad as 'PRESENCIAL' | 'ONLINE',
       inicio: course.inicio,
       fin: course.fin,
+      inscripcionId: enrollment.id, // Incluir ID de inscripción
       instructor: {
         nombre: instructorName,
         apellido: instructorLastName

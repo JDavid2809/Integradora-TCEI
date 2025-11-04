@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { ArrowLeft, BookOpen, ListChecks } from 'lucide-react'
 import StudentCourseDetailComponent from '@/components/student/StudentCourseDetail'
 import StudentActivityList from '@/components/student/StudentActivityList'
+import CertificateButton from '@/components/certificates/CertificateButton'
 import { StudentCourseDetail, StudentActivityWithSubmission } from '@/types/student-activity'
 
 interface StudentCourseViewProps {
@@ -47,6 +48,24 @@ export default function StudentCourseView({ course, activities: initialActivitie
                 </p>
               </div>
             </div>
+
+            {/* Botón de Certificado */}
+            <div className="hidden sm:block">
+              <CertificateButton
+                inscripcionId={course.inscripcionId}
+                courseId={course.id}
+                courseName={course.nombre}
+              />
+            </div>
+          </div>
+
+          {/* Botón de Certificado - Versión móvil */}
+          <div className="sm:hidden py-3 border-b border-gray-100">
+            <CertificateButton
+              inscripcionId={course.inscripcionId}
+              courseId={course.id}
+              courseName={course.nombre}
+            />
           </div>
 
           {/* Tabs */}

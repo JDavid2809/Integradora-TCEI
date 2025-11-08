@@ -145,6 +145,20 @@ export const authOptions: NextAuthOptions = {
   },
 },
 
-  session: { strategy: "jwt" },
+  session: { 
+    strategy: "jwt",
+    maxAge: 24 * 60 * 60, // 24 horas
+  },
+  pages: {
+    signIn: '/Login',
+    signOut: '/Login',
+    error: '/Login',
+  },
+  events: {
+    async signOut({ token }) {
+      // Log cuando un usuario cierra sesión
+      console.log('🚪 User signed out:', token?.email)
+    },
+  },
   secret: process.env.NEXTAUTH_SECRET,
 };

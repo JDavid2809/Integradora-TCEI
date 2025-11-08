@@ -6,6 +6,7 @@ import Providers from "../components/Providers";
 import { SearchProvider } from "../contexts/SearchContext";
 import Chatbot from "@/components/ui/admin/Chatbot";
 import PasswordChangeWrapper from "@/components/ui/PasswordChangeWrapper";
+import PWAInstallPrompt from "@/components/PWAInstallPrompt";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -56,6 +57,7 @@ export default function RootLayout({
                 
               <Chatbot />
               </main>
+              <PWAInstallPrompt />
             </PasswordChangeWrapper>
           </SearchProvider>
         </Providers>

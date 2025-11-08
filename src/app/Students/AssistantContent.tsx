@@ -4,6 +4,7 @@ import React, { useState, useRef, useEffect, useCallback } from "react"
 import { generateAssistantResponse } from "./assistantAction"
 import { driver } from "driver.js"
 import "driver.js/dist/driver.css"
+import { BrushCleaning, SendHorizontal } from "lucide-react"
 
 export default function AssistantContent() {
   type Msg = { role: 'user' | 'assistant' | 'system'; text: string; time?: string }
@@ -229,257 +230,382 @@ export default function AssistantContent() {
   }
 
   return (
-        <div className="max-w-5xl mx-auto px-4">
-      <div id="assistant-header" className="rounded-xl bg-[#00246a] p-6 mb-6 shadow-lg">
-        <div className="flex items-center justify-between">
-          <div>
-            <h2 className="text-3xl font-bold text-white mb-1">Asistente</h2>
-            <p className="text-white/80 text-sm">Ayuda rápida para tus cursos de inglés</p>
-          </div>
-          <div className="flex items-center gap-3">
-            <div id="language-selector" className="flex items-center gap-1 bg-white/10 rounded-lg p-1">
-              <button
-                type="button"
-                onClick={() => setLanguage("es")}
-                className={`px-4 py-2 rounded-md font-medium transition-all ${language === "es" ? "bg-[#e30f28] text-white shadow-md" : "text-white hover:bg-white/10"}`}
-              >
-                ES
-              </button>
-              <button
-                type="button"
-                onClick={() => setLanguage("en")}
-                className={`px-4 py-2 rounded-md font-medium transition-all ${language === "en" ? "bg-[#e30f28] text-white shadow-md" : "text-white hover:bg-white/10"}`}
-              >
-                EN
-              </button>
+    <div className="w-full h-full flex flex-col px-0 sm:px-4 lg:px-6 py-0 sm:py-4">
+      {/* HEADER */}
+      <div 
+        id="assistant-header"
+        className="relative bg-gradient-to-br from-[#00246a] via-[#003875] to-[#00246a] p-4 sm:p-8 mb-0 sm:mb-4 rounded-xl sm:rounded-2xl shadow-2xl overflow-hidden"
+      >
+        {/* Patrón de fondo decorativo */}
+        <div className="absolute inset-0 opacity-5">
+          <div className="absolute top-0 left-0 w-64 h-64 bg-white rounded-full -translate-x-32 -translate-y-32"></div>
+          <div className="absolute bottom-0 right-0 w-96 h-96 bg-white rounded-full translate-x-48 translate-y-48"></div>
+          <div className="absolute top-1/2 left-1/2 w-72 h-72 bg-[#e30f28] rounded-full -translate-x-36 -translate-y-36"></div>
+        </div>
+
+        <div className="relative z-10">
+          {/* Layout Mobile: Minimalista y espaciado */}
+          <div className="flex sm:hidden flex-col gap-3">
+            {/* Solo Logo + Título */}
+            <div className="flex items-center gap-3">
+              <div className="relative flex-shrink-0">
+                <div className="w-14 h-14 rounded-2xl bg-white/95 backdrop-blur-sm shadow-xl flex items-center justify-center">
+                  <img src="/ChatBot.png" alt="AI" className="w-8 h-8" />
+                </div>
+                <div className="absolute -bottom-1 -right-1 w-3.5 h-3.5 bg-green-400 rounded-full border-2 border-[#00246a]"></div>
+              </div>
+              <div>
+                <h2 className="text-lg font-bold text-white">
+                  {language === 'es' ? 'Asistente Beanie' : 'Beanie Assistant'}
+                </h2>
+                <div className="flex items-center gap-1.5 mt-0.5">
+                  <div className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse"></div>
+                  <span className="text-xs text-white/70">
+                    {language === 'es' ? 'En línea' : 'Online'}
+                  </span>
+                </div>
+              </div>
             </div>
-            <select
-              id="model-selector"
-              className="bg-white/10 text-white border border-white/20 px-4 py-2 rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#e30f28] transition-all cursor-pointer hover:bg-white/20"
-              value={model}
-              onChange={(e) => setModel(e.target.value)}
-            >
-              <option value="google/gemma-3n-e2b-it:free" className="text-gray-900">
-                Gemma
-              </option>
-              <option value="meta-llama/llama-3.3-70b-instruct:free" className="text-gray-900">
-                Llama 3.3
-              </option>
-              <option value="deepseek/deepseek-prover-v2:free" className="text-gray-900">
-                Deepseek (experimental)
-              </option>
-            </select>
+
+            {/* Controles simplificados */}
+            <div className="flex items-center gap-2">
+              {/* Toggle idioma */}
+              <div className="flex bg-white/10 rounded-xl p-1 backdrop-blur-sm border border-white/20">
+                <button
+                  type="button"
+                  onClick={() => setLanguage("es")}
+                  className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all ${
+                    language === "es"
+                      ? "bg-[#e30f28] text-white"
+                      : "text-white/70"
+                  }`}
+                >
+                  ES
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setLanguage("en")}
+                  className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all ${
+                    language === "en"
+                      ? "bg-[#e30f28] text-white"
+                      : "text-white/70"
+                  }`}
+                >
+                  EN
+                </button>
+              </div>
+
+              {/* Selector modelo */}
+              <select
+                className="flex-1 bg-white/10 text-white border border-white/20 px-3 py-2 rounded-xl text-sm font-medium focus:outline-none backdrop-blur-sm"
+                value={model}
+                onChange={(e) => setModel(e.target.value)}
+              >
+                <option value="google/gemma-3n-e2b-it:free" className="text-gray-900 bg-white">
+                  Gemma
+                </option>
+                <option value="meta-llama/llama-3.3-70b-instruct:free" className="text-gray-900 bg-white">
+                  Llama
+                </option>
+                <option value="deepseek/deepseek-prover-v2:free" className="text-gray-900 bg-white">
+                  Deepseek
+                </option>
+              </select>
+            </div>
+          </div>
+
+          {/* Layout Desktop: Original */}
+          <div className="hidden sm:flex sm:items-center sm:justify-between gap-4">
+            <div className="flex items-center gap-4">
+              <div className="relative flex-shrink-0">
+                <div className="w-20 h-20 rounded-full bg-white/95 backdrop-blur-md border-2 border-white/30 shadow-xl flex items-center justify-center relative overflow-hidden group hover:scale-105 transition-transform duration-300">
+                  <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
+                  <img src="/ChatBot.png" alt="Robot Icon" className="w-12 h-12 relative z-10" />
+                </div>
+                <div className="absolute bottom-1 -right-1 w-5 h-5 bg-green-400 rounded-full border-3 border-[#00246a] shadow-lg">
+                  <div className="w-full h-full rounded-full bg-green-400 animate-ping opacity-75"></div>
+                </div>
+              </div>
+              <div>
+                <h2 className="text-2xl lg:text-3xl font-bold text-white leading-tight">
+                  {language === 'es' ? 'Asistente Beanie' : 'Beanie Assistant'}
+                </h2>
+                <p className="text-white/80 text-sm mt-0.5 font-medium">
+                  {language === 'es' 
+                    ? 'Potenciado con Inteligencia Artificial' 
+                    : 'Powered by Artificial Intelligence'}
+                </p>
+                <div className="flex items-center gap-2 mt-1">
+                  <span className="text-white/40">•</span>
+                  <span className="text-xs text-white/60">
+                    {language === 'es' ? 'Listo para ayudarte' : 'Ready to assist you'}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Controles Desktop */}
+            <div className="flex items-center gap-3">
+              <div 
+                id="language-selector"
+                className="flex bg-white/10 rounded-xl p-1 backdrop-blur-md border border-white/20 shadow-lg"
+              >
+                <button
+                  type="button"
+                  onClick={() => setLanguage("es")}
+                  className={`px-5 py-2 rounded-lg font-semibold transition-all text-sm ${
+                    language === "es"
+                      ? "bg-[#e30f28] text-white shadow-lg scale-105"
+                      : "text-white/80 hover:bg-white/10 hover:text-white"
+                  }`}
+                >
+                  Español
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setLanguage("en")}
+                  className={`px-5 py-2 rounded-lg font-semibold transition-all text-sm ${
+                    language === "en"
+                      ? "bg-[#e30f28] text-white shadow-lg scale-105"
+                      : "text-white/80 hover:bg-white/10 hover:text-white"
+                  }`}
+                >
+                  English
+                </button>
+              </div>
+
+              <select
+                id="model-selector"
+                className="bg-white/10 text-white border border-white/20 px-4 py-2.5 rounded-xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#e30f28] transition-all cursor-pointer hover:bg-white/15 backdrop-blur-md shadow-lg min-w-[200px]"
+                value={model}
+                onChange={(e) => setModel(e.target.value)}
+              >
+                <option value="google/gemma-3n-e2b-it:free" className="text-gray-900 bg-white">
+                  Gemma - Rápido
+                </option>
+                <option value="meta-llama/llama-3.3-70b-instruct:free" className="text-gray-900 bg-white">
+                  Llama 3.3 - Preciso
+                </option>
+                <option value="deepseek/deepseek-prover-v2:free" className="text-gray-900 bg-white">
+                  Deepseek - Experimental
+                </option>
+              </select>
+            </div>
           </div>
         </div>
       </div>
 
+      {/* CHAT AREA */}
       <div
         id="chat-area"
-        className="bg-white rounded-xl shadow-lg border border-gray-200 p-6 h-[56vh] overflow-y-auto mb-6"
-        style={{ display: "flex", flexDirection: "column" }}
+        className="flex-1 bg-white sm:rounded-xl border-t sm:border border-gray-200 p-4 sm:p-5 overflow-y-auto mb-0 sm:mb-4 flex flex-col"
+        style={{ 
+          height: 'calc(100vh - 300px)',
+          minHeight: '400px'
+        }}
       >
-        <div style={{ flex: 1 }}>
-          {messages.length === 0 && (
-            <div className="flex flex-col items-center justify-center h-full text-center">
-              <div className="w-20 h-20 bg-[#00246a]/10 rounded-full flex items-center justify-center mb-4">
-                <svg className="w-10 h-10 text-[#00246a]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"
-                  />
-                </svg>
-              </div>
-              <p className="text-gray-600 text-lg font-medium">Empieza la conversación</p>
-              <p className="text-gray-400 text-sm mt-1">Pregunta sobre gramática, ejercicios o vocabulario</p>
+        {messages.length === 0 ? (
+          <div className="flex flex-col items-center justify-center flex-1 text-center px-4">
+            <div className="w-16 h-16 bg-[#00246a]/5 rounded-2xl flex items-center justify-center mb-4">
+              <svg
+                className="w-9 h-9 text-[#00246a]"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"
+                />
+              </svg>
             </div>
-          )}
-
-          <div className="space-y-4">
+            <h3 className="text-gray-800 text-lg font-semibold mb-1">
+              {language === 'es' ? '¡Hola! Soy tu asistente' : 'Hello! I\'m your assistant'}
+            </h3>
+            <p className="text-gray-500 text-sm mb-6">
+              {language === 'es' 
+                ? 'Pregúntame sobre inglés: gramática, vocabulario o ejercicios'
+                : 'Ask me about English: grammar, vocabulary or exercises'}
+            </p>
+            
+            {/* Sugerencias */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 w-full max-w-xl text-gray-600">
+              {(language === 'es' ? [
+                '¿Cómo uso el present perfect?',
+                'Diferencia entre make y do',
+                'Dame ejercicios de vocabulario',
+                '¿Qué son los phrasal verbs? ' 
+              ] : [
+                'How do I use present perfect?',
+                'Difference between make and do',
+                'Give me vocabulary exercises',
+                'What are phrasal verbs?'
+              ]).map((suggestion, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => setPrompt(suggestion)}
+                  className="text-sm text-left px-4 py-2.5 bg-gray-50 hover:bg-gray-100 border border-gray-200 hover:border-[#00246a] rounded-lg transition-all"
+                >
+                  {suggestion}
+                </button>
+              ))}
+            </div>
+          </div>
+        ) : (
+          <div className="space-y-3 flex-1">
             {messages.map((m, i) => (
               <div
                 key={i}
-                className={`${m.role === "user" ? "flex justify-end" : "flex justify-start items-start gap-2"} animate-fade-in`}
+                className={`flex ${
+                  m.role === "user" ? "justify-end" : "justify-start items-start gap-2.5"
+                } animate-fade-in`}
               >
+                {/* Avatar */}
                 {m.role === "assistant" && (
-                  <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center flex-shrink-0 shadow-md mt-1">
-                    <img src="/logos/01_logo.png" alt="Assistant Avatar" className="w-8 h-8 rounded-full" />
+                  <div className="w-9 h-9 rounded-full bg-[#00246a]/5 flex items-center justify-center flex-shrink-0 border border-[#00246a]/10">
+                    <svg className="w-5 h-5 text-[#00246a]" fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z" />
+                    </svg>
                   </div>
                 )}
-                <div  
-                  className={`inline-block px-5 py-3 rounded-xl shadow-sm max-w-[85%] whitespace-pre-wrap transition-all hover:shadow-md ${m.role === "user" ? "bg-[#00246a] text-white" : "bg-gray-50 border border-gray-200 text-gray-800"}`}
+                
+                <div
+                  className={`max-w-[85%] sm:max-w-[75%] ${
+                    m.role === "user"
+                      ? "bg-[#00246a] text-white rounded-2xl rounded-tr-md"
+                      : "bg-gray-50 text-gray-900 rounded-2xl rounded-tl-md border border-gray-200"
+                  } px-4 py-2.5 shadow-sm`}
                 >
-                  <div className="flex items-end gap-3">
-                    <div style={{ flex: 1 }} className="leading-relaxed">
-                      {m.text}
-                    </div>
-                    <div
-                      className={`text-xs ${m.role === "user" ? "text-white/70" : "text-gray-400"} ml-2 whitespace-nowrap`}
-                    >
+                  <div className="text-sm sm:text-base leading-relaxed whitespace-pre-wrap break-words">
+                    {m.text}
+                  </div>
+                  
+                  {m.time && (
+                    <div className={`text-xs mt-1.5 ${
+                      m.role === "user" ? "text-white/60" : "text-gray-400"
+                    }`}>
                       {m.time}
                     </div>
-                  </div>
-                  {m.role === "assistant" && (
-                    <div className="mt-3 flex gap-2 pt-2 border-t border-gray-200">
-                      <button
-                        onClick={() => copyToClipboard(m.text)}
-                        className="text-xs font-medium text-[#00246a] hover:text-white hover:bg-[#00246a] px-3 py-1.5 rounded-lg transition-all flex items-center gap-1 border border-[#00246a]"
-                      >
-                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
-                          />
-                        </svg>
-                        {language === "es" ? "Copiar" : "Copy"}
-                      </button>
-                    </div>
+                  )}
+
+                  {/* Botón copiar */}
+                  {m.role === "assistant" && m.text && (
+                    <button
+                      onClick={() => copyToClipboard(m.text)}
+                      className="mt-2 text-xs font-medium text-[#00246a] hover:text-[#e30f28] px-2 py-1 rounded transition-colors flex items-center gap-1"
+                    >
+                      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                      </svg>
+                      <span>{language === "es" ? "Copiar" : "Copy"}</span>
+                    </button>
                   )}
                 </div>
               </div>
             ))}
             <div ref={appRef} />
           </div>
-        </div>
+        )}
 
-        <div className="mt-3">
-          {loading ? (
-            <div className="flex items-center gap-3 bg-[#00246a]/5 px-4 py-3 rounded-lg border border-[#00246a]/20">
-              <div className="w-10 h-10 rounded-full bg-white shadow-sm flex items-center justify-center border border-[#00246a]/20">
-                <div className="dot-typing"></div>
-              </div>
-              <div className="text-sm font-medium text-[#00246a]">Generando respuesta...</div>
+        {/* Loading */}
+        {loading && (
+          <div className="flex items-center gap-3 bg-gray-50 px-4 py-3 rounded-xl border border-gray-200">
+            <div className="flex gap-1">
+              <span className="w-2 h-2 bg-[#00246a] rounded-full animate-bounce"></span>
+              <span className="w-2 h-2 bg-[#00246a] rounded-full animate-bounce [animation-delay:0.15s]"></span>
+              <span className="w-2 h-2 bg-[#00246a] rounded-full animate-bounce [animation-delay:0.3s]"></span>
             </div>
-          ) : null}
-        </div>
+            <span className="text-sm text-gray-600">
+              {language === 'es' ? 'Escribiendo...' : 'Writing...'}
+            </span>
+          </div>
+        )}
       </div>
 
-      <form onSubmit={submit} className="flex items-center gap-3">
-        <input
-          id="input-area"
-          className="flex-1 px-5 py-4 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-[#e30f28] focus:ring-2 focus:ring-[#e30f28]/20 transition-all text-gray-800 placeholder:text-gray-400"
-          placeholder={language === "es" ? "Escribe tu pregunta..." : "Type your question..."}
-          value={prompt}
-          onChange={(e) => setPrompt(e.target.value)}
-          disabled={loading}
-        />
-        <button
-          id="clear-button"
-          type="button"
-          onClick={() => {
-            setMessages([])
-          }}
-          title="Limpiar"
-          className="px-5 py-4 border-2 border-gray-300 rounded-lg hover:bg-gray-100 hover:border-gray-400 transition-all font-medium text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
-          disabled={loading}
-        >
-          Limpiar
-        </button>
-        <button
-          id="send-button"
-          type="submit"
-          disabled={loading || !prompt.trim()}
-          className="px-6 py-4 bg-[#e30f28] hover:bg-[#c20d22] text-white rounded-lg font-medium shadow-md hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          {loading ? (
-            <span className="flex items-center gap-2">
-              <span className="dot-typing-white" />
-              {language === "es" ? "Enviando..." : "Sending..."}
-            </span>
-          ) : (
-            <span className="flex items-center gap-2">
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"
-                />
-              </svg>
-              {language === "es" ? "Enviar" : "Send"}
-            </span>
-          )}
-        </button>
-        <button
-          id="regenerate-button"
-          type="button"
-          onClick={regenerateLast}
-          title="Regenerar última"
-          className="px-5 py-4 border-2 border-[#00246a] text-[#00246a] rounded-lg hover:bg-[#00246a] hover:text-white transition-all text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
-          disabled={loading}
-        >
-          <svg className="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+      {/* INPUT AREA */}
+      <form
+        onSubmit={submit}
+        className="bg-white border-t sm:border-0 sm:bg-transparent p-4 sm:p-0"
+      >
+        <div className="flex items-stretch gap-2">
+          {/* Input con botón limpiar */}
+          <div 
+            id="input-area"
+            className="flex-1 flex items-center bg-white sm:bg-white border-2 border-gray-300 rounded-xl focus-within:border-[#00246a] transition-all"
+          >
+            <input
+              className="flex-1 px-4 py-3 bg-transparent focus:outline-none text-gray-900 placeholder:text-gray-400 text-sm rounded-l-xl"
+              placeholder={language === "es" ? "Escribe tu pregunta..." : "Type your question..."}
+              value={prompt}
+              onChange={(e) => setPrompt(e.target.value)}
+              disabled={loading}
+              autoComplete="off"
             />
-          </svg>
-          {language === "es" ? "Regenerar" : "Regenerate"}
-        </button>
+            
+            {messages.length > 0 && (
+              <button
+                id="clear-button"
+                type="button"
+                onClick={() => {
+                  setMessages([])
+                  setPrompt('')
+                }}
+                className="p-2 text-gray-400 hover:text-gray-600 transition-colors disabled:opacity-40"
+                disabled={loading}
+              >
+                <BrushCleaning className="w-5 h-5" />
+              </button>
+            )}
+          </div>
+
+          {/* Botón enviar */}
+          <button
+            id="send-button"
+            type="submit"
+            disabled={loading || !prompt.trim()}
+            className="px-5 py-3 bg-[#e30f28] hover:bg-[#c20d22] text-white rounded-xl font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 shadow-sm"
+          >
+            {loading ? (
+              <div className="flex gap-1">
+                <span className="w-1.5 h-1.5 bg-white rounded-full animate-bounce"></span>
+                <span className="w-1.5 h-1.5 bg-white rounded-full animate-bounce [animation-delay:0.15s]"></span>
+                <span className="w-1.5 h-1.5 bg-white rounded-full animate-bounce [animation-delay:0.3s]"></span>
+              </div>
+            ) : (
+              <>
+                <SendHorizontal className="w-5 h-5" />
+                <span className="hidden sm:inline text-sm">{language === "es" ? "Enviar" : "Send"}</span>
+              </>
+            )}
+          </button>
+
+          {/* Botón regenerar */}
+          {messages.length > 0 && (
+            <button
+              id="regenerate-button"
+              type="button"
+              onClick={regenerateLast}
+              disabled={loading}
+              className="hidden sm:flex items-center gap-2 px-4 py-3 border-2 border-[#00246a] text-[#00246a] hover:bg-[#00246a] hover:text-white rounded-xl font-medium transition-all disabled:opacity-50"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+              </svg>
+              <span className="text-sm">{language === "es" ? "Regenerar" : "Regenerate"}</span>
+            </button>
+          )}
+        </div>
       </form>
 
-      <style jsx>{`
-        @keyframes fade-in {
-          from { opacity: 0; transform: translateY(10px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-        .animate-fade-in {
-          animation: fade-in 0.3s ease-out;
-        }
-        .dot-typing {
-          width: 14px;
-          height: 6px;
-          display: inline-block;
-          position: relative;
-        }
-        .dot-typing:before, .dot-typing:after, .dot-typing div {
-          content: '';
-          display: inline-block;
-          width: 6px;
-          height: 6px;
-          background: #00246a;
-          border-radius: 9999px;
-          position: absolute;
-          animation: dot 1s infinite ease-in-out;
-        }
-        .dot-typing:before { left: 0; animation-delay: 0s }
-        .dot-typing div { left: 5px; animation-delay: 0.15s }
-        .dot-typing:after { left: 10px; animation-delay: 0.3s }
-        
-        .dot-typing-white {
-          width: 14px;
-          height: 6px;
-          display: inline-block;
-          position: relative;
-        }
-        .dot-typing-white:before, .dot-typing-white:after, .dot-typing-white div {
-          content: '';
-          display: inline-block;
-          width: 6px;
-          height: 6px;
-          background: white;
-          border-radius: 9999px;
-          position: absolute;
-          animation: dot 1s infinite ease-in-out;
-        }
-        .dot-typing-white:before { left: 0; animation-delay: 0s }
-        .dot-typing-white div { left: 5px; animation-delay: 0.15s }
-        .dot-typing-white:after { left: 10px; animation-delay: 0.3s }
-        
-        @keyframes dot { 
-          0%, 100% { transform: translateY(0); opacity: 0.7; } 
-          50% { transform: translateY(-8px); opacity: 1; } 
-        }
-      `}</style>
-
+      {/* Toast */}
       {toast && (
-        <div className="fixed right-6 bottom-6 bg-[#00246a] text-white px-6 py-3 rounded-lg shadow-xl animate-fade-in">
-          {toast}
+        <div className="fixed bottom-20 left-1/2 -translate-x-1/2 bg-[#00246a] text-white px-5 py-3 rounded-lg shadow-xl animate-fade-in z-50 flex items-center gap-2">
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+          </svg>
+          <span className="text-sm font-medium">{toast}</span>
         </div>
       )}
     </div>

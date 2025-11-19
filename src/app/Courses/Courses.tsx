@@ -204,21 +204,20 @@ export default function Courses({ paginatedData }: CoursesProps) {
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                         {/* Search Input */}
                         <div className="relative md:col-span-2">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-600 w-5 h-5" />
                             <input
                                 type="text"
                                 placeholder="Buscar por nombre, instructor..."
                                 value={filters.search}
                                 onChange={(e) => updateFilters({ search: e.target.value })}
-                                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#002469] focus:border-transparent text-sm"
+                                className="w-full pl-10 pr-4 py-3 text-gray-600 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#002469] focus:border-transparent text-sm"
                             />
                         </div>
-
                         {/* Level Filter */}
                         <select
                             value={filters.level}
                             onChange={(e) => updateFilters({ level: e.target.value })}
-                            className="px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#002469] focus:border-transparent text-sm"
+                            className="px-4 py-3 border border-gray-300 text-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#002469] focus:border-transparent text-sm"
                         >
                             {englishLevels.map((level) => (
                                 <option key={level.value} value={level.value}>
@@ -231,7 +230,7 @@ export default function Courses({ paginatedData }: CoursesProps) {
                         <select
                             value={filters.modalidad}
                             onChange={(e) => updateFilters({ modalidad: e.target.value })}
-                            className="px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#002469] focus:border-transparent text-sm"
+                            className="px-4 py-3 border border-gray-300 text-gray-600  rounded-lg focus:outline-none focus:ring-2 focus:ring-[#002469] focus:border-transparent text-sm"
                         >
                             {modalidadOptions.map((modalidad) => (
                                 <option key={modalidad.value} value={modalidad.value}>

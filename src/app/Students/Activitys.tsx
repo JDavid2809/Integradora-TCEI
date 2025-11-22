@@ -27,15 +27,18 @@ import {
     TrendingUp,
     Award,
     Target,
-    Zap
+    Zap,
+    RefreshCw,
+    Loader2
 } from 'lucide-react'
+import { getAllStudentActivities, getStudentActivitiesStats, StudentActivityWithCourse } from '@/actions/student/allActivitiesActions'
 
-// Tipos
+// Tipos internos para manejo del estado
 interface Activity {
     id: number
     title: string
     description: string
-    due_date: string
+    due_date: string | null
     activity_type: string
     status: 'pending' | 'in_progress' | 'completed' | 'overdue'
     course: {
@@ -48,106 +51,6 @@ interface Activity {
     total_points: number
     progress: number
 }
-
-// Datos de ejemplo (luego se reemplazará con llamada a API)
-const mockActivities: Activity[] = [
-    {
-        id: 1,
-        title: "Essay: My Daily Routine",
-        description: "Write a 300-word essay describing your daily routine using present simple tense.",
-        due_date: "2025-11-05T23:59:00",
-        activity_type: "ASSIGNMENT",
-        status: "pending",
-        course: { id: 1, nombre: "English Basic A1", nivel: "A1", color: "bg-blue-500" },
-        points: 0,
-        total_points: 100,
-        progress: 0
-    },
-    {
-        id: 2,
-        title: "Grammar Quiz: Present Perfect",
-        description: "Complete the quiz about present perfect tense. 20 questions, 60 minutes.",
-        due_date: "2025-11-04T18:00:00",
-        activity_type: "QUIZ",
-        status: "pending",
-        course: { id: 2, nombre: "English Intermediate B1", nivel: "B1", color: "bg-green-500" },
-        points: 0,
-        total_points: 50,
-        progress: 0
-    },
-    {
-        id: 3,
-        title: "Watch: TED Talk - Climate Change",
-        description: "Watch the assigned TED Talk and take notes on key vocabulary and main ideas.",
-        due_date: "2025-11-06T23:59:00",
-        activity_type: "VIDEO",
-        status: "in_progress",
-        course: { id: 2, nombre: "English Intermediate B1", nivel: "B1", color: "bg-green-500" },
-        points: 30,
-        total_points: 40,
-        progress: 75
-    },
-    {
-        id: 4,
-        title: "Reading: Short Story Analysis",
-        description: "Read 'The Gift of the Magi' and answer comprehension questions.",
-        due_date: "2025-11-08T23:59:00",
-        activity_type: "READING",
-        status: "pending",
-        course: { id: 3, nombre: "English Advanced C1", nivel: "C1", color: "bg-purple-500" },
-        points: 0,
-        total_points: 80,
-        progress: 0
-    },
-    {
-        id: 5,
-        title: "Final Project: Business Presentation",
-        description: "Prepare a 10-minute presentation about a business topic of your choice.",
-        due_date: "2025-11-15T23:59:00",
-        activity_type: "PROJECT",
-        status: "in_progress",
-        course: { id: 3, nombre: "English Advanced C1", nivel: "C1", color: "bg-purple-500" },
-        points: 45,
-        total_points: 150,
-        progress: 30
-    },
-    {
-        id: 6,
-        title: "Vocabulary Practice: Business Terms",
-        description: "Complete the flashcard set and practice exercises on business vocabulary.",
-        due_date: "2025-11-03T23:59:00",
-        activity_type: "PRACTICE",
-        status: "overdue",
-        course: { id: 1, nombre: "English Basic A1", nivel: "A1", color: "bg-blue-500" },
-        points: 0,
-        total_points: 30,
-        progress: 0
-    },
-    {
-        id: 7,
-        title: "Speaking Practice: Job Interview",
-        description: "Record yourself answering common job interview questions.",
-        due_date: "2025-11-10T23:59:00",
-        activity_type: "PRACTICE",
-        status: "pending",
-        course: { id: 2, nombre: "English Intermediate B1", nivel: "B1", color: "bg-green-500" },
-        points: 0,
-        total_points: 60,
-        progress: 0
-    },
-    {
-        id: 8,
-        title: "Discussion Forum: Travel Experiences",
-        description: "Share your travel experiences and respond to at least 2 classmates.",
-        due_date: "2025-11-07T23:59:00",
-        activity_type: "DISCUSSION",
-        status: "completed",
-        course: { id: 1, nombre: "English Basic A1", nivel: "A1", color: "bg-blue-500" },
-        points: 45,
-        total_points: 45,
-        progress: 100
-    },
-]
 
 // Configuración de tipos de actividades
 const ACTIVITY_CONFIG = {
@@ -170,8 +73,8 @@ const STATUS_CONFIG = {
 }
 
 export default function Activitys() {
-    const [activities, setActivities] = useState<Activity[]>(mockActivities)
-    const [filteredActivities, setFilteredActivities] = useState<Activity[]>(mockActivities)
+    const [activities, setActivities] = useState<Activity[]>([])
+    const [filteredActivities, setFilteredActivities] = useState<Activity[]>([])
     const [searchTerm, setSearchTerm] = useState('')
     const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
     const [selectedStatus, setSelectedStatus] = useState<string>('all')
@@ -179,6 +82,96 @@ export default function Activitys() {
     const [selectedCourse, setSelectedCourse] = useState<string>('all')
     const [showFilters, setShowFilters] = useState(false)
     const [selectedActivity, setSelectedActivity] = useState<Activity | null>(null)
+    const [loading, setLoading] = useState(true)
+    const [error, setError] = useState<string | null>(null)
+
+    // Función para obtener color por modalidad
+    const getColorByModalidad = (modalidad: string, nivel: string | null): string => {
+        if (modalidad === 'ONLINE') {
+            return 'bg-blue-500'
+        }
+        if (nivel) {
+            if (nivel.includes('A1') || nivel.includes('A2')) return 'bg-blue-500'
+            if (nivel.includes('B1') || nivel.includes('B2')) return 'bg-green-500'
+            if (nivel.includes('C1') || nivel.includes('C2')) return 'bg-purple-500'
+        }
+        return 'bg-slate-500'
+    }
+
+    // Función para calcular el estado de la actividad
+    const calculateActivityStatus = (activity: StudentActivityWithCourse): 'pending' | 'in_progress' | 'completed' | 'overdue' => {
+        if (activity.submission) {
+            if (activity.submission.status === 'GRADED') {
+                return 'completed'
+            }
+            if (activity.submission.status === 'SUBMITTED' || activity.submission.status === 'RETURNED') {
+                return 'in_progress'
+            }
+        }
+        
+        if (activity.due_date) {
+            const now = new Date()
+            const dueDate = new Date(activity.due_date)
+            if (now > dueDate && !activity.submission) {
+                return 'overdue'
+            }
+        }
+
+        return 'pending'
+    }
+
+    // Función para calcular el progreso
+    const calculateProgress = (activity: StudentActivityWithCourse): number => {
+        if (!activity.submission) return 0
+        if (activity.submission.status === 'GRADED' && activity.submission.score !== null) {
+            return Math.round((activity.submission.score / activity.total_points) * 100)
+        }
+        if (activity.submission.status === 'SUBMITTED') {
+            return 50 // Entregado pero no calificado
+        }
+        return 0
+    }
+
+    // Cargar actividades
+    const loadActivities = useCallback(async () => {
+        try {
+            setLoading(true)
+            setError(null)
+            const data = await getAllStudentActivities()
+            
+            // Transformar datos de la BD al formato del componente
+            const transformedActivities: Activity[] = data.map(act => ({
+                id: act.id,
+                title: act.title,
+                description: act.description || '',
+                due_date: act.due_date ? act.due_date.toISOString() : null,
+                activity_type: act.activity_type,
+                status: calculateActivityStatus(act),
+                course: {
+                    id: act.course.id,
+                    nombre: act.course.nombre,
+                    nivel: act.course.nivel_ingles || 'N/A',
+                    color: getColorByModalidad(act.course.modalidad, act.course.nivel_ingles)
+                },
+                points: act.submission?.score || 0,
+                total_points: act.total_points,
+                progress: calculateProgress(act)
+            }))
+
+            setActivities(transformedActivities)
+            setFilteredActivities(transformedActivities)
+        } catch (err) {
+            console.error('Error loading activities:', err)
+            setError('Error al cargar las actividades. Por favor, intenta de nuevo.')
+        } finally {
+            setLoading(false)
+        }
+    }, [])
+
+    // Cargar actividades al montar
+    useEffect(() => {
+        loadActivities()
+    }, [loadActivities])
 
     // Tour con driver.js
     const startActivitiesTour = useCallback(() => {
@@ -303,7 +296,8 @@ export default function Activitys() {
         .map(str => JSON.parse(str))
 
     // Obtener días hasta vencimiento
-    const getDaysUntilDue = (dueDate: string) => {
+    const getDaysUntilDue = (dueDate: string | null) => {
+        if (!dueDate) return 999 // Sin fecha límite
         const now = new Date()
         const due = new Date(dueDate)
         const diffTime = due.getTime() - now.getTime()
@@ -321,6 +315,36 @@ export default function Activitys() {
         return 'border-slate-200'
     }
 
+    // Mostrar loader
+    if (loading) {
+        return (
+            <div className="flex items-center justify-center min-h-[400px]">
+                <div className="text-center">
+                    <Loader2 className="w-12 h-12 text-[#00246a] animate-spin mx-auto mb-4" />
+                    <p className="text-slate-600">Cargando tus actividades...</p>
+                </div>
+            </div>
+        )
+    }
+
+    // Mostrar error
+    if (error) {
+        return (
+            <div className="bg-red-50 border border-red-200 rounded-xl p-6 text-center">
+                <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
+                <h3 className="text-lg font-semibold text-red-800 mb-2">Error al cargar actividades</h3>
+                <p className="text-red-600 mb-4">{error}</p>
+                <button
+                    onClick={loadActivities}
+                    className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors flex items-center gap-2 mx-auto"
+                >
+                    <RefreshCw className="w-4 h-4" />
+                    Reintentar
+                </button>
+            </div>
+        )
+    }
+
     return (
         <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -335,10 +359,17 @@ export default function Activitys() {
                     <h2 className="text-2xl md:text-3xl font-bold text-[#00246a]">Mis Actividades</h2>
                     <p className="text-slate-600 text-sm md:text-base">Gestiona todas tus tareas y proyectos en un solo lugar</p>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-3">
                     <span className="text-sm text-slate-600">
                         {filteredActivities.length} de {activities.length} actividades
                     </span>
+                    <button
+                        onClick={loadActivities}
+                        className="p-2 hover:bg-slate-100 rounded-lg transition-colors"
+                        title="Actualizar actividades"
+                    >
+                        <RefreshCw className="w-5 h-5 text-slate-600" />
+                    </button>
                 </div>
             </div>
 
@@ -390,18 +421,18 @@ export default function Activitys() {
             </div>
 
             {/* Search and Filters */}
-            <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-4 md:p-6">
+            <div className="bg-gradient-to-br from-white to-slate-50 rounded-xl shadow-md border border-slate-200 p-4 md:p-6">
                 <div className="flex flex-col md:flex-row gap-3 md:gap-4">
                     {/* Search */}
                     <div id="search-bar" className="flex-1">
                         <div className="relative">
-                            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400" />
+                            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-500" />
                             <input
                                 type="text"
-                                placeholder="Buscar actividades..."
+                                placeholder="Buscar por título o descripción..."
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
-                                className="w-full pl-10 pr-4 py-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#e30f28] focus:border-transparent"
+                                className="w-full pl-10 pr-4 py-3 border-2 border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00246a] focus:border-[#00246a] bg-white text-slate-900 placeholder:text-slate-500 font-medium transition-all hover:border-slate-400"
                             />
                         </div>
                     </div>
@@ -410,30 +441,44 @@ export default function Activitys() {
                     <button
                         id="filter-button"
                         onClick={() => setShowFilters(!showFilters)}
-                        className={`flex items-center gap-2 px-4 py-2.5 rounded-lg font-medium transition-all ${showFilters
-                                ? 'bg-[#e30f28] text-white shadow-md'
-                                : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
-                            }`}
+                        className={`flex items-center justify-center gap-2 px-5 py-3 rounded-lg font-semibold transition-all min-w-[120px] ${
+                            showFilters
+                                ? 'bg-gradient-to-r from-[#00246a] to-[#003a8c] text-white shadow-lg transform scale-105'
+                                : 'bg-white text-[#00246a] border-2 border-[#00246a] hover:bg-[#00246a] hover:text-white shadow-md'
+                        }`}
                     >
                         <Filter className="w-5 h-5" />
-                        <span className="hidden md:inline">Filtros</span>
+                        <span>Filtros</span>
+                        {(selectedStatus !== 'all' || selectedType !== 'all' || selectedCourse !== 'all') && (
+                            <span className="ml-1 px-2 py-0.5 bg-[#e30f28] text-white text-xs rounded-full font-bold">
+                                {[selectedStatus !== 'all', selectedType !== 'all', selectedCourse !== 'all'].filter(Boolean).length}
+                            </span>
+                        )}
                     </button>
 
                     {/* View Toggle */}
-                    <div id="view-toggle" className="flex bg-slate-100 rounded-lg p-1">
+                    <div id="view-toggle" className="flex bg-slate-200 rounded-lg p-1 shadow-inner">
                         <button
                             onClick={() => setViewMode('grid')}
-                            className={`p-2 rounded-md transition-all ${viewMode === 'grid' ? 'bg-white shadow-sm' : 'hover:bg-slate-200'
-                                }`}
+                            className={`p-2.5 rounded-md transition-all ${
+                                viewMode === 'grid'
+                                    ? 'bg-gradient-to-br from-white to-slate-50 shadow-md text-[#00246a] scale-105'
+                                    : 'text-slate-600 hover:bg-slate-300 hover:text-slate-900'
+                            }`}
+                            title="Vista de cuadrícula"
                         >
-                            <Grid3x3 className="w-5 h-5 text-slate-700" />
+                            <Grid3x3 className="w-5 h-5" />
                         </button>
                         <button
                             onClick={() => setViewMode('list')}
-                            className={`p-2 rounded-md transition-all ${viewMode === 'list' ? 'bg-white shadow-sm' : 'hover:bg-slate-200'
-                                }`}
+                            className={`p-2.5 rounded-md transition-all ${
+                                viewMode === 'list'
+                                    ? 'bg-gradient-to-br from-white to-slate-50 shadow-md text-[#00246a] scale-105'
+                                    : 'text-slate-600 hover:bg-slate-300 hover:text-slate-900'
+                            }`}
+                            title="Vista de lista"
                         >
-                            <List className="w-5 h-5 text-slate-700" />
+                            <List className="w-5 h-5" />
                         </button>
                     </div>
                 </div>
@@ -445,68 +490,100 @@ export default function Activitys() {
                             initial={{ opacity: 0, height: 0 }}
                             animate={{ opacity: 1, height: 'auto' }}
                             exit={{ opacity: 0, height: 0 }}
-                            className="mt-4 pt-4 border-t border-slate-200"
+                            transition={{ duration: 0.3 }}
+                            className="mt-5 pt-5 border-t-2 border-slate-300"
                         >
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
                                 {/* Estado */}
                                 <div>
-                                    <label className="block text-sm font-medium text-slate-700 mb-2">Estado</label>
-                                    <select
-                                        value={selectedStatus}
-                                        onChange={(e) => setSelectedStatus(e.target.value)}
-                                        className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#e30f28]"
-                                    >
-                                        <option value="all">Todos</option>
-                                        <option value="pending">Pendientes</option>
-                                        <option value="in_progress">En Progreso</option>
-                                        <option value="completed">Completadas</option>
-                                        <option value="overdue">Vencidas</option>
-                                    </select>
+                                    <label className="flex items-center gap-2 text-sm font-bold text-[#00246a] mb-3">
+                                        <CheckCircle className="w-4 h-4" />
+                                        Estado de la Actividad
+                                    </label>
+                                    <div className="relative">
+                                        <select
+                                            value={selectedStatus}
+                                            onChange={(e) => setSelectedStatus(e.target.value)}
+                                            className="w-full px-4 py-3 pr-10 border-2 border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00246a] focus:border-[#00246a] bg-white text-slate-900 font-semibold appearance-none cursor-pointer transition-all hover:border-slate-400 shadow-sm"
+                                        >
+                                            <option value="all">Todos los estados</option>
+                                            <option value="pending">Pendientes</option>
+                                            <option value="in_progress">En Progreso</option>
+                                            <option value="completed">Completadas</option>
+                                            <option value="overdue">Vencidas</option>
+                                        </select>
+                                        <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-[#00246a] pointer-events-none" />
+                                    </div>
                                 </div>
 
                                 {/* Tipo */}
                                 <div>
-                                    <label className="block text-sm font-medium text-slate-700 mb-2">Tipo</label>
-                                    <select
-                                        value={selectedType}
-                                        onChange={(e) => setSelectedType(e.target.value)}
-                                        className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#e30f28]"
-                                    >
-                                        <option value="all">Todos</option>
-                                        {Object.entries(ACTIVITY_CONFIG).map(([key, config]) => (
-                                            <option key={key} value={key}>{config.label}</option>
-                                        ))}
-                                    </select>
+                                    <label className="flex items-center gap-2 text-sm font-bold text-[#00246a] mb-3">
+                                        <FileText className="w-4 h-4" />
+                                        Tipo de Actividad
+                                    </label>
+                                    <div className="relative">
+                                        <select
+                                            value={selectedType}
+                                            onChange={(e) => setSelectedType(e.target.value)}
+                                            className="w-full px-4 py-3 pr-10 border-2 border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00246a] focus:border-[#00246a] bg-white text-slate-900 font-semibold appearance-none cursor-pointer transition-all hover:border-slate-400 shadow-sm"
+                                        >
+                                            <option value="all">Todos los tipos</option>
+                                            {Object.entries(ACTIVITY_CONFIG).map(([key, config]) => (
+                                                <option key={key} value={key}>
+                                                    {config.label}
+                                                </option>
+                                            ))}
+                                        </select>
+                                        <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-[#00246a] pointer-events-none" />
+                                    </div>
                                 </div>
 
                                 {/* Curso */}
                                 <div>
-                                    <label className="block text-sm font-medium text-slate-700 mb-2">Curso</label>
-                                    <select
-                                        value={selectedCourse}
-                                        onChange={(e) => setSelectedCourse(e.target.value)}
-                                        className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#e30f28]"
-                                    >
-                                        <option value="all">Todos</option>
-                                        {uniqueCourses.map((course) => (
-                                            <option key={course.id} value={course.id}>{course.nombre}</option>
-                                        ))}
-                                    </select>
+                                    <label className="flex items-center gap-2 text-sm font-bold text-[#00246a] mb-3">
+                                        <BookOpen className="w-4 h-4" />
+                                        Curso
+                                    </label>
+                                    <div className="relative">
+                                        <select
+                                            value={selectedCourse}
+                                            onChange={(e) => setSelectedCourse(e.target.value)}
+                                            className="w-full px-4 py-3 pr-10 border-2 border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00246a] focus:border-[#00246a] bg-white text-slate-900 font-semibold appearance-none cursor-pointer transition-all hover:border-slate-400 shadow-sm"
+                                        >
+                                            <option value="all">Todos los cursos</option>
+                                            {uniqueCourses.map((course) => (
+                                                <option key={course.id} value={course.id}>
+                                                    {course.nombre}
+                                                </option>
+                                            ))}
+                                        </select>
+                                        <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-[#00246a] pointer-events-none" />
+                                    </div>
                                 </div>
                             </div>
 
                             {/* Clear Filters */}
                             {(selectedStatus !== 'all' || selectedType !== 'all' || selectedCourse !== 'all') && (
-                                <button
-                                    onClick={() => {
-                                        setSelectedStatus('all')
-                                        setSelectedType('all')
-                                        setSelectedCourse('all')
-                                    }}
-                                    className="mt-3 text-sm text-[#e30f28] hover:text-[#e30f28]/80 font-medium"
-                                >
-                                    Limpiar filtros
-                                </button>
+                                <div className="mt-5 flex items-center justify-between bg-gradient-to-r from-[#e30f28]/10 to-[#e30f28]/5 border-2 border-[#e30f28]/30 rounded-lg p-4">
+                                    <div className="flex items-center gap-2">
+                                        <AlertCircle className="w-5 h-5 text-[#e30f28]" />
+                                        <span className="text-sm font-semibold text-slate-700">
+                                            {[selectedStatus !== 'all', selectedType !== 'all', selectedCourse !== 'all'].filter(Boolean).length} filtro(s) activo(s)
+                                        </span>
+                                    </div>
+                                    <button
+                                        onClick={() => {
+                                            setSelectedStatus('all')
+                                            setSelectedType('all')
+                                            setSelectedCourse('all')
+                                        }}
+                                        className="flex items-center gap-2 px-4 py-2 bg-[#e30f28] text-white rounded-lg font-semibold hover:bg-[#c20d23] transition-all shadow-md hover:shadow-lg"
+                                    >
+                                        <X className="w-4 h-4" />
+                                        Limpiar Filtros
+                                    </button>
+                                </div>
                             )}
                         </motion.div>
                     )}
@@ -604,11 +681,13 @@ export default function Activitys() {
                                                             ? 'Vencida'
                                                             : activity.status === 'completed'
                                                                 ? 'Completada'
-                                                                : daysUntil === 0
-                                                                    ? 'Hoy'
-                                                                    : daysUntil === 1
-                                                                        ? 'Mañana'
-                                                                        : `${daysUntil} días`
+                                                                : !activity.due_date
+                                                                    ? 'Sin límite'
+                                                                    : daysUntil === 0
+                                                                        ? 'Hoy'
+                                                                        : daysUntil === 1
+                                                                            ? 'Mañana'
+                                                                            : `${daysUntil} días`
                                                         }
                                                     </span>
                                                 </div>
@@ -647,11 +726,13 @@ export default function Activitys() {
                                                         <span>
                                                             {activity.status === 'overdue'
                                                                 ? 'Vencida'
-                                                                : daysUntil === 0
-                                                                    ? 'Hoy'
-                                                                    : daysUntil === 1
-                                                                        ? 'Mañana'
-                                                                        : `${daysUntil} días`
+                                                                : !activity.due_date
+                                                                    ? 'Sin límite'
+                                                                    : daysUntil === 0
+                                                                        ? 'Hoy'
+                                                                        : daysUntil === 1
+                                                                            ? 'Mañana'
+                                                                            : `${daysUntil} días`
                                                             }
                                                         </span>
                                                     </div>
@@ -756,12 +837,15 @@ export default function Activitys() {
                                             <span className="font-medium">Fecha de Entrega</span>
                                         </div>
                                         <p className="text-slate-800 font-semibold">
-                                            {new Date(selectedActivity.due_date).toLocaleDateString('es-ES', {
-                                                weekday: 'long',
-                                                year: 'numeric',
-                                                month: 'long',
-                                                day: 'numeric'
-                                            })}
+                                            {selectedActivity.due_date 
+                                                ? new Date(selectedActivity.due_date).toLocaleDateString('es-ES', {
+                                                    weekday: 'long',
+                                                    year: 'numeric',
+                                                    month: 'long',
+                                                    day: 'numeric'
+                                                })
+                                                : 'Sin fecha límite'
+                                            }
                                         </p>
                                     </div>
 
@@ -796,21 +880,32 @@ export default function Activitys() {
                                 <div className="flex flex-wrap gap-3 pt-4 border-t border-slate-200">
                                     {selectedActivity.status !== 'completed' && (
                                         <>
-                                            <button className="flex-1 bg-[#e30f28] text-white px-6 py-3 rounded-xl font-medium hover:bg-[#e30f28]/90 transition-all flex items-center justify-center gap-2">
+                                            <button 
+                                                onClick={() => window.location.href = `/Students/courses/${selectedActivity.course.id}`}
+                                                className="flex-1 bg-[#e30f28] text-white px-6 py-3 rounded-xl font-medium hover:bg-[#e30f28]/90 transition-all flex items-center justify-center gap-2"
+                                            >
                                                 <Upload className="w-5 h-5" />
-                                                Subir Trabajo
+                                                Ir al Curso
                                             </button>
-                                            <button className="flex-1 bg-slate-100 text-slate-700 px-6 py-3 rounded-xl font-medium hover:bg-slate-200 transition-all flex items-center justify-center gap-2">
+                                            <button 
+                                                onClick={() => window.location.href = `/Students/courses/${selectedActivity.course.id}`}
+                                                className="flex-1 bg-slate-100 text-slate-700 px-6 py-3 rounded-xl font-medium hover:bg-slate-200 transition-all flex items-center justify-center gap-2"
+                                            >
                                                 <Eye className="w-5 h-5" />
                                                 Ver Detalles
                                             </button>
                                         </>
                                     )}
                                     {selectedActivity.status === 'completed' && (
-                                        <button className="flex-1 bg-green-100 text-green-700 px-6 py-3 rounded-xl font-medium hover:bg-green-200 transition-all flex items-center justify-center gap-2">
-                                            <CheckCircle className="w-5 h-5" />
-                                            Actividad Completada
-                                        </button>
+                                        <>
+                                            <button 
+                                                onClick={() => window.location.href = `/Students/courses/${selectedActivity.course.id}`}
+                                                className="flex-1 bg-green-100 text-green-700 px-6 py-3 rounded-xl font-medium hover:bg-green-200 transition-all flex items-center justify-center gap-2"
+                                            >
+                                                <CheckCircle className="w-5 h-5" />
+                                                Ver en Curso
+                                            </button>
+                                        </>
                                     )}
                                 </div>
                             </div>

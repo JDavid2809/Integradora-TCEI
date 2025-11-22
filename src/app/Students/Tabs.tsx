@@ -60,18 +60,18 @@ export default function BottomTabs({ activeSection, setActiveSection }: BottomTa
                 },
             },
             {
-                element: "#tab-activities",
-                popover: {
-                    title: "Actividades",
-                    description: "Consulta tus actividades y tareas aquí.",
-                    position: "top",
-                },
-            },
-            {
                 element: "#tab-assistant",
                 popover: {
                     title: "Asistente Virtual IA",
                     description: "Tu asistente inteligente que te ayudará a mejorar tu aprendizaje con recomendaciones personalizadas.",
+                    position: "top",
+                },
+            },
+            {
+                element: "#tab-activities",
+                popover: {
+                    title: "Actividades",
+                    description: "Consulta tus actividades y tareas aquí.",
                     position: "top",
                 },
             },

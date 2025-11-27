@@ -279,16 +279,80 @@ export async function getStudentCourses(userId: number) {
                   }
                 }
               }
+            },
+            // Incluir actividades publicadas para calcular progreso
+            activities: {
+              where: {
+                is_published: true
+              },
+              select: {
+                id: true,
+                total_points: true,
+                min_passing_score: true
+              }
             }
+          }
+        },
+        // Incluir entregas del estudiante
+        submissions: {
+          select: {
+            activity_id: true,
+            status: true,
+            score: true
           }
         }
       }
     })
 
-    return cursosInscritos.map(inscripcion => ({
-      ...inscripcion.course,
-      precio: inscripcion.course.precio ? Number(inscripcion.course.precio) : null
-    }))
+    return cursosInscritos.map(inscripcion => {
+      // Calcular progreso basado en actividades aprobadas
+      const totalActivities = inscripcion.course.activities.length
+      let passedActivities = 0
+
+      if (totalActivities > 0) {
+        // Agrupar entregas por actividad (mejor intento)
+        const submissionsByActivity = new Map<number, { status: string; score: number | null }>()
+        
+        for (const submission of inscripcion.submissions) {
+          const existing = submissionsByActivity.get(submission.activity_id)
+          if (!existing || 
+              (submission.status === 'GRADED' && existing.status !== 'GRADED') ||
+              (submission.status === 'GRADED' && existing.status === 'GRADED' && 
+               (submission.score || 0) > (existing.score || 0))) {
+            submissionsByActivity.set(submission.activity_id, {
+              status: submission.status,
+              score: submission.score
+            })
+          }
+        }
+
+        // Contar actividades aprobadas
+        for (const activity of inscripcion.course.activities) {
+          const submission = submissionsByActivity.get(activity.id)
+          if (submission && submission.status === 'GRADED' && submission.score !== null) {
+            const minScore = activity.min_passing_score || Math.floor(activity.total_points * 0.6)
+            if (submission.score >= minScore) {
+              passedActivities++
+            }
+          }
+        }
+      }
+
+      const progress = totalActivities > 0 
+        ? Math.round((passedActivities / totalActivities) * 100) 
+        : 0
+
+      return {
+        ...inscripcion.course,
+        precio: inscripcion.course.precio ? Number(inscripcion.course.precio) : null,
+        // Agregar información de progreso
+        activityProgress: {
+          total: totalActivities,
+          passed: passedActivities,
+          percentage: progress
+        }
+      }
+    })
   } catch (error) {
     console.error('Error fetching student courses:', error)
     throw new Error('Error al obtener los cursos del estudiante')

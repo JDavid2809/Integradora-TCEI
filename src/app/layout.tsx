@@ -1,12 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import NavBar from "../components/Navbar";
-import Providers from "../components/Providers";
-import { SearchProvider } from "../contexts/SearchContext";
-import Chatbot from "@/components/ui/admin/Chatbot";
-import PasswordChangeWrapper from "@/components/ui/PasswordChangeWrapper";
-import PWAInstallPrompt from "@/components/PWAInstallPrompt";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -48,19 +42,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} font-sans antialiased bg-white text-[#00246a]`}
         suppressHydrationWarning={true}
       >
-        <Providers>
-          <SearchProvider>
-            <PasswordChangeWrapper>
-              <NavBar />
-              <main className="pt-24 pb-16 px-4 min-h-screen bg-white">
-                {children}
-                
-              <Chatbot />
-              </main>
-              <PWAInstallPrompt />
-            </PasswordChangeWrapper>
-          </SearchProvider>
-        </Providers>
+        {children}
       </body>
     </html>
   );

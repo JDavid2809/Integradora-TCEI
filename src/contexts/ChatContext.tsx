@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect, useRef } from 'react'
 import { useSession } from 'next-auth/react'
-import { useWebSocket, WSMessage } from '@/hooks/useWebSocket'
+// import { useWebSocket, WSMessage } from '@/hooks/useWebSocket' // Removed for polling implementation
 
 interface ChatMessage {
   id: number
@@ -115,82 +115,14 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
   const [failedReadIds, setFailedReadIds] = useState<number[]>([])
   const [typingUsers, setTypingUsers] = useState<string[]>([])
   const typingTimersRef = useRef<Record<string, NodeJS.Timeout>>({})
-  // const [isConnected, setIsConnected] = useState(false) // Replaced by WS hook
-  const [token, setToken] = useState<string>('')
+  const [isConnected, setIsConnected] = useState(true)
   
-  // Para simular conexión en tiempo real (en producción usarías WebSockets)
-  // const pollInterval = useRef<NodeJS.Timeout | null>(null)
-
-  // Fetch token
-  useEffect(() => {
-    if (session?.user) {
-      fetch('/api/chat/token')
-        .then(res => res.json())
-        .then(data => setToken(data.token))
-        .catch(err => console.error('Error fetching token:', err))
-    }
-  }, [session])
-
-  const { isConnected, joinRoom, leaveRoom, sendTyping: wsSendTyping } = useWebSocket({
-    url: process.env.NEXT_PUBLIC_CHAT_WS_URL || 'ws://localhost:3001/ws/chat',
-    token,
-    enabled: !!token && !!session,
-    onMessage: (msg) => {
-      if (msg.type === 'typing' && activeRoom && String(msg.room) === String(activeRoom.id) && String(msg.senderId) !== String(session?.user?.id)) {
-        // add to typingUsers and remove after timeout
-        setTypingUsers(prev => Array.from(new Set([...prev, msg.senderName || String(msg.senderId)])))
-        const timerId = setTimeout(() => {
-          setTypingUsers(prev => prev.filter(name => name !== (msg.senderName || String(msg.senderId))))
-        }, 3000)
-        typingTimersRef.current[msg.senderId || ''] = timerId
-        return
-      }
-
-      if (msg.type === 'message' && activeRoom && String(msg.room) === String(activeRoom.id)) {
-        const newMessage: ChatMessage = {
-            id: Number(msg.id),
-            chat_room_id: Number(msg.room),
-            usuario_id: Number(msg.senderId),
-            contenido: msg.content || '',
-            tipo: (msg.metadata?.tipo as any) || 'TEXTO',
-            archivo_url: msg.metadata?.archivo_url,
-            archivo_nombre: msg.metadata?.archivo_nombre,
-            enviado_en: new Date(msg.timestamp * 1000).toISOString(),
-            eliminado: false,
-            usuario: {
-                id: Number(msg.senderId),
-                nombre: msg.senderName?.split(' ')[0] || '',
-                apellido: msg.senderName?.split(' ').slice(1).join(' ') || '',
-                rol: 'ESTUDIANTE' // Default fallback
-            }
-        }
-        
-        setMessages(prev => {
-            if (prev.some(m => m.id === newMessage.id)) return prev
-            return [...prev, newMessage]
-        })
-      }
-    }
-  })
+  // Polling interval ref
+  const pollInterval = useRef<NodeJS.Timeout | null>(null)
 
   const sendTyping = (isTyping: boolean) => {
-    if (!activeRoom) return
-    try {
-      wsSendTyping(String(activeRoom.id), isTyping)
-    } catch (err) {
-      console.warn('Failed to send typing', err)
-    }
+    // No-op for polling version
   }
-
-  // Join room via WS when activeRoom changes
-  useEffect(() => {
-    if (activeRoom && isConnected) {
-        joinRoom(String(activeRoom.id))
-        return () => {
-            leaveRoom(String(activeRoom.id))
-        }
-    }
-  }, [activeRoom, isConnected])
 
   // API helper
   const api = async (url: string, options?: RequestInit) => {
@@ -229,13 +161,46 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
   const loadMessages = async (roomId: number) => {
     try {
       const data = await api(`/api/chat/rooms/${roomId}/messages`)
-      setMessages(data.messages || [])
-      setParticipants(data.participants || []);
-      // Debugging logs removed for stability
+      
+      setMessages(prev => {
+        const newMessages = data.messages || []
+        // Simple check to avoid unnecessary re-renders and scroll jumps
+        if (JSON.stringify(prev) !== JSON.stringify(newMessages)) {
+          return newMessages
+        }
+        return prev
+      })
+
+      setParticipants(prev => {
+        const newParticipants = data.participants || []
+        if (JSON.stringify(prev) !== JSON.stringify(newParticipants)) {
+          return newParticipants
+        }
+        return prev
+      })
     } catch (error) {
       console.error('Error loading messages:', error)
     }
   }
+
+  // Polling effect
+  useEffect(() => {
+    if (activeRoom) {
+      // Initial load
+      loadMessages(activeRoom.id)
+
+      // Start polling
+      pollInterval.current = setInterval(() => {
+        loadMessages(activeRoom.id)
+      }, 3000) // Poll every 3 seconds
+
+      return () => {
+        if (pollInterval.current) {
+          clearInterval(pollInterval.current)
+        }
+      }
+    }
+  }, [activeRoom])
 
   // Enviar mensaje
   const sendMessage = async (contenido: string, tipo: 'TEXTO' | 'IMAGEN' | 'ARCHIVO' = 'TEXTO') => {

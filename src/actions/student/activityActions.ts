@@ -205,6 +205,19 @@ export async function getStudentActivities(courseId: number): Promise<StudentAct
       ]
     })
 
+    // DEBUG: Log para verificar datos de submissions
+    activities.forEach(activity => {
+      if (activity.submissions[0]) {
+        console.log(`[DEBUG] Activity ${activity.id} - Submission:`, {
+          id: activity.submissions[0].id,
+          status: activity.submissions[0].status,
+          score: activity.submissions[0].score,
+          feedback: activity.submissions[0].feedback,
+          graded_at: activity.submissions[0].graded_at
+        })
+      }
+    })
+
     return activities.map(activity => ({
       id: activity.id,
       title: activity.title,

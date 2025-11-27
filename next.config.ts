@@ -6,6 +6,12 @@ const nextConfig: NextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
+  // Aumentar límite de tamaño para Server Actions (archivos grandes)
+  experimental: {
+    serverActions: {
+      bodySizeLimit: '10mb', // Permitir archivos hasta 10MB
+    },
+  },
 };
 
 export default nextConfig;

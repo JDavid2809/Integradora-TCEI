@@ -635,6 +635,7 @@ export async function gradeSubmission(
       }
     }
 
+    // Siempre marcar como GRADED cuando se califica (ignorar status enviado)
     const graded = await prisma.activity_submission.update({
       where: { id: submissionId },
       data: {
@@ -642,7 +643,7 @@ export async function gradeSubmission(
         feedback: data.feedback,
         graded_by: teacherId,
         graded_at: new Date(),
-        status: data.status || 'GRADED'
+        status: 'GRADED' // Siempre GRADED al calificar
       },
       include: {
         student: {
@@ -662,7 +663,9 @@ export async function gradeSubmission(
       }
     })
 
+    // Revalidar rutas del profesor y estudiante
     revalidatePath(`/teacher/courses/${submission.activity.course_id}`)
+    revalidatePath(`/Students/courses/${submission.activity.course_id}`)
 
     return {
       success: true,

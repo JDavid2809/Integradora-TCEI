@@ -151,11 +151,7 @@ export async function generateCertificate(
       data: { url_verificacion: urlVerificacion }
     })
 
-    // Actualizar el estado de la inscripción a COMPLETED
-    await prisma.inscripcion.update({
-      where: { id: inscripcionId },
-      data: { status: 'COMPLETED' }
-    })
+    // NO cambiar el estado de la inscripción - el estudiante debe seguir en el curso
 
     console.log('[Certificate] ✅ Certificado generado:', certificado.token_uuid)
 

@@ -754,25 +754,51 @@ export async function generateStudyGuide(topic: string) {
       }
 
       const finalContent = guideData
-      // NOTE: The `study_guide` model may not exist in all deployments/branches
-      // For local testing we avoid a DB write; return the generated guide object directly
-      const guide = {
-        id: Math.floor(Date.now() / 1000),
-        title: topic,
-        content: finalContent,
-        created_at: new Date(),
-        student_id: student.id_estudiante
+      
+      // Auto-save to database
+      try {
+        const prismaAny = prisma as any
+        if (!prismaAny.study_guide) {
+          // Fallback for environments without the model
+          const guide = {
+            id: Math.floor(Date.now() / 1000),
+            title: topic,
+            content: finalContent,
+            created_at: new Date(),
+            student_id: student.id_estudiante
+          }
+          const serializedGuide = { id: guide.id, title: guide.title, content: guide.content, created_at: guide.created_at?.toISOString(), student_id: guide.student_id };
+          const r = { success: true, guide: serializedGuide, savedToDb: false };
+          console.log('generateStudyGuide returning (success, no DB):', { id: guide.id, title: guide.title })
+          return r
+        }
+        
+        // Create in database
+        const savedGuide = await prismaAny.study_guide.create({
+          data: {
+            title: topic,
+            content: JSON.stringify(finalContent),
+            student_id: student.id_estudiante,
+          },
+        })
+        
+        const serializedGuide = serializeGuide(savedGuide);
+        const r = { success: true, guide: serializedGuide, savedToDb: true };
+        console.log('generateStudyGuide returning (success, saved to DB):', { id: savedGuide.id, title: savedGuide.title })
+        try { JSON.stringify(r) } catch (e) { console.error('generateStudyGuide return serialization error', e) }
+        return r
+      } catch (error) {
+        console.error("Error saving study guide to database:", error)
+        const r = { error: "Error al guardar la guía en la base de datos" }
+        console.error('generateStudyGuide returning (save error):', r)
+        try { JSON.stringify(r) } catch(e) { console.error('Serialization error for save error return', e) }
+        return r
       }
-      const serializedGuide = { id: guide.id, title: guide.title, content: guide.content, created_at: guide.created_at?.toISOString(), student_id: guide.student_id }
-      const r = { success: true, guide: serializedGuide }
-    console.log('generateStudyGuide returning (success):', { id: guide.id, title: guide.title })
-    try { JSON.stringify(r) } catch (e) { console.error('generateStudyGuide return serialization error', e) }
-    return r
-    } catch (error) {
-      console.error("Error saving study guide:", error)
-      const r = { error: "Error al guardar la guía" }
-      console.error('generateStudyGuide returning (save error):', r)
-      try { JSON.stringify(r) } catch(e) { console.error('Serialization error for save error return', e) }
+    } catch (err) {
+      console.error('Unexpected error in generateStudyGuide', err)
+      const r = { error: 'Error interno al generar la guía' }
+      console.error('generateStudyGuide returning (unexpected):', r)
+      try { JSON.stringify(r) } catch(e) { console.error('Serialization error for unexpected error return', e) }
       return r
     }
   } catch (err) {

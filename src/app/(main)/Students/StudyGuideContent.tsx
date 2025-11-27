@@ -2,9 +2,11 @@
 
 import React, { useState, useEffect } from "react"
 import ReactMarkdown from 'react-markdown'
+import html2canvas from 'html2canvas'
+import jsPDF from 'jspdf'
 import { tryParseJson, contentToString, extractKeywordsFromText } from '@/lib/studyGuideUtils'
 import { generateStudyGuide, getStudyGuides, deleteStudyGuide, updateStudyGuide } from "./studyGuideAction"
-import { Loader2, BookOpen, Trash2, Plus, FileText, ArrowLeft, Award, Target, Flame, Trophy, Star, X } from "lucide-react"
+import { Loader2, BookOpen, Trash2, Plus, FileText, ArrowLeft, Award, Target, Flame, Trophy, Star, X, Download } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 import InteractiveGuide, { KeywordChip } from "./InteractiveGuide"
 
@@ -16,7 +18,7 @@ type StudyGuide = {
   student_id?: number // optional for backwards compatibility
 }
 
-type GenerateResult = { success?: boolean; guide?: StudyGuide; error?: string }
+type GenerateResult = { success?: boolean; guide?: StudyGuide; error?: string; savedToDb?: boolean }
 type UpdateResult = { success?: boolean; guide?: StudyGuide; error?: string }
 
 type Badge = {
@@ -46,6 +48,7 @@ export default function StudyGuideContent() {
   const [editTitle, setEditTitle] = useState("")
   const [editContent, setEditContent] = useState("")
   const [view, setView] = useState<'list' | 'create' | 'view'>('list')
+  const [showSavedIndicator, setShowSavedIndicator] = useState(false)
   const [userStats, setUserStats] = useState<UserStats>({
     totalGuides: 0,
     completedGuides: 0,
@@ -188,6 +191,12 @@ export default function StudyGuideContent() {
       setView('view')
       setTopic("")
       
+      // Show saved indicator if saved to DB
+      if (result.savedToDb) {
+        setShowSavedIndicator(true)
+        setTimeout(() => setShowSavedIndicator(false), 3000)
+      }
+      
       // Update stats
       const newTotal = userStats.totalGuides + 1
       updateStats({ totalGuides: newTotal })
@@ -238,6 +247,467 @@ export default function StudyGuideContent() {
       setEditing(false)
     } else {
       alert('Error al actualizar la guía')
+    }
+  }
+
+  const handleExportPDF = async () => {
+    // Show coming soon message
+    const tempMsg = document.createElement('div')
+    tempMsg.textContent = '📄 Exportar PDF - Próximamente'
+    tempMsg.style.cssText = 'position:fixed;top:20px;right:20px;background:#3b82f6;color:white;padding:12px 24px;border-radius:8px;z-index:9999;font-weight:500;box-shadow:0 4px 6px rgba(0,0,0,0.1)'
+    document.body.appendChild(tempMsg)
+    setTimeout(() => document.body.removeChild(tempMsg), 3000)
+  }
+
+  const handleExportPDF_DISABLED = async () => {
+    if (!selectedGuide) return
+    const element = document.getElementById('study-guide-content')
+    if (!element) {
+      alert('No se pudo encontrar el contenido de la guía. Por favor, intenta de nuevo.')
+      return
+    }
+
+    try {
+      // Before capturing, temporarily mark all elements with IDs for mapping
+      const allElements = element.querySelectorAll('*')
+      const elementMap = new Map<string, CSSStyleDeclaration>()
+      allElements.forEach((el, idx) => {
+        const id = `temp-clone-${idx}`
+        el.setAttribute('data-temp-id', id)
+        elementMap.set(id, window.getComputedStyle(el))
+      })
+
+      // Debug: list nodes that still contain unsafe color functions before cloning
+      try {
+        if (process.env.NODE_ENV === 'development') {
+          const debugUnsafeNodes: Element[] = []
+          element.querySelectorAll('*').forEach((el) => {
+            try {
+              const attrs = Array.from(el.attributes).map(a => a.value).join(' ')
+              const style = el.getAttribute('style') || ''
+              if (/\b(?:lab|lch|oklab|oklch|display-p3)\(/i.test(attrs + ' ' + style)) {
+                debugUnsafeNodes.push(el)
+              }
+            } catch (err) {}
+          })
+          if (debugUnsafeNodes.length) console.warn('Export debug - elements with unsafe color functions present before onclone sanitization:', debugUnsafeNodes)
+        }
+      } catch (err) {}
+
+      const canvas = await html2canvas(element, {
+        useCORS: true,
+        logging: false,
+        allowTaint: true,
+        scale: 2, // Improve resolution
+        onclone: (clonedDoc: Document) => {
+          // Remove ALL stylesheets and style tags to prevent lab() parsing errors
+          clonedDoc.querySelectorAll('link[rel="stylesheet"], style').forEach(el => el.remove())
+          
+          const clonedElement = clonedDoc.getElementById('study-guide-content')
+          if (!clonedElement) return
+
+          // Regex to detect unsafe color functions (lab, lch, oklab, oklch, display-p3)
+            const unsafeFnRegex = /\b(?:lab|lch|oklab|oklch|display-p3)\(/i
+
+          // Converters for various color functions used during sanitization
+            const parseLabToRgb = (labStr: string): string | null => {
+              try {
+                const match = /lab\(\s*([\d\.]+%?)\s+([\-\d\.]+)\s+([\-\d\.]+)\s*\)/i.exec(labStr)
+                if (!match) return null
+                let L = match[1]
+                const a = parseFloat(match[2])
+                const b = parseFloat(match[3])
+                let Lnum = L.includes('%') ? parseFloat(L) : parseFloat(L)
+                Lnum = parseFloat(Lnum as any)
+                const fy = (Lnum + 16) / 116
+                const fx = a / 500 + fy
+                const fz = fy - b / 200
+                const pivot = (t: number) => t ** 3 > 0.008856 ? t ** 3 : (t - 16 / 116) / 7.787
+                let x = pivot(fx) * 0.95047
+                let y = pivot(fy) * 1.0
+                let z = pivot(fz) * 1.08883
+                let r = x * 3.2406 + y * -1.5372 + z * -0.4986
+                let g = x * -0.9689 + y * 1.8758 + z * 0.0415
+                let bl = x * 0.0557 + y * -0.2040 + z * 1.0570
+                const gamma = (c: number) => c <= 0.0031308 ? 12.92 * c : 1.055 * Math.pow(c, 1 / 2.4) - 0.055
+                r = Math.max(0, Math.min(1, gamma(r)))
+                g = Math.max(0, Math.min(1, gamma(g)))
+                bl = Math.max(0, Math.min(1, gamma(bl)))
+                const r255 = Math.round(r * 255)
+                const g255 = Math.round(g * 255)
+                const b255 = Math.round(bl * 255)
+                return `rgb(${r255}, ${g255}, ${b255})`
+              } catch (err) {
+                return null
+              }
+            }
+
+            const parseOklabToRgb = (oklabStr: string): string | null => {
+              try {
+                const match = /oklab\(\s*([\d\.]+%?)\s+([\-\d\.]+)\s+([\-\d\.]+)\s*\)/i.exec(oklabStr)
+                if (!match) return null
+                let L = parseFloat(match[1])
+                const a = parseFloat(match[2])
+                const b = parseFloat(match[3])
+                if (match[1].includes('%')) L = (L / 100)
+                const l_ = L + 0.3963377774 * a + 0.2158037573 * b
+                const m_ = L - 0.1055613458 * a - 0.0638541728 * b
+                const s_ = L - 0.0894841775 * a - 1.2914855480 * b
+                const l = l_ ** 3
+                const m = m_ ** 3
+                const s = s_ ** 3
+                let r = +4.0767416621 * l - 3.3077115913 * m + 0.2309699292 * s
+                let g = -1.2684380046 * l + 2.6097574011 * m - 0.3413193965 * s
+                let bl = -0.0041960863 * l - 0.7034186147 * m + 1.7076147010 * s
+                const gamma = (c: number) => c <= 0.0031308 ? 12.92 * c : 1.055 * Math.pow(c, 1 / 2.4) - 0.055
+                r = Math.max(0, Math.min(1, gamma(r)))
+                g = Math.max(0, Math.min(1, gamma(g)))
+                bl = Math.max(0, Math.min(1, gamma(bl)))
+                const r255 = Math.round(r * 255)
+                const g255 = Math.round(g * 255)
+                const b255 = Math.round(bl * 255)
+                return `rgb(${r255}, ${g255}, ${b255})`
+              } catch (err) {
+                return null
+              }
+            }
+
+            const parseOklchToRgb = (oklchStr: string): string | null => {
+              try {
+                const match = /oklch\(\s*([\d\.]+%?)\s+([\d\.]+)\s+([\d\.]+)(?:deg|rad|g)?\s*\)/i.exec(oklchStr)
+                if (!match) return null
+                let L = parseFloat(match[1])
+                const C = parseFloat(match[2])
+                const Hdeg = parseFloat(match[3])
+                if (match[1].includes('%')) L = (L / 100)
+                const hRad = (Hdeg * Math.PI) / 180
+                const a = C * Math.cos(hRad)
+                const b = C * Math.sin(hRad)
+                return parseOklabToRgb(`oklab(${L} ${a} ${b})`)
+              } catch (err) {
+                return null
+              }
+            }
+          const colorAttrs = ['fill', 'stroke', 'stop-color', 'flood-color', 'lighting-color', 'color', 'background', 'bgcolor']
+
+          // First pass: sanitize style attributes and color-like attributes
+          clonedElement.querySelectorAll('*').forEach((el) => {
+            const element = el as HTMLElement
+
+            // Sanitize style attribute if it contains unsafe functions
+            const styleAttr = element.getAttribute('style')
+            if (styleAttr && unsafeFnRegex.test(styleAttr)) {
+              // Debug: report elements that had unsafe style values (only in dev)
+              try { if (process.env.NODE_ENV === 'development') console.warn('Sanitizing style attr in onclone:', element, styleAttr) } catch (e) { }
+              const decls = styleAttr.split(';').map(d => d.trim()).filter(Boolean)
+              const sanitizedDecls: string[] = []
+              decls.forEach((decl) => {
+                const colonIndex = decl.indexOf(':')
+                if (colonIndex === -1) {
+                  sanitizedDecls.push(decl)
+                  return
+                }
+                const propName = decl.slice(0, colonIndex).trim()
+                const val = decl.slice(colonIndex + 1).trim()
+                if (!unsafeFnRegex.test(val)) {
+                  sanitizedDecls.push(`${propName}: ${val}`)
+                  return
+                }
+                // If this is a color-like style we attempt conversion
+                const colorLikeProps = ['color', 'background', 'background-color', 'border-color', 'fill', 'stroke']
+                if (colorLikeProps.includes(propName.toLowerCase())) {
+                  const converted = parseLabToRgb(val) || parseOklabToRgb(val) || parseOklchToRgb(val)
+                  if (converted) sanitizedDecls.push(`${propName}: ${converted}`)
+                }
+                // Otherwise skip this declaration
+              })
+              if (sanitizedDecls.length) {
+                element.setAttribute('style', sanitizedDecls.join('; '))
+              } else {
+                element.removeAttribute('style')
+              }
+            }
+
+            // Sanitize common color attributes in SVG/HTML
+            colorAttrs.forEach(attr => {
+              const val = element.getAttribute(attr as string)
+              if (val && unsafeFnRegex.test(val)) {
+                try { if (process.env.NODE_ENV === 'development') console.warn('Sanitizing attribute', attr, 'with value', val, 'on element', element) } catch (e) {}
+                // Attempt conversion (lab/oklab/oklch)
+                const converted = parseLabToRgb(val) || parseOklabToRgb(val) || parseOklchToRgb(val)
+                if (converted) {
+                  element.setAttribute(attr as string, converted)
+                } else {
+                  // Use safe fallbacks depending on attribute
+                  if (attr === 'stroke') element.setAttribute('stroke', 'none')
+                  else if (attr === 'fill') element.setAttribute('fill', 'currentColor')
+                  else element.setAttribute(attr as string, '#000000')
+                }
+              }
+            })
+
+            // Remove any other attributes that contain unsafe color functions
+            Array.from(element.attributes).forEach((a) => {
+              try {
+                if (unsafeFnRegex.test(a.value)) {
+                  // Keep aria/data attributes but sanitize or remove other attributes
+                  if (!a.name.startsWith('data-') && !a.name.startsWith('aria-')) {
+                    element.removeAttribute(a.name)
+                  }
+                }
+              } catch (err) {
+                // ignore errors while iterating attributes
+              }
+            })
+          })
+
+          // Apply comprehensive inline styles from computed styles to preserve layout
+          clonedElement.querySelectorAll('*').forEach((el) => {
+            const element = el as HTMLElement
+            const tempId = element.getAttribute('data-temp-id')
+            if (!tempId) return
+
+            const computed = elementMap.get(tempId)
+            if (!computed) return
+
+            try {
+              // List of properties to copy to preserve layout and appearance
+              const propsToCopy = [
+                'display', 'position', 'top', 'left', 'right', 'bottom',
+                'width', 'height', 'minWidth', 'minHeight', 'maxWidth', 'maxHeight',
+                'margin', 'padding',
+                'border', 'borderRadius', 'borderWidth', 'borderColor', 'borderStyle',
+                'flex', 'flexDirection', 'flexWrap', 'justifyContent', 'alignItems', 'alignContent', 'gap',
+                'grid', 'gridTemplateColumns', 'gridTemplateRows', 'gridGap',
+                'fontSize', 'fontWeight', 'fontFamily', 'textAlign', 'lineHeight', 'textDecoration', 'textTransform',
+                'overflow', 'whiteSpace', 'boxShadow', 'opacity', 'zIndex',
+                'listStyle', 'listStyleType',
+                'boxSizing', 'float', 'clear'
+              ]
+              
+              propsToCopy.forEach(prop => {
+                // Convert camelCase to kebab-case for getPropertyValue
+                const kebabProp = prop.replace(/[A-Z]/g, m => `-${m.toLowerCase()}`)
+                const value = computed.getPropertyValue(kebabProp)
+                // Skip copying values that include unsafe color functions (lab, lch, oklab, oklch, display-p3)
+                if (value && value !== 'none' && value !== 'auto' && value !== 'normal' && value !== '0px') {
+                  if (!unsafeFnRegex.test(value)) {
+                    element.style[prop as any] = value
+                  } else {
+                    // If it's a color-like property we can attempt to convert
+                    const colorProps = ['color', 'background-color', 'border-color', 'fill', 'stroke']
+                    if (colorProps.includes(kebabProp)) {
+                      // Attempt conversions: lab -> rgb, oklab -> rgb, oklch -> rgb
+                      const converted = parseLabToRgb(value) || parseOklabToRgb(value) || parseOklchToRgb(value)
+                      if (converted) element.style[prop as any] = converted
+                      // else skip copying this value
+                    }
+                  }
+                }
+              })
+
+                // Handle colors safely - convert to rgb or use fallback (including lab to rgb conversion)
+                const color = computed.color
+                const bgColor = computed.backgroundColor
+                const borderColor = computed.borderColor
+
+                // Helper to check if color is safe (rgb, rgba, hex, or named color)
+                const isSafeColor = (c: string) => c && !unsafeFnRegex.test(c)
+
+                // Helper to parse and convert lab() to rgb() fallback
+                  const parseLabToRgb = (labStr: string): string | null => {
+                  try {
+                    // Extract numbers from lab(L a b) — L might be percentage
+                    const match = /lab\(\s*([\d\.]+%?)\s+([\-\d\.]+)\s+([\-\d\.]+)\s*\)/i.exec(labStr)
+                    if (!match) return null
+                    let L = match[1]
+                    const a = parseFloat(match[2])
+                    const b = parseFloat(match[3])
+                    let Lnum = L.includes('%') ? parseFloat(L) : parseFloat(L)
+                    // CSS lab L is specified as percentage usually 0%..100% scale; we accept 0..100
+                    // Convert Lab to XYZ then to linear RGB, then to sRGB
+                    Lnum = parseFloat(Lnum as any)
+
+                    // Convert Lab to XYZ
+                    const fy = (Lnum + 16) / 116
+                    const fx = a / 500 + fy
+                    const fz = fy - b / 200
+                    const pivot = (t: number) => t ** 3 > 0.008856 ? t ** 3 : (t - 16 / 116) / 7.787
+                    let x = pivot(fx) * 0.95047
+                    let y = pivot(fy) * 1.0
+                    let z = pivot(fz) * 1.08883
+
+                    // Convert XYZ to linear RGB
+                    let r = x * 3.2406 + y * -1.5372 + z * -0.4986
+                    let g = x * -0.9689 + y * 1.8758 + z * 0.0415
+                    let bl = x * 0.0557 + y * -0.2040 + z * 1.0570
+
+                    // Gamma correction
+                    const gamma = (c: number) => c <= 0.0031308 ? 12.92 * c : 1.055 * Math.pow(c, 1 / 2.4) - 0.055
+                    r = Math.max(0, Math.min(1, gamma(r)))
+                    g = Math.max(0, Math.min(1, gamma(g)))
+                    bl = Math.max(0, Math.min(1, gamma(bl)))
+
+                    const r255 = Math.round(r * 255)
+                    const g255 = Math.round(g * 255)
+                    const b255 = Math.round(bl * 255)
+                    return `rgb(${r255}, ${g255}, ${b255})`
+                  } catch (err) {
+                    return null
+                  }
+
+                    // Oklab parsing & conversion
+                    const parseOklabToRgb = (oklabStr: string): string | null => {
+                      try {
+                        const match = /oklab\(\s*([\d\.]+%?)\s+([\-\d\.]+)\s+([\-\d\.]+)\s*\)/i.exec(oklabStr)
+                        if (!match) return null
+                        let L = parseFloat(match[1])
+                        const a = parseFloat(match[2])
+                        const b = parseFloat(match[3])
+                        // If L was given in percent, ensure it's 0..1 scale for formula assumptions
+                        if (match[1].includes('%')) {
+                          L = (L / 100) // converting percent to 0..1 for this algorithm
+                        }
+                        // Oklab expects L in 0..1; formula uses that
+                        const l_ = L + 0.3963377774 * a + 0.2158037573 * b
+                        const m_ = L - 0.1055613458 * a - 0.0638541728 * b
+                        const s_ = L - 0.0894841775 * a - 1.2914855480 * b
+
+                        const l = l_ ** 3
+                        const m = m_ ** 3
+                        const s = s_ ** 3
+
+                        let r = +4.0767416621 * l - 3.3077115913 * m + 0.2309699292 * s
+                        let g = -1.2684380046 * l + 2.6097574011 * m - 0.3413193965 * s
+                        let bl = -0.0041960863 * l - 0.7034186147 * m + 1.7076147010 * s
+
+                        const gamma = (c: number) => c <= 0.0031308 ? 12.92 * c : 1.055 * Math.pow(c, 1 / 2.4) - 0.055
+                        r = Math.max(0, Math.min(1, gamma(r)))
+                        g = Math.max(0, Math.min(1, gamma(g)))
+                        bl = Math.max(0, Math.min(1, gamma(bl)))
+
+                        const r255 = Math.round(r * 255)
+                        const g255 = Math.round(g * 255)
+                        const b255 = Math.round(bl * 255)
+                        return `rgb(${r255}, ${g255}, ${b255})`
+                      } catch (err) {
+                        return null
+                      }
+                    }
+
+                    // Oklch values: oklch(L C H) - convert to oklab first
+                    const parseOklchToRgb = (oklchStr: string): string | null => {
+                      try {
+                        const match = /oklch\(\s*([\d\.]+%?)\s+([\d\.]+)\s+([\d\.]+)(?:deg|rad|g)?\s*\)/i.exec(oklchStr)
+                        if (!match) return null
+                        let L = parseFloat(match[1])
+                        const C = parseFloat(match[2])
+                        const Hdeg = parseFloat(match[3])
+                        if (match[1].includes('%')) {
+                          L = (L / 100)
+                        }
+                        const hRad = (Hdeg * Math.PI) / 180
+                        const a = C * Math.cos(hRad)
+                        const b = C * Math.sin(hRad)
+                        return parseOklabToRgb(`oklab(${L} ${a} ${b})`)
+                      } catch (err) {
+                        return null
+                      }
+                    }
+                }
+
+                const setSafeColor = (prop: 'color' | 'backgroundColor' | 'borderColor', src: string | undefined) => {
+                  if (!src) return
+                  if (isSafeColor(src)) {
+                    element.style[prop as any] = src
+                  } else {
+                    const converted = parseLabToRgb(src)
+                    if (converted) element.style[prop as any] = converted
+                    else if (prop === 'color') element.style[prop as any] = '#000000'
+                    else if (prop === 'backgroundColor') element.style[prop as any] = 'transparent'
+                  }
+                }
+
+                setSafeColor('color', color)
+                setSafeColor('backgroundColor', bgColor)
+                setSafeColor('borderColor', borderColor)
+              
+              // Handle SVGs specifically
+                if (element.tagName.toLowerCase() === 'svg') {
+                  // SVG computed fill/stroke may be CSSOM values
+                  const fillVal = computed.getPropertyValue('fill') || (element.getAttribute('fill') ?? '')
+                  const strokeVal = computed.getPropertyValue('stroke') || (element.getAttribute('stroke') ?? '')
+                  if (isSafeColor(fillVal)) element.style.fill = fillVal
+                  else {
+                    const convertedFill = parseLabToRgb(fillVal)
+                    if (convertedFill) element.style.fill = convertedFill
+                    else element.style.fill = 'currentColor'
+                  }
+                  if (isSafeColor(strokeVal)) element.style.stroke = strokeVal
+                  else {
+                    const convertedStroke = parseLabToRgb(strokeVal)
+                    if (convertedStroke) element.style.stroke = convertedStroke
+                    else element.style.stroke = 'none'
+                  }
+                }
+
+            } catch (e) {
+              // Continue on error
+            }
+          })
+        },
+        width: element.scrollWidth,
+        height: element.scrollHeight
+      } as any) // Cast to any to avoid TS errors with 'scale'
+
+      // Clean up temp markers
+      allElements.forEach(el => el.removeAttribute('data-temp-id'))
+
+      const imgData = canvas.toDataURL('image/png')
+      const pdf = new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: 'a4'
+      })
+
+      const imgWidth = 190 // A4 width (210) - margins (10 left + 10 right)
+      const pageHeight = 297
+      const pageMargin = 10
+      const imgHeight = (canvas.height * imgWidth) / canvas.width
+      let heightLeft = imgHeight
+
+      // First page
+      pdf.addImage(imgData, 'PNG', pageMargin, pageMargin, imgWidth, imgHeight)
+      heightLeft -= (pageHeight - 2 * pageMargin)
+
+      // Subsequent pages
+      while (heightLeft > 0) {
+        pdf.addPage()
+        // Calculate position: negative offset to show the next chunk
+        const position = - (imgHeight - heightLeft) + pageMargin
+        pdf.addImage(imgData, 'PNG', pageMargin, position, imgWidth, imgHeight)
+        heightLeft -= (pageHeight - 2 * pageMargin)
+      }
+
+      // Generate filename from guide title
+      const safeTitle = selectedGuide.title
+        .replace(/[^a-z0-9áéíóúñü\s-]/gi, '')
+        .replace(/\s+/g, '-')
+        .toLowerCase()
+        .substring(0, 50)
+      const filename = `${safeTitle || 'guia-estudio'}.pdf`
+      
+      pdf.save(filename)
+      
+      // Show success message
+      const tempMsg = document.createElement('div')
+      tempMsg.textContent = '✓ PDF descargado exitosamente'
+      tempMsg.style.cssText = 'position:fixed;top:20px;right:20px;background:#10b981;color:white;padding:12px 24px;border-radius:8px;z-index:9999;font-weight:500;box-shadow:0 4px 6px rgba(0,0,0,0.1)'
+      document.body.appendChild(tempMsg)
+      setTimeout(() => document.body.removeChild(tempMsg), 3000)
+    } catch (error) {
+      console.error('Error exporting PDF:', error)
+      alert('Error al exportar el PDF. Por favor, intenta de nuevo.')
     }
   }
 
@@ -461,7 +931,22 @@ export default function StudyGuideContent() {
                 <ArrowLeft size={18} />
                 Volver a la lista
               </button>
-              <div className="flex gap-2">
+              <div className="flex gap-2 items-center">
+                {showSavedIndicator && (
+                  <div className="flex items-center gap-2 text-green-600 bg-green-50 px-3 py-1.5 rounded-lg animate-fade-in">
+                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                    </svg>
+                    <span className="text-sm font-medium">Guardado en BD</span>
+                  </div>
+                )}
+                <button
+                  onClick={handleExportPDF}
+                  className="text-slate-500 hover:bg-slate-50 p-2 rounded-lg transition-colors"
+                  title="Exportar a PDF"
+                >
+                  <Download size={18} />
+                </button>
                 <button
                   onClick={() => handleDelete(selectedGuide.id)}
                   className="text-red-500 hover:bg-red-50 p-2 rounded-lg transition-colors"
@@ -479,7 +964,7 @@ export default function StudyGuideContent() {
               </div>
             </div>
             
-            <div className="p-8 max-w-4xl mx-auto">
+            <div id="study-guide-content" className="p-8 max-w-4xl mx-auto">
               <h1 className="text-3xl font-bold text-[#00246a] mb-2">{selectedGuide.title}</h1>
               <p className="text-slate-400 text-sm mb-8 border-b border-slate-100 pb-4">
                 Generado el {new Date(selectedGuide.created_at).toLocaleDateString()}

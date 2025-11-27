@@ -166,8 +166,12 @@ export default function InteractiveGuide({
               <p className="text-xs text-slate-500">{completedSections} de {totalSections} completado</p>
             </div>
           </div>
-          <div className="text-right flex items-center gap-3">
+            <div className="text-right flex items-center gap-3">
             <span className="text-xl font-bold text-[#00246a]">{progressPercentage}%</span>
+            {/*
+              Disabled: Button to view raw JSON.
+              To re-enable, uncomment the lines below.
+            
             <button
               type="button"
               title="Ver JSON crudo"
@@ -177,6 +181,7 @@ export default function InteractiveGuide({
               <Clipboard size={16} />
               <span className="hidden sm:inline">JSON</span>
             </button>
+            */}
           </div>
         </div>
         <div className="w-full bg-slate-100 rounded-full h-2 overflow-hidden">

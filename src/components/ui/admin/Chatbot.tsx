@@ -259,7 +259,7 @@ export default function Chatbot() {
             <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-4 rounded-2xl shadow-lg text-sm font-medium max-w-xs">
               <div className="flex items-start justify-between mb-2">
                 <div>
-                  <div className="font-semibold mb-1">¿Tienes dudas? 💬</div>
+                  <div className="font-semibold mb-1">¿Tienes dudas?</div>
                   <div className="text-xs opacity-90">Pregúntame cualquier cosa</div>
                 </div>
                 <button
@@ -458,7 +458,7 @@ export default function Chatbot() {
                 disabled={typing}
                 className="bg-white px-4 py-2 rounded-2xl shadow hover:bg-blue-100 hover:scale-105 transition transform text-sm flex items-center gap-1 whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed text-gray-700"
               >
-                💡 {opt}
+                {opt}
               </button>
             ))}
           </div>

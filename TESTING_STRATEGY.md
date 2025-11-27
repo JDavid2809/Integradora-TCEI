@@ -1,13 +1,13 @@
-# 🎯 Estrategia de Testing Práctica
+# Estrategia de Testing Práctica (Archivo movido)
 
-## 📊 Coverage Realista
+## Coverage Realista
 
 **No necesitas 100% de coverage!** Un buen coverage está entre **60-80%**.
 
-### ✅ QUÉ SÍ TESTEAR (Prioridad Alta)
+### QUÉ SÍ TESTEAR (Prioridad Alta)
 
 1. **Lógica de Negocio Crítica**
-   - Validaciones (schemas) ✅ Ya hecho
+   - Validaciones (schemas) - Ya hecho
    - Cálculos complejos
    - Transformaciones de datos
 
@@ -26,7 +26,7 @@
    - Pagos
    - Operaciones CRUD importantes
 
-### ❌ QUÉ NO TESTEAR (Ahorra tiempo)
+### QUÉ NO TESTEAR (Ahorra tiempo)
 
 1. **Componentes UI Simples**
    - Botones básicos
@@ -48,7 +48,7 @@
    - page.tsx básicos
    - Wrappers simples
 
-## 🚀 Comandos de Testing
+## Comandos de Testing
 
 ```bash
 # Desarrollo diario (sin coverage)
@@ -66,7 +66,7 @@ npm test src/validations
 
 ## 📈 Estrategia de Implementación
 
-### Fase 1: Foundation (Ya hecho ✅)
+### Fase 1: Foundation (Ya hecho)
 - [x] Setup de Jest
 - [x] Validaciones críticas
 - [x] Configuración base
@@ -86,7 +86,7 @@ npm test src/validations
 - [ ] API + Frontend
 - [ ] E2E básicos
 
-## 🎯 Métricas Objetivo
+## Métricas Objetivo
 
 - **Validaciones**: 90-100% (crítico)
 - **API Routes**: 70-80% (importante)
@@ -94,7 +94,7 @@ npm test src/validations
 - **Utilidades**: 80-90% (fácil de testear)
 - **Global**: 60-70% (realista)
 
-## 💡 Tips del Profesor
+## Tips del Profesor
 
 1. **Calidad > Cantidad**: Mejor pocos tests buenos que muchos malos
 2. **Test Happy Path + Edge Cases**: No todos los escenarios
@@ -109,4 +109,5 @@ npm test src/validations
 - **Environment**: jsdom para React
 - **Mocks**: Next.js, router, APIs del browser
 
-¡Recuerda: El testing es una herramienta, no el objetivo final!
+Este archivo ha sido movido a `docs/testing/TESTING_STRATEGY.md`.
+Por favor revisa la versión actualizada y centralizada en el directorio `docs/`.

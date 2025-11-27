@@ -112,16 +112,16 @@ export default function CrudImplementationSummary() {
   ]
 
   const technicalFeatures = [
-    "🎨 Interfaz moderna con Lucide React Icons",
-    "🔒 Autenticación y autorización de administrador",
-    "📱 Diseño completamente responsivo",
-    "⚡ Estados de carga y feedback visual",
-    "🔄 Actualizaciones en tiempo real",
-    "🎯 Validación de formularios robusta",
-    "📊 Estadísticas y métricas integradas",
-    "💾 Persistencia de datos con Prisma ORM",
-    "🌐 API RESTful completa",
-    "📋 Mensajes de éxito y error claros"
+    "Interfaz moderna con Lucide React Icons",
+    "Autenticación y autorización de administrador",
+    "Diseño completamente responsivo",
+    "Estados de carga y feedback visual",
+    "Actualizaciones en tiempo real",
+    "Validación de formularios robusta",
+    "Estadísticas y métricas integradas",
+    "Persistencia de datos con Prisma ORM",
+    "API RESTful completa",
+    "Mensajes de éxito y error claros"
   ]
 
   return (

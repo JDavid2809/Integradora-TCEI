@@ -28,14 +28,14 @@ export async function updateEnrollmentStatus(
         const certResult = await generateCertificate({ inscripcionId })
         
         if (certResult.success) {
-          console.log(`✅ Certificado generado automáticamente para inscripción ${inscripcionId}`)
+          console.log(`Certificado generado automáticamente para inscripción ${inscripcionId}`)
           return {
             success: true,
             data: inscripcion,
             certificate: certResult.data
           }
         } else {
-          console.error(`❌ Error al generar certificado: ${certResult.error}`)
+          console.error(`Error al generar certificado: ${certResult.error}`)
         }
       }
     }

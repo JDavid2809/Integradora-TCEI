@@ -98,7 +98,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const { id_solicitud, accion, comentario_revision, password } = body
 
-    console.log('📋 Procesando solicitud:', { id_solicitud, accion, comentario_revision })
+    console.log('Procesando solicitud:', { id_solicitud, accion, comentario_revision })
 
     // Validaciones
     if (!id_solicitud || !accion) {
@@ -162,7 +162,7 @@ export async function POST(request: NextRequest) {
           email: normalizedEmail, // Usar email normalizado
           password: hashedPassword,
           rol: 'PROFESOR',
-          verificado: true, // ✅ Se marca como verificado automáticamente al ser aprobado por admin
+          verificado: true, // Se marca como verificado automáticamente al ser aprobado por admin
           debe_cambiar_password: true // ✅ Debe cambiar contraseña en el primer login
         }
       })
@@ -202,11 +202,11 @@ export async function POST(request: NextRequest) {
         );
         console.log('📧 Email de credenciales enviado a:', normalizedEmail);
       } catch (emailError) {
-        console.error('❌ Error al enviar email de credenciales:', emailError);
+        console.error('Error al enviar email de credenciales:', emailError);
         // No fallar todo el proceso si el email falla
       }
 
-      console.log('✅ Profesor aprobado y usuario creado:', nuevoProfesor.email)
+      console.log('Profesor aprobado y usuario creado:', nuevoProfesor.email)
 
       return NextResponse.json({
         message: 'Solicitud aprobada exitosamente',
@@ -232,7 +232,7 @@ export async function POST(request: NextRequest) {
         }
       })
 
-      console.log('❌ Solicitud rechazada:', solicitud.email)
+      console.log('Solicitud rechazada:', solicitud.email)
 
       return NextResponse.json({
         message: 'Solicitud rechazada exitosamente'

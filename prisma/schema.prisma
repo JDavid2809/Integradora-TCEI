@@ -30,6 +30,7 @@ model estudiante {
   resultado_examen        resultado_examen[]
   activity_submissions    activity_submission[] // Entregas de actividades
   certificados            Certificado[] // Certificados obtenidos
+  study_guides            study_guide[] // Guías de estudio generadas por IA
 
   @@index([id_categoria_edad])
 }
@@ -267,6 +268,8 @@ model usuario {
   apellido      String
   rol           Rol
   id            Int            @id @default(autoincrement())
+  // Indica si el usuario dio consentimiento para usar servicios externos de IA con sus datos
+  ai_consent    Boolean        @default(false)
   administrador Administrador?
   estudiante    estudiante?
   profesor      profesor?
@@ -315,6 +318,7 @@ model curso {
   imparte         imparte[]
   activities      course_activity[] // Actividades del curso
   certificados    Certificado[]     // Certificados emitidos
+  modules         CourseModule[]    // Módulos del curso (Nueva estructura)
 
   @@index([created_by])
 }
@@ -611,6 +615,13 @@ model course_activity {
   teacher     profesor              @relation(fields: [created_by], references: [id_profesor])
   attachments activity_attachment[]
   submissions activity_submission[]
+  
+  // Relación con lección (opcional)
+  lesson_id   Int?
+  lesson      CourseLesson?         @relation(fields: [lesson_id], references: [id])
+  
+  // Preguntas (para Quizzes)
+  questions   ActivityQuestion[]
 
   @@index([course_id])
   @@index([created_by])
@@ -783,4 +794,82 @@ model Certificado {
   @@index([codigo_verificacion])
   @@index([fecha_emision])
   @@index([es_valido])
+}
+
+model study_guide {
+  id          Int      @id @default(autoincrement())
+  title       String   @db.VarChar(200)
+  content     Json
+  created_at  DateTime @default(now())
+  student_id  Int
+  student     estudiante @relation(fields: [student_id], references: [id_estudiante], onDelete: Cascade)
+
+  @@index([student_id])
+}
+
+// ============================================
+// NUEVA ESTRUCTURA DE CONTENIDO (Módulos y Lecciones)
+// ============================================
+
+model CourseModule {
+  id          Int       @id @default(autoincrement())
+  course_id   Int
+  title       String    @db.VarChar(200)
+  description String?   @db.Text
+  order       Int       @default(0)
+  is_active   Boolean   @default(true)
+  
+  course      curso     @relation(fields: [course_id], references: [id_curso], onDelete: Cascade)
+  lessons     CourseLesson[]
+  
+  @@index([course_id])
+}
+
+model CourseLesson {
+  id          Int       @id @default(autoincrement())
+  module_id   Int
+  title       String    @db.VarChar(200)
+  content     String?   @db.Text // Contenido educativo rico (HTML/Markdown)
+  video_url   String?   @db.VarChar(500)
+  duration    Int?      // Duración estimada en minutos
+  order       Int       @default(0)
+  is_active   Boolean   @default(true)
+  is_preview  Boolean   @default(false)
+
+  module      CourseModule @relation(fields: [module_id], references: [id], onDelete: Cascade)
+  activities  course_activity[] // Actividades específicas de esta lección
+
+  @@index([module_id])
+}
+
+model ActivityQuestion {
+  id          Int       @id @default(autoincrement())
+  activity_id Int
+  text        String    @db.Text
+  points      Int       @default(1)
+  order       Int       @default(0)
+  type        QuestionType @default(MULTIPLE_CHOICE)
+  
+  activity    course_activity @relation(fields: [activity_id], references: [id], onDelete: Cascade)
+  options     ActivityOption[]
+
+  @@index([activity_id])
+}
+
+model ActivityOption {
+  id          Int       @id @default(autoincrement())
+  question_id Int
+  text        String    @db.Text
+  is_correct  Boolean   @default(false)
+  explanation String?   @db.Text
+  
+  question    ActivityQuestion @relation(fields: [question_id], references: [id], onDelete: Cascade)
+
+  @@index([question_id])
+}
+
+enum QuestionType {
+  MULTIPLE_CHOICE
+  TRUE_FALSE
+  OPEN_ENDED
 }

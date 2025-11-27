@@ -41,11 +41,17 @@ export async function PUT(
     }
 
     // Verificar que el usuario es participante de la sala
-    const isParticipant = message.chat_room.participantes.some(
-      (p: any) => p.usuario_id === Number(session.user.id)
-    )
+    // Use explicit lookup instead of relying on includes to avoid stale/partial data
+    const participant = await prisma.chat_participant.findFirst({
+      where: {
+        chat_room_id: message.chat_room.id,
+        usuario_id: Number(session.user.id),
+        activo: true,
+      }
+    })
 
-    if (!isParticipant) {
+    if (!participant) {
+      console.warn(`User ${session.user?.email} attempted to mark message ${messageId} as read but is not participant (room ${message.chat_room.id}) - participants in room: ${JSON.stringify(message.chat_room.participantes?.map((p: any) => p.usuario_id)) || '[]'}`)
       return NextResponse.json({ error: 'No tienes acceso a esta sala' }, { status: 403 })
     }
 

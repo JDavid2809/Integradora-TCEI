@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/authOptions'
 import { prisma } from '@/lib/prisma'
+import { getUserFromSession } from '@/lib/getUserFromSession'
+import { redis, safePublish } from '@/lib/redis'
 
 interface RouteParams {
   params: Promise<{
@@ -13,13 +15,11 @@ interface RouteParams {
 export async function GET(request: NextRequest, { params }: RouteParams) {
   try {
     const session = await getServerSession(authOptions)
-    if (!session?.user?.email) {
+    if (!session?.user) {
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 })
     }
 
-    const user = await prisma.usuario.findUnique({
-      where: { email: session.user.email }
-    })
+    const user = await getUserFromSession(session)
 
     if (!user) {
       return NextResponse.json({ error: 'Usuario no encontrado' }, { status: 404 })
@@ -101,13 +101,11 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 export async function POST(request: NextRequest, { params }: RouteParams) {
   try {
     const session = await getServerSession(authOptions)
-    if (!session?.user?.email) {
+    if (!session?.user) {
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 })
     }
 
-    const user = await prisma.usuario.findUnique({
-      where: { email: session.user.email }
-    })
+    const user = await getUserFromSession(session)
 
     if (!user) {
       return NextResponse.json({ error: 'Usuario no encontrado' }, { status: 404 })
@@ -192,6 +190,33 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
         }
       }
     })
+
+    // Publicar en Redis para WebSocket
+    try {
+      const wsMessage = {
+        type: 'message',
+        id: String(newMessage.id),
+        room: String(roomId),
+        content: newMessage.contenido,
+        senderId: String(user.id),
+        senderName: `${user.nombre} ${user.apellido || ''}`.trim(),
+        timestamp: Math.floor(new Date(newMessage.enviado_en).getTime() / 1000),
+        metadata: {
+          tipo: newMessage.tipo,
+          archivo_url: newMessage.archivo_url,
+          archivo_nombre: newMessage.archivo_nombre
+        }
+      }
+      
+      // Use helper to avoid unhandled errors and to retry if needed
+      const ok = await safePublish(`chat:room:${roomId}`, JSON.stringify(wsMessage))
+      if (!ok) {
+        console.warn('Redis publish failed, continuing without Pub/Sub')
+      }
+    } catch (redisError) {
+      console.error('Error publishing to Redis:', redisError)
+      // No fallar la request si Redis falla, el mensaje ya se guardó en DB
+    }
 
     return NextResponse.json(newMessage, { status: 201 })
 

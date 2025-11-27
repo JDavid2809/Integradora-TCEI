@@ -33,7 +33,7 @@ export default async function page() {
     getAllCourses()
   ])
 
-  console.log('✅ Student access granted:', session.user.email, 'Role:', session.user.rol)
+  console.log('Student access granted:', session.user.email, 'Role:', session.user.rol)
  
   return (
     <Intermedio 

@@ -17,7 +17,7 @@ export function useAuthRedirect() {
 
       // Si no está en la ruta correcta para su rol, redirigir
       if (!currentPath.startsWith(redirectPath)) {
-        console.log('🔄 Redirecting authenticated user to correct dashboard:', redirectPath)
+        console.log('Redirecting authenticated user to correct dashboard:', redirectPath)
         router.replace(redirectPath)
       }
     }

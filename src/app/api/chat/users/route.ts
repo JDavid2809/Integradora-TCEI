@@ -2,18 +2,17 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/authOptions'
 import { prisma } from '@/lib/prisma'
+import { getUserFromSession } from '@/lib/getUserFromSession'
 
 // GET - Buscar usuarios para chat privado
 export async function GET(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions)
-    if (!session?.user?.email) {
+    if (!session?.user) {
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 })
     }
 
-    const currentUser = await prisma.usuario.findUnique({
-      where: { email: session.user.email }
-    })
+    const currentUser = await getUserFromSession(session)
 
     if (!currentUser) {
       return NextResponse.json({ error: 'Usuario no encontrado' }, { status: 404 })
@@ -26,7 +25,7 @@ export async function GET(request: NextRequest) {
     // En desarrollo, incluir usuarios no verificados para debug
     const includeUnverified = process.env.NODE_ENV === 'development'
     
-    console.log(`🔍 Searching users with query: "${query}", includeUnverified: ${includeUnverified}`)
+    console.log(`Searching users with query: "${query}", includeUnverified: ${includeUnverified}`)
 
     // Buscar usuarios (excluyendo al usuario actual)
     const users = await prisma.usuario.findMany({
@@ -106,7 +105,7 @@ export async function GET(request: NextRequest) {
       })
     )
 
-    console.log(`✅ Found ${usersWithChatStatus.length} users for query "${query}"`)
+    console.log(`Found ${usersWithChatStatus.length} users for query "${query}"`)
 
     // En desarrollo, agregar información de debug
     const response: any = {

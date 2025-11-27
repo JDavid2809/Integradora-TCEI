@@ -16,7 +16,7 @@ async function seedScheduleData() {
         }
       })
     }
-    console.log('✅ Levels created/updated')
+    console.log('Levels created/updated')
 
     // 2. Get existing courses and teachers
     const courses = await prisma.curso.findMany({
@@ -31,7 +31,7 @@ async function seedScheduleData() {
     })
 
     if (courses.length === 0) {
-      console.log('❌ No courses found. Please seed courses first.')
+      console.log('No courses found. Please seed courses first.')
       return
     }
 
@@ -86,7 +86,7 @@ async function seedScheduleData() {
         }
       }
     }
-    console.log('✅ Class schedules created')
+    console.log('Class schedules created')
 
     // 4. Create sample activities
     for (const course of courses) {
@@ -138,12 +138,12 @@ async function seedScheduleData() {
         }
       }
     }
-    console.log('✅ Course activities created')
+    console.log('Course activities created')
 
-    console.log('🎉 Schedule seed data completed successfully!')
+    console.log('Schedule seed data completed successfully!')
 
   } catch (error) {
-    console.error('❌ Error seeding schedule data:', error)
+    console.error('Error seeding schedule data:', error)
   } finally {
     await prisma.$disconnect()
   }

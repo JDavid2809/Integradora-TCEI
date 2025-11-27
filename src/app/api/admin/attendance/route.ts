@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/authOptions'
 import { prisma } from '@/lib/prisma'
+import { getUserFromSession } from '@/lib/getUserFromSession'
 
 /**
  * GET /api/admin/attendance
@@ -210,10 +211,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Obtener el ID del administrador desde la sesión
-    const usuario = await prisma.usuario.findUnique({
-      where: { email: session.user.email ?? '' },
-      include: { administrador: { select: { id_administrador: true } } }
-    })
+    const usuario = await getUserFromSession(session)
 
     const adminId = (usuario as any)?.administrador?.id_administrador
 

@@ -1,59 +1,87 @@
-# 🚀 SIGUIENTES PASOS - ROADMAP DEL PROYECTO
+#  SIGUIENTES PASOS - ROADMAP DEL PROYECTO
 
-## 📊 **ESTADO ACTUAL**
-- **Calificación Actual:** 92/100 ⭐⭐⭐⭐⭐
+##  **ESTADO ACTUAL**
+
+
+- **Calificación Actual:** 92/100
+
 - **Calificación Objetivo:** 97-98/100
+
 - **Nivel:** Proyecto Profesional
+
 - **Status:** Production-Ready (con mejoras pendientes)
 
 ---
 
 ## 📅 **CRONOGRAMA GENERAL (8-10 SEMANAS)**
 
-```
-Semana 1-2:   ✅ Completar funcionalidades faltantes
+```text
+Semana 1-2:   - [x] Completar funcionalidades faltantes
 Semana 3-4:   🧪 Implementar testing completo
-Semana 5:     🚀 CI/CD y deployment
+Semana 5:      CI/CD y deployment
 Semana 6:     ⚡ Optimización y performance
 Semana 7:     🔒 Seguridad avanzada
-Semana 8:     📊 Analytics y monitoreo
-Semana 9-10:  🎨 Mejoras UX/UI
+Semana 8:      Analytics y monitoreo
+Semana 9-10:   Mejoras UX/UI
 ```
 
+text
 ---
 
 ## 📋 **FASE 1: COMPLETAR FUNCIONALIDADES (1-2 semanas)**
 
-### ✅ **Paso 1: Completar CRUD de Evaluaciones para Admin**
+### - [x] **Paso 1: Completar CRUD de Evaluaciones para Admin**
+
 **Impacto:** Alto | **Dificultad:** Media | **Tiempo:** 2-3 días
 
 #### **Tareas:**
+
+
 1. **Crear endpoints de admin para historial_academico**
    ```
+
    - GET /api/admin/evaluations
+
    - GET /api/admin/evaluations/[id]
+
    - PUT /api/admin/evaluations/[id]
+
    - DELETE /api/admin/evaluations/[id]
    ```
 
+
 2. **Crear componente AdminEvaluationsCrud.tsx**
+
    - Lista paginada de evaluaciones
+
    - Filtros por estudiante/curso/fecha
+
    - Edición de calificaciones
+
    - Eliminación con confirmación
+
    - Integrar con DataTable, Modal, Pagination
 
+
 3. **Integrar en el panel de admin**
+
    - Agregar sección en AdminPanelFinal.tsx
+
    - Agregar ruta en el menú de navegación
 
 #### **Archivos a crear:**
+
+
 - `src/app/api/admin/evaluations/route.ts`
+
 - `src/app/api/admin/evaluations/[id]/route.ts`
+
 - `src/components/admin/AdminEvaluationsCrud.tsx`
+
 - Actualizar `src/components/AdminPanelFinal.tsx`
 
 #### **Modelo de datos:**
+
 ```typescript
 interface Evaluacion {
   id_historial: number
@@ -68,103 +96,164 @@ interface Evaluacion {
 }
 ```
 
+text
 ---
 
-### ✅ **Paso 2: Completar Sistema de Asistencias para Admin**
+### - [x] **Paso 2: Completar Sistema de Asistencias para Admin**
+
 **Impacto:** Alto | **Dificultad:** Media | **Tiempo:** 2-3 días
 
 #### **Tareas:**
+
+
 1. **Mejorar endpoints de asistencias**
    ```
+
    - GET /api/admin/attendance (verificar existente)
+
    - POST /api/admin/attendance/manual
+
    - PUT /api/admin/attendance/[id]
+
    - DELETE /api/admin/attendance/[id]
+
    - GET /api/admin/attendance/reports (reportes)
    ```
 
+
 2. **Crear AdminAttendanceCrud.tsx**
+
    - Vista de asistencias por curso/estudiante
+
    - Registro manual de asistencias
+
    - Reportes de asistencia con gráficas
+
    - Exportar a PDF/Excel
+
    - Estadísticas: porcentaje de asistencia
 
+
 3. **Agregar filtros avanzados**
+
    - Por rango de fechas
+
    - Por porcentaje de asistencia
+
    - Por curso/nivel
+
    - Por tipo de clase (presencial/remota)
 
 #### **Archivos:**
+
+
 - `src/app/api/admin/attendance/manual/route.ts`
+
 - `src/app/api/admin/attendance/[id]/route.ts`
+
 - `src/app/api/admin/attendance/reports/route.ts`
+
 - `src/components/admin/AdminAttendanceCrud.tsx`
 
 ---
 
-### ✅ **Paso 3: Sistema de Notificaciones por Email**
+### - [x] **Paso 3: Sistema de Notificaciones por Email**
+
 **Impacto:** Alto | **Dificultad:** Media | **Tiempo:** 2-3 días
 
 #### **Tareas:**
+
+
 1. **Configurar templates de email**
+
    - Email de bienvenida a profesor aprobado (con credenciales)
+
    - Email de rechazo con motivo detallado
+
    - Notificación de nueva solicitud a todos los admins
+
    - Recordatorios de clases (24h antes)
+
    - Notificación de nueva actividad asignada
+
    - Confirmación de inscripción a curso
 
+
 2. **Implementar queue de emails (opcional)**
+
    - Usar librería como `bull` o `agenda`
+
    - Reintento automático en caso de fallo
+
    - Log de emails enviados
 
+
 3. **Agregar preferencias de notificación**
+
    - Panel para usuarios: qué notificaciones recibir
+
    - Frecuencia de notificaciones (inmediato, diario, semanal)
+
    - Tabla en BD para preferencias
 
 #### **Archivos a crear:**
+
+
 - `src/lib/email-templates.ts` (todos los templates HTML)
+
 - `src/lib/email-queue.ts` (sistema de cola)
+
 - `src/app/api/notifications/preferences/route.ts`
+
 - Actualizar `src/lib/mailer.ts`
+
 - Actualizar `src/app/api/admin/teacher-requests/route.ts` (agregar envío de emails)
 
 #### **Templates de Email:**
+
 ```typescript
+
 - welcomeTeacherTemplate(name, email, password, loginUrl)
+
 - rejectionTeacherTemplate(name, reason, contactEmail)
+
 - newRequestAdminTemplate(teacherName, requestId, reviewUrl)
+
 - classReminderTemplate(studentName, courseName, dateTime)
+
 - newActivityTemplate(studentName, activityTitle, dueDate, courseUrl)
 ```
 
+text
 ---
 
 ## 🧪 **FASE 2: TESTING (1-2 semanas)**
 
-### ✅ **Paso 4: Implementar Tests Unitarios**
+### - [x] **Paso 4: Implementar Tests Unitarios**
+
 **Impacto:** Crítico | **Dificultad:** Media-Alta | **Tiempo:** 5-7 días
 
 #### **Instalación:**
+
 ```bash
 npm install -D jest @testing-library/react @testing-library/jest-dom
 npm install -D @testing-library/user-event jest-environment-jsdom
 npm install -D @types/jest ts-node ts-jest
 ```
 
+text
 #### **Configuración:**
+
 Ya creados:
-- ✅ `jest.config.js`
-- ✅ `jest.setup.js`
+
+- [x] `jest.config.js`
+
+- [x] `jest.setup.js`
 
 #### **Tests a escribir (en orden de prioridad):**
 
 **1. Hooks personalizados (Alta prioridad):**
-```
+```text
 src/hooks/__tests__/
 ├── useResourceList.test.ts
 ├── useDebounce.test.ts
@@ -172,8 +261,9 @@ src/hooks/__tests__/
 └── useModal.test.ts
 ```
 
+text
 **2. Componentes comunes (Alta prioridad):**
-```
+```text
 src/components/admin/common/__tests__/
 ├── Modal.test.tsx
 ├── DataTable.test.tsx
@@ -183,16 +273,18 @@ src/components/admin/common/__tests__/
 └── ConfirmationModal.test.tsx
 ```
 
+text
 **3. Utilidades (Media prioridad):**
-```
+```text
 src/lib/__tests__/
 ├── apiClient.test.ts
 ├── prisma.test.ts
 └── mailer.test.ts
 ```
 
+text
 **4. API Routes (Alta prioridad):**
-```
+```text
 src/app/api/__tests__/
 ├── teacher-request/route.test.ts
 ├── admin/users/route.test.ts
@@ -200,13 +292,16 @@ src/app/api/__tests__/
 └── auth/[...nextauth]/route.test.ts
 ```
 
+text
 **5. Validaciones (Media prioridad):**
-```
+```text
 src/validations/__tests__/
 └── adminSchemas.test.ts
 ```
 
+text
 #### **Ejemplo de test básico:**
+
 ```typescript
 // src/hooks/__tests__/useDebounce.test.ts
 import { renderHook, act } from '@testing-library/react'
@@ -214,43 +309,51 @@ import { useDebounce } from '../useDebounce'
 
 describe('useDebounce', () => {
   jest.useFakeTimers()
-  
+
   it('should debounce value changes', () => {
     const { result, rerender } = renderHook(
       ({ value, delay }) => useDebounce(value, delay),
       { initialProps: { value: 'initial', delay: 500 } }
     )
-    
+
     expect(result.current).toBe('initial')
-    
+
     rerender({ value: 'updated', delay: 500 })
     expect(result.current).toBe('initial') // Still initial
-    
+
     act(() => {
       jest.advanceTimersByTime(500)
     })
-    
+
     expect(result.current).toBe('updated') // Now updated
   })
 })
 ```
 
+text
 #### **Comandos:**
+
 ```bash
 # Correr todos los tests
+
 npm test
 
 # Correr tests con coverage
+
 npm test -- --coverage
 
 # Correr tests en modo watch
+
 npm test -- --watch
 
 # Correr un test específico
+
 npm test -- useDebounce
 ```
 
+text
 #### **Agregar scripts a package.json:**
+
 ```json
 "scripts": {
   "test": "jest",
@@ -260,27 +363,36 @@ npm test -- useDebounce
 }
 ```
 
+text
 #### **Objetivo de cobertura:**
+
+
 - **Líneas:** 70%+
+
 - **Funciones:** 70%+
+
 - **Branches:** 70%+
+
 - **Statements:** 70%+
 
 ---
 
-### ✅ **Paso 5: Tests E2E con Playwright**
+### - [x] **Paso 5: Tests E2E con Playwright**
+
 **Impacto:** Alto | **Dificultad:** Media | **Tiempo:** 3-4 días
 
 #### **Instalación:**
+
 ```bash
 npm install -D @playwright/test
 npx playwright install
 ```
 
+text
 #### **Tests E2E críticos:**
 
 **1. Autenticación:**
-```
+```text
 tests/e2e/auth/
 ├── login.spec.ts
 ├── register.spec.ts
@@ -288,15 +400,17 @@ tests/e2e/auth/
 └── email-verification.spec.ts
 ```
 
+text
 **2. Solicitud de Profesor:**
-```
+```text
 tests/e2e/teacher-request/
 ├── submit-request.spec.ts
 └── check-status.spec.ts
 ```
 
+text
 **3. Admin:**
-```
+```text
 tests/e2e/admin/
 ├── approve-teacher.spec.ts
 ├── create-course.spec.ts
@@ -304,23 +418,27 @@ tests/e2e/admin/
 └── view-statistics.spec.ts
 ```
 
+text
 **4. Chat:**
-```
+```text
 tests/e2e/chat/
 ├── send-message.spec.ts
 ├── create-room.spec.ts
 └── search-messages.spec.ts
 ```
 
+text
 **5. Cursos:**
-```
+```text
 tests/e2e/courses/
 ├── enroll-course.spec.ts
 ├── view-course-details.spec.ts
 └── submit-activity.spec.ts
 ```
 
+text
 #### **Ejemplo de test E2E:**
+
 ```typescript
 // tests/e2e/auth/login.spec.ts
 import { test, expect } from '@playwright/test'
@@ -328,28 +446,30 @@ import { test, expect } from '@playwright/test'
 test.describe('Login Flow', () => {
   test('should login successfully with valid credentials', async ({ page }) => {
     await page.goto('/Login')
-    
+
     await page.fill('input[name="email"]', 'admin@test.com')
     await page.fill('input[name="password"]', 'password123')
     await page.click('button[type="submit"]')
-    
+
     await expect(page).toHaveURL('/Admin')
     await expect(page.locator('text=Dashboard')).toBeVisible()
   })
-  
+
   test('should show error with invalid credentials', async ({ page }) => {
     await page.goto('/Login')
-    
+
     await page.fill('input[name="email"]', 'wrong@test.com')
     await page.fill('input[name="password"]', 'wrongpassword')
     await page.click('button[type="submit"]')
-    
+
     await expect(page.locator('text=Credenciales inválidas')).toBeVisible()
   })
 })
 ```
 
+text
 #### **Configuración Playwright:**
+
 ```typescript
 // playwright.config.ts
 import { defineConfig, devices } from '@playwright/test'
@@ -387,38 +507,61 @@ export default defineConfig({
 })
 ```
 
+text
 ---
 
-## 🚀 **FASE 3: CI/CD Y DEPLOYMENT (1 semana)**
+##  **FASE 3: CI/CD Y DEPLOYMENT (1 semana)**
 
-### ✅ **Paso 6: GitHub Actions para CI/CD**
+### - [x] **Paso 6: GitHub Actions para CI/CD**
+
 **Impacto:** Alto | **Dificultad:** Media | **Tiempo:** 2-3 días
 
 #### **Archivo ya creado:**
-- ✅ `.github/workflows/ci-cd.yml`
+
+
+- [x] `.github/workflows/ci-cd.yml`
 
 #### **Pipeline incluye:**
+
+
 1. **Test Job:**
+
    - Setup PostgreSQL en Docker
+
    - Instalar dependencias
+
    - Correr migraciones de Prisma
+
    - Ejecutar linter
+
    - Ejecutar tests con coverage
+
    - Upload coverage a Codecov
 
+
 2. **Build Job:**
+
    - Build de Next.js
+
    - Verificar que no hay errores de compilación
+
    - Archivar artefactos
 
+
 3. **Deploy Staging:**
+
    - Deploy automático a staging cuando se hace push a `develop`
 
+
 4. **Deploy Production:**
+
    - Deploy automático a producción cuando se hace push a `main`
 
 #### **Configurar en GitHub:**
+
+
 1. Ir a Settings → Secrets and variables → Actions
+
 2. Agregar secrets:
    ```
    DATABASE_URL
@@ -431,20 +574,26 @@ export default defineConfig({
    ```
 
 #### **Agregar badge al README:**
+
 ```markdown
 [![CI/CD](https://github.com/JDavid2809/Integradora-TCEI/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/JDavid2809/Integradora-TCEI/actions/workflows/ci-cd.yml)
 ```
 
+text
 ---
 
-### ✅ **Paso 7: Deploy a Producción**
+### - [x] **Paso 7: Deploy a Producción**
+
 **Impacto:** Alto | **Dificultad:** Media | **Tiempo:** 2-3 días
 
-#### **Opción 1: Vercel (Más Fácil) ⭐ RECOMENDADO**
+#### **Opción 1: Vercel (Más Fácil)  RECOMENDADO**
 
 **Pasos:**
+
 1. Crear cuenta en [vercel.com](https://vercel.com)
+
 2. Importar repositorio desde GitHub
+
 3. Configurar variables de entorno:
    ```
    DATABASE_URL=postgresql://...
@@ -456,52 +605,78 @@ export default defineConfig({
    SMTP_PASS=tu-app-password
    NEXT_PUBLIC_URL=https://tu-dominio.vercel.app
    ```
+
 4. Deploy automático en cada push a `main`
+
 5. Configurar dominio personalizado (opcional)
 
 **Ventajas:**
-- ✅ Gratis para proyectos personales
-- ✅ Deploy automático
-- ✅ SSL incluido
-- ✅ Edge functions
-- ✅ CDN global
+
+- [x] Gratis para proyectos personales
+
+- [x] Deploy automático
+
+- [x] SSL incluido
+
+- [x] Edge functions
+
+- [x] CDN global
 
 ---
 
 #### **Opción 2: Railway (Base de Datos + App)**
 
 **Pasos:**
+
 1. Crear cuenta en [railway.app](https://railway.app)
+
 2. Crear nuevo proyecto
+
 3. Provisionar PostgreSQL:
+
    - Add Service → Database → PostgreSQL
+
    - Copiar DATABASE_URL
+
 4. Deploy app desde GitHub:
+
    - Add Service → GitHub Repo → Seleccionar repo
+
    - Configurar variables de entorno
+
 5. Configurar dominio
 
 **Ventajas:**
-- ✅ Base de datos incluida
-- ✅ $5 gratis al mes
-- ✅ Fácil configuración
-- ✅ Logs en tiempo real
+
+- [x] Base de datos incluida
+
+- [x] $5 gratis al mes
+
+- [x] Fácil configuración
+
+- [x] Logs en tiempo real
 
 ---
 
 #### **Opción 3: AWS/DigitalOcean (Más Control)**
 
 **Pasos:**
+
 1. Crear VPS (Droplet en DigitalOcean)
+
 2. Instalar Docker y Docker Compose
+
 3. Clonar repositorio
+
 4. Configurar `.env` en producción
+
 5. Configurar Nginx como reverse proxy:
-   ```nginx
+
+```nginx
    server {
        listen 80;
        server_name tu-dominio.com;
-       
+
        location / {
            proxy_pass http://localhost:3000;
            proxy_http_version 1.1;
@@ -512,37 +687,59 @@ export default defineConfig({
        }
    }
    ```
+
+
+
 6. Configurar SSL con Let's Encrypt:
-   ```bash
+
+```bash
    sudo apt install certbot python3-certbot-nginx
    sudo certbot --nginx -d tu-dominio.com
    ```
+
+
+
 7. Configurar Docker Compose para producción
+
 8. Setup systemd para auto-restart
 
 **Ventajas:**
-- ✅ Control total
-- ✅ Más económico a largo plazo
-- ✅ Escalable
-- ✅ Sin límites de uso
+
+- [x] Control total
+
+- [x] Más económico a largo plazo
+
+- [x] Escalable
+
+- [x] Sin límites de uso
 
 ---
 
 #### **Checklist Pre-Deployment:**
+
+
 - [ ] Variables de entorno configuradas
+
 - [ ] Base de datos en producción creada
+
 - [ ] Migraciones de Prisma aplicadas
+
 - [ ] SMTP configurado y probado
+
 - [ ] SSL/HTTPS configurado
+
 - [ ] Dominio apuntando al servidor
+
 - [ ] Backups automáticos configurados
+
 - [ ] Monitoreo básico configurado
 
 ---
 
 ## ⚡ **FASE 4: OPTIMIZACIÓN Y PERFORMANCE (1 semana)**
 
-### ✅ **Paso 8: Optimización de Rendimiento**
+### - [x] **Paso 8: Optimización de Rendimiento**
+
 **Impacto:** Medio | **Dificultad:** Media | **Tiempo:** 3-5 días
 
 #### **1. React Performance:**
@@ -550,12 +747,17 @@ export default defineConfig({
 **Implementar React.memo:**
 ```typescript
 // Componentes a optimizar:
+
 - DataTable.tsx
+
 - ChatWindow.tsx
+
 - CourseCard.tsx
+
 - StudentList.tsx
 ```
 
+text
 **Ejemplo:**
 ```typescript
 import { memo } from 'react'
@@ -567,6 +769,7 @@ const DataTable = memo(({ data, columns }) => {
 })
 ```
 
+text
 **Usar useMemo y useCallback:**
 ```typescript
 const sortedData = useMemo(() => {
@@ -578,6 +781,7 @@ const handleClick = useCallback(() => {
 }, [])
 ```
 
+text
 ---
 
 #### **2. Next.js Optimizations:**
@@ -592,6 +796,7 @@ const ChatWindow = dynamic(() => import('@/components/ChatWindow'), {
 })
 ```
 
+text
 **Optimización de imágenes:**
 ```typescript
 import Image from 'next/image'
@@ -605,6 +810,7 @@ import Image from 'next/image'
 />
 ```
 
+text
 **ISR (Incremental Static Regeneration):**
 ```typescript
 // Para páginas de cursos
@@ -618,6 +824,7 @@ export async function generateStaticParams() {
 }
 ```
 
+text
 ---
 
 #### **3. Database Optimizations:**
@@ -626,7 +833,7 @@ export async function generateStaticParams() {
 ```prisma
 model estudiante {
   // ...
-  
+
   @@index([email])
   @@index([b_activo])
   @@index([id_categoria_edad])
@@ -634,12 +841,13 @@ model estudiante {
 
 model chat_message {
   // ...
-  
+
   @@index([chat_room_id, enviado_en])
   @@index([usuario_id, enviado_en])
 }
 ```
 
+text
 **Query Optimization:**
 ```typescript
 // Usar select para traer solo campos necesarios
@@ -660,11 +868,13 @@ const students = await prisma.estudiante.findMany({
 })
 ```
 
+text
 **Caching con Redis (opcional):**
 ```bash
 npm install redis
 ```
 
+text
 ```typescript
 import { Redis } from 'redis'
 
@@ -680,6 +890,7 @@ const courses = await prisma.curso.findMany()
 await redis.set('courses:all', JSON.stringify(courses), 'EX', 3600)
 ```
 
+text
 ---
 
 #### **4. Bundle Size Optimization:**
@@ -689,6 +900,7 @@ await redis.set('courses:all', JSON.stringify(courses), 'EX', 3600)
 npm install -D @next/bundle-analyzer
 ```
 
+text
 ```javascript
 // next.config.ts
 const withBundleAnalyzer = require('@next/bundle-analyzer')({
@@ -700,19 +912,22 @@ module.exports = withBundleAnalyzer({
 })
 ```
 
+text
 ```bash
 ANALYZE=true npm run build
 ```
 
+text
 **Tree shaking:**
 ```typescript
 // ❌ Malo
 import _ from 'lodash'
 
-// ✅ Bueno
+// - [x] Bueno
 import debounce from 'lodash/debounce'
 ```
 
+text
 ---
 
 #### **5. Performance Monitoring:**
@@ -736,11 +951,13 @@ export default function RootLayout({ children }) {
 }
 ```
 
+text
 ---
 
 ## 🔒 **FASE 5: SEGURIDAD AVANZADA (3-5 días)**
 
-### ✅ **Paso 9: Implementar Medidas de Seguridad**
+### - [x] **Paso 9: Implementar Medidas de Seguridad**
+
 **Impacto:** Alto | **Dificultad:** Media | **Tiempo:** 2-3 días
 
 #### **1. Rate Limiting:**
@@ -749,6 +966,7 @@ export default function RootLayout({ children }) {
 npm install express-rate-limit
 ```
 
+text
 ```typescript
 // src/middleware/rateLimiter.ts
 import rateLimit from 'express-rate-limit'
@@ -766,6 +984,7 @@ export const apiLimiter = rateLimit({
 })
 ```
 
+text
 **Aplicar en rutas:**
 ```typescript
 // src/app/api/auth/[...nextauth]/route.ts
@@ -774,11 +993,12 @@ import { loginLimiter } from '@/middleware/rateLimiter'
 export async function POST(req: Request) {
   // Aplicar rate limiting
   await loginLimiter(req, res)
-  
+
   // Continuar con lógica
 }
 ```
 
+text
 ---
 
 #### **2. Security Headers:**
@@ -826,6 +1046,7 @@ const nextConfig = {
 }
 ```
 
+text
 ---
 
 #### **3. Content Security Policy:**
@@ -837,7 +1058,7 @@ import type { NextRequest } from 'next/server'
 
 export function middleware(request: NextRequest) {
   const response = NextResponse.next()
-  
+
   response.headers.set(
     'Content-Security-Policy',
     `
@@ -849,11 +1070,12 @@ export function middleware(request: NextRequest) {
       connect-src 'self' https://api.example.com;
     `.replace(/\s{2,}/g, ' ').trim()
   )
-  
+
   return response
 }
 ```
 
+text
 ---
 
 #### **4. Input Validation y Sanitization:**
@@ -862,6 +1084,7 @@ export function middleware(request: NextRequest) {
 npm install validator dompurify
 ```
 
+text
 ```typescript
 // src/lib/sanitize.ts
 import validator from 'validator'
@@ -880,6 +1103,7 @@ export function sanitizeInput(input: string): string {
 }
 ```
 
+text
 ---
 
 #### **5. CSRF Protection:**
@@ -908,29 +1132,37 @@ export const authOptions = {
 }
 ```
 
+text
 ---
 
 #### **6. Auditoría de Seguridad:**
 
 ```bash
 # Auditar dependencias
+
 npm audit
 
 # Fix vulnerabilidades automáticamente
+
 npm audit fix
 
 # Actualizar dependencias
+
 npm update
 
 # Verificar dependencias obsoletas
+
 npm outdated
 ```
 
+text
 **Configurar Dependabot en GitHub:**
 ```yaml
 # .github/dependabot.yml
+
 version: 2
 updates:
+
   - package-ecosystem: "npm"
     directory: "/"
     schedule:
@@ -938,6 +1170,7 @@ updates:
     open-pull-requests-limit: 10
 ```
 
+text
 ---
 
 #### **7. Implementar 2FA (Opcional):**
@@ -946,6 +1179,7 @@ updates:
 npm install speakeasy qrcode
 ```
 
+text
 ```typescript
 // Generar secret para 2FA
 import speakeasy from 'speakeasy'
@@ -966,11 +1200,13 @@ const verified = speakeasy.totp.verify({
 })
 ```
 
+text
 ---
 
-## 📊 **FASE 6: ANALYTICS Y MONITOREO (3-5 días)**
+##  **FASE 6: ANALYTICS Y MONITOREO (3-5 días)**
 
-### ✅ **Paso 10: Implementar Monitoreo**
+### - [x] **Paso 10: Implementar Monitoreo**
+
 **Impacto:** Medio | **Dificultad:** Baja | **Tiempo:** 2-3 días
 
 #### **1. Error Tracking con Sentry:**
@@ -979,10 +1215,12 @@ const verified = speakeasy.totp.verify({
 npm install @sentry/nextjs
 ```
 
+text
 ```bash
 npx @sentry/wizard -i nextjs
 ```
 
+text
 ```typescript
 // sentry.client.config.ts
 import * as Sentry from '@sentry/nextjs'
@@ -994,6 +1232,7 @@ Sentry.init({
 })
 ```
 
+text
 ---
 
 #### **2. Analytics con Google Analytics:**
@@ -1002,6 +1241,7 @@ Sentry.init({
 npm install @next/third-parties
 ```
 
+text
 ```typescript
 // src/app/layout.tsx
 import { GoogleAnalytics } from '@next/third-parties/google'
@@ -1018,11 +1258,13 @@ export default function RootLayout({ children }) {
 }
 ```
 
+text
 **O usar Plausible (privacy-friendly):**
 ```typescript
 <script defer data-domain="tudominio.com" src="https://plausible.io/js/script.js"></script>
 ```
 
+text
 ---
 
 #### **3. Logging Estructurado con Winston:**
@@ -1031,6 +1273,7 @@ export default function RootLayout({ children }) {
 npm install winston
 ```
 
+text
 ```typescript
 // src/lib/logger.ts
 import winston from 'winston'
@@ -1057,6 +1300,7 @@ if (process.env.NODE_ENV !== 'production') {
 export default logger
 ```
 
+text
 **Uso:**
 ```typescript
 import logger from '@/lib/logger'
@@ -1065,19 +1309,27 @@ logger.info('Usuario creado', { userId: user.id, email: user.email })
 logger.error('Error al crear usuario', { error: error.message })
 ```
 
+text
 ---
 
 #### **4. Uptime Monitoring:**
 
 **Opciones:**
+
 - [UptimeRobot](https://uptimerobot.com/) - Gratis para 50 monitores
+
 - [Pingdom](https://www.pingdom.com/)
+
 - [Better Uptime](https://betteruptime.com/)
 
 **Configurar:**
+
 1. Crear cuenta
+
 2. Agregar monitor HTTP/HTTPS
+
 3. Configurar alertas por email/SMS
+
 4. Verificar cada 5 minutos
 
 ---
@@ -1090,7 +1342,7 @@ export async function GET() {
   try {
     // Verificar BD
     await prisma.$queryRaw`SELECT 1`
-    
+
     return Response.json({
       status: 'healthy',
       timestamp: new Date().toISOString(),
@@ -1106,6 +1358,7 @@ export async function GET() {
 }
 ```
 
+text
 ---
 
 #### **6. Custom Dashboard (opcional):**
@@ -1129,16 +1382,18 @@ export async function GET() {
       where: { estado: 'PENDIENTE' }
     })
   }
-  
+
   return Response.json(metrics)
 }
 ```
 
+text
 ---
 
-## 🎨 **FASE 7: UX/UI ENHANCEMENTS (1 semana)**
+##  **FASE 7: UX/UI ENHANCEMENTS (1 semana)**
 
-### ✅ **Paso 11: Mejoras de UX/UI**
+### - [x] **Paso 11: Mejoras de UX/UI**
+
 **Impacto:** Medio | **Dificultad:** Baja-Media | **Tiempo:** 5-7 días
 
 #### **1. Skeleton Loaders Consistentes:**
@@ -1166,6 +1421,7 @@ export function SkeletonTable({ rows = 5 }) {
 }
 ```
 
+text
 ---
 
 #### **2. Animaciones Suaves:**
@@ -1195,6 +1451,7 @@ export default function Page() {
 }
 ```
 
+text
 ---
 
 #### **3. Dark Mode:**
@@ -1203,6 +1460,7 @@ export default function Page() {
 npm install next-themes
 ```
 
+text
 ```typescript
 // src/providers/ThemeProvider.tsx
 'use client'
@@ -1217,6 +1475,7 @@ export function ThemeProvider({ children }) {
 }
 ```
 
+text
 ```typescript
 // src/components/ThemeToggle.tsx
 'use client'
@@ -1225,7 +1484,7 @@ import { Moon, Sun } from 'lucide-react'
 
 export function ThemeToggle() {
   const { theme, setTheme } = useTheme()
-  
+
   return (
     <button onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}>
       {theme === 'dark' ? <Sun /> : <Moon />}
@@ -1234,6 +1493,7 @@ export function ThemeToggle() {
 }
 ```
 
+text
 **Actualizar Tailwind:**
 ```css
 /* globals.css */
@@ -1242,7 +1502,7 @@ export function ThemeToggle() {
     --background: 0 0% 100%;
     --foreground: 222.2 84% 4.9%;
   }
-  
+
   .dark {
     --background: 222.2 84% 4.9%;
     --foreground: 210 40% 98%;
@@ -1250,6 +1510,7 @@ export function ThemeToggle() {
 }
 ```
 
+text
 ---
 
 #### **4. Accesibilidad (A11y):**
@@ -1278,8 +1539,11 @@ const handleKeyDown = (e: KeyboardEvent) => {
 }
 ```
 
+text
 **Verificar con:**
+
 - [axe DevTools](https://www.deque.com/axe/devtools/)
+
 - [Lighthouse](https://developers.google.com/web/tools/lighthouse)
 
 ---
@@ -1306,6 +1570,7 @@ const breakpoints = {
 </div>
 ```
 
+text
 ---
 
 #### **6. PWA (Progressive Web App):**
@@ -1314,6 +1579,7 @@ const breakpoints = {
 npm install next-pwa
 ```
 
+text
 ```javascript
 // next.config.ts
 const withPWA = require('next-pwa')({
@@ -1328,6 +1594,7 @@ module.exports = withPWA({
 })
 ```
 
+text
 **Crear manifest.json:**
 ```json
 {
@@ -1353,6 +1620,7 @@ module.exports = withPWA({
 }
 ```
 
+text
 ---
 
 #### **7. Feedback Visual Mejorado:**
@@ -1383,20 +1651,26 @@ toast.error('Error al crear usuario')
 toast.loading('Procesando...')
 ```
 
+text
 ---
 
-## 📱 **FASE 8: FEATURES ADICIONALES (2-3 semanas) - OPCIONAL**
+##  **FASE 8: FEATURES ADICIONALES (2-3 semanas) - OPCIONAL**
 
-### ✅ **Paso 12: Notificaciones Push**
+### - [x] **Paso 12: Notificaciones Push**
+
 **Impacto:** Medio | **Dificultad:** Media-Alta | **Tiempo:** 5-7 días
 
 ```bash
 npm install firebase
 ```
 
+text
 **Configurar Firebase:**
+
 1. Crear proyecto en Firebase Console
+
 2. Habilitar Cloud Messaging
+
 3. Obtener credenciales
 
 ```typescript
@@ -1416,28 +1690,32 @@ const messaging = getMessaging(app)
 
 export async function requestNotificationPermission() {
   const permission = await Notification.requestPermission()
-  
+
   if (permission === 'granted') {
     const token = await getToken(messaging, {
       vapidKey: process.env.NEXT_PUBLIC_FIREBASE_VAPID_KEY
     })
-    
+
     // Guardar token en BD
     return token
   }
 }
 ```
 
+text
 ---
 
-### ✅ **Paso 13: Sistema de Reportes Avanzados**
+### - [x] **Paso 13: Sistema de Reportes Avanzados**
+
 **Impacto:** Medio | **Dificultad:** Media | **Tiempo:** 5-7 días
 
 #### **Exportar a PDF:**
+
 ```bash
 npm install jspdf jspdf-autotable
 ```
 
+text
 ```typescript
 // src/lib/pdf-generator.ts
 import jsPDF from 'jspdf'
@@ -1445,31 +1723,34 @@ import autoTable from 'jspdf-autotable'
 
 export function generateStudentReport(student: Student, grades: Grade[]) {
   const doc = new jsPDF()
-  
+
   doc.setFontSize(20)
   doc.text('Reporte Académico', 20, 20)
-  
+
   doc.setFontSize(12)
   doc.text(`Estudiante: ${student.nombre} ${student.paterno}`, 20, 40)
   doc.text(`Email: ${student.email}`, 20, 50)
-  
+
   autoTable(doc, {
     startY: 60,
     head: [['Curso', 'Calificación', 'Fecha']],
     body: grades.map(g => [g.curso, g.calificacion, g.fecha]),
   })
-  
+
   doc.save(`reporte-${student.id_estudiante}.pdf`)
 }
 ```
 
+text
 ---
 
 #### **Exportar a Excel:**
+
 ```bash
 npm install xlsx
 ```
 
+text
 ```typescript
 // src/lib/excel-generator.ts
 import * as XLSX from 'xlsx'
@@ -1478,18 +1759,21 @@ export function exportToExcel(data: any[], filename: string) {
   const ws = XLSX.utils.json_to_sheet(data)
   const wb = XLSX.utils.book_new()
   XLSX.utils.book_append_sheet(wb, ws, 'Datos')
-  
+
   XLSX.writeFile(wb, `${filename}.xlsx`)
 }
 ```
 
+text
 ---
 
 #### **Gráficas con Recharts:**
+
 ```bash
 npm install recharts
 ```
 
+text
 ```typescript
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts'
 
@@ -1507,16 +1791,20 @@ export function GradesChart({ data }) {
 }
 ```
 
+text
 ---
 
-### ✅ **Paso 14: Sistema de Carga de Archivos**
+### - [x] **Paso 14: Sistema de Carga de Archivos**
+
 **Impacto:** Alto | **Dificultad:** Media | **Tiempo:** 3-5 días
 
 #### **Opción 1: Cloudinary**
+
 ```bash
 npm install cloudinary next-cloudinary
 ```
 
+text
 ```typescript
 // src/lib/cloudinary.ts
 import { v2 as cloudinary } from 'cloudinary'
@@ -1530,7 +1818,7 @@ cloudinary.config({
 export async function uploadFile(file: File) {
   const bytes = await file.arrayBuffer()
   const buffer = Buffer.from(bytes)
-  
+
   return new Promise((resolve, reject) => {
     cloudinary.uploader.upload_stream({}, (error, result) => {
       if (error) reject(error)
@@ -1540,13 +1828,16 @@ export async function uploadFile(file: File) {
 }
 ```
 
+text
 ---
 
 #### **Opción 2: AWS S3**
+
 ```bash
 npm install @aws-sdk/client-s3 @aws-sdk/s3-request-presigner
 ```
 
+text
 ```typescript
 // src/lib/s3.ts
 import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3'
@@ -1562,23 +1853,25 @@ const s3Client = new S3Client({
 
 export async function uploadToS3(file: File, key: string) {
   const buffer = Buffer.from(await file.arrayBuffer())
-  
+
   const command = new PutObjectCommand({
     Bucket: process.env.AWS_S3_BUCKET,
     Key: key,
     Body: buffer,
     ContentType: file.type,
   })
-  
+
   await s3Client.send(command)
-  
+
   return `https://${process.env.AWS_S3_BUCKET}.s3.${process.env.AWS_REGION}.amazonaws.com/${key}`
 }
 ```
 
+text
 ---
 
 #### **Componente de Upload:**
+
 ```typescript
 'use client'
 import { useState } from 'react'
@@ -1586,22 +1879,22 @@ import { Upload } from 'lucide-react'
 
 export function FileUploader({ onUpload }) {
   const [uploading, setUploading] = useState(false)
-  
+
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file) return
-    
+
     setUploading(true)
-    
+
     const formData = new FormData()
     formData.append('file', file)
-    
+
     try {
       const res = await fetch('/api/upload', {
         method: 'POST',
         body: formData,
       })
-      
+
       const data = await res.json()
       onUpload(data.url)
     } catch (error) {
@@ -1610,7 +1903,7 @@ export function FileUploader({ onUpload }) {
       setUploading(false)
     }
   }
-  
+
   return (
     <div className="border-2 border-dashed rounded-lg p-8 text-center">
       <input
@@ -1629,44 +1922,74 @@ export function FileUploader({ onUpload }) {
 }
 ```
 
+text
 ---
 
-## 🎯 **PRIORIDADES INMEDIATAS (PRÓXIMOS 7 DÍAS)**
+##  **PRIORIDADES INMEDIATAS (PRÓXIMOS 7 DÍAS)**
 
 ### **DÍA 1:**
+
+
 - [ ] Completar CRUD de evaluaciones (backend)
+
 - [ ] Crear endpoints `/api/admin/evaluations`
+
 - [ ] Actualizar documentación
 
 ### **DÍA 2:**
+
+
 - [ ] Completar CRUD de evaluaciones (frontend)
+
 - [ ] Crear componente `AdminEvaluationsCrud.tsx`
+
 - [ ] Integrar en panel admin
 
 ### **DÍA 3:**
+
+
 - [ ] Sistema de asistencias para admin (backend)
+
 - [ ] Mejorar endpoints `/api/admin/attendance`
+
 - [ ] Reportes de asistencia
 
 ### **DÍA 4:**
+
+
 - [ ] Sistema de asistencias para admin (frontend)
+
 - [ ] Crear componente `AdminAttendanceCrud.tsx`
+
 - [ ] Gráficas de estadísticas
 
 ### **DÍA 5:**
+
+
 - [ ] Configurar templates de email
+
 - [ ] Implementar envío de emails en solicitudes
+
 - [ ] Probar sistema de notificaciones
 
 ### **DÍA 6:**
+
+
 - [ ] Escribir primeros 10 tests unitarios
+
 - [ ] Tests de hooks (`useResourceList`, `useDebounce`)
+
 - [ ] Tests de componentes comunes
 
 ### **DÍA 7:**
+
+
 - [ ] Implementar rate limiting
+
 - [ ] Configurar security headers
+
 - [ ] Auditoría de dependencias
+
 - [ ] Revisar y documentar cambios
 
 ---
@@ -1674,21 +1997,35 @@ export function FileUploader({ onUpload }) {
 ## 📚 **RECURSOS ÚTILES**
 
 ### **Documentación:**
+
+
 - [Next.js Docs](https://nextjs.org/docs)
+
 - [Prisma Docs](https://www.prisma.io/docs)
+
 - [Testing Library](https://testing-library.com/docs/react-testing-library/intro/)
+
 - [Playwright](https://playwright.dev/docs/intro)
 
 ### **Seguridad:**
+
+
 - [OWASP Cheat Sheets](https://cheatsheetseries.owasp.org/)
+
 - [Next.js Security](https://nextjs.org/docs/app/building-your-application/configuring/security)
 
 ### **Performance:**
+
+
 - [Web.dev](https://web.dev/)
+
 - [Next.js Performance](https://nextjs.org/docs/app/building-your-application/optimizing)
 
 ### **Deployment:**
+
+
 - [Vercel Docs](https://vercel.com/docs)
+
 - [Railway Docs](https://docs.railway.app/)
 
 ---
@@ -1696,38 +2033,65 @@ export function FileUploader({ onUpload }) {
 ## 🎓 **OBJETIVO FINAL**
 
 ### **Meta a 4 semanas:**
-- ✅ Funcionalidades 100% completas
-- ✅ Tests unitarios > 70% coverage
-- ✅ CI/CD configurado
-- ✅ Deploy en producción
-- ✅ Calificación: 95/100
+
+
+- [x] Funcionalidades 100% completas
+
+- [x] Tests unitarios > 70% coverage
+
+- [x] CI/CD configurado
+
+- [x] Deploy en producción
+
+- [x] Calificación: 95/100
 
 ### **Meta a 8 semanas:**
-- ✅ Tests E2E completos
-- ✅ Optimización avanzada
-- ✅ Seguridad nivel producción
-- ✅ Monitoreo y analytics
-- ✅ UX/UI pulido
-- ✅ Calificación: 97-98/100
+
+
+- [x] Tests E2E completos
+
+- [x] Optimización avanzada
+
+- [x] Seguridad nivel producción
+
+- [x] Monitoreo y analytics
+
+- [x] UX/UI pulido
+
+- [x] Calificación: 97-98/100
 
 ### **Meta a 12 semanas:**
-- ✅ Features adicionales
-- ✅ Sistema de reportes avanzado
-- ✅ Notificaciones push
-- ✅ PWA completo
-- ✅ Documentación exhaustiva
-- ✅ Portfolio-ready
-- ✅ Calificación: 99/100
+
+
+- [x] Features adicionales
+
+- [x] Sistema de reportes avanzado
+
+- [x] Notificaciones push
+
+- [x] PWA completo
+
+- [x] Documentación exhaustiva
+
+- [x] Portfolio-ready
+
+- [x] Calificación: 99/100
 
 ---
 
 ## 📝 **NOTAS FINALES**
 
+
 - **Prioriza calidad sobre cantidad**
+
 - **Mantén la documentación actualizada**
+
 - **Haz commits frecuentes y descriptivos**
+
 - **Revisa código con regularidad**
+
 - **Prueba en diferentes dispositivos**
+
 - **Pide feedback de usuarios reales**
 
 ---
@@ -1738,4 +2102,4 @@ export function FileUploader({ onUpload }) {
 
 ---
 
-¡Tu proyecto es excelente! Con estos pasos llegarás a un nivel profesional top. 🚀
+¡Tu proyecto es excelente! Con estos pasos llegarás a un nivel profesional top.

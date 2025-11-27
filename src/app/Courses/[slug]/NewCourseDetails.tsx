@@ -112,13 +112,13 @@ export default function CourseDetails({ courseData }: CourseDetailsProps) {
     const [reviews, setReviews] = useState(courseData.reviews || [])
     const [isUserEnrolled, setIsUserEnrolled] = useState(false)
 
-    // ✅ Estado para controlar la visibilidad de la alerta de cancelación
+    // Estado para controlar la visibilidad de la alerta de cancelación
     const [showCancelAlert, setShowCancelAlert] = useState(false)
 
-    // ✅ Detectar si el pago fue cancelado
+    // Detectar si el pago fue cancelado
     const wasCanceled = searchParams?.get('canceled') === 'true'
 
-    // ✅ Efecto para mostrar y ocultar la alerta de cancelación
+    // Efecto para mostrar y ocultar la alerta de cancelación
     React.useEffect(() => {
         if (wasCanceled) {
             setShowCancelAlert(true)
@@ -649,7 +649,7 @@ export default function CourseDetails({ courseData }: CourseDetailsProps) {
                                         </div>
                                     </div>
 
-                                    {/* ✅ Alerta de cancelación con animación de salida */}
+                                    {/* Alerta de cancelación con animación de salida */}
                                     {showCancelAlert && (
                                         <div className={`mb-4 p-4 rounded-lg text-center bg-red-50 border-2 border-red-300 shadow-md transition-all duration-500 ${
                                             showCancelAlert ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2'
@@ -661,7 +661,7 @@ export default function CourseDetails({ courseData }: CourseDetailsProps) {
                                             <p className="text-sm text-red-700 font-medium">
                                                 No se procesó ningún cargo. Puedes intentar de nuevo cuando quieras.
                                             </p>
-                                            {/* ✅ Barra de progreso opcional */}
+                                            {/* Barra de progreso opcional */}
                                             <div className="mt-3 w-full bg-red-200 rounded-full h-1 overflow-hidden">
                                                 <div 
                                                     className="bg-red-600 h-full rounded-full transition-all duration-[5000ms] ease-linear"
@@ -671,7 +671,7 @@ export default function CourseDetails({ courseData }: CourseDetailsProps) {
                                         </div>
                                     )}
 
-                                    {/* ✅ LÓGICA CORREGIDA */}
+                                    {/* LÓGICA CORREGIDA */}
                                     {isUserEnrolled ? (
                                         // Ya está inscrito
                                         <div className="mb-4 p-4 rounded-lg text-center bg-green-50 border border-green-200">
@@ -726,13 +726,13 @@ export default function CourseDetails({ courseData }: CourseDetailsProps) {
                                             </p>
                                         </div>
                                     ) : courseData.precio && courseData.precio > 0 ? (
-                                        // ✅ Curso de PAGO - Mostrar botón de compra
+                                        // Curso de PAGO - Mostrar botón de compra
                                         <BuyButton 
                                             courseId={courseData.id_curso}
                                             label="Comprar Curso"
                                         />
                                     ) : canEnroll ? (
-                                        // ✅ Curso GRATIS - Botón de inscripción gratuita
+                                        // Curso GRATIS - Botón de inscripción gratuita
                                         <button
                                             onClick={handleEnroll}
                                             disabled={isEnrolling}

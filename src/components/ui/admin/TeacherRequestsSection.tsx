@@ -127,7 +127,7 @@ export default function TeacherRequestsSection({ className = '' }: TeacherReques
       alert(`Solicitud ${actionType === 'APROBAR' ? 'aprobada' : 'rechazada'} exitosamente`)
       
       if (actionType === 'APROBAR' && result.usuario_creado?.credenciales_enviadas) {
-        alert(`✅ Credenciales enviadas por correo electrónico a: ${result.usuario_creado.email}\n\nEl profesor recibirá sus credenciales de acceso en su bandeja de entrada.`)
+        alert(`Credenciales enviadas por correo electrónico a: ${result.usuario_creado.email}\n\nEl profesor recibirá sus credenciales de acceso en su bandeja de entrada.`)
       }
 
     } catch (error) {
@@ -362,7 +362,7 @@ export default function TeacherRequestsSection({ className = '' }: TeacherReques
             {actionType === 'APROBAR' && (
               <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg">
                 <p className="text-sm text-green-700">
-                  ✅ Se creará automáticamente una cuenta de profesor con una contraseña temporal.
+                  Se creará automáticamente una cuenta de profesor con una contraseña temporal.
                 </p>
               </div>
             )}

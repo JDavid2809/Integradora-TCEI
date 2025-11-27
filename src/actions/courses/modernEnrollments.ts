@@ -31,7 +31,7 @@ const PaymentStatus = {
  */
 export async function enrollStudentModern(courseId: number, userId?: string) {
   try {
-    console.log('🚀 Iniciando inscripción moderna - courseId:', courseId, 'userId:', userId)
+    console.log('Iniciando inscripción moderna - courseId:', courseId, 'userId:', userId)
     
     const session = await getServerSession(authOptions)
     const targetUserId = userId || session?.user?.id
@@ -45,7 +45,7 @@ export async function enrollStudentModern(courseId: number, userId?: string) {
       where: { id_usuario: +targetUserId }
     })
 
-    console.log('🔍 Estudiante encontrado:', estudiante?.nombre)
+    console.log('Estudiante encontrado:', estudiante?.nombre)
 
     if (!estudiante) {
       throw new Error("Estudiante no encontrado")
@@ -60,7 +60,7 @@ export async function enrollStudentModern(courseId: number, userId?: string) {
       throw new Error("Curso no encontrado o inactivo")
     }
 
-    console.log('📚 Curso encontrado:', curso.nombre)
+    console.log('Curso encontrado:', curso.nombre)
 
     // Verificar si ya está inscrito en la nueva tabla Inscripcion
     const existingInscripcion = await prisma.inscripcion.findUnique({
@@ -76,7 +76,7 @@ export async function enrollStudentModern(courseId: number, userId?: string) {
       throw new Error("Ya estás inscrito en este curso")
     }
 
-    console.log('✅ Usuario no está inscrito, procediendo con inscripción...')
+    console.log('Usuario no está inscrito, procediendo con inscripción...')
 
     // Crear la inscripción SOLO en la tabla Inscripcion
     const inscripcion = await prisma.inscripcion.create({
@@ -90,11 +90,11 @@ export async function enrollStudentModern(courseId: number, userId?: string) {
       }
     })
 
-    console.log('🎉 Inscripción creada exitosamente en tabla Inscripcion:', inscripcion.id)
+    console.log('Inscripción creada exitosamente en tabla Inscripcion:', inscripcion.id)
 
     return { success: true, inscripcion }
   } catch (error) {
-    console.error('❌ Error enrolling student:', error)
+    console.error('Error enrolling student:', error)
     throw error
   }
 }
@@ -135,10 +135,10 @@ export async function isUserEnrolledModern(courseId: number, userId?: string): P
       return inscripcion.status === EnrollmentStatus.ACTIVE
     }
 
-    console.log('❌ Usuario no encontrado en tabla Inscripcion')
+    console.log('Usuario no encontrado en tabla Inscripcion')
     return false
   } catch (error) {
-    console.error('❌ Error checking enrollment:', error)
+    console.error('Error checking enrollment:', error)
     return false
   }
 }

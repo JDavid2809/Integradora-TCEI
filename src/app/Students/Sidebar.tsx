@@ -4,7 +4,6 @@ import { useEffect, useCallback, useState } from "react";
 import { BookOpen, Home, Calendar, X, CheckSquare, BrainCircuit, Sparkles, LogOut } from "lucide-react";
 import Image from "next/image";
 import { driver } from "driver.js";
-import "driver.js/dist/driver.css";
 
 interface SidebarProps {
     activeSection: string;
@@ -51,6 +50,7 @@ export default function Sidebar({
     const menuItemsBottom = [
         { id: "activities", label: "Mis Actividades", icon: CheckSquare },  
         { id: "schedule", label: "Mi Horario", icon: Calendar },
+        { id: "study-guide", label: "Guía de Estudio (IA)", icon: BrainCircuit },
     ];
 
     const startSidebarTour = useCallback(() => {
@@ -110,6 +110,14 @@ export default function Sidebar({
                 popover: {
                     title: "Mi Horario",
                     description: "Consulta tu horario de clases y actividades.",
+                    position: "right",
+                },
+            },
+            {
+                element: "#menu-study-guide",
+                popover: {
+                    title: "Guía de Estudio (IA)",
+                    description: "Genera planes de estudio personalizados con ayuda de la IA y guárdalos en tu portafolio.",
                     position: "right",
                 },
             },

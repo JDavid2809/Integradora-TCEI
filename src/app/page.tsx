@@ -18,13 +18,13 @@ export default async function Home() {
   try {
     session = await getServerSession(authOptions)
   } catch (error) {
-    console.error('❌ Error getting session:', error)
+    console.error('Error getting session:', error)
     // Si hay error al obtener la sesión, continuar sin sesión
   }
   
   if (session?.user) {
     // Si hay sesión, redirigir al dashboard correspondiente
-    console.log('🏠 Authenticated user accessing home, redirecting to dashboard:', session.user.rol)
+    console.log('Authenticated user accessing home, redirecting to dashboard:', session.user.rol)
     
     switch (session.user.rol) {
       case 'PROFESOR':

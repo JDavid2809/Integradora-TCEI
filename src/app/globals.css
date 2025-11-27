@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "driver.js/dist/driver.css";
 
 :root {
   --background: #ffffff;
@@ -23,6 +24,11 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Ensure consistent box-sizing so paddings and borders don't affect layout calculations */
+*, *::before, *::after {
+  box-sizing: border-box;
 }
 
 /* Estilos para scroll horizontal en móvil */
@@ -74,6 +80,51 @@ body {
 
 .animate-fade-in {
   animation: fade-in 0.3s ease-out;
+}
+
+/* Custom scrollbar for chat scroll areas */
+.custom-scrollbar {
+  scrollbar-color: rgba(0,36,106,0.22) rgba(0,0,0,0.03);
+  scrollbar-width: thin;
+}
+.custom-scrollbar::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(0,36,106,0.18);
+  border-radius: 9999px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+/* Overscroll containment to prevent page scroll when at chat edges */
+.overscroll-contain {
+  overscroll-behavior: contain;
+}
+
+/* Contents inside message bubbles should not overflow; allow images/media to scale to available width */
+.chat-message-content img,
+.chat-message-content video,
+.chat-message-content iframe {
+  max-width: 100%;
+  height: auto !important;
+  display: block;
+}
+.chat-message-content pre {
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* Safe area helpers (iOS notch support): add padding to top/bottom if needed */
+.safe-area-top {
+  padding-top: env(safe-area-inset-top);
+}
+.safe-area-bottom {
+  padding-bottom: env(safe-area-inset-bottom);
 }
 
 /* Estilos para driver.js tour */

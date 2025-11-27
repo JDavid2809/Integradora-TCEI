@@ -15,7 +15,7 @@ export default function CoursesContent() {
             if (session?.user?.extra?.id_profesor) {
                 setTeacherId(session.user.extra.id_profesor)
             } else {
-                console.warn('⚠️ Profesor sin registro en tabla profesor:', {
+                console.warn('Profesor sin registro en tabla profesor:', {
                     userId: session.user.id,
                     email: session.user.email,
                     extra: session.user.extra
@@ -46,7 +46,7 @@ export default function CoursesContent() {
                     </p>
                     {hasSession && isTeacher && !session?.user?.extra?.id_profesor && (
                         <p className="text-red-600 text-sm mt-2">
-                            ⚠️ Problema con el registro del profesor. Contacte al administrador.
+                            Problema con el registro del profesor. Contacte al administrador.
                         </p>
                     )}
                 </div>

@@ -51,8 +51,8 @@ export default function RootLayout({
         <Providers>
           <SearchProvider>
             <PasswordChangeWrapper>
-              <NavBar /><br />
-              <main className="pt-[80px] pb-16 px-4 min-h-screen bg-white">
+              <NavBar />
+              <main className="pt-24 pb-16 px-4 min-h-screen bg-white">
                 {children}
                 
               <Chatbot />

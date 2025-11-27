@@ -13,7 +13,7 @@ const prisma = new PrismaClient()
 
 async function testCertificateGeneration() {
   try {
-    console.log('🧪 Iniciando prueba de certificados...\n')
+    console.log('Iniciando prueba de certificados...\n')
 
     // 1. Buscar una inscripción activa
     const inscripcion = await prisma.inscripcion.findFirst({
@@ -34,8 +34,8 @@ async function testCertificateGeneration() {
     })
 
     if (!inscripcion) {
-      console.log('❌ No se encontró ninguna inscripción activa en un curso con certificado')
-      console.log('💡 Sugerencia: Crea una inscripción o habilita certificados en un curso')
+      console.log('No se encontró ninguna inscripción activa en un curso con certificado')
+      console.log('Sugerencia: Crea una inscripción o habilita certificados en un curso')
       
       // Mostrar cursos disponibles
       const cursos = await prisma.curso.findMany({
@@ -48,27 +48,27 @@ async function testCertificateGeneration() {
         take: 5
       })
       
-      console.log('\n📚 Cursos disponibles:')
+      console.log('\nCursos disponibles:')
       cursos.forEach(c => {
-        console.log(`  - ID: ${c.id_curso} | ${c.nombre} | Certificado: ${c.certificado ? '✅' : '❌'}`)
+        console.log(`  - ID: ${c.id_curso} | ${c.nombre} | Certificado: ${c.certificado ? 'Yes' : 'No'}`)
       })
       
       return
     }
 
-    console.log('📋 Inscripción encontrada:')
+    console.log('Inscripción encontrada:')
     console.log(`  ID: ${inscripcion.id}`)
     console.log(`  Estudiante: ${inscripcion.student.usuario.nombre}`)
     console.log(`  Curso: ${inscripcion.course.nombre}`)
     console.log(`  Status actual: ${inscripcion.status}\n`)
 
     // 2. Completar el curso (esto generará el certificado automáticamente)
-    console.log('🎓 Completando curso y generando certificado...\n')
+    console.log('Completando curso y generando certificado...\n')
     
     const result = await updateEnrollmentStatus(inscripcion.id, 'COMPLETED')
 
     if (result.success) {
-      console.log('✅ ¡Curso completado exitosamente!')
+      console.log('¡Curso completado exitosamente!')
       
       if (result.certificate) {
         console.log('\n🎖️ CERTIFICADO GENERADO:')
@@ -81,11 +81,11 @@ async function testCertificateGeneration() {
         console.log('ℹ️ Curso completado pero no genera certificado')
       }
     } else {
-      console.log(`❌ Error: ${result.error}`)
+      console.log(`Error: ${result.error}`)
     }
 
   } catch (error) {
-    console.error('❌ Error en la prueba:', error)
+    console.error('Error en la prueba:', error)
   } finally {
     await prisma.$disconnect()
   }

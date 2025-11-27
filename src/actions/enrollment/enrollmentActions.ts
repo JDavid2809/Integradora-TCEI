@@ -139,7 +139,7 @@ export async function enrollInCourse(courseId: number) {
     }
 
   } catch (error) {
-    console.error('❌ Error en inscripción:', error)
+    console.error('Error en inscripción:', error)
     return {
       success: false,
       error: 'Error al procesar inscripción: ' + (error as Error).message

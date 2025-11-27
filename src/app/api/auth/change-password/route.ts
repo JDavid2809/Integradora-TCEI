@@ -78,11 +78,11 @@ export async function POST(request: NextRequest) {
       where: { id: usuario.id },
       data: {
         password: hashedNewPassword,
-        debe_cambiar_password: false // ✅ Ya no necesita cambiar contraseña
+        debe_cambiar_password: false // Ya no necesita cambiar contraseña
       }
     });
 
-    console.log('✅ Contraseña cambiada exitosamente para:', usuario.email);
+    console.log('Contraseña cambiada exitosamente para:', usuario.email);
 
     return NextResponse.json({
       message: 'Contraseña cambiada exitosamente',

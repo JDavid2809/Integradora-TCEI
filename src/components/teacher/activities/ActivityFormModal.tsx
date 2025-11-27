@@ -150,7 +150,7 @@ export default function ActivityFormModal({
           min_passing_score: formData.passing_score,
           max_attempts: formData.max_attempts,
           allow_late: formData.allow_late_submissions,
-          is_published: formData.is_published, // ⚠️ IMPORTANTE: Este campo determina visibilidad
+          is_published: formData.is_published, // IMPORTANTE: Este campo determina visibilidad
           created_by: teacherId
         }
 
@@ -246,11 +246,11 @@ export default function ActivityFormModal({
               </p>
               {formData.is_published ? (
                 <p className="text-sm text-green-700 mt-1">
-                  ✅ La actividad está <strong>publicada y visible</strong> para todos los estudiantes del curso.
+                  La actividad está <strong>publicada y visible</strong> para todos los estudiantes del curso.
                 </p>
               ) : (
                 <div className="text-sm text-yellow-800 mt-1 space-y-1">
-                  <p>⚠️ La actividad se guardó como <strong>borrador</strong>.</p>
+                  <p>La actividad se guardó como <strong>borrador</strong>.</p>
                   <p className="text-xs">Los estudiantes NO pueden verla todavía. Publícala desde la lista de actividades cuando esté lista.</p>
                 </div>
               )}
@@ -480,12 +480,12 @@ export default function ActivityFormModal({
                     {formData.is_published ? (
                       <>
                         <Eye className="w-4 h-4 text-green-600" />
-                        <span className="text-green-900">✅ Actividad Publicada</span>
+                        <span className="text-green-900">Actividad Publicada</span>
                       </>
                     ) : (
                       <>
                         <EyeOff className="w-4 h-4 text-yellow-600" />
-                        <span className="text-yellow-900">⚠️ Mantener como Borrador</span>
+                        <span className="text-yellow-900">Mantener como Borrador</span>
                       </>
                     )}
                   </p>
@@ -493,8 +493,8 @@ export default function ActivityFormModal({
                     formData.is_published ? 'text-green-700' : 'text-yellow-700'
                   }`}>
                     {formData.is_published
-                      ? '✓ Los estudiantes PUEDEN ver y trabajar en esta actividad'
-                      : '✗ La actividad NO será visible para los estudiantes'}
+                      ? 'Los estudiantes PUEDEN ver y trabajar en esta actividad'
+                      : 'La actividad NO será visible para los estudiantes'}
                   </p>
                 </div>
               </label>
@@ -504,7 +504,7 @@ export default function ActivityFormModal({
                 <div className="bg-yellow-100 border-2 border-yellow-400 rounded-xl p-4 flex items-start gap-3">
                   <AlertCircle className="w-5 h-5 text-yellow-700 mt-0.5 flex-shrink-0" />
                   <div className="text-sm">
-                    <p className="font-bold text-yellow-900 mb-1">⚠️ Actividad en modo borrador</p>
+                    <p className="font-bold text-yellow-900 mb-1">Actividad en modo borrador</p>
                     <p className="text-yellow-800">
                       Esta actividad se guardará pero <strong>NO será visible para los estudiantes</strong> hasta que la publiques. 
                       Marca la casilla "Publicar Actividad" si quieres que esté disponible ahora.

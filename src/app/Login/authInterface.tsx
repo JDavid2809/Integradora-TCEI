@@ -19,7 +19,7 @@ export default function AuthInterface() {
         if (status === "loading") return // Aún cargando
 
         if (session?.user) {
-            console.log('🔄 Client: User already authenticated, redirecting...', session.user.email)
+            console.log('Client: User already authenticated, redirecting...', session.user.email)
             
             // Redirigir según el rol
             switch (session.user.rol) {

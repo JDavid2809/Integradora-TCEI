@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect, useRef } from 'react'
 import { useSession } from 'next-auth/react'
+import { useWebSocket, WSMessage } from '@/hooks/useWebSocket'
 
 interface ChatMessage {
   id: number
@@ -74,6 +75,7 @@ interface ChatContextType {
   participants: ChatParticipant[]
   loading: boolean
   isConnected: boolean
+  typingUsers: string[]
   
   // Acciones
   setActiveRoom: (room: ChatRoom | null) => void
@@ -93,6 +95,10 @@ interface ChatContextType {
   
   // Estado de conexión
   updateUserStatus: (isOnline: boolean) => Promise<void>
+  pendingReadIds: number[]
+  joiningRoomIds: number[]
+  failedReadIds: number[]
+  sendTyping: (isTyping: boolean) => void
 }
 
 const ChatContext = createContext<ChatContextType | undefined>(undefined)
@@ -104,10 +110,87 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
   const [messages, setMessages] = useState<ChatMessage[]>([])
   const [participants, setParticipants] = useState<ChatParticipant[]>([])
   const [loading, setLoading] = useState(false)
-  const [isConnected, setIsConnected] = useState(false)
+  const [pendingReadIds, setPendingReadIds] = useState<number[]>([])
+  const [joiningRoomIds, setJoiningRoomIds] = useState<number[]>([])
+  const [failedReadIds, setFailedReadIds] = useState<number[]>([])
+  const [typingUsers, setTypingUsers] = useState<string[]>([])
+  const typingTimersRef = useRef<Record<string, NodeJS.Timeout>>({})
+  // const [isConnected, setIsConnected] = useState(false) // Replaced by WS hook
+  const [token, setToken] = useState<string>('')
   
   // Para simular conexión en tiempo real (en producción usarías WebSockets)
-  const pollInterval = useRef<NodeJS.Timeout | null>(null)
+  // const pollInterval = useRef<NodeJS.Timeout | null>(null)
+
+  // Fetch token
+  useEffect(() => {
+    if (session?.user) {
+      fetch('/api/chat/token')
+        .then(res => res.json())
+        .then(data => setToken(data.token))
+        .catch(err => console.error('Error fetching token:', err))
+    }
+  }, [session])
+
+  const { isConnected, joinRoom, leaveRoom, sendTyping: wsSendTyping } = useWebSocket({
+    url: process.env.NEXT_PUBLIC_CHAT_WS_URL || 'ws://localhost:3001/ws/chat',
+    token,
+    enabled: !!token && !!session,
+    onMessage: (msg) => {
+      if (msg.type === 'typing' && activeRoom && String(msg.room) === String(activeRoom.id) && String(msg.senderId) !== String(session?.user?.id)) {
+        // add to typingUsers and remove after timeout
+        setTypingUsers(prev => Array.from(new Set([...prev, msg.senderName || String(msg.senderId)])))
+        const timerId = setTimeout(() => {
+          setTypingUsers(prev => prev.filter(name => name !== (msg.senderName || String(msg.senderId))))
+        }, 3000)
+        typingTimersRef.current[msg.senderId || ''] = timerId
+        return
+      }
+
+      if (msg.type === 'message' && activeRoom && String(msg.room) === String(activeRoom.id)) {
+        const newMessage: ChatMessage = {
+            id: Number(msg.id),
+            chat_room_id: Number(msg.room),
+            usuario_id: Number(msg.senderId),
+            contenido: msg.content || '',
+            tipo: (msg.metadata?.tipo as any) || 'TEXTO',
+            archivo_url: msg.metadata?.archivo_url,
+            archivo_nombre: msg.metadata?.archivo_nombre,
+            enviado_en: new Date(msg.timestamp * 1000).toISOString(),
+            eliminado: false,
+            usuario: {
+                id: Number(msg.senderId),
+                nombre: msg.senderName?.split(' ')[0] || '',
+                apellido: msg.senderName?.split(' ').slice(1).join(' ') || '',
+                rol: 'ESTUDIANTE' // Default fallback
+            }
+        }
+        
+        setMessages(prev => {
+            if (prev.some(m => m.id === newMessage.id)) return prev
+            return [...prev, newMessage]
+        })
+      }
+    }
+  })
+
+  const sendTyping = (isTyping: boolean) => {
+    if (!activeRoom) return
+    try {
+      wsSendTyping(String(activeRoom.id), isTyping)
+    } catch (err) {
+      console.warn('Failed to send typing', err)
+    }
+  }
+
+  // Join room via WS when activeRoom changes
+  useEffect(() => {
+    if (activeRoom && isConnected) {
+        joinRoom(String(activeRoom.id))
+        return () => {
+            leaveRoom(String(activeRoom.id))
+        }
+    }
+  }, [activeRoom, isConnected])
 
   // API helper
   const api = async (url: string, options?: RequestInit) => {
@@ -116,6 +199,7 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
         'Content-Type': 'application/json',
         ...options?.headers,
       },
+      credentials: 'include',
       ...options,
     })
     
@@ -146,7 +230,8 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
     try {
       const data = await api(`/api/chat/rooms/${roomId}/messages`)
       setMessages(data.messages || [])
-      setParticipants(data.participants || [])
+      setParticipants(data.participants || []);
+      // Debugging logs removed for stability
     } catch (error) {
       console.error('Error loading messages:', error)
     }
@@ -229,6 +314,14 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
     if (!session?.user) return
     
     try {
+      // Ensure the user is a participant or join first
+      const room = chatRooms.find(r => r.id === roomId)
+      const isParticipant = room?.participantes?.some((p: any) => p.usuario?.id === Number(session.user.id) && p.activo)
+      if (!isParticipant) {
+        console.warn(`User not participant of room ${roomId} — attempting join before marking as read`)
+        await joinChatRoom(roomId)
+      }
+
       await api(`/api/chat/rooms/${roomId}/read`, { method: 'POST' })
       // Actualizar el contador de no leídos localmente
       setChatRooms(prev => 
@@ -301,10 +394,15 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
   // Marcar mensaje como leído
   const markMessageAsRead = async (messageId: number): Promise<void> => {
     if (!session?.user) return
-    
+
+    // set pending read state
+    setPendingReadIds(prev => Array.from(new Set([...prev, messageId])))
+
     try {
       await api(`/api/chat/messages/${messageId}/read`, { method: 'PUT' })
-      
+
+      // Remove pending for success
+      setPendingReadIds(prev => prev.filter(id => id !== messageId))
       // Actualizar el mensaje en el estado local
       setMessages(prev => prev.map(msg => 
         msg.id === messageId 
@@ -329,8 +427,80 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
             }
           : msg
       ))
-    } catch (error) {
-      console.error('Error marking message as read:', error)
+    } catch (error: any) {
+      const errMsg = String(error?.message || '')
+      if ((errMsg.includes('status: 403') || errMsg.includes('403'))) {
+        console.warn('403 marking read - attempting to join correct room and retry...')
+        // Determine roomId for the message: try local state first
+        let roomToJoin: number | null = null
+        const localMsg = messages.find(m => m.id === messageId)
+        if (localMsg) {
+          roomToJoin = localMsg.chat_room_id
+        }
+        // Fallback: fetch message details from server to get chat_room_id
+        if (!roomToJoin) {
+          try {
+            const data = await api(`/api/chat/messages/${messageId}`)
+            if (data?.message?.chat_room_id) roomToJoin = Number(data.message.chat_room_id)
+          } catch (err) {
+            console.error('Error fetching message for retry room: ', err)
+          }
+        }
+
+        if (roomToJoin) {
+          try {
+            // show joining state
+            setJoiningRoomIds(prev => Array.from(new Set([...prev, roomToJoin!])))
+            // Use existing function to keep local state in sync
+            await joinChatRoom(roomToJoin)
+            // Optionally reload participants/messages to reflect state
+            await loadMessages(roomToJoin)
+            // Retry marking as read
+            await api(`/api/chat/messages/${messageId}/read`, { method: 'PUT' })
+
+            // Remove joining flag
+            setJoiningRoomIds(prev => prev.filter(id => id !== roomToJoin!))
+            // Remove pending read
+            setPendingReadIds(prev => prev.filter(id => id !== messageId))
+            // Update message in local state after successful retry
+            setMessages(prev => prev.map(msg => 
+              msg.id === messageId 
+                ? { 
+                    ...msg, 
+                    visto_en: new Date().toISOString(),
+                    lecturas: [
+                      ...(msg.lecturas || []),
+                      {
+                        id: Date.now(), // Temporal ID
+                        mensaje_id: messageId,
+                        usuario_id: Number(session.user.id),
+                        leido_en: new Date().toISOString(),
+                        usuario: {
+                          id: Number(session.user.id),
+                          nombre: session.user.name || '',
+                          apellido: session.user.apellido || '',
+                          rol: session.user.rol || ''
+                        }
+                      }
+                    ]
+                  }
+                : msg
+            ))
+          } catch (err2) {
+            // Clean states on error
+            setJoiningRoomIds(prev => prev.filter(id => id !== roomToJoin!))
+            setPendingReadIds(prev => prev.filter(id => id !== messageId))
+            console.error('Failed after retry to mark as read:', err2)
+          }
+        } else {
+          setPendingReadIds(prev => prev.filter(id => id !== messageId))
+          console.error('Failed to determine room for message to retry join.')
+        }
+      } else {
+        setPendingReadIds(prev => prev.filter(id => id !== messageId))
+        setFailedReadIds(prev => Array.from(new Set([...prev, messageId])))
+        console.error('Error marking message as read:', error)
+      }
     }
   }
 
@@ -349,6 +519,7 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
   }
 
   // Polling para simular tiempo real (en producción usarías WebSockets)
+  /*
   useEffect(() => {
     if (!session?.user || !activeRoom) return
     
@@ -374,6 +545,7 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
       setIsConnected(false)
     }
   }, [session, activeRoom])
+  */
 
   // Cargar salas al montar
   useEffect(() => {
@@ -401,7 +573,12 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
     markMessageAsRead,
     startPrivateChat,
     searchUsers,
-    updateUserStatus
+    updateUserStatus,
+    pendingReadIds,
+    joiningRoomIds,
+    failedReadIds,
+    typingUsers,
+    sendTyping,
   }
 
   return (

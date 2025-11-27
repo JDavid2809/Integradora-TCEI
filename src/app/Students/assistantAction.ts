@@ -15,6 +15,13 @@ const DEFAULT_SYSTEM_PROMPTS: Record<'es' | 'en', string> = {
   es: `Eres un tutor de inglés y asistente conversacional. Responde con claridad y concisión en español a menos que el usuario pida lo contrario. Da ejemplos, corrige la gramática cuando sea apropiado y mantén un tono amable y claro. Si el usuario pide traducciones, ofrece el original y la traducción. Cuando sea posible, ofrece ejercicios cortos o preguntas de seguimiento para practicar.`,
 }
 
+// Lista blanca de modelos permitidos. Evitar aceptar modelos arbitrarios desde el cliente.
+const ALLOWED_MODELS: string[] = [
+  'google/gemma-3n-e2b-it:free',
+  'meta-llama/llama-3.3-70b-instruct:free',
+  'deepseek/deepseek-prover-v2:free',
+]
+
 type ChatMessage = {
   role: 'system' | 'user' | 'assistant'
   content: string | Array<{ text?: string }>
@@ -47,7 +54,8 @@ export async function generateAssistantResponse({ prompt, system, model, languag
     const body: OpenRouterRequest = {
       model: model || 'deepseek/deepseek-prover-v2:free',
       messages: [],
-    }  
+    }
+
     // Si no se provee system desde el cliente, usar el prompt por defecto según el idioma
     const chosenLang: 'es' | 'en' = language === 'es' ? 'es' : 'en'
     if (system) {
@@ -57,15 +65,18 @@ export async function generateAssistantResponse({ prompt, system, model, languag
     }
     body.messages.push({ role: 'user', content: prompt })
 
-    // Intentar llamada; si OpenRouter responde 404 "No endpoints found" reintentar con modelos fallback
-    const FALLBACK_MODELS: string[] = [
-      // 'openai/gpt-4o',
-      'google/gemma-3n-e2b-it:free',
-      'meta-llama/llama-3.3-70b-instruct:free',
-      'deepseek/deepseek-prover-v2:free',
-    ]
+    // Solo usar modelos permitidos. Si el cliente solicita un modelo no permitido,
+    // ignorarlo y usar la lista de fallback segura.
+    const FALLBACK_MODELS: string[] = ALLOWED_MODELS
 
-    const modelCandidates: string[] = model ? [model, ...FALLBACK_MODELS.filter((m) => m !== model)] : FALLBACK_MODELS
+    let requestedModel = model
+    if (requestedModel && !ALLOWED_MODELS.includes(requestedModel)) {
+      // No aceptar modelos arbitrarios del cliente: hacer fallback y avisar en logs.
+      console.warn('assistantAction: modelo solicitado no permitido, usando fallback seguro')
+      requestedModel = undefined
+    }
+
+    const modelCandidates: string[] = requestedModel ? [requestedModel, ...FALLBACK_MODELS.filter((m) => m !== requestedModel)] : FALLBACK_MODELS
 
     let res: Response | null = null
     let data: OpenRouterResponse | null = null

@@ -12,7 +12,7 @@ export default function CourseDetailsPage({ curso, inscripcion }) {
     <div>
       <h1>{curso.nombre}</h1>
       <p>{curso.descripcion}</p>
-      
+
       {/* Mostrar botón de certificado si el estudiante está inscrito */}
       {inscripcion && (
         <div className="mt-8">
@@ -28,6 +28,7 @@ export default function CourseDetailsPage({ curso, inscripcion }) {
 }
 ```
 
+text
 ## 2. En el Perfil del Estudiante
 
 ```tsx
@@ -37,7 +38,7 @@ export default function StudentProfilePage({ estudiante }) {
   return (
     <div>
       <h1>Perfil de {estudiante.nombre}</h1>
-      
+
       {/* Sección de certificados */}
       <div className="mt-8">
         <StudentCertificates estudianteId={estudiante.id_estudiante} />
@@ -47,6 +48,7 @@ export default function StudentProfilePage({ estudiante }) {
 }
 ```
 
+text
 ## 3. En el Panel de Admin - Gestión de Inscripciones
 
 ```tsx
@@ -55,12 +57,12 @@ import { completeCourse, updateEnrollmentStatus } from '@/actions/enrollment'
 export default function AdminEnrollmentManager() {
   const handleCompleteCourse = async (inscripcionId: number) => {
     const result = await completeCourse(inscripcionId)
-    
-    if (result.success) {
+
+      if (result.success) {
       if (result.certificate) {
-        alert(`✅ Curso completado y certificado generado!\nURL: ${result.certificate.url}`)
+        alert(`Curso completado y certificado generado!\nURL: ${result.certificate.url}`)
       } else {
-        alert('✅ Curso completado (este curso no genera certificado)')
+        alert('Curso completado (este curso no genera certificado)')
       }
     } else {
       alert(`❌ Error: ${result.error}`)
@@ -77,6 +79,7 @@ export default function AdminEnrollmentManager() {
 }
 ```
 
+text
 ## 4. En el Panel de Profesor - Lista de Estudiantes
 
 ```tsx
@@ -85,13 +88,13 @@ import { completeCourse } from '@/actions/enrollment'
 export default function TeacherStudentsList() {
   const handleMarkAsCompleted = async (inscripcionId: number) => {
     if (!confirm('¿Marcar este curso como completado?')) return
-    
+
     const result = await completeCourse(inscripcionId)
-    
+
     if (result.success) {
-      alert('✅ Curso completado exitosamente')
+      alert('Curso completado exitosamente')
     } else {
-      alert(`❌ ${result.error}`)
+      alert(`Error: ${result.error}`)
     }
   }
 
@@ -106,6 +109,7 @@ export default function TeacherStudentsList() {
 }
 ```
 
+text
 ## 5. API Route para Completar Curso
 
 ```tsx
@@ -142,6 +146,7 @@ export async function POST(
 }
 ```
 
+text
 ## 6. Página de Verificación de Certificados
 
 ```tsx
@@ -158,7 +163,7 @@ export default function VerifyCertificatePage() {
 
   const handleVerify = async () => {
     if (!code.trim()) return
-    
+
     setLoading(true)
     const verification = await verifyCertificateByCode(code.trim().toUpperCase())
     setResult(verification)
@@ -202,7 +207,7 @@ export default function VerifyCertificatePage() {
               <div className="flex items-center gap-2 mb-4">
                 <CheckCircle className="w-6 h-6 text-green-600" />
                 <h2 className="text-xl font-bold text-green-800">
-                  ✅ Certificado Válido
+                  Certificado Válido
                 </h2>
               </div>
               <div className="space-y-2 text-gray-700">
@@ -226,7 +231,7 @@ export default function VerifyCertificatePage() {
               <div className="flex items-center gap-2">
                 <XCircle className="w-6 h-6 text-red-600" />
                 <h2 className="text-xl font-bold text-red-800">
-                  ❌ Certificado No Válido
+                  Certificado No Válido
                 </h2>
               </div>
               <p className="text-red-700 mt-2">{result.error}</p>
@@ -239,6 +244,7 @@ export default function VerifyCertificatePage() {
 }
 ```
 
+text
 ## 7. Dashboard de Admin - Estadísticas de Certificados
 
 ```tsx
@@ -263,18 +269,18 @@ export default async function AdminCertificatesPage() {
   return (
     <div className="p-8">
       <h1 className="text-3xl font-bold mb-8">Gestión de Certificados</h1>
-      
+
       <div className="grid grid-cols-3 gap-6 mb-8">
         <div className="bg-blue-50 p-6 rounded-lg">
           <h3 className="text-lg font-semibold text-blue-800">Total</h3>
           <p className="text-4xl font-bold text-blue-600">{totalCertificates}</p>
         </div>
-        
+
         <div className="bg-green-50 p-6 rounded-lg">
           <h3 className="text-lg font-semibold text-green-800">Este Mes</h3>
           <p className="text-4xl font-bold text-green-600">{thisMonth}</p>
         </div>
-        
+
         <div className="bg-purple-50 p-6 rounded-lg">
           <h3 className="text-lg font-semibold text-purple-800">Válidos</h3>
           <p className="text-4xl font-bold text-purple-600">
@@ -287,6 +293,7 @@ export default async function AdminCertificatesPage() {
 }
 ```
 
+text
 ## 8. Compartir Certificado en Redes Sociales
 
 ```tsx
@@ -322,7 +329,7 @@ export function ShareCertificateButtons({ certificate }) {
         <Linkedin className="w-5 h-5" />
         LinkedIn
       </button>
-      
+
       <button
         onClick={shareToTwitter}
         className="flex items-center gap-2 px-4 py-2 bg-sky-500 text-white rounded-lg hover:bg-sky-600"
@@ -330,7 +337,7 @@ export function ShareCertificateButtons({ certificate }) {
         <Twitter className="w-5 h-5" />
         Twitter
       </button>
-      
+
       <button
         onClick={shareToFacebook}
         className="flex items-center gap-2 px-4 py-2 bg-blue-700 text-white rounded-lg hover:bg-blue-800"
@@ -343,12 +350,18 @@ export function ShareCertificateButtons({ certificate }) {
 }
 ```
 
+text
 ---
 
 ## Notas Importantes
 
+
 - **Validación**: Siempre valida que el usuario tenga permisos antes de llamar funciones de servidor
+
 - **Loading States**: Usa estados de carga para mejorar la UX
+
 - **Error Handling**: Maneja errores apropiadamente y muestra mensajes claros al usuario
+
 - **Confirmaciones**: Pide confirmación antes de acciones importantes como completar cursos
+
 - **Tipos**: Usa TypeScript apropiadamente para type safety

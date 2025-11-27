@@ -7,10 +7,19 @@
     "build": "prisma generate && next build",
     "start": "next start",
     "lint": "next lint",
-    "seed:schedule": "node scripts/seed-schedule.js"
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "test:ci": "jest --runInBand",
+    "test:basic": "jest --coverage --coverageThreshold='{\"global\":{\"branches\":60,\"functions\":60,\"lines\":60,\"statements\":60}}'",
+    "seed:schedule": "ts-node scripts/seed-schedule.ts",
+    "seed:study-guides": "ts-node scripts/seed-study-guides.ts",
+    "seed:populate": "ts-node scripts/seedpoblar.ts",
+    "migrate:manual": "node scripts/run-manual-migration.js --force",
+    "check:student": "ts-node scripts/check-student.ts"
   },
   "prisma": {
-    "seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts"
+    "seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed_v2.ts"
   },
   "dependencies": {
     "@chakra-ui/pin-input": "^2.1.0",
@@ -27,6 +36,8 @@
     "dotenv": "^17.2.1",
     "driver.js": "^1.3.6",
     "framer-motion": "^12.23.12",
+    "ioredis": "^5.8.2",
+    "jsonwebtoken": "^9.0.2",
     "lucide-react": "^0.525.0",
     "next": "15.4.3",
     "next-auth": "^4.24.11",
@@ -34,6 +45,7 @@
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "react-hook-form": "^7.62.0",
+    "react-markdown": "^10.1.0",
     "recharts": "^3.3.0",
     "stripe": "^19.1.0",
     "tailwind-merge": "^3.3.1",
@@ -46,14 +58,19 @@
     "@testing-library/react": "^16.3.0",
     "@testing-library/user-event": "^14.6.1",
     "@types/jest": "^30.0.0",
+    "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^20",
     "@types/nodemailer": "^7.0.1",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "15.4.3",
+    "identity-obj-proxy": "^3.0.0",
+    "jest": "^29.7.0",
+    "jest-environment-jsdom": "^29.7.0",
     "prisma": "^6.17.1",
     "tailwindcss": "^4",
+    "ts-jest": "^29.4.5",
     "ts-node": "^10.9.2",
     "typescript": "^5.8.3"
   }

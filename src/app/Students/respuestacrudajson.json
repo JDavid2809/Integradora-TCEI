@@ -1,0 +1,347 @@
+{
+  "title": "Maestría en Modales: Cómo sonar educado, solicitar ayuda y dar consejos en inglés",
+  "metadata": {
+    "topic": "modales",
+    "level": "A1/A2 (Fundacional)",
+    "estimatedTime": "20 min"
+  },
+  "sections": [
+    {
+      "id": "intro",
+      "title": "Introduccion Personalizada",
+      "type": "content",
+      "content": "Bienvenido! Dado que estás comenzando tu camino en el inglés (o estamos reforzando tus bases), el tema de los verbos modales es el punto de partida más importante para la comunicación real. Los modales son la clave para agregar matices, cortesía y precisión a tu discurso. Si solo usaras verbos simples, sonarías muy directo o, a veces, un poco rudo. Los modales te permiten hacer solicitudes de forma educada ('Can I help you?' vs. 'I help you'), dar consejos útiles ('You should rest') y expresar tus habilidades. Dominar 'Can', 'Should' y 'Must' te dará una base sólida para interactuar en cualquier situación cotidiana.",
+      "keywords": [
+        {
+          "word": "modal verb",
+          "phonetic": "/ˈmoʊdəl vɜrb/",
+          "example": "Modal verbs include can, should, and must."
+        },
+        {
+          "word": "politeness",
+          "phonetic": "/pəˈlaɪtnəs/",
+          "example": "Using 'could' shows greater politeness."
+        },
+        {
+          "word": "request",
+          "phonetic": "/rɪˈkwɛst/",
+          "example": "Can I make a request, please?"
+        }
+      ]
+    },
+    {
+      "id": "concepts",
+      "title": "Conceptos Fundamentales",
+      "type": "content",
+      "content": "Regla de Oro: Los verbos modales son 'ayudantes' especiales. Siempre van seguidos de la forma base del verbo principal (el infinitivo sin 'to'). Nunca cambian, ni siquiera en tercera persona (no llevan 's'). Usos Fundamentales: 1. Habilidad y Posibilidad (Can / Could):\n'Can' es el modal más usado para expresar habilidad en el presente o futuro. Ejemplos: 'I can speak a little English.' (Habilidad).\n'Could' es la forma pasada de 'Can' para habilidad pasada ('When I was young, I could run fast'), pero en el presente se usa para hacer solicitudes más corteses. Comparación: 'Can you help me?' (Directo) vs. 'Could you help me?' (Más cortés). 2. Consejo y Sugerencia (Should):\n'Should' se utiliza para dar una recomendación o un consejo suave. No es una obligación, sino lo que es mejor o correcto hacer. Es el equivalente a 'deberías' en español. Ejemplos: 'You look tired. You should take a break.' 3. Obligación y Necesidad (Must / Have to):\n'Must' y 'Have to' expresan una obligación o necesidad fuerte.\n'Must' se usa generalmente para obligaciones internas (que vienen del hablante) o reglas muy formales. Ejemplo: 'I must study tonight.' (Yo siento la necesidad).\n'Have to' se usa para obligaciones externas (reglas, leyes, o circunstancias). Ejemplo: 'I have to wear a uniform at work.' (La regla de la empresa).\nPara la negación, 'Mustn't' significa que algo está prohibido (Prohibición). 'Don't have to' significa que algo no es necesario (Ausencia de Obligación). Esta distinción es crucial! Comparación: 'You mustn't drive here.' (Prohibido) vs. 'You dont have to drive.' (Puedes caminar, no es necesario).",
+      "keywords": [
+        {
+          "word": "base form",
+          "phonetic": "/beɪs fɔrm/",
+          "example": "After 'can', we use the base form of the verb."
+        },
+        {
+          "word": "obligation",
+          "phonetic": "/ˌɒblɪˈɡeɪʃən/",
+          "example": "The students must wear their badges."
+        },
+        {
+          "word": "advice",
+          "phonetic": "/ədˈvaɪs/",
+          "example": "We use 'should' to give advice."
+        },
+        {
+          "word": "necessity",
+          "phonetic": "/nəˈsɛsɪti/",
+          "example": "It is a necessity that you follow the rules."
+        },
+        {
+          "word": "prohibition",
+          "phonetic": "/ˌproʊəˈbɪʃən/",
+          "example": "You mustn't enter this area."
+        }
+      ]
+    },
+    {
+      "id": "common-mistakes",
+      "title": "Errores Comunes",
+      "type": "content",
+      "content": "1. Usar 'to' después del modal: Muchos estudiantes traducen literalmente de 'deberías ir' a 'You should to go'. Esto es incorrecto.\nCORRECTO: 'You should go now.' 2. Conjugar el modal en tercera persona singular: Los modales nunca cambian, pero es un error común agregar '-s' a 'can', 'must', o 'should' cuando el sujeto es 'He', 'She' o 'It'.\nCORRECTO: 'She can speak three languages.' (NO: She cans speak). 3. Confundir 'Mustn't' con 'Don't have to': Usar 'mustn't' cuando solo queremos decir que algo no es obligatorio.\nERROR: 'I mustnt go to the party if I don't want.' (Suena a prohibición).\nCORRECTO: 'I dont have to go to the party if I don't want.' (No tengo la obligación).",
+      "keywords": [
+        {
+          "word": "modal",
+          "phonetic": "",
+          "example": ""
+        },
+        {
+          "word": "should",
+          "phonetic": "",
+          "example": ""
+        },
+        {
+          "word": "correcto",
+          "phonetic": "",
+          "example": ""
+        },
+        {
+          "word": "don",
+          "phonetic": "",
+          "example": ""
+        },
+        {
+          "word": "usar",
+          "phonetic": "",
+          "example": ""
+        },
+        {
+          "word": "error",
+          "phonetic": "",
+          "example": ""
+        },
+        {
+          "word": "cuando",
+          "phonetic": "",
+          "example": ""
+        },
+        {
+          "word": "speak",
+          "phonetic": "",
+          "example": ""
+        }
+      ]
+    },
+    {
+      "id": "practice",
+      "title": "Practica Conversacional",
+      "type": "content",
+      "content": "A continuación, tres situaciones de la vida real donde debes usar los modales aprendidos: Situación 1: Solicitando ayuda\nA: Excuse me, I am lost. Could you tell me where the nearest train station is?\nB: Yes, of course. You must walk straight for two blocks, then you should turn left. Situación 2: Dando un consejo de salud\nA: I feel terrible. I haven't slept well all week.\nB: Oh dear. You should drink some herbal tea and you must try to relax this evening. Situación 3: Expresando habilidad y posibilidad\nA: Can your son lift that heavy box?\nB: He is very strong, so he can probably lift it. But he might need help with the largest one.",
+      "keywords": [
+        {
+          "word": "situaci",
+          "phonetic": "",
+          "example": ""
+        },
+        {
+          "word": "must",
+          "phonetic": "",
+          "example": ""
+        },
+        {
+          "word": "should",
+          "phonetic": "",
+          "example": ""
+        },
+        {
+          "word": "lift",
+          "phonetic": "",
+          "example": ""
+        },
+        {
+          "word": "continuaci",
+          "phonetic": "",
+          "example": ""
+        },
+        {
+          "word": "tres",
+          "phonetic": "",
+          "example": ""
+        },
+        {
+          "word": "situaciones",
+          "phonetic": "",
+          "example": ""
+        },
+        {
+          "word": "vida",
+          "phonetic": "",
+          "example": ""
+        }
+      ]
+    },
+    {
+      "id": "quiz",
+      "title": "Autoevaluacion",
+      "type": "quiz",
+      "questions": [
+        {
+          "question": "Choose the correct sentence: My sister swim very well when she was a child.",
+          "options": [
+            "could",
+            "can",
+            "must",
+            "should"
+          ],
+          "correctAnswer": 0,
+          "explanation": "La respuesta correcta es 'could'. Estamos hablando de una habilidad en el pasado ('when she was a child'). 'Can' es para el presente. 'Must' y 'Should' no expresan habilidad."
+        },
+        {
+          "question": "Fill in the blank: If you want to pass the exam, you study harder.",
+          "options": [
+            "must to",
+            "should",
+            "can",
+            "musts"
+          ],
+          "correctAnswer": 1,
+          "explanation": "La respuesta correcta es 'should' porque ofrece un consejo o recomendación para lograr un objetivo. 'Must to' es incorrecto porque los modales no llevan 'to'. 'Musts' es incorrecto porque los modales no se conjugan."
+        },
+        {
+          "question": "Which sentence expresses that it is PROHIBITED to talk loudly here?",
+          "options": [
+            "You don't have to talk loudly.",
+            "You couldn't talk loudly.",
+            "You mustn't talk loudly.",
+            "You shouldn't talk loudly."
+          ],
+          "correctAnswer": 2,
+          "explanation": "La respuesta correcta es 'You mustn't talk loudly.' 'Mustn't' se usa para expresar una prohibición o una obligación de no hacer algo. 'Don't have to' indica falta de necesidad, no prohibición. 'Shouldn't' es solo un consejo suave."
+        },
+        {
+          "question": "Identify the grammatical error: 'He cans speak Spanish and Italian.'",
+          "options": [
+            "The subject 'He' is incorrect.",
+            "The verb form 'cans' is incorrect.",
+            "The verb 'speak' is incorrect.",
+            "The modal is missing 'to'."
+          ],
+          "correctAnswer": 1,
+          "explanation": "El error es 'cans'. Los verbos modales nunca se conjugan en tercera persona. La forma correcta es 'He can speak Spanish and Italian'."
+        }
+      ],
+      "keywords": [
+        {
+          "word": "verb",
+          "phonetic": "",
+          "example": ""
+        },
+        {
+          "word": "talk",
+          "phonetic": "",
+          "example": ""
+        },
+        {
+          "word": "loudly",
+          "phonetic": "",
+          "example": ""
+        },
+        {
+          "word": "subject",
+          "phonetic": "",
+          "example": ""
+        },
+        {
+          "word": "modal",
+          "phonetic": "",
+          "example": ""
+        },
+        {
+          "word": "question",
+          "phonetic": "",
+          "example": ""
+        },
+        {
+          "word": "options",
+          "phonetic": "",
+          "example": ""
+        },
+        {
+          "word": "must",
+          "phonetic": "",
+          "example": ""
+        }
+      ]
+    },
+    {
+      "id": "resources",
+      "title": "Recursos para Profundizar",
+      "type": "resources",
+      "internal": [
+        {
+          "title": "No hay cursos activos actualmente",
+          "description": "Te recomendamos activar un curso pronto para seguir una estructura de aprendizaje continua.",
+          "link": "/Students/Courses/New"
+        }
+      ],
+      "external": [
+        {
+          "title": "Video: Modales básicos (Can, Could, Should, Must)",
+          "description": "Una explicación visual clara sobre la diferencia entre los cuatro modales más comunes.",
+          "link": "https://www.youtube.com/watch?vXXXXXX",
+          "type": "video"
+        },
+        {
+          "title": "Ejercicio Interactivo de Relleno: Modales",
+          "description": "Pon a prueba tu conocimiento usando 'can' y 'should' en oraciones de la vida diaria.",
+          "link": "https://www.esl-lounge.com/student/grammar/2g2-modal-verbs-exercise.php",
+          "type": "exercise"
+        },
+        {
+          "title": "Artículo: La diferencia entre Must, Have to y Should",
+          "description": "Lee ejemplos contextuales detallados para dominar las obligaciones en inglés.",
+          "link": "https://www.bbc.co.uk/learningenglish/english/course/towards-advanced/unit-16/tab/grammar",
+          "type": "website"
+        },
+        {
+          "title": "No more mistakes with MODALS! 3 Easy Rules",
+          "description": "Video tutorial de inglés: Learn English with Rebecca · engVid",
+          "link": "https://www.youtube.com/watch?v=5Dq7lEw7CKM",
+          "type": "video"
+        },
+        {
+          "title": "An Introduction to Past Modals: must have, should have, would have, and could have",
+          "description": "Video tutorial de inglés: Learn English with Bob the Canadian",
+          "link": "https://www.youtube.com/watch?v=hBogiz8JWWo",
+          "type": "video"
+        },
+        {
+          "title": "MODAL VERBS: All you need to know about CAN, COULD, MAY, MIGHT, MUST, SHOULD, SHALL, WILL and WOULD",
+          "description": "Video tutorial de inglés: English with Lucy",
+          "link": "https://www.youtube.com/watch?v=36wG9pSYu7Q",
+          "type": "video"
+        }
+      ],
+      "keywords": [
+        {
+          "word": "modal",
+          "phonetic": "",
+          "example": ""
+        },
+        {
+          "word": "title",
+          "phonetic": "",
+          "example": ""
+        },
+        {
+          "word": "type",
+          "phonetic": "",
+          "example": ""
+        },
+        {
+          "word": "description",
+          "phonetic": "",
+          "example": ""
+        },
+        {
+          "word": "link",
+          "phonetic": "",
+          "example": ""
+        },
+        {
+          "word": "modales",
+          "phonetic": "",
+          "example": ""
+        },
+        {
+          "word": "should",
+          "phonetic": "",
+          "example": ""
+        },
+        {
+          "word": "https",
+          "phonetic": "",
+          "example": ""
+        }
+      ]
+    }
+  ]
+}

@@ -12,7 +12,7 @@ async function seedChatRooms() {
     })
 
     if (!adminUser) {
-      console.log('❌ No admin user found. Skipping chat rooms seed.')
+      console.log('No admin user found. Skipping chat rooms seed.')
       return
     }
 
@@ -73,16 +73,16 @@ async function seedChatRooms() {
           }
         })
 
-        console.log(`✅ Created chat room: ${room.nombre}`)
+        console.log(`Created chat room: ${room.nombre}`)
       } else {
         console.log(`⏭️  Chat room already exists: ${roomData.nombre}`)
       }
     }
 
-    console.log('🎉 Chat rooms seeding completed!')
+    console.log('Chat rooms seeding completed!')
 
   } catch (error) {
-    console.error('❌ Error seeding chat rooms:', error)
+    console.error('Error seeding chat rooms:', error)
     throw error
   }
 }

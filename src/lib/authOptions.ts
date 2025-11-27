@@ -26,13 +26,12 @@ export const authOptions: NextAuthOptions = {
        try {
            
         if (!credentials?.email || !credentials.password) {
-          console.log('❌ Missing credentials');
+          console.log('Missing credentials');
           return null;
         }
         
         // Normalizar email a minúsculas
         const normalizedEmail = normalizeEmail(credentials.email);
-        console.time("findUser");
 
         const user = await prisma.usuario.findUnique({
           where: { email: normalizedEmail },
@@ -47,7 +46,6 @@ export const authOptions: NextAuthOptions = {
             debe_cambiar_password: true,
           },
         });
-        console.timeEnd("findUser");
 
         if (!user) {
 
@@ -58,21 +56,14 @@ export const authOptions: NextAuthOptions = {
           
         }
 
-        console.log('👤 User found:', user.email, 'Role:', user.rol);
-
-        console.time("bcrypt");
         const isValid = await bcrypt.compare(credentials.password, user.password);
         if (!isValid) {
           throw new Error("Correo o contraseña incorrectos");
         }
 
-        console.timeEnd("bcrypt");
-        console.log('✅ Login successful for:', user.email);
-
         let extraData: Record<string, unknown> | null = null;
 
 
-        console.time("extraData");
         if (user.rol === "ESTUDIANTE") {
           extraData = await prisma.estudiante.findUnique({
             where: { id_usuario: user.id },
@@ -82,8 +73,6 @@ export const authOptions: NextAuthOptions = {
             where: { id_usuario: user.id },
           });
         }
-
-        console.timeEnd("extraData");
 
         // Devuelve objeto user para guardar en sesión
         return {
@@ -156,8 +145,8 @@ export const authOptions: NextAuthOptions = {
   },
   events: {
     async signOut({ token }) {
-      // Log cuando un usuario cierra sesión
-      console.log('🚪 User signed out:', token?.email)
+    // Log cuando un usuario cierra sesión
+    console.log('User signed out:', token?.email)
     },
   },
   secret: process.env.NEXTAUTH_SECRET,

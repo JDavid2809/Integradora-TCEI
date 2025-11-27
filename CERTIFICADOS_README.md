@@ -1,21 +1,19 @@
-# 🎓 Sistema de Certificados Implementado
-
-## ✅ ¡SISTEMA COMPLETAMENTE FUNCIONAL!
+# Sistema de Certificados Implementado (archivo movido)
 
 Se ha implementado un sistema de certificados profesional similar a Udemy con todas las características solicitadas.
 
 ## 🎨 Diseño Elegante
 
-- ✅ Header con gradiente azul/índigo/púrpura
-- ✅ Decoraciones en las esquinas
-- ✅ Marca de agua sutil con ícono Award
-- ✅ Secciones bien organizadas
-- ✅ Códigos de verificación visibles
-- ✅ Footer decorativo
-- ✅ Completamente responsive
-- ✅ Optimizado para impresión/PDF
+- Header con gradiente azul/índigo/púrpura
+- Decoraciones en las esquinas
+- Marca de agua sutil con ícono Award
+- Secciones bien organizadas
+- Códigos de verificación visibles
+- Footer decorativo
+- Completamente responsive
+- Optimizado para impresión/PDF
 
-## 🚀 Generación Automática
+## Generación Automática
 
 El certificado se genera **automáticamente** cuando:
 1. Un estudiante completa un curso (status = COMPLETED)
@@ -45,17 +43,20 @@ Ejemplo:
 http://localhost:3000/certificate/UC-123e4567-e89b-12d3-a456-426614174000
 ```
 
-## 📊 Datos en el Certificado
+## Datos en el Certificado
 
-- ✅ Nombre completo del estudiante
-- ✅ Nombre del curso
-- ✅ Nombre del instructor
-- ✅ Fecha de finalización
-- ✅ Duración en horas
-- ✅ Nivel de inglés
-- ✅ Código de verificación único
-- ✅ ID del certificado (UUID)
-- ✅ Fecha de emisión
+- Nombre completo del estudiante
+- Nombre del curso
+- Nombre del instructor
+- Fecha de finalización
+- Duración en horas
+- Nivel de inglés
+- Código de verificación único
+- ID del certificado (UUID)
+- Fecha de emisión
+
+Este archivo ha sido movido a `docs/certificates/CERTIFICADOS_README.md`.
+Por favor revisa la versión actualizada y centralizada en el directorio `docs/`.
 
 ## 🛠️ Cómo Usar
 
@@ -104,7 +105,7 @@ docs/
 └── CERTIFICATE_INTEGRATION_EXAMPLES.tsx (ejemplos)
 ```
 
-## 🎯 Próximos Pasos
+## Próximos Pasos
 
 1. **Probar el sistema:**
    ```bash
@@ -125,11 +126,11 @@ docs/
    - Botón "Compartir" (Web Share API)
    - Botón "Descargar" (imprime/genera PDF)
 
-## 🔒 Seguridad
+## Seguridad
 
-- ✅ UUIDs únicos imposibles de adivinar
-- ✅ Códigos de verificación cortos para verificación rápida
-- ✅ Sistema de revocación para administradores
+- UUIDs únicos imposibles de adivinar
+- Códigos de verificación cortos para verificación rápida
+- Sistema de revocación para administradores
 - ✅ Tracking de visualizaciones
 - ✅ Validación pública
 

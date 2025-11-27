@@ -454,20 +454,17 @@ export default function NavBar() {
                 // Revalidar sesión cuando la página vuelve a ser visible
                 if (session?.user) {
                     // La sesión se revalidará automáticamente con useSession
-                    console.log('📍 Page visible, session will revalidate')
                 }
             }
         }
 
         const handlePopState = () => {
             // Cuando el usuario presiona atrás/adelante
-            console.log('⬅️ Browser back/forward detected')
             // Forzar recarga si estamos en una ruta protegida sin sesión válida
             if (typeof window !== 'undefined' && !session?.user) {
                 const protectedPaths = ['/Teachers', '/Students', '/Admin']
                 const currentPath = window.location.pathname
                 if (protectedPaths.some(path => currentPath.startsWith(path))) {
-                    console.log('🔒 Protected route without session, redirecting to login')
                     window.location.href = '/Login'
                 }
             }

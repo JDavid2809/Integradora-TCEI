@@ -4,13 +4,12 @@ import CertificateView from '@/components/certificates/CertificateView'
 import { Metadata } from 'next'
 
 interface PageProps {
-  params: {
-    token: string
-  }
+  params: Promise<{ token: string }>
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const result = await getCertificateByToken(params.token)
+  const p = await params
+  const result = await getCertificateByToken(p.token)
   
   if (!result.success || !result.data) {
     return {
@@ -32,7 +31,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 export default async function CertificatePage({ params }: PageProps) {
-  const result = await getCertificateByToken(params.token)
+  const p = await params
+  const result = await getCertificateByToken(p.token)
 
   if (!result.success || !result.data) {
     notFound()

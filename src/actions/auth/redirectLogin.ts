@@ -9,29 +9,29 @@ export async function getRedirectPath() {
     const session = await getServerSession(authOptions);
 
     if (!session || !session.user) {
-      console.log('❌ No session found, redirecting to login');
+      console.log('No session found, redirecting to login');
       return '/Login';
     }
 
     const rol = session.user.rol;
-    console.log('🔄 Redirecting user:', session.user.email, 'with role:', rol);
+    console.log('Redirecting user:', session.user.email, 'with role:', rol);
 
     switch (rol) {
       case 'PROFESOR':
-        console.log('👨‍🏫 Teacher access granted');
+        console.log('Teacher access granted');
         return '/Teachers';
       case 'ESTUDIANTE':
-        console.log('👨‍🎓 Student access granted');
+        console.log('Student access granted');
         return '/Students';
       case 'ADMIN':
-        console.log('👑 Admin access granted');
+        console.log('Admin access granted');
         return '/Admin';
       default:
-        console.log('⚠️ Unknown role:', rol, 'redirecting to login');
+        console.log('Unknown role:', rol, 'redirecting to login');
         return '/Login';
     }
   } catch (error) {
-    console.error('❌ Error in getRedirectPath:', error);
+    console.error('Error in getRedirectPath:', error);
     return '/Login';
   }
 }

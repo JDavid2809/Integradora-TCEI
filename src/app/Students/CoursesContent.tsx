@@ -16,7 +16,7 @@ interface CoursesContentProps {
 export default function CoursesContent({ studentCourses = [], allCourses = [] }: CoursesContentProps) {
     const router = useRouter();
 
-    // 🚀 --- Lógica original intacta ---
+    // --- Lógica original intacta ---
     const handleExploreCourses = () => {
         router.push("/Courses");
     };
@@ -49,7 +49,7 @@ export default function CoursesContent({ studentCourses = [], allCourses = [] }:
         return colors[level as keyof typeof colors] || "bg-gray-100 text-gray-800";
     };
 
-    // 🎯 --- Implementación Driver.js (tour interactivo) ---
+    // Implementación Driver.js (tour interactivo)
     const startCoursesTour = useCallback(() => {
         const steps = [
             {

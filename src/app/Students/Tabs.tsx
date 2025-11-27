@@ -5,7 +5,6 @@ import { motion } from "framer-motion";
 import { BookOpen, Home, GraduationCap, CheckSquare, Calendar, BrainCircuit, Sparkles } from "lucide-react";
 import Image from "next/image";
 import { driver } from "driver.js";
-import "driver.js/dist/driver.css";
 
 interface BottomTabsProps {
     activeSection: string;

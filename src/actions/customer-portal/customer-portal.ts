@@ -5,7 +5,7 @@ import { redirect } from 'next/navigation';
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/authOptions'
 import { prisma } from '@/lib/prisma'
-import { createSlug } from '@/lib/slugUtils' // ✅ Importar la función de slug
+import { createSlug } from '@/lib/slugUtils' // Importar la función de slug
 import Stripe from 'stripe';
 
 // Lazy initialization to avoid build-time errors
@@ -36,7 +36,7 @@ export async function createCheckoutSession(courseId: number) {
     throw new Error('This course is not available for purchase or is free');
   }
 
-  // ✅ Crear slug del curso para la URL de cancelación
+  // Crear slug del curso para la URL de cancelación
   const courseSlug = createSlug(curso.nombre);
 
   const stripe = getStripe()
@@ -60,7 +60,7 @@ export async function createCheckoutSession(courseId: number) {
       },
     ],
     success_url: `${process.env.NEXT_PUBLIC_URL}/Success?session_id={CHECKOUT_SESSION_ID}`,
-    // ✅ Corregir URL de cancelación para usar el slug del curso
+    // Corregir URL de cancelación para usar el slug del curso
     cancel_url: `${process.env.NEXT_PUBLIC_URL}/Courses/${courseSlug}?canceled=true`,
 
     metadata: {

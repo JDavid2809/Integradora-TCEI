@@ -10,7 +10,7 @@ export default async function LoginPage() {
   
   if (session) {
     // Si ya está autenticado, redirigir según su rol
-    console.log('🔄 User already authenticated:', session.user?.email, 'Role:', session.user?.rol)
+    console.log('User already authenticated:', session.user?.email, 'Role:', session.user?.rol)
     
     switch (session.user?.rol) {
       case 'PROFESOR':

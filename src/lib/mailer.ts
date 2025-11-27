@@ -33,7 +33,7 @@ export async function sendVerificationEmail(to: string, token: string, name: str
 
           <!-- Body -->
           <div style="padding:40px 30px; text-align:center;">
-            <div style="font-size:50px; margin-bottom:20px;">📘</div>
+            <div style="font-size:50px; margin-bottom:20px;"></div>
             <h2 style="color:#222; margin-bottom:15px;">Verify your email address</h2>
             <p style="font-size:15px; color:#555; margin-bottom:25px; line-height:1.6;">
               Hello <strong>${name}</strong>,<br>
@@ -86,7 +86,7 @@ export async function ResetEmail(to: string, name: string, url: string) {
   await transporter.sendMail({
     from: '"EnglishApp" <no-reply@englishapp.com>',
     to,
-    subject: `🔑 Restablece tu contraseña, ${name}`,
+    subject: `Restablece tu contraseña, ${name}`,
     html: `
     <div style="font-family: Arial, sans-serif; background-color: #f9fafb; padding: 30px; color: #333;">
       <table width="100%" style="max-width: 600px; margin: auto; background: #fff; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.06); overflow: hidden;">
@@ -98,17 +98,17 @@ export async function ResetEmail(to: string, name: string, url: string) {
         </tr>
         <tr>
           <td style="padding: 30px;">
-            <h2 style="color: #111827; font-size: 22px; margin-bottom: 10px;">Hola ${name} 👋</h2>
+            <h2 style="color: #111827; font-size: 22px; margin-bottom: 10px;">Hola ${name}</h2>
             <p style="font-size: 15px; color: #374151; line-height: 1.6;">
               Recibimos una solicitud para <strong>restablecer tu contraseña</strong>.  
               Si no realizaste esta acción, puedes ignorar este correo.
             </p>
             <div style="text-align: center; margin: 30px 0;">
-              <a href="${url}" target="_blank" 
+                <a href="${url}" target="_blank" 
                 style="display: inline-block; background: #2563eb; color: #fff; padding: 14px 28px; 
                 text-decoration: none; font-size: 16px; border-radius: 8px; font-weight: bold; 
                 box-shadow: 0 4px 8px rgba(37,99,235,0.2);">
-                🔑 Cambiar Contraseña
+                Cambiar Contraseña
               </a>
             </div>
             <p style="font-size: 14px; color: #6b7280; line-height: 1.5;">
@@ -120,7 +120,7 @@ export async function ResetEmail(to: string, name: string, url: string) {
         <tr>
           <td style="background: #f3f4f6; padding: 20px; text-align: center; font-size: 12px; color: #6b7280;">
             <p style="margin: 0;">EnglishApp © 2025</p>
-            <p style="margin: 4px 0;">Mejora tu inglés, mejora tu futuro 🌍</p>
+            <p style="margin: 4px 0;">Mejora tu inglés, mejora tu futuro</p>
           </td>
         </tr>
       </table>
@@ -159,7 +159,7 @@ export async function sendTeacherCredentials(to: string, name: string, lastname:
 
           <!-- Body -->
           <div style="padding:40px 30px;">
-            <div style="text-align:center; font-size:50px; margin-bottom:20px;">🎓</div>
+            <div style="text-align:center; font-size:50px; margin-bottom:20px;"></div>
             <h2 style="color:#00246a; margin-bottom:15px; text-align:center;">¡Tu solicitud ha sido aprobada!</h2>
             
             <p style="font-size:16px; color:#333; margin-bottom:25px; line-height:1.6;">
@@ -172,7 +172,7 @@ export async function sendTeacherCredentials(to: string, name: string, lastname:
 
             <!-- Credentials Box -->
             <div style="background:#f8f9fa; border:2px solid #00246a; border-radius:8px; padding:25px; margin:25px 0;">
-              <h3 style="color:#00246a; margin:0 0 15px; font-size:18px; text-align:center;">🔑 Tus Credenciales de Acceso</h3>
+              <h3 style="color:#00246a; margin:0 0 15px; font-size:18px; text-align:center;">Tus Credenciales de Acceso</h3>
               
               <div style="background:#ffffff; border-radius:6px; padding:15px; margin:10px 0;">
                 <p style="margin:0; font-size:14px; color:#666;"><strong>Correo electrónico:</strong></p>
@@ -186,15 +186,15 @@ export async function sendTeacherCredentials(to: string, name: string, lastname:
             </div>
 
             <div style="text-align:center; margin:30px 0;">
-              <a href="${loginUrl}" 
+                <a href="${loginUrl}" 
                 style="display:inline-block; padding:16px 32px; background:#00246a; color:#fff; text-decoration:none; font-size:16px; font-weight:bold; border-radius:8px; box-shadow:0 4px 8px rgba(0,36,106,0.2);">
-                🚀 Acceder al Portal
+                Acceder al Portal
               </a>
             </div>
 
             <!-- Important Notice -->
             <div style="background:#fff3cd; border:1px solid #ffeaa7; border-radius:6px; padding:20px; margin:25px 0;">
-              <h4 style="color:#856404; margin:0 0 10px; font-size:16px;">⚠️ Importante - Primer Acceso:</h4>
+              <h4 style="color:#856404; margin:0 0 10px; font-size:16px;">Importante - Primer Acceso:</h4>
               <ul style="color:#856404; margin:0; padding-left:20px; font-size:14px;">
                 <li>Esta es una <strong>contraseña temporal</strong> por motivos de seguridad</li>
                 <li><strong>Deberás cambiarla</strong> en tu primer inicio de sesión</li>

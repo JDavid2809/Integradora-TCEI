@@ -10,7 +10,7 @@ async function seedChatData() {
     })
 
     if (users.length < 2) {
-      console.log('❌ Se necesitan al menos 2 usuarios para crear datos de chat')
+      console.log('Se necesitan al menos 2 usuarios para crear datos de chat')
       return
     }
 
@@ -28,7 +28,7 @@ async function seedChatData() {
           creado_por: users[0].id
         }
       })
-      console.log('✅ Sala General creada')
+      console.log('Sala General creada')
     }
 
     // Crear sala de soporte si no existe
@@ -45,7 +45,7 @@ async function seedChatData() {
           creado_por: users[0].id
         }
       })
-      console.log('✅ Sala de Soporte creada')
+      console.log('Sala de Soporte creada')
     }
 
     // Crear chat privado entre usuarios
@@ -77,7 +77,7 @@ async function seedChatData() {
           { chat_room_id: privateRoom.id, usuario_id: users[1].id }
         ]
       })
-      console.log('✅ Chat privado creado')
+      console.log('Chat privado creado')
     }
 
     // Agregar participantes a salas públicas
@@ -187,11 +187,11 @@ async function seedChatData() {
       }
     }
 
-    console.log('✅ Mensajes de ejemplo creados')
-    console.log('🎉 Datos de chat poblados exitosamente!')
+    console.log('Mensajes de ejemplo creados')
+    console.log('Datos de chat poblados exitosamente!')
 
   } catch (error) {
-    console.error('❌ Error poblando datos de chat:', error)
+    console.error('Error poblando datos de chat:', error)
   } finally {
     await prisma.$disconnect()
   }

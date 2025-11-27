@@ -489,9 +489,9 @@ function MonthlyCalendar({ schedules }: { schedules: CourseSchedule[] }) {
                       <div key={classItem.id} className="p-3 bg-blue-50 rounded-lg border border-blue-200">
                         <div className="font-medium text-blue-800">{classItem.curso.nombre}</div>
                         <div className="text-sm text-slate-600 mt-1">
-                          <div>⏰ {classItem.start_time} ({classItem.duration_minutes} min)</div>
-                          <div>👨‍🏫 {classItem.teacher.nombre} {classItem.teacher.apellido}</div>
-                          {classItem.classroom && <div>📍 {classItem.classroom}</div>}
+                          <div>Hora: {classItem.start_time} ({classItem.duration_minutes} min)</div>
+                          <div>Profesor: {classItem.teacher.nombre} {classItem.teacher.apellido}</div>
+                          {classItem.classroom && <div>Aula: {classItem.classroom}</div>}
                         </div>
                       </div>
                     ))}
@@ -515,9 +515,9 @@ function MonthlyCalendar({ schedules }: { schedules: CourseSchedule[] }) {
                             <ActivityIcon className="w-4 h-4 text-orange-600" />
                             <div className="font-medium text-orange-800">{activity.title}</div>
                           </div>
-                          <div className="text-sm text-slate-600">
-                            📚 {activity.curso.nombre}
-                          </div>
+                            <div className="text-sm text-slate-600">
+                              Curso: {activity.curso.nombre}
+                            </div>
                         </div>
                       )
                     })}

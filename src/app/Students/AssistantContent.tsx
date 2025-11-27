@@ -5,9 +5,11 @@ import { generateAssistantResponse } from "./assistantAction"
 import { driver } from "driver.js"
 import "driver.js/dist/driver.css"
 import { BrushCleaning, SendHorizontal } from "lucide-react"
+import { saveStudyGuide } from "./studyGuideAction"
 
 export default function AssistantContent() {
   type Msg = { role: 'user' | 'assistant' | 'system'; text: string; time?: string }
+  const [aiConsent, setAiConsent] = useState<boolean | null>(null)
   const [messages, setMessages] = useState<Msg[]>([])
   const [prompt, setPrompt] = useState("")
   const [language, setLanguage] = useState<'es' | 'en'>('es')
@@ -125,11 +127,27 @@ export default function AssistantContent() {
     return () => clearTimeout(timeout);
   }, [startAssistantTour]);
 
+  // Load consent from localStorage
+  useEffect(() => {
+    try {
+      const v = localStorage.getItem('ai_consent')
+      setAiConsent(v === 'true' ? true : v === 'false' ? false : null)
+    } catch {
+      setAiConsent(null)
+    }
+  }, [])
+
   // Students should always use the server action to keep the key private.
   const submit = async (e?: React.FormEvent) => {
     e?.preventDefault()
     const text = prompt.trim()
     if (!text) return
+    // Require consent before sending any student data to third-party AI
+    if (aiConsent !== true) {
+      setToast(language === 'es' ? 'Debes aceptar el uso de IA para continuar' : 'You must accept AI usage to continue')
+      setTimeout(() => setToast(null), 2500)
+      return
+    }
     setPrompt("")
   const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
   setMessages((m) => [...m, { role: 'user', text, time }])
@@ -154,6 +172,34 @@ export default function AssistantContent() {
     } finally {
       setLoading(false)
       appRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' })
+    }
+  }
+
+  const acceptAiConsent = async (accepted: boolean) => {
+    // Optimistic update
+    try { localStorage.setItem('ai_consent', accepted ? 'true' : 'false') } catch {}
+    setAiConsent(accepted)
+
+    // Persist server-side
+    try {
+      const res = await fetch('/api/user/ai-consent', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ consent: accepted }),
+      })
+      if (!res.ok) {
+        const json = await res.json().catch(() => ({}))
+        console.warn('Failed to persist ai consent on server', json)
+        setToast(language === 'es' ? 'No se pudo guardar el consentimiento en el servidor' : 'Could not save consent on server')
+        setTimeout(() => setToast(null), 2500)
+      } else {
+        setToast(language === 'es' ? 'Preferencia guardada' : 'Preference saved')
+        setTimeout(() => setToast(null), 1500)
+      }
+    } catch (err) {
+      console.warn('Error calling ai-consent endpoint', err)
+      setToast(language === 'es' ? 'No se pudo conectar al servidor' : 'Could not connect to server')
+      setTimeout(() => setToast(null), 2500)
     }
   }
 
@@ -197,9 +243,22 @@ export default function AssistantContent() {
   }
 
   const saveToPortfolio = (text: string) => {
-    // Placeholder: integrarlo con endpoint real para guardar en DB
-    setToast(language === 'es' ? 'Guardado en portafolio (simulado)' : 'Saved to portfolio (simulated)')
-    setTimeout(() => setToast(null), 2000)
+    const title = prompt || text.substring(0, 60) || 'Guía de Estudio'
+    ;(async () => {
+      try {
+        const res: any = await saveStudyGuide(title, text)
+        if (res?.success) {
+          setToast(language === 'es' ? 'Guardado en Guías de Estudio' : 'Saved to Study Guides')
+        } else {
+          setToast(language === 'es' ? 'Error al guardar la guía' : 'Error saving guide')
+        }
+      } catch (err) {
+        console.error('Error saving guide:', err)
+        setToast(language === 'es' ? 'Error al guardar la guía' : 'Error saving guide')
+      } finally {
+        setTimeout(() => setToast(null), 2000)
+      }
+    })()
   }
 
   const regenerateLast = async () => {
@@ -231,6 +290,20 @@ export default function AssistantContent() {
 
   return (
     <div className="w-full h-full flex flex-col px-0 sm:px-4 lg:px-6 py-0 sm:py-4">
+      {/* AI Consent Banner */}
+      {aiConsent !== true && (
+        <div className="w-full bg-yellow-50 border border-yellow-200 text-yellow-800 px-4 py-2 rounded-md mb-3 flex items-center justify-between">
+          <div className="text-sm">
+            {language === 'es'
+              ? 'Para personalizar respuestas con tus datos, aceptas que usemos un servicio de IA externo. No compartiremos tu email.'
+              : 'To personalize responses with your data, you accept we use a third-party AI service. We will not share your email.'}
+          </div>
+          <div className="flex items-center gap-2">
+            <button onClick={() => acceptAiConsent(false)} className="text-sm px-3 py-1 rounded-md bg-white/80">{language === 'es' ? 'No aceptar' : 'Decline'}</button>
+            <button onClick={() => acceptAiConsent(true)} className="text-sm px-3 py-1 rounded-md bg-[#00246a] text-white">{language === 'es' ? 'Aceptar' : 'Accept'}</button>
+          </div>
+        </div>
+      )}
       {/* HEADER */}
       <div 
         id="assistant-header"
@@ -500,6 +573,18 @@ export default function AssistantContent() {
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
                       </svg>
                       <span>{language === "es" ? "Copiar" : "Copy"}</span>
+                    </button>
+                  )}
+                  {/* Guardar como Guía */}
+                  {m.role === "assistant" && m.text && (
+                    <button
+                      onClick={() => saveToPortfolio(m.text)}
+                      className="mt-2 ml-2 text-xs font-medium text-[#00246a] hover:text-[#e30f28] px-2 py-1 rounded transition-colors flex items-center gap-1"
+                    >
+                      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 5v14M5 12h14" />
+                      </svg>
+                      <span>{language === "es" ? "Guardar Guía" : "Save as Guide"}</span>
                     </button>
                   )}
                 </div>

@@ -17,7 +17,7 @@ export async function POST(request: NextRequest) {
   const signature = headersList.get('stripe-signature')
 
   if (!signature) {
-    console.error('❌ No signature found')
+    console.error('No signature found')
     return NextResponse.json({ error: 'No signature' }, { status: 400 })
   }
 
@@ -30,9 +30,9 @@ export async function POST(request: NextRequest) {
       signature,
       process.env.STRIPE_WEBHOOK_SECRET!
     )
-    console.log('✅ Webhook received:', event.type)
+    console.log('Webhook received:', event.type)
   } catch (err) {
-    console.error('❌ Webhook signature verification failed:', err)
+    console.error('Webhook signature verification failed:', err)
     return NextResponse.json({ error: 'Invalid signature' }, { status: 400 })
   }
 
@@ -44,7 +44,7 @@ export async function POST(request: NextRequest) {
       const courseId = parseInt(session.metadata!.course_id)
       const userId = parseInt(session.metadata!.userId)
 
-      console.log('💳 Processing payment:', { 
+      console.log('Processing payment:', { 
         courseId, 
         userId, 
         sessionId: session.id,
@@ -58,7 +58,7 @@ export async function POST(request: NextRequest) {
       })
 
       if (!user || !user.estudiante) {
-        console.error('❌ Student not found for user:', userId)
+        console.error('Student not found for user:', userId)
         return NextResponse.json({ error: 'Student not found' }, { status: 404 })
       }
 
@@ -94,7 +94,7 @@ export async function POST(request: NextRequest) {
         }
       })
 
-      console.log('✅ Enrollment created successfully:', {
+      console.log('Enrollment created successfully:', {
         enrollmentId: enrollment.id,
         studentId,
         courseId
@@ -107,7 +107,7 @@ export async function POST(request: NextRequest) {
       })
 
     } catch (error) {
-      console.error('❌ Error creating enrollment:', error)
+      console.error('Error creating enrollment:', error)
       return NextResponse.json({ 
         error: 'Error creating enrollment',
         details: error instanceof Error ? error.message : 'Unknown error'

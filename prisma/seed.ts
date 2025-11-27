@@ -245,6 +245,36 @@ async function main(){
       });
     }
 
+    // Create some sample study guides for the test student
+    if (nuevoEstudiante.estudiante) {
+      console.log('  - Creating sample study guides for test student...');
+      const guides = [
+        {
+          title: 'Guía rápida: Present Simple',
+          content: `# Present Simple\n\n- Explicación breve del tiempo Present Simple.\n- Ejemplos: I eat, You eat, He eats.\n\n## Plan de estudio sugerido\n1. Repasar vocabulario básico.\n2. Hacer ejercicios de conjugación.\n3. Revisar lección: [Lección 1](/Students/Courses/1)`,
+        },
+        {
+          title: 'Guía de vocabulario: Viajes',
+          content: `# Vocabulario de viajes\n\n- Lista de palabras útiles: travel, airport, ticket, boarding pass.\n\n## Actividades\n- Crea 10 frases con las palabras nuevas.\n- Ver lección: [Lección 2](/Students/Courses/1)`,
+        },
+        {
+          title: 'Plan de repaso: Phrasal Verbs',
+          content: `# Phrasal Verbs\n\n- Introducción a phrasal verbs más comunes: take off, put on, get up.\n\n## Ejercicios\n- Relaciona definiciones y ejemplos.\n- Repasa módulos relacionados en tu curso: [Business English](/Students/Courses/2)`,
+        },
+      ]
+
+      for (const g of guides) {
+        await prisma.study_guide.create({
+          data: {
+            title: g.title,
+            content: { sections: [ { id: 'main', title: g.title, type: 'content', content: { blocks: [ { type: 'paragraph', text: g.content.replace(/`/g,'') } ] } } ] },
+            student_id: nuevoEstudiante.estudiante.id_estudiante,
+          },
+        })
+      }
+      console.log('  - Sample study guides created')
+    }
+
     console.log('');
     console.log('🎉 Fresh database seed completed successfully!');
     console.log('');
@@ -266,7 +296,7 @@ async function main(){
     console.log('🚀 Database is ready for testing!');
     
     } catch (error) {
-        console.error("❌ Error during seeding:", error);
+        console.error("Error during seeding:", error);
         console.error("💡 Make sure your database is running and accessible");
         process.exit(1);
     }
@@ -279,7 +309,7 @@ main()
     console.log('✅ Disconnected successfully');
   })
   .catch(async (e) => {
-    console.error("❌ Error in main function:", e);
+    console.error("Error in main function:", e);
     await prisma.$disconnect();
     process.exit(1);
   })

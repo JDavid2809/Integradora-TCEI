@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/authOptions'
 import { prisma } from '@/lib/prisma'
+import { getUserFromSession } from '@/lib/getUserFromSession'
 
 // GET - Debug: Diagnosticar por qué un usuario no aparece
 export async function GET(request: NextRequest) {
@@ -102,9 +103,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Verificar visibilidad en búsqueda de chat
-    const currentUser = session?.user ? await prisma.usuario.findUnique({
-      where: { email: session.user.email! }
-    }) : null
+    const currentUser = session?.user ? await getUserFromSession(session) : null
 
     if (currentUser) {
       const searchResults = await prisma.usuario.findMany({

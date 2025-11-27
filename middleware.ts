@@ -9,7 +9,7 @@ export default withAuth(
     // Si hay token y está intentando acceder a Login o Home, redirigir a su dashboard
     if (token && (pathname.startsWith('/Login') || pathname === '/')) {
       const userRole = token.rol
-      console.log('🔄 Authenticated user trying to access login/home, redirecting:', userRole)
+      console.log('Authenticated user trying to access login/home, redirecting:', userRole)
       
       const redirectUrl = userRole === 'PROFESOR' ? '/Teachers' :
                          userRole === 'ESTUDIANTE' ? '/Students' :

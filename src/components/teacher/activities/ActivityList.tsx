@@ -843,7 +843,7 @@ export default function ActivityList({
                             <strong>&ldquo;{activityToDelete.title}&rdquo;</strong>?
                             {activityToDelete._count && activityToDelete._count.submissions > 0 && (
                                 <span className="block mt-2 text-red-600 font-medium">
-                                    ⚠️ Esta actividad tiene {activityToDelete._count.submissions} entrega(s). Se eliminarán también.
+                                    Esta actividad tiene {activityToDelete._count.submissions} entrega(s). Se eliminarán también.
                                 </span>
                             )}
                         </p>

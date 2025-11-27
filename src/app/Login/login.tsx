@@ -50,14 +50,14 @@ export default  function LoginForm({ toggleMode }: LoginFormProps) {
         setError(cleanError);
         setLoading(false);
       } else if (res?.ok) {
-        console.log('✅ Login successful, getting redirect path...');
+        console.log('Login successful, getting redirect path...');
 
         const path = await getRedirectPath();
-        console.log('🔄 Redirecting to:', path);
+        console.log('Redirecting to:', path);
 
         router.replace(path);
       } else {
-        console.log('⚠️ Unexpected login response:', res);
+        console.log('Unexpected login response:', res);
         setError("Error inesperado durante el inicio de sesión");
         setLoading(false);
       }

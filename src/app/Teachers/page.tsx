@@ -26,7 +26,7 @@ export default async function page() {
     }
   }
 
-  console.log('✅ Teacher access granted:', session.user.email, 'Role:', session.user.rol)
+  console.log('Teacher access granted:', session.user.email, 'Role:', session.user.rol)
  
   return (
     <Intermedio user={session} />

@@ -1,6 +1,7 @@
 'use server'
 
 import { prisma } from '@/lib/prisma'
+import cloudinary from '@/lib/cloudinary'
 import {
   CreateActivityInput,
   UpdateActivityInput,
@@ -10,6 +11,21 @@ import {
   StudentActivityProgress
 } from '@/types/course-activity'
 import { revalidatePath } from 'next/cache'
+
+// Tipos permitidos para archivos
+const ALLOWED_TYPES = [
+  'image/jpeg',
+  'image/png',
+  'image/gif',
+  'image/webp',
+  'application/pdf',
+  'application/msword',
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  'text/plain',
+]
+
+const MAX_FILE_SIZE = 10 * 1024 * 1024 // 10MB
+const MAX_FILES = 5
 
 // ============================================
 // ACTIVIDADES - PROFESOR
@@ -285,6 +301,210 @@ export async function toggleActivityPublish(activityId: number, teacherId: numbe
     return {
       success: false,
       message: 'Error al cambiar el estado de publicación'
+    }
+  }
+}
+
+// ============================================
+// ARCHIVOS ADJUNTOS - PROFESOR
+// ============================================
+
+/**
+ * Subir archivos adjuntos a una actividad (materiales del profesor)
+ */
+export async function uploadActivityAttachments(formData: FormData, teacherId: number) {
+  try {
+    const activityId = parseInt(formData.get('activityId') as string)
+    const files = formData.getAll('files') as File[]
+
+    if (!activityId || isNaN(activityId)) {
+      return {
+        success: false,
+        message: 'ID de actividad inválido'
+      }
+    }
+
+    // Verificar que el profesor tenga acceso a la actividad
+    const activity = await prisma.course_activity.findFirst({
+      where: {
+        id: activityId,
+        created_by: teacherId
+      }
+    })
+
+    if (!activity) {
+      return {
+        success: false,
+        message: 'No tienes permiso para adjuntar archivos a esta actividad'
+      }
+    }
+
+    if (!files || files.length === 0) {
+      return {
+        success: false,
+        message: 'No se proporcionaron archivos'
+      }
+    }
+
+    // Validar archivos
+    if (files.length > MAX_FILES) {
+      return {
+        success: false,
+        message: `Máximo ${MAX_FILES} archivos permitidos`
+      }
+    }
+
+    for (const file of files) {
+      if (!ALLOWED_TYPES.includes(file.type)) {
+        return {
+          success: false,
+          message: `Tipo de archivo no permitido: ${file.name}`
+        }
+      }
+      if (file.size > MAX_FILE_SIZE) {
+        return {
+          success: false,
+          message: `Archivo demasiado grande: ${file.name} (máximo 10MB)`
+        }
+      }
+    }
+
+    // Subir archivos a Cloudinary
+    const uploadedFiles: Array<{
+      fileName: string
+      fileUrl: string
+      fileType: string
+      fileSize: number
+    }> = []
+
+    for (const file of files) {
+      try {
+        const bytes = await file.arrayBuffer()
+        const buffer = Buffer.from(bytes)
+
+        const resourceType = file.type.startsWith('image/') ? 'image' : 'raw'
+
+        const result = await new Promise<{
+          secure_url: string
+          public_id: string
+          format: string
+          bytes: number
+        }>((resolve, reject) => {
+          cloudinary.uploader.upload_stream(
+            {
+              folder: `tareas/materiales/${activity.course_id}/${activityId}`,
+              resource_type: resourceType,
+              public_id: `${Date.now()}-${file.name.replace(/\.[^/.]+$/, '')}`,
+            },
+            (error, result) => {
+              if (error) reject(error)
+              else if (result) resolve(result)
+              else reject(new Error('No result from Cloudinary'))
+            }
+          ).end(buffer)
+        })
+
+        uploadedFiles.push({
+          fileName: file.name,
+          fileUrl: result.secure_url,
+          fileType: file.type,
+          fileSize: result.bytes
+        })
+      } catch (uploadError) {
+        console.error(`Error subiendo archivo ${file.name}:`, uploadError)
+        return {
+          success: false,
+          message: `Error al subir el archivo: ${file.name}`
+        }
+      }
+    }
+
+    // Guardar en la base de datos
+    const attachments = await prisma.activity_attachment.createMany({
+      data: uploadedFiles.map(file => ({
+        activity_id: activityId,
+        file_name: file.fileName,
+        file_url: file.fileUrl,
+        file_type: file.fileType,
+        file_size: file.fileSize
+      }))
+    })
+
+    revalidatePath(`/teacher/courses/${activity.course_id}`)
+
+    return {
+      success: true,
+      message: `${uploadedFiles.length} archivo(s) subido(s) exitosamente`,
+      files: uploadedFiles
+    }
+  } catch (error) {
+    console.error('Error uploading attachments:', error)
+    return {
+      success: false,
+      message: 'Error al subir los archivos'
+    }
+  }
+}
+
+/**
+ * Eliminar un archivo adjunto de una actividad
+ */
+export async function deleteActivityAttachment(attachmentId: number, teacherId: number) {
+  try {
+    // Verificar que el archivo pertenezca a una actividad del profesor
+    const attachment = await prisma.activity_attachment.findFirst({
+      where: {
+        id: attachmentId,
+        activity: {
+          created_by: teacherId
+        }
+      },
+      include: {
+        activity: {
+          select: {
+            course_id: true
+          }
+        }
+      }
+    })
+
+    if (!attachment) {
+      return {
+        success: false,
+        message: 'No tienes permiso para eliminar este archivo'
+      }
+    }
+
+    // Intentar eliminar de Cloudinary
+    try {
+      // Extraer el public_id de la URL
+      const urlParts = attachment.file_url.split('/')
+      const publicIdWithExtension = urlParts.slice(-4).join('/') // tareas/materiales/courseId/activityId/filename
+      const publicId = publicIdWithExtension.replace(/\.[^/.]+$/, '')
+      
+      const resourceType = attachment.file_type.startsWith('image/') ? 'image' : 'raw'
+      await cloudinary.uploader.destroy(publicId, { resource_type: resourceType })
+    } catch (cloudinaryError) {
+      console.warn('Error eliminando de Cloudinary:', cloudinaryError)
+      // Continuar aunque falle Cloudinary
+    }
+
+    // Eliminar de la base de datos
+    await prisma.activity_attachment.delete({
+      where: { id: attachmentId }
+    })
+
+    revalidatePath(`/teacher/courses/${attachment.activity.course_id}`)
+
+    return {
+      success: true,
+      message: 'Archivo eliminado exitosamente'
+    }
+  } catch (error) {
+    console.error('Error deleting attachment:', error)
+    return {
+      success: false,
+      message: 'Error al eliminar el archivo'
     }
   }
 }

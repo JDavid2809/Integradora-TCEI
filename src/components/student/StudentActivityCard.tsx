@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { FileText, Calendar, Award, Clock, CheckCircle2, XCircle, AlertCircle, Send } from 'lucide-react'
+import { FileText, Calendar, Award, Clock, CheckCircle2, XCircle, AlertCircle, Send, Paperclip } from 'lucide-react'
 import { StudentActivityWithSubmission } from '@/types/student-activity'
 import { ActivityTypeConfig } from '@/types/course-activity'
 import SubmitActivityModal from './SubmitActivityModal'
@@ -140,6 +140,14 @@ export default function StudentActivityCard({ activity, courseId, onSubmitSucces
                 <span className="inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-full bg-green-100 text-green-700">
                   <CheckCircle2 className="w-3.5 h-3.5" />
                   Pendiente
+                </span>
+              )}
+
+              {/* Badge de archivos adjuntos del profesor */}
+              {activity.attachments && activity.attachments.length > 0 && (
+                <span className="inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-full bg-orange-100 text-orange-700">
+                  <Paperclip className="w-3.5 h-3.5" />
+                  {activity.attachments.length} {activity.attachments.length === 1 ? 'archivo' : 'archivos'}
                 </span>
               )}
             </div>
@@ -353,6 +361,14 @@ export default function StudentActivityCard({ activity, courseId, onSubmitSucces
                       <Clock className="w-3.5 h-3.5" />
                       Intento {hasSubmission ? submission.attempt_number : 0}/{activity.max_attempts || '∞'}
                     </span>
+
+                    {/* Archivos adjuntos del profesor */}
+                    {activity.attachments && activity.attachments.length > 0 && (
+                      <span className="inline-flex items-center gap-1 bg-orange-100 text-orange-700 px-2.5 py-1 rounded-full font-semibold">
+                        <Paperclip className="w-3.5 h-3.5" />
+                        {activity.attachments.length} {activity.attachments.length === 1 ? 'archivo' : 'archivos'}
+                      </span>
+                    )}
                   </div>
                 </div>
               </div>

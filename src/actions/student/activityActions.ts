@@ -3,11 +3,27 @@
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/authOptions'
 import { prisma } from '@/lib/prisma'
+import cloudinary from '@/lib/cloudinary'
 import { 
   StudentCourseDetail, 
   StudentActivityWithSubmission,
   SubmitActivityResult
 } from '@/types/student-activity'
+
+// Tipos permitidos para archivos
+const ALLOWED_TYPES = [
+  'image/jpeg',
+  'image/png',
+  'image/gif',
+  'image/webp',
+  'application/pdf',
+  'application/msword',
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  'text/plain',
+]
+
+const MAX_FILE_SIZE = 10 * 1024 * 1024 // 10MB
+const MAX_FILES = 5
 
 /**
  * Obtener detalles del curso para un estudiante
@@ -241,6 +257,29 @@ export async function submitStudentActivity(formData: FormData) {
       }
     }
 
+    // Validar archivos
+    if (files.length > MAX_FILES) {
+      return {
+        success: false,
+        message: `Máximo ${MAX_FILES} archivos permitidos`
+      }
+    }
+
+    for (const file of files) {
+      if (!ALLOWED_TYPES.includes(file.type)) {
+        return {
+          success: false,
+          message: `Tipo de archivo no permitido: ${file.name}`
+        }
+      }
+      if (file.size > MAX_FILE_SIZE) {
+        return {
+          success: false,
+          message: `Archivo demasiado grande: ${file.name} (máximo 10MB)`
+        }
+      }
+    }
+
     // Verificar inscripción
     const enrollment = await prisma.inscripcion.findFirst({
       where: {
@@ -296,42 +335,93 @@ export async function submitStudentActivity(formData: FormData) {
       }
     }
 
-    // Crear la entrega
-    const submission = await prisma.activity_submission.create({
-      data: {
-        activity_id: activityId,
-        student_id: studentId,
-        enrollment_id: enrollment.id,
-        submission_text: submissionText || null,
-        is_late: isLate,
-        attempt_number: submissionCount + 1,
-        status: 'SUBMITTED'
-      },
-      include: {
-        files: true
-      }
-    })
-
-    // TODO: Guardar archivos adjuntos
-    // Por ahora, los archivos se envían pero no se guardan en la BD ni en storage
-    // En una implementación completa:
-    // 1. Subir archivos a cloud storage (S3, Cloudinary, etc.)
-    // 2. Guardar referencias en submission_file:
-    //    await prisma.submission_file.createMany({
-    //      data: fileUrls.map(url => ({
-    //        submission_id: submission.id,
-    //        file_name: ...,
-    //        file_url: url,
-    //        file_type: ...,
-    //        file_size: ...
-    //      }))
-    //    })
+    // Subir archivos a Cloudinary
+    const uploadedFiles: Array<{
+      fileName: string
+      fileUrl: string
+      fileType: string
+      fileSize: number
+    }> = []
 
     if (files && files.length > 0) {
-      console.log(`Recibidos ${files.length} archivos para la entrega ${submission.id}`)
-      console.log('Archivos:', files.map(f => ({ name: f.name, type: f.type, size: f.size })))
-      // Aquí iría la lógica de upload real
+      for (const file of files) {
+        try {
+          // Convertir archivo a buffer
+          const bytes = await file.arrayBuffer()
+          const buffer = Buffer.from(bytes)
+
+          // Determinar tipo de recurso
+          const resourceType = file.type.startsWith('image/') ? 'image' : 'raw'
+
+          // Subir a Cloudinary
+          const result = await new Promise<{
+            secure_url: string
+            public_id: string
+            format: string
+            bytes: number
+          }>((resolve, reject) => {
+            cloudinary.uploader.upload_stream(
+              {
+                folder: `tareas/entregas/${courseId}/${activityId}`,
+                resource_type: resourceType,
+                public_id: `${studentId}-${Date.now()}-${file.name.replace(/\.[^/.]+$/, '')}`,
+              },
+              (error, result) => {
+                if (error) reject(error)
+                else if (result) resolve(result)
+                else reject(new Error('No result from Cloudinary'))
+              }
+            ).end(buffer)
+          })
+
+          uploadedFiles.push({
+            fileName: file.name,
+            fileUrl: result.secure_url,
+            fileType: file.type,
+            fileSize: result.bytes
+          })
+        } catch (uploadError) {
+          console.error(`Error subiendo archivo ${file.name}:`, uploadError)
+          return {
+            success: false,
+            message: `Error al subir el archivo: ${file.name}`
+          }
+        }
+      }
     }
+
+    // Crear la entrega con transacción
+    const submission = await prisma.$transaction(async (tx) => {
+      // Crear la entrega
+      const newSubmission = await tx.activity_submission.create({
+        data: {
+          activity_id: activityId,
+          student_id: studentId,
+          enrollment_id: enrollment.id,
+          submission_text: submissionText || null,
+          is_late: isLate,
+          attempt_number: submissionCount + 1,
+          status: 'SUBMITTED'
+        }
+      })
+
+      // Guardar archivos en la base de datos
+      if (uploadedFiles.length > 0) {
+        await tx.submission_file.createMany({
+          data: uploadedFiles.map(file => ({
+            submission_id: newSubmission.id,
+            file_name: file.fileName,
+            file_url: file.fileUrl,
+            file_type: file.fileType,
+            file_size: file.fileSize
+          }))
+        })
+      }
+
+      return newSubmission
+    })
+
+    console.log(`Entrega ${submission.id} creada con ${uploadedFiles.length} archivos`)
 
     return {
       success: true,

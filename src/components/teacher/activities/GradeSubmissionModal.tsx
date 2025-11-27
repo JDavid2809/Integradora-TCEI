@@ -14,7 +14,10 @@ import {
   AlertCircle,
   RefreshCw,
   Clock,
-  Send
+  Send,
+  ExternalLink,
+  Image as ImageIcon,
+  File
 } from 'lucide-react'
 import { ActivitySubmissionWithDetails, SubmissionStatusConfig } from '@/types/course-activity'
 import { gradeSubmission } from '@/actions/teacher/activityActions'
@@ -221,37 +224,85 @@ export default function GradeSubmissionModal({
             {/* Archivos adjuntos */}
             {submission.files && submission.files.length > 0 && (
               <div className="mt-4">
-                <p className="text-sm font-medium text-gray-700 mb-2">
+                <p className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 bg-blue-500 rounded-full"></span>
                   Archivos Adjuntos ({submission.files.length})
                 </p>
-                <div className="space-y-2">
-                  {submission.files.map((file) => (
-                    <div
-                      key={file.id}
-                      className="flex items-center justify-between p-3 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
-                    >
-                      <div className="flex items-center gap-3 flex-1 min-w-0">
-                        <FileText className="w-5 h-5 text-gray-400 flex-shrink-0" />
-                        <div className="min-w-0">
+                <div className="grid gap-2">
+                  {submission.files.map((file) => {
+                    const isImage = file.file_type?.startsWith('image/')
+                    const isPdf = file.file_type === 'application/pdf'
+                    const formatFileSize = (bytes: number): string => {
+                      if (!bytes || bytes === 0) return '0 KB'
+                      const k = 1024
+                      const sizes = ['Bytes', 'KB', 'MB']
+                      const i = Math.floor(Math.log(bytes) / Math.log(k))
+                      return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i]
+                    }
+                    
+                    return (
+                      <div
+                        key={file.id}
+                        className="flex items-center gap-3 bg-white border-2 border-gray-200 rounded-lg p-3 hover:border-blue-300 hover:shadow-md transition-all group"
+                      >
+                        {/* Preview para imágenes o ícono */}
+                        {isImage ? (
+                          <div className="w-14 h-14 relative rounded-lg overflow-hidden border border-gray-200 flex-shrink-0">
+                            <img
+                              src={file.file_url}
+                              alt={file.file_name}
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+                        ) : (
+                          <div className="w-14 h-14 bg-gradient-to-br from-blue-100 to-blue-200 rounded-lg flex items-center justify-center flex-shrink-0">
+                            {isPdf ? (
+                              <FileText className="w-7 h-7 text-red-600" />
+                            ) : (
+                              <File className="w-7 h-7 text-blue-600" />
+                            )}
+                          </div>
+                        )}
+
+                        {/* Info del archivo */}
+                        <div className="flex-1 min-w-0">
                           <p className="text-sm font-medium text-gray-900 truncate">
                             {file.file_name}
                           </p>
-                          <p className="text-xs text-gray-500">
-                            Subido: {formatDate(file.uploaded_at)}
-                          </p>
+                          <div className="flex items-center gap-2 text-xs text-gray-500 mt-1">
+                            <span className="px-1.5 py-0.5 bg-gray-100 rounded text-gray-600 font-medium uppercase">
+                              {file.file_name.split('.').pop()}
+                            </span>
+                            {file.file_size && (
+                              <span>{formatFileSize(file.file_size)}</span>
+                            )}
+                            <span>• {formatDate(file.uploaded_at)}</span>
+                          </div>
+                        </div>
+
+                        {/* Acciones */}
+                        <div className="flex items-center gap-1">
+                          <a
+                            href={file.file_url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                            title="Ver archivo"
+                          >
+                            <ExternalLink className="w-5 h-5" />
+                          </a>
+                          <a
+                            href={file.file_url}
+                            download={file.file_name}
+                            className="p-2 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors"
+                            title="Descargar"
+                          >
+                            <Download className="w-5 h-5" />
+                          </a>
                         </div>
                       </div>
-                      <a
-                        href={file.file_url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center gap-2 px-3 py-2 text-sm text-[#00246a] hover:bg-blue-50 rounded-lg transition-colors flex-shrink-0"
-                      >
-                        <Download className="w-4 h-4" />
-                        <span className="hidden sm:inline">Descargar</span>
-                      </a>
-                    </div>
-                  ))}
+                    )
+                  })}
                 </div>
               </div>
             )}

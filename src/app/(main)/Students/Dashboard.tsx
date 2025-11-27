@@ -14,6 +14,7 @@ import AssistantContent from "./AssistantContent"
 import { Session } from "next-auth"
 import { CursoFromDB } from "@/types/courses"
 import Activitys from "./Activitys"
+import SpeakingEvaluator from "@/components/SpeakingEvaluator"
 
 interface DashboardProps {
     onLogout: () => void
@@ -55,6 +56,8 @@ export default function Dashboard({ onLogout, user, studentCourses, allCourses, 
                 return <ExamsContent key="exams" />
             case "activities":
                 return <Activitys key="activities" />
+            case "speaking":
+                return <SpeakingEvaluator key="speaking" />
             default:
                 return <DashboardContent key="dashboard" />
         }

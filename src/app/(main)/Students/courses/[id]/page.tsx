@@ -2,8 +2,9 @@ import { Suspense } from 'react'
 import { redirect } from 'next/navigation'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/authOptions'
-import StudentCourseView from '@/app/Students/courses/[id]/StudentCourseView'
+// import StudentCourseView from '@/app/Students/courses/[id]/StudentCourseView'
 import { getStudentCourseDetails, getStudentActivities } from '@/actions/student/activityActions'
+import StudentCourseView from './StudentCourseView'
 
 interface PageProps {
   params: Promise<{

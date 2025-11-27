@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useCallback, useState } from "react"
-import { BookOpen, Home, GraduationCap, Calendar, X, CheckSquare, SquareActivity, CalendarDays } from "lucide-react"
+import { BookOpen, Home, GraduationCap, Calendar, X, CheckSquare, SquareActivity, CalendarDays, Sparkles } from "lucide-react"
 import Image from "next/image"
 import { driver } from "driver.js"
 import "driver.js/dist/driver.css"
@@ -37,6 +37,7 @@ export default function Sidebar({
         { id: "courses", label: "Gestión de Cursos", icon: BookOpen },
         { id: "students", label: "Mis Estudiantes", icon: GraduationCap },
         { id: "schedule", label: "Mi Horario", icon: CalendarDays },
+        { id: "ia", label: "Asistente IA", icon: Sparkles },
         { id: "attendance", label: "Asistencia", icon: CheckSquare },
         { id: "exams", label: "Exámenes", icon: Calendar },
         { id: "activity", label: "Actividades", icon: SquareActivity }
@@ -82,6 +83,14 @@ export default function Sidebar({
                 popover: {
                     title: "Mi Horario",
                     description: "Consulta tu horario de clases, planifica sesiones y gestiona tu calendario académico.",
+                    position: "right",
+                },
+            },
+            {
+                element: "#menu-ia",
+                popover: {
+                    title: "Asistente IA",
+                    description: "Genera presentaciones profesionales automáticamente con inteligencia artificial. Solo describe lo que necesitas y la IA creará slides completos con diseño profesional.",
                     position: "right",
                 },
             },

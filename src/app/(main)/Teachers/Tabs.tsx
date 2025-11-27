@@ -1,7 +1,7 @@
 "use client"
 
 import { motion } from "framer-motion"
-import { BookOpen, Home, GraduationCap, CheckSquare, CalendarDays, SquareActivity, Calendar } from "lucide-react"
+import { BookOpen, Home, GraduationCap, CheckSquare, CalendarDays, SquareActivity, Calendar, Sparkles } from "lucide-react"
 
 interface BottomTabsProps {
     activeSection: string
@@ -13,7 +13,7 @@ export default function BottomTabs({ activeSection, setActiveSection }: BottomTa
         { id: "dashboard", label: "Inicio", icon: Home },
         { id: "courses", label: "Cursos", icon: BookOpen },
         { id: "students", label: "Estudiantes", icon: GraduationCap },
-        { id: "schedule", label: "Horario", icon: CalendarDays },
+        { id: "ia", label: "IA", icon: Sparkles },
         { id: "attendance", label: "Asistencia", icon: CheckSquare },
     ]
 

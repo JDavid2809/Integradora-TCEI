@@ -13,6 +13,7 @@ import Header from "./Header"
 import BottomTabs from "./Tabs"
 import { Session } from "next-auth"
 import ActivityCRUD from "../ActivityTeacher/ActivityPro"
+import IAPresentation from "./IAPresentation"
 
 interface DashboardProps {
     user: Session
@@ -44,6 +45,8 @@ export default function Dashboard({ user, onLogout }: DashboardProps) {
                 return <StudentsContent key="students" />
             case "schedule":
                 return <TeacherScheduleContent key="schedule" />
+            case "ia":
+                return <IAPresentation key="ia" />
             case "attendance":
                 return <AttendanceContent key="attendance" />
             case "exams":

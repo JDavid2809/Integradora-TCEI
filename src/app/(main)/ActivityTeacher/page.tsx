@@ -1,8 +1,9 @@
 
 import React, { Suspense } from 'react'
-import ActivityCRUD from '@/app/ActivityTeacher/ActivityPro'
+// import ActivityCRUD from '@/app/ActivityTeacher/ActivityPro'
 import { getPaginatedCourses } from '@/actions/courses/manageCourses'
 import { CourseSearchParams } from '@/types/courses'
+import ActivityCRUD from './ActivityPro'
 
 // Componente de fallback mientras se carga
 function LoadingCourses() {

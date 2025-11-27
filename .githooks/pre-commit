@@ -1,0 +1,13 @@
+#!/bin/sh
+# Prevent accidental commits directly to main or master branch
+# This script is local-only and won't be pushed (unless you version-control the .githooks folder)
+set -e
+BRANCH=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "")
+if [ "$BRANCH" = "main" ] || [ "$BRANCH" = "master" ]; then
+  echo "\033[1;31mERROR:\033[0m Committing directly on '$BRANCH' is disabled."
+  echo "Please create a new branch and commit there, e.g.:"
+  echo "  git checkout -b feature/your-change"
+  echo "If you intentionally want to commit to main, run:\n  git commit --no-verify ...\nBUT be aware this bypasses the safety hook."
+  exit 1
+fi
+exit 0

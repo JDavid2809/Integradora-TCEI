@@ -22,7 +22,9 @@ export async function generateCertificate(
   try {
     const { inscripcionId } = params
 
-    // Verificar que la inscripción existe y está completada
+    console.log('[Certificate] Intentando generar certificado para inscripción:', inscripcionId)
+
+    // Verificar que la inscripción existe
     const inscripcion = await prisma.inscripcion.findUnique({
       where: { id: inscripcionId },
       include: {
@@ -33,23 +35,26 @@ export async function generateCertificate(
         },
         course: {
           include: {
-            creator: true
+            creator: true,
+            activities: {
+              where: {
+                is_published: true
+              }
+            }
           }
-        }
+        },
+        submissions: true
       }
     })
 
     if (!inscripcion) {
+      console.log('[Certificate] Inscripción no encontrada')
       return { success: false, error: 'Inscripción no encontrada' }
-    }
-
-    // Verificar que el curso esté completado
-    if (inscripcion.status !== 'COMPLETED') {
-      return { success: false, error: 'El curso no ha sido completado' }
     }
 
     // Verificar que el curso otorga certificado
     if (!inscripcion.course.certificado) {
+      console.log('[Certificate] El curso no otorga certificado')
       return { success: false, error: 'Este curso no otorga certificado' }
     }
 
@@ -59,7 +64,7 @@ export async function generateCertificate(
     })
 
     if (certificadoExistente) {
-      // Si ya existe, devolver la información del certificado existente
+      console.log('[Certificate] Ya existe certificado:', certificadoExistente.token_uuid)
       return {
         success: true,
         data: {
@@ -70,8 +75,52 @@ export async function generateCertificate(
       }
     }
 
+    // Verificar que todas las actividades estén aprobadas
+    const publishedActivities = inscripcion.course.activities
+    const totalActivities = publishedActivities.length
+
+    console.log('[Certificate] Total actividades publicadas:', totalActivities)
+
+    if (totalActivities > 0) {
+      // Obtener el mejor intento de cada actividad
+      const submissionsByActivity = new Map<number, typeof inscripcion.submissions[0]>()
+      
+      for (const submission of inscripcion.submissions) {
+        const existing = submissionsByActivity.get(submission.activity_id)
+        if (!existing || 
+            (submission.status === 'GRADED' && existing.status !== 'GRADED') ||
+            (submission.status === 'GRADED' && existing.status === 'GRADED' && 
+             (submission.score || 0) > (existing.score || 0))) {
+          submissionsByActivity.set(submission.activity_id, submission)
+        }
+      }
+
+      // Verificar que todas estén aprobadas
+      let passed = 0
+      for (const activity of publishedActivities) {
+        const submission = submissionsByActivity.get(activity.id)
+        if (submission && submission.status === 'GRADED' && submission.score !== null) {
+          const minScore = activity.min_passing_score || Math.floor(activity.total_points * 0.6)
+          if (submission.score >= minScore) {
+            passed++
+          }
+        }
+      }
+
+      console.log('[Certificate] Actividades aprobadas:', passed, 'de', totalActivities)
+
+      if (passed < totalActivities) {
+        return { 
+          success: false, 
+          error: `Debes aprobar todas las actividades (${passed}/${totalActivities} aprobadas)` 
+        }
+      }
+    }
+
     // Generar código de verificación corto (8 caracteres alfanuméricos)
     const codigoVerificacion = randomBytes(4).toString('hex').toUpperCase()
+
+    console.log('[Certificate] Creando certificado...')
 
     // Crear el certificado
     const certificado = await prisma.certificado.create({
@@ -102,6 +151,10 @@ export async function generateCertificate(
       data: { url_verificacion: urlVerificacion }
     })
 
+    // NO cambiar el estado de la inscripción - el estudiante debe seguir en el curso
+
+    console.log('[Certificate] ✅ Certificado generado:', certificado.token_uuid)
+
     return {
       success: true,
       data: {
@@ -111,7 +164,7 @@ export async function generateCertificate(
       }
     }
   } catch (error) {
-    console.error('Error al generar certificado:', error)
+    console.error('[Certificate] Error al generar certificado:', error)
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Error desconocido al generar certificado'
@@ -157,9 +210,18 @@ export async function getCertificateByToken(token: string) {
       }
     })
 
+    // Serializar datos para evitar errores con Decimal
+    const serializedData = {
+      ...certificado,
+      curso: certificado.curso ? {
+        ...certificado.curso,
+        precio: certificado.curso.precio ? Number(certificado.curso.precio) : null
+      } : null
+    }
+
     return {
       success: true,
-      data: certificado
+      data: serializedData
     }
   } catch (error) {
     console.error('Error al obtener certificado:', error)

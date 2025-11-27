@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { FileText, Calendar, Award, Clock, CheckCircle2, XCircle, AlertCircle, Send } from 'lucide-react'
+import { FileText, Calendar, Award, Clock, CheckCircle2, XCircle, AlertCircle, Send, Paperclip } from 'lucide-react'
 import { StudentActivityWithSubmission } from '@/types/student-activity'
 import { ActivityTypeConfig } from '@/types/course-activity'
 import SubmitActivityModal from './SubmitActivityModal'
@@ -39,8 +39,11 @@ export default function StudentActivityCard({ activity, courseId, onSubmitSucces
   const submission = activity.submission
   const hasSubmission = !!submission
   const isGraded = submission?.status === 'GRADED'
-  const isPassed = isGraded && submission.score !== null && activity.min_passing_score !== null 
-    ? submission.score >= activity.min_passing_score 
+  
+  // Calcular si aprobó (usando min_passing_score o 60% por defecto)
+  const minScore = activity.min_passing_score || Math.floor(activity.total_points * 0.6)
+  const isPassed = isGraded && submission?.score !== null 
+    ? submission.score >= minScore 
     : null
 
   // Fecha límite
@@ -52,6 +55,11 @@ export default function StudentActivityCard({ activity, courseId, onSubmitSucces
   // Días restantes
   const daysRemaining = dueDate 
     ? Math.ceil((dueDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
+    : null
+
+  // Calcular porcentaje de calificación
+  const scorePercentage = isGraded && submission?.score !== null 
+    ? Math.round((submission.score / activity.total_points) * 100)
     : null
 
   // Vista de tarjetas (Grid)
@@ -142,20 +150,55 @@ export default function StudentActivityCard({ activity, courseId, onSubmitSucces
                   Pendiente
                 </span>
               )}
+
+              {/* Badge de archivos adjuntos del profesor */}
+              {activity.attachments && activity.attachments.length > 0 && (
+                <span className="inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-full bg-orange-100 text-orange-700">
+                  <Paperclip className="w-3.5 h-3.5" />
+                  {activity.attachments.length} {activity.attachments.length === 1 ? 'archivo' : 'archivos'}
+                </span>
+              )}
             </div>
 
             {/* Mini-cards de estadísticas */}
             <div className="grid grid-cols-3 gap-3">
-              <div className="bg-blue-50 rounded-lg p-3 text-center">
-                <Award className="w-5 h-5 text-blue-600 mx-auto mb-1" />
-                <p className="text-lg font-bold text-blue-600">
+              <div className={`rounded-lg p-3 text-center ${
+                isGraded 
+                  ? isPassed 
+                    ? 'bg-green-50' 
+                    : 'bg-red-50'
+                  : 'bg-blue-50'
+              }`}>
+                <Award className={`w-5 h-5 mx-auto mb-1 ${
+                  isGraded 
+                    ? isPassed 
+                      ? 'text-green-600' 
+                      : 'text-red-600'
+                    : 'text-blue-600'
+                }`} />
+                <p className={`text-lg font-bold ${
+                  isGraded 
+                    ? isPassed 
+                      ? 'text-green-600' 
+                      : 'text-red-600'
+                    : 'text-blue-600'
+                }`}>
                   {isGraded && submission?.score !== null 
-                    ? submission.score
+                    ? `${submission.score}/${activity.total_points}`
                     : activity.total_points
                   }
                 </p>
-                <p className="text-xs text-blue-700">
-                  {isGraded ? 'Obtenidos' : 'Puntos'}
+                <p className={`text-xs ${
+                  isGraded 
+                    ? isPassed 
+                      ? 'text-green-700' 
+                      : 'text-red-700'
+                    : 'text-blue-700'
+                }`}>
+                  {isGraded 
+                    ? scorePercentage !== null ? `${scorePercentage}%` : 'Calificado'
+                    : 'Puntos'
+                  }
                 </p>
               </div>
 
@@ -167,12 +210,12 @@ export default function StudentActivityCard({ activity, courseId, onSubmitSucces
                 <p className="text-xs text-purple-700">Intentos</p>
               </div>
 
-              <div className="bg-green-50 rounded-lg p-3 text-center">
-                <CheckCircle2 className="w-5 h-5 text-green-600 mx-auto mb-1" />
-                <p className="text-lg font-bold text-green-600">
+              <div className="bg-gray-50 rounded-lg p-3 text-center">
+                <CheckCircle2 className="w-5 h-5 text-gray-600 mx-auto mb-1" />
+                <p className="text-lg font-bold text-gray-600">
                   {activity.max_attempts || '∞'}
                 </p>
-                <p className="text-xs text-green-700">Máximo</p>
+                <p className="text-xs text-gray-700">Máximo</p>
               </div>
             </div>
 
@@ -197,13 +240,55 @@ export default function StudentActivityCard({ activity, courseId, onSubmitSucces
 
             {/* Submission info */}
             {hasSubmission && (
-              <div className="bg-gray-50 border border-gray-200 rounded-lg p-3 space-y-2">
+              <div className={`rounded-lg p-3 space-y-2 border ${
+                isGraded 
+                  ? isPassed 
+                    ? 'bg-green-50 border-green-200' 
+                    : 'bg-red-50 border-red-200'
+                  : 'bg-gray-50 border-gray-200'
+              }`}>
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-medium text-gray-600">Tu entrega</span>
+                  <span className={`text-xs font-medium ${
+                    isGraded 
+                      ? isPassed ? 'text-green-700' : 'text-red-700'
+                      : 'text-gray-600'
+                  }`}>Tu entrega</span>
                   <span className="text-xs text-gray-500">
                     Intento #{submission.attempt_number}
                   </span>
                 </div>
+                
+                {/* Mostrar calificación destacada cuando está calificado */}
+                {isGraded && submission.score !== null && (
+                  <div className={`flex items-center justify-between p-2 rounded-lg ${
+                    isPassed ? 'bg-green-100' : 'bg-red-100'
+                  }`}>
+                    <div className="flex items-center gap-2">
+                      {isPassed ? (
+                        <CheckCircle2 className="w-5 h-5 text-green-600" />
+                      ) : (
+                        <XCircle className="w-5 h-5 text-red-600" />
+                      )}
+                      <span className={`text-sm font-bold ${
+                        isPassed ? 'text-green-700' : 'text-red-700'
+                      }`}>
+                        {isPassed ? '¡Aprobado!' : 'Reprobado'}
+                      </span>
+                    </div>
+                    <div className="text-right">
+                      <p className={`text-lg font-bold ${
+                        isPassed ? 'text-green-700' : 'text-red-700'
+                      }`}>
+                        {submission.score}/{activity.total_points}
+                      </p>
+                      <p className={`text-xs ${
+                        isPassed ? 'text-green-600' : 'text-red-600'
+                      }`}>
+                        {scorePercentage}%
+                      </p>
+                    </div>
+                  </div>
+                )}
                 
                 {submission.submission_text && (
                   <p className="text-sm text-gray-700 line-clamp-2 italic">
@@ -217,8 +302,8 @@ export default function StudentActivityCard({ activity, courseId, onSubmitSucces
 
                 {isGraded && submission.feedback && (
                   <div className="pt-2 border-t border-gray-300">
-                    <div className="text-xs font-medium text-gray-600 mb-1">Retroalimentación:</div>
-                    <p className="text-sm text-gray-700 line-clamp-2">
+                    <div className="text-xs font-medium text-gray-600 mb-1">Retroalimentación del profesor:</div>
+                    <p className="text-sm text-gray-700 line-clamp-3">
                       {submission.feedback}
                     </p>
                   </div>
@@ -353,6 +438,14 @@ export default function StudentActivityCard({ activity, courseId, onSubmitSucces
                       <Clock className="w-3.5 h-3.5" />
                       Intento {hasSubmission ? submission.attempt_number : 0}/{activity.max_attempts || '∞'}
                     </span>
+
+                    {/* Archivos adjuntos del profesor */}
+                    {activity.attachments && activity.attachments.length > 0 && (
+                      <span className="inline-flex items-center gap-1 bg-orange-100 text-orange-700 px-2.5 py-1 rounded-full font-semibold">
+                        <Paperclip className="w-3.5 h-3.5" />
+                        {activity.attachments.length} {activity.attachments.length === 1 ? 'archivo' : 'archivos'}
+                      </span>
+                    )}
                   </div>
                 </div>
               </div>

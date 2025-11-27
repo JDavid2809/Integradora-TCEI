@@ -1,15 +1,25 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { BookOpen, Users, Clock, Award } from "lucide-react";
+import { BookOpen, Users, Clock, Award, ArrowRight } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useCallback } from "react";
 import { driver } from "driver.js";
 import "driver.js/dist/driver.css";
 import { CursoFromDB } from "@/types/courses";
 
+interface ActivityProgress {
+    total: number;
+    passed: number;
+    percentage: number;
+}
+
+interface CursoWithProgress extends CursoFromDB {
+    activityProgress?: ActivityProgress;
+}
+
 interface CoursesContentProps {
-    studentCourses?: CursoFromDB[];
+    studentCourses?: CursoWithProgress[];
     allCourses?: CursoFromDB[];
 }
 
@@ -24,9 +34,10 @@ export default function CoursesContent({ studentCourses = [], allCourses = [] }:
     const courses = studentCourses.map((curso) => ({
         id: curso.id_curso,
         title: curso.nombre,
-        progress: 65,
-        lessons: 12,
-        completed: 6,
+        // Usar el progreso real de actividades
+        progress: curso.activityProgress?.percentage || 0,
+        totalActivities: curso.activityProgress?.total || 0,
+        passedActivities: curso.activityProgress?.passed || 0,
         level: curso.imparte[0]?.nivel?.nombre || "A1",
         instructor: curso.imparte[0]
             ? `${curso.imparte[0].profesor.usuario.nombre} ${curso.imparte[0].profesor.usuario.apellido}`
@@ -193,21 +204,32 @@ export default function CoursesContent({ studentCourses = [], allCourses = [] }:
 
                                 <div className="mb-4">
                                     <div className="flex items-center justify-between text-sm mb-1">
-                                        <span className="text-slate-600">Progreso</span>
+                                        <span className="text-slate-600">
+                                            Progreso {course.totalActivities > 0 && `(${course.passedActivities}/${course.totalActivities})`}
+                                        </span>
                                         <span className="font-medium text-[#00246a]">{course.progress}%</span>
                                     </div>
                                     <div className="w-full bg-slate-200 rounded-full h-2">
                                         <div
-                                            className="bg-[#e30f28] h-2 rounded-full transition-all duration-300"
+                                            className={`h-2 rounded-full transition-all duration-300 ${
+                                                course.progress >= 100 
+                                                    ? 'bg-green-500' 
+                                                    : course.progress >= 50 
+                                                        ? 'bg-blue-500' 
+                                                        : course.progress > 0 
+                                                            ? 'bg-yellow-500' 
+                                                            : 'bg-slate-300'
+                                            }`}
                                             style={{ width: `${course.progress}%` }}
                                         ></div>
                                     </div>
                                 </div>
                                 <button
                                     onClick={() => router.push(`/Students/courses/${course.id}`)}
-                                    className="w-full bg-slate-100 hover:bg-slate-200 text-[#00246a] font-medium py-3 rounded-xl transition-colors duration-200"
+                                    className="w-full bg-[#00246a] hover:bg-[#001a4d] text-white font-medium py-3 rounded-xl transition-colors duration-200 flex items-center justify-center gap-2"
                                 >
-                                    {course.progress === 100 ? "Revisar Curso" : "Continuar"}
+                                    <span>Ingresar</span>
+                                    <ArrowRight className="w-4 h-4" />
                                 </button>
                             </div>
                         </motion.div>

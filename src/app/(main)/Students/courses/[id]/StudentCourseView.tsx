@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { ArrowLeft, BookOpen, ListChecks } from 'lucide-react'
 import StudentCourseDetailComponent from '@/components/student/StudentCourseDetail'
@@ -19,6 +19,14 @@ export default function StudentCourseView({ course, activities: initialActivitie
   const router = useRouter()
   const [currentTab, setCurrentTab] = useState<ViewTab>('activities')
   const [activities, setActivities] = useState(initialActivities)
+  const [refreshKey, setRefreshKey] = useState(0)
+
+  // Sincronizar estado con los datos del servidor cuando cambien
+  useEffect(() => {
+    setActivities(initialActivities)
+    // Incrementar refreshKey para forzar actualización del CertificateButton
+    setRefreshKey(prev => prev + 1)
+  }, [initialActivities])
 
   const handleRefresh = () => {
     // Recargar la página para obtener datos actualizados
@@ -55,6 +63,7 @@ export default function StudentCourseView({ course, activities: initialActivitie
                 inscripcionId={course.inscripcionId}
                 courseId={course.id}
                 courseName={course.nombre}
+                refreshKey={refreshKey}
               />
             </div>
           </div>
@@ -65,6 +74,7 @@ export default function StudentCourseView({ course, activities: initialActivitie
               inscripcionId={course.inscripcionId}
               courseId={course.id}
               courseName={course.nombre}
+              refreshKey={refreshKey}
             />
           </div>
 

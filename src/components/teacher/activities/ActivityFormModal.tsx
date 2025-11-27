@@ -14,7 +14,11 @@ import {
   CheckCircle2,
   Eye,
   EyeOff,
-  Plus
+  Plus,
+  File,
+  Image as ImageIcon,
+  ExternalLink,
+  Download
 } from 'lucide-react'
 import {
   CreateActivityInput,
@@ -25,8 +29,11 @@ import {
 import {
   createActivity,
   updateActivity,
-  getActivityDetails
+  getActivityDetails,
+  uploadActivityAttachments,
+  deleteActivityAttachment
 } from '@/actions/teacher/activityActions'
+import FileUpload from '@/components/student/FileUpload'
 
 interface ActivityFormModalProps {
   courseId: number
@@ -47,6 +54,17 @@ export default function ActivityFormModal({
   const [isSaving, setIsSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState(false)
+
+  // Archivos
+  const [filesToUpload, setFilesToUpload] = useState<File[]>([])
+  const [existingAttachments, setExistingAttachments] = useState<Array<{
+    id: number
+    file_name: string
+    file_url: string
+    file_type: string
+    file_size: number
+  }>>([])
+  const [isDeletingFile, setIsDeletingFile] = useState<number | null>(null)
 
   // Form data
   const [formData, setFormData] = useState({
@@ -90,6 +108,11 @@ export default function ActivityFormModal({
         allow_late_submissions: activity.allow_late,
         is_published: activity.is_published
       })
+
+      // Cargar archivos adjuntos existentes
+      if (activity.attachments && activity.attachments.length > 0) {
+        setExistingAttachments(activity.attachments)
+      }
     } catch (error) {
       console.error('Error loading activity:', error)
       setError('Error al cargar la actividad')
@@ -117,6 +140,8 @@ export default function ActivityFormModal({
       if (formData.max_attempts < 1) {
         throw new Error('Debe permitir al menos 1 intento')
       }
+
+      let savedActivityId = activityId
 
       if (activityId) {
         // Actualizar
@@ -158,6 +183,23 @@ export default function ActivityFormModal({
         if (!result.success) {
           throw new Error(result.message || 'Error al crear')
         }
+        savedActivityId = result.activity?.id
+      }
+
+      // Subir archivos nuevos si hay
+      if (filesToUpload.length > 0 && savedActivityId) {
+        const formDataFiles = new FormData()
+        formDataFiles.append('activityId', savedActivityId.toString())
+        filesToUpload.forEach(file => {
+          formDataFiles.append('files', file)
+        })
+
+        const uploadResult = await uploadActivityAttachments(formDataFiles, teacherId)
+        if (!uploadResult.success) {
+          // La actividad se guardó pero hubo error al subir archivos
+          console.error('Error subiendo archivos:', uploadResult.message)
+          // Continuar de todos modos, la actividad se guardó
+        }
       }
 
       setSuccess(true)
@@ -170,6 +212,39 @@ export default function ActivityFormModal({
     } finally {
       setIsSaving(false)
     }
+  }
+
+  // Función para eliminar un archivo existente
+  const handleDeleteAttachment = async (attachmentId: number) => {
+    setIsDeletingFile(attachmentId)
+    try {
+      const result = await deleteActivityAttachment(attachmentId, teacherId)
+      if (result.success) {
+        setExistingAttachments(prev => prev.filter(a => a.id !== attachmentId))
+      } else {
+        setError(result.message || 'Error al eliminar archivo')
+      }
+    } catch (error) {
+      console.error('Error deleting attachment:', error)
+      setError('Error al eliminar archivo')
+    } finally {
+      setIsDeletingFile(null)
+    }
+  }
+
+  // Funciones helper para mostrar archivos
+  const formatFileSize = (bytes: number): string => {
+    if (!bytes || bytes === 0) return '0 KB'
+    const k = 1024
+    const sizes = ['Bytes', 'KB', 'MB']
+    const i = Math.floor(Math.log(bytes) / Math.log(k))
+    return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i]
+  }
+
+  const getFileIcon = (fileType: string) => {
+    if (fileType?.startsWith('image/')) return ImageIcon
+    if (fileType === 'application/pdf') return FileText
+    return File
   }
 
   const handleChange = (
@@ -512,6 +587,100 @@ export default function ActivityFormModal({
                   </div>
                 </div>
               )}
+            </div>
+          </div>
+
+          {/* Archivos adjuntos */}
+          <div className="space-y-4 bg-gradient-to-br from-orange-50 to-amber-50 p-5 rounded-xl border-2 border-orange-200 shadow-sm">
+            <h3 className="text-lg font-bold text-orange-900 flex items-center gap-2.5">
+              <div className="w-8 h-8 bg-orange-500 rounded-lg flex items-center justify-center">
+                <Upload className="w-5 h-5 text-white" />
+              </div>
+              Archivos Adjuntos (Material de apoyo)
+            </h3>
+            <p className="text-sm text-orange-700">
+              Sube documentos, imágenes o archivos que los estudiantes necesiten para completar la actividad.
+            </p>
+
+            {/* Archivos existentes (solo en edición) */}
+            {existingAttachments.length > 0 && (
+              <div className="space-y-2">
+                <p className="text-sm font-semibold text-gray-700">Archivos actuales:</p>
+                <div className="grid gap-2">
+                  {existingAttachments.map((file) => {
+                    const Icon = getFileIcon(file.file_type)
+                    const isImage = file.file_type?.startsWith('image/')
+                    
+                    return (
+                      <div
+                        key={file.id}
+                        className="flex items-center gap-3 bg-white border-2 border-gray-200 rounded-lg p-3 hover:border-orange-300 transition-all group"
+                      >
+                        {isImage ? (
+                          <div className="w-12 h-12 relative rounded-lg overflow-hidden border border-gray-200 flex-shrink-0">
+                            <img
+                              src={file.file_url}
+                              alt={file.file_name}
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+                        ) : (
+                          <div className="w-12 h-12 bg-gradient-to-br from-orange-100 to-orange-200 rounded-lg flex items-center justify-center flex-shrink-0">
+                            <Icon className="w-6 h-6 text-orange-600" />
+                          </div>
+                        )}
+
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium text-gray-900 truncate">
+                            {file.file_name}
+                          </p>
+                          <p className="text-xs text-gray-500">
+                            {formatFileSize(file.file_size)}
+                          </p>
+                        </div>
+
+                        <div className="flex items-center gap-1">
+                          <a
+                            href={file.file_url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                            title="Ver"
+                          >
+                            <ExternalLink className="w-4 h-4" />
+                          </a>
+                          <button
+                            type="button"
+                            onClick={() => handleDeleteAttachment(file.id)}
+                            disabled={isDeletingFile === file.id}
+                            className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50"
+                            title="Eliminar"
+                          >
+                            {isDeletingFile === file.id ? (
+                              <RefreshCw className="w-4 h-4 animate-spin" />
+                            ) : (
+                              <Trash2 className="w-4 h-4" />
+                            )}
+                          </button>
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
+              </div>
+            )}
+
+            {/* Subir nuevos archivos */}
+            <div>
+              <p className="text-sm font-semibold text-gray-700 mb-2">
+                {activityId ? 'Agregar más archivos:' : 'Subir archivos:'}
+              </p>
+              <FileUpload
+                onFilesChange={setFilesToUpload}
+                maxFiles={5}
+                maxSizeMB={10}
+                disabled={isSaving}
+              />
             </div>
           </div>
 

@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { X, Send, AlertCircle, CheckCircle2, Clock } from 'lucide-react'
+import { X, Send, AlertCircle, CheckCircle2, Clock, FileText, Download, ExternalLink, File, Image as ImageIcon, Paperclip } from 'lucide-react'
 import { StudentActivityWithSubmission } from '@/types/student-activity'
 import { submitStudentActivity } from '@/actions/student/activityActions'
 import FileUpload from './FileUpload'
@@ -161,6 +161,94 @@ export default function SubmitActivityModal({
                     Te quedan {attemptsRemaining} {attemptsRemaining === 1 ? 'intento' : 'intentos'}. 
                     Asegúrate de revisar tu trabajo antes de enviar.
                   </div>
+                </div>
+              </div>
+            )}
+
+            {/* Material del profesor (archivos adjuntos) */}
+            {activity.attachments && activity.attachments.length > 0 && (
+              <div className="bg-gradient-to-br from-blue-50 to-indigo-50 p-5 rounded-xl border-2 border-blue-200">
+                <div className="flex items-center gap-2 font-bold text-blue-800 mb-3">
+                  <Paperclip className="w-5 h-5" />
+                  Material de apoyo ({activity.attachments.length} {activity.attachments.length === 1 ? 'archivo' : 'archivos'})
+                </div>
+                <p className="text-sm text-blue-700 mb-3">
+                  Revisa estos archivos proporcionados por el profesor para completar la actividad.
+                </p>
+                <div className="grid gap-2">
+                  {activity.attachments.map((file) => {
+                    const isImage = file.file_type?.startsWith('image/')
+                    const isPdf = file.file_type === 'application/pdf'
+                    const formatFileSize = (bytes: number): string => {
+                      if (!bytes || bytes === 0) return '0 KB'
+                      const k = 1024
+                      const sizes = ['Bytes', 'KB', 'MB']
+                      const i = Math.floor(Math.log(bytes) / Math.log(k))
+                      return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i]
+                    }
+                    
+                    return (
+                      <div
+                        key={file.id}
+                        className="flex items-center gap-3 bg-white border-2 border-blue-200 rounded-lg p-3 hover:border-blue-400 hover:shadow-md transition-all group"
+                      >
+                        {/* Preview para imágenes o ícono */}
+                        {isImage ? (
+                          <div className="w-14 h-14 relative rounded-lg overflow-hidden border border-gray-200 flex-shrink-0">
+                            <img
+                              src={file.file_url}
+                              alt={file.file_name}
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+                        ) : (
+                          <div className="w-14 h-14 bg-gradient-to-br from-blue-100 to-blue-200 rounded-lg flex items-center justify-center flex-shrink-0">
+                            {isPdf ? (
+                              <FileText className="w-7 h-7 text-red-600" />
+                            ) : (
+                              <File className="w-7 h-7 text-blue-600" />
+                            )}
+                          </div>
+                        )}
+
+                        {/* Info del archivo */}
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium text-gray-900 truncate">
+                            {file.file_name}
+                          </p>
+                          <div className="flex items-center gap-2 text-xs text-gray-500 mt-1">
+                            <span className="px-1.5 py-0.5 bg-gray-100 rounded text-gray-600 font-medium uppercase">
+                              {file.file_name.split('.').pop()}
+                            </span>
+                            {file.file_size && (
+                              <span>{formatFileSize(file.file_size)}</span>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Acciones */}
+                        <div className="flex items-center gap-1">
+                          <a
+                            href={file.file_url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                            title="Ver archivo"
+                          >
+                            <ExternalLink className="w-5 h-5" />
+                          </a>
+                          <a
+                            href={file.file_url}
+                            download={file.file_name}
+                            className="p-2 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors"
+                            title="Descargar"
+                          >
+                            <Download className="w-5 h-5" />
+                          </a>
+                        </div>
+                      </div>
+                    )
+                  })}
                 </div>
               </div>
             )}

@@ -4,8 +4,8 @@ import { motion } from "framer-motion"
 import { useState, useEffect } from "react"
 import { CheckCircle, Users, BookOpen, Clock } from "lucide-react"
 import Image from "next/image"
+import TextType from "@/components/TextType"
 
-// Fixed particles data to avoid hydration mismatch
 const PARTICLES = [
   { id: 0, x: -120, y: 80, size: 8, duration: 3.5, delay: 0.5 },
   { id: 1, x: 150, y: -100, size: 6, duration: 4, delay: 1 },
@@ -154,14 +154,14 @@ export function Hero() {
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8, delay: 0.3 }}
           >
-            <motion.h1
-              className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-4 leading-tight text-[#00246A]"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.5 }}
-            >
-              Triunfando con el Inglés
-            </motion.h1>
+            <TextType
+            className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-4 leading-tight text-[#00246A]"
+            text={["Bienvenido!!!", "Listo para aprender inglés?", "Triunfando con el Inglés!"]}
+            typingSpeed={115}
+            pauseDuration={2500}
+            showCursor={true}
+            cursorCharacter="•"
+            />
 
             <motion.div
               className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full mb-6 shadow-lg"

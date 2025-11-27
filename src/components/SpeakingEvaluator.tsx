@@ -1,6 +1,12 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Mic, Square, RefreshCw, AlertCircle, Loader2 } from "lucide-react";
-
+import { AlertCircle, Loader2 } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Scenario, Feedback } from "./speaking-evaluator/types";
+import ScenarioGrid from "./speaking-evaluator/ScenarioGrid";
+import PhraseSelector from "./speaking-evaluator/PhraseSelector";
+import RecordingInterface from "./speaking-evaluator/RecordingInterface";
+import FeedbackDisplay from "./speaking-evaluator/FeedbackDisplay";
+import FreeSpeakingMode from "./speaking-evaluator/FreeSpeakingMode";
 
 declare global {
   interface Window {
@@ -11,36 +17,55 @@ declare global {
 
 export default function SpeakingEvaluator() {
   const [isRecording, setIsRecording] = useState(false);
-  const [transcript, setTranscript] = useState<string | null>(null);
-  const [feedback, setFeedback] = useState<any>(null);
+  const [transcript, setTranscript] = useState<string>("");
+  const [feedback, setFeedback] = useState<Feedback | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [isSupported, setIsSupported] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   
+  const [selectedScenario, setSelectedScenario] = useState<Scenario | null>(null);
+  const [selectedPromptIndex, setSelectedPromptIndex] = useState<number | null>(null);
+  const [isFreeSpeaking, setIsFreeSpeaking] = useState(false);
+
   const recognitionRef = useRef<any>(null);
 
   useEffect(() => {
-    // Check for browser support
     if (typeof window !== "undefined" && (window.SpeechRecognition || window.webkitSpeechRecognition)) {
       setIsSupported(true);
       const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
       const recognition = new SpeechRecognition();
-      recognition.continuous = false;
-      recognition.interimResults = false;
-      recognition.lang = 'en-US'; // Set to English
+      
+      recognition.continuous = true;
+      recognition.interimResults = true;
+      recognition.lang = 'en-US';
 
       recognition.onresult = (event: any) => {
-        const text = event.results[0][0].transcript;
-        setTranscript(text);
-        generateFeedback(text);
+        let finalTranscript = '';
+        let interimTranscript = '';
+
+        for (let i = event.resultIndex; i < event.results.length; ++i) {
+          if (event.results[i].isFinal) {
+            finalTranscript += event.results[i][0].transcript;
+          } else {
+            interimTranscript += event.results[i][0].transcript;
+          }
+        }
+        
+        const currentFullTranscript = Array.from(event.results)
+          .map((result: any) => result[0].transcript)
+          .join('');
+          
+        setTranscript(currentFullTranscript);
       };
 
       recognition.onerror = (event: any) => {
         console.error("Speech recognition error", event.error);
         if (event.error === 'not-allowed') {
           setErrorMsg("Microphone access denied.");
+        } else if (event.error === 'no-speech') {
+          return; 
         } else {
-          setErrorMsg("Error recognizing speech: " + event.error);
+          setErrorMsg("Error: " + event.error);
         }
         setIsRecording(false);
       };
@@ -57,14 +82,19 @@ export default function SpeakingEvaluator() {
   }, []);
 
   const generateFeedback = async (text: string) => {
+    if (!text || text.trim().length === 0) return;
+    
     setIsProcessing(true);
     try {
       const response = await fetch("/api/evaluate", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ text }),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ 
+          text,
+          context: selectedScenario && selectedPromptIndex !== null 
+            ? `User is practicing: ${selectedScenario.title}. Target phrase: ${selectedScenario.prompts[selectedPromptIndex]}` 
+            : undefined
+        }),
       });
 
       if (!response.ok) throw new Error("Error fetching feedback");
@@ -73,7 +103,6 @@ export default function SpeakingEvaluator() {
       setFeedback(data);
     } catch (error) {
       console.error("Error getting AI feedback:", error);
-      // Fallback if API fails
       setFeedback({
         score: 70,
         suggestions: "Could not connect to AI. Good effort on speaking!",
@@ -89,9 +118,13 @@ export default function SpeakingEvaluator() {
 
     if (isRecording) {
       recognitionRef.current.stop();
+      setIsRecording(false);
+      if (transcript) {
+        generateFeedback(transcript);
+      }
     } else {
       setErrorMsg(null);
-      setTranscript(null);
+      setTranscript("");
       setFeedback(null);
       try {
         recognitionRef.current.start();
@@ -102,136 +135,136 @@ export default function SpeakingEvaluator() {
     }
   };
 
+  const handleScenarioSelect = (scenario: Scenario) => {
+    setSelectedScenario(scenario);
+    setSelectedPromptIndex(null);
+    setIsFreeSpeaking(false);
+    setTranscript("");
+    setFeedback(null);
+    setErrorMsg(null);
+  };
+
+  const handleFreeSpeakingSelect = () => {
+    setIsFreeSpeaking(true);
+    setSelectedScenario(null);
+    setSelectedPromptIndex(null);
+    setTranscript("");
+    setFeedback(null);
+    setErrorMsg(null);
+  };
+
+  const handleBackToGrid = () => {
+    setSelectedScenario(null);
+    setIsFreeSpeaking(false);
+    setSelectedPromptIndex(null);
+    setTranscript("");
+    setFeedback(null);
+    setErrorMsg(null);
+  };
+
+  const handlePromptSelect = (index: number) => {
+    setSelectedPromptIndex(index);
+    setTranscript("");
+    setFeedback(null);
+    setErrorMsg(null);
+  };
+
+  // Determine which view to show
+  const showGrid = !selectedScenario && !isFreeSpeaking;
+  const showScenario = selectedScenario && selectedPromptIndex === null;
+  const showRecording = selectedScenario && selectedPromptIndex !== null;
+  const showFreeSpeaking = isFreeSpeaking;
+
   return (
-    <div className="max-w-2xl mx-auto py-12 px-4 font-sans text-slate-900">
-      <div className="text-center mb-12">
-        <h2 className="text-2xl font-semibold tracking-tight mb-2">Speaking Evaluation</h2>
-        <p className="text-slate-500 text-sm">
-          {isSupported ? "Free Real-time Transcription (Browser Native)" : "Browser not supported"}
-        </p>
-      </div>
+    <div className="w-full min-h-screen bg-slate-50/50 p-4 md:p-8">
+      {showGrid && (
+        <ScenarioGrid 
+          onSelectScenario={handleScenarioSelect}
+          onSelectFreeSpeaking={handleFreeSpeakingSelect}
+        />
+      )}
 
-      <div className="space-y-8">
-        {/* Controls */}
-        <div className="flex flex-col items-center justify-center gap-6">
-          <div className="relative">
-            <button
-              onClick={toggleRecording}
-              disabled={!isSupported}
-              className={`w-20 h-20 rounded-full flex items-center justify-center transition-all duration-300 ${
-                isRecording 
-                  ? "bg-red-500 text-white scale-110 shadow-lg shadow-red-200" 
-                  : "bg-slate-900 text-white hover:bg-slate-800 hover:scale-105"
-              } disabled:opacity-50 disabled:cursor-not-allowed`}
-            >
-              {isRecording ? (
-                <Square className="w-8 h-8 fill-current" />
-              ) : (
-                <Mic className="w-8 h-8" />
-              )}
-            </button>
-            {isRecording && (
-              <span className="absolute -top-2 -right-2 flex h-4 w-4">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-4 w-4 bg-red-500"></span>
-              </span>
-            )}
-          </div>
-
-          <div className="flex items-center gap-4 text-sm text-slate-500">
-            <span>{isRecording ? "Listening..." : "Tap to speak"}</span>
-          </div>
-        </div>
-
-        {/* Error */}
-        {errorMsg && (
-          <div className="flex items-center gap-2 p-4 bg-red-50 text-red-600 text-sm rounded-lg justify-center">
-            <AlertCircle className="w-4 h-4" />
-            {errorMsg}
-          </div>
-        )}
-
-        {/* Processing */}
-        {isProcessing && (
-          <div className="flex flex-col items-center gap-3 py-8 text-slate-400 animate-in fade-in">
-            <Loader2 className="w-6 h-6 animate-spin" />
-            <span className="text-sm">Analyzing with DeepSeek AI...</span>
-          </div>
-        )}
-
-        {/* Results */}
-        {!isProcessing && (transcript || feedback) && (
-          <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+      {!showGrid && (
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="max-w-5xl mx-auto bg-white rounded-[2.5rem] shadow-2xl overflow-hidden border border-slate-100 relative min-h-[600px] flex flex-col"
+        >
+          <div className="absolute top-0 left-0 w-full h-32 bg-gradient-to-r from-[#00246a] to-[#0044cc] opacity-10" />
+          
+          <div className="relative z-10 p-6 md:p-12 flex-1 flex flex-col">
             
-            <div className="grid gap-8">
-              {/* Score */}
-              {feedback && (
-                <div className="flex flex-col items-center">
-                  <span className="text-6xl font-light tracking-tighter text-slate-900">
-                    {feedback.score}
-                  </span>
-                  <span className="text-xs font-medium uppercase tracking-widest text-slate-400 mt-2">
-                    Score
-                  </span>
-                </div>
-              )}
+            {showScenario && (
+              <PhraseSelector 
+                scenario={selectedScenario!} 
+                onSelectPhrase={handlePromptSelect} 
+                onClearScenario={handleBackToGrid} 
+              />
+            )}
 
-              {/* Transcript */}
-              {transcript && (
-                <div className="space-y-2 text-center">
-                  <h3 className="text-xs font-semibold uppercase tracking-wider text-slate-400">You said:</h3>
-                  <p className="text-xl font-medium text-slate-800 leading-relaxed">
-                    "{transcript}"
-                  </p>
-                </div>
-              )}
+            {showRecording && (
+              <RecordingInterface 
+                isRecording={isRecording}
+                toggleRecording={toggleRecording}
+                transcript={transcript}
+                isSupported={isSupported}
+                targetPhrase={selectedScenario!.prompts[selectedPromptIndex!]}
+                onBack={() => setSelectedPromptIndex(null)}
+              />
+            )}
 
-              {/* Feedback Details */}
-              {feedback && feedback.suggestions && (
-                <div className="space-y-2 text-center">
-                  <h3 className="text-xs font-semibold uppercase tracking-wider text-slate-400">Feedback</h3>
-                  <p className="text-sm text-slate-600 leading-relaxed">
-                    {feedback.suggestions}
-                  </p>
-                </div>
-              )}
-            </div>
+            {showFreeSpeaking && (
+              <FreeSpeakingMode 
+                isRecording={isRecording}
+                toggleRecording={toggleRecording}
+                transcript={transcript}
+                isSupported={isSupported}
+                onBack={handleBackToGrid}
+              />
+            )}
 
-            {/* Reset */}
-            <div className="flex justify-center pt-8">
-              <button
-                onClick={() => {
-                  setTranscript(null);
-                  setFeedback(null);
-                  setErrorMsg(null);
-                }}
-                className="flex items-center gap-2 px-4 py-2 text-sm text-slate-400 hover:text-slate-900 transition-colors"
-              >
-                <RefreshCw className="w-4 h-4" />
-                Start Over
-              </button>
-            </div>
+            <AnimatePresence>
+              {errorMsg && (
+                <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  className="flex items-center gap-3 p-4 bg-red-50 text-red-600 text-sm rounded-xl border border-red-100 max-w-md mx-auto mb-8"
+                >
+                  <AlertCircle className="w-5 h-5 flex-shrink-0" />
+                  {errorMsg}
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            <AnimatePresence>
+              {isProcessing && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="flex flex-col items-center gap-4 py-8"
+                >
+                  <Loader2 className="w-10 h-10 text-[#00246a] animate-spin" />
+                  <span className="text-slate-500 font-medium animate-pulse">Analyzing your pronunciation...</span>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            <AnimatePresence>
+              {!isRecording && !isProcessing && (transcript || feedback) && (
+                <FeedbackDisplay feedback={feedback!} transcript={transcript} />
+              )}
+            </AnimatePresence>
           </div>
-        )}
-      </div>
-
-      <div className="mt-16 text-center space-y-4">
-        <p className="text-[10px] text-slate-300 uppercase tracking-widest">
-          Powered by Web Speech API
-        </p>
-        
-        <div className="max-w-md mx-auto bg-slate-50 p-4 rounded-lg text-xs text-slate-500 text-left border border-slate-100">
-          <p className="font-semibold mb-1 text-slate-700">Tecnología utilizada:</p>
-          <ul className="list-disc pl-4 space-y-1">
-            <li>
-              <strong>Transcripción:</strong> Web Speech API (Nativo del navegador).
-            </li>
-            <li>
-              <strong>Evaluación:</strong> DeepSeek AI (Análisis gramatical y de coherencia).
-            </li>
-          </ul>
-        </div>
-      </div>
+          
+          <div className="bg-slate-50 border-t border-slate-100 p-4 text-center">
+             <p className="text-[10px] text-slate-400 font-medium uppercase tracking-widest">
+               Powered by Web Speech API & DeepSeek AI
+             </p>
+          </div>
+        </motion.div>
+      )}
     </div>
   );
 }

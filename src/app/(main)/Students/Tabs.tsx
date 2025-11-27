@@ -2,7 +2,7 @@
 
 import { useEffect, useCallback, useState } from "react";
 import { motion } from "framer-motion";
-import { BookOpen, Home, GraduationCap, CheckSquare, Calendar, BrainCircuit, Sparkles } from "lucide-react";
+import { BookOpen, Home, GraduationCap, CheckSquare, Calendar, BrainCircuit, Sparkles, Mic } from "lucide-react";
 import Image from "next/image";
 import { driver } from "driver.js";
 import "driver.js/dist/driver.css";
@@ -30,6 +30,7 @@ export default function BottomTabs({ activeSection, setActiveSection }: BottomTa
     const tabItemsBottom = [
         { id: "activities", label: "Actividades", icon: CheckSquare },
         { id: "schedule", label: "Horario", icon: Calendar },
+        { id: "speaking", label: "Speaking", icon: Mic },
     ];
 
     const startBottomTabsTour = useCallback(() => {
@@ -83,6 +84,14 @@ export default function BottomTabs({ activeSection, setActiveSection }: BottomTa
                     position: "top",
                 },
             },
+            {
+                element: "#tab-speaking",
+                popover: {
+                    title: "Speaking Practice",
+                    description: "Practica tu pronunciación con nuestro evaluador de voz con IA.",
+                    position: "top",
+                },
+            }
         ];
 
         const driverObj = driver({
@@ -114,7 +123,7 @@ export default function BottomTabs({ activeSection, setActiveSection }: BottomTa
     return (
         <div
             id="bottom-tabs"
-            className="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 z-30"
+            className="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 z-50"
         >
             <div className="flex items-center justify-around px-1 py-1.5 safe-area-pb">
                 {/* Primeros 2 tabs */}

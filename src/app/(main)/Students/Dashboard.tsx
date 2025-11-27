@@ -58,6 +58,8 @@ export default function Dashboard({ onLogout, user, studentCourses, allCourses, 
                 return <Activitys key="activities" />
             case "speaking":
                 return <SpeakingEvaluator key="speaking" />
+            case "chat":
+                return <React.Suspense key="assistant-chat" fallback={<div>Cargando asistente...</div>}><AssistantContent /></React.Suspense>
             default:
                 return <DashboardContent key="dashboard" />
         }

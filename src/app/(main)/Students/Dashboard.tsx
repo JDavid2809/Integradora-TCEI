@@ -1,8 +1,10 @@
 "use client"
 
 import React, { useState } from "react"
+import dynamic from 'next/dynamic'
 import { motion, AnimatePresence } from "framer-motion"
 import DashboardContent from "./DashboardContent"
+const StudyGuideContent = dynamic(() => import('./StudyGuideContent'), { ssr: false, loading: () => <div>Cargando guía...</div> })
 import CoursesContent from "./CoursesContent"
 import ScheduleContent from "./Schedule"
 import PaymentsContent from "./PaymentsContent"
@@ -60,6 +62,8 @@ export default function Dashboard({ onLogout, user, studentCourses, allCourses, 
                 return <SpeakingEvaluator key="speaking" />
             case "chat":
                 return <React.Suspense key="assistant-chat" fallback={<div>Cargando asistente...</div>}><AssistantContent /></React.Suspense>
+            case "study-guide":
+                return <React.Suspense key="study-guide" fallback={<div>Cargando guía...</div>}><StudyGuideContent /></React.Suspense>
             default:
                 return <DashboardContent key="dashboard" />
         }

@@ -46,6 +46,7 @@ export default function Sidebar({
     const menuItemsTop = [
         { id: "dashboard", label: "Inicio", icon: Home },
         { id: "courses", label: "Mis Cursos", icon: BookOpen },
+        { id: "study-guide", label: "Guía de Estudio (IA)", icon: BookOpen },
     ];
 
     const menuItemsBottom = [

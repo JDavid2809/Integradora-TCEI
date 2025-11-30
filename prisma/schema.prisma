@@ -31,6 +31,7 @@ model estudiante {
   resultado_examen        resultado_examen[]
   activity_submissions    activity_submission[] // Entregas de actividades
   certificados            Certificado[] // Certificados obtenidos
+  study_guides            study_guide[] // Guías de estudio generadas con IA
 
   @@index([id_categoria_edad])
 }
@@ -273,6 +274,7 @@ model usuario {
   profesor      profesor?
   verificado    Boolean        @default(false)
   debe_cambiar_password Boolean @default(false) // Campo para contraseñas temporales
+  ai_consent    Boolean        @default(false) // Consentimiento para uso de IA
 
   tokenVerif String?
   expiraEn   DateTime?
@@ -784,4 +786,23 @@ model Certificado {
   @@index([codigo_verificacion])
   @@index([fecha_emision])
   @@index([es_valido])
+}
+
+// ============================================
+// SISTEMA DE GUÍAS DE ESTUDIO CON IA
+// ============================================
+
+model study_guide {
+  id          Int      @id @default(autoincrement())
+  title       String   @db.VarChar(255)
+  content     String   @db.Text // JSON con estructura de guía
+  student_id  Int
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt @default(now())
+  
+  // Relación
+  student     estudiante @relation(fields: [student_id], references: [id_estudiante], onDelete: Cascade)
+  
+  @@index([student_id])
+  @@index([created_at])
 }

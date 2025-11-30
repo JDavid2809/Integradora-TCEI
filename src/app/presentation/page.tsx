@@ -2,7 +2,9 @@
 
 import { useSearchParams } from 'next/navigation'
 import { Suspense, useEffect, useState } from 'react'
-import ImpressPresentation from '@/components/ImpressPresentation'
+import dynamic from 'next/dynamic'
+
+const ImpressPresentation = dynamic(() => import('@/components/ImpressPresentation'), { ssr: false })
 
 interface PresentationData {
   title: string

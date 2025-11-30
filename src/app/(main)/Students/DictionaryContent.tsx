@@ -128,8 +128,13 @@ export default function DictionaryContent() {
                             animate={{ opacity: 1 }}
                             className="flex flex-col items-center justify-center h-full text-center text-slate-400"
                         >
-                            <BookOpen className="w-16 h-16 mb-4 opacity-10" />
-                            <p className="text-sm">Ingresa una palabra para ver su definición</p>
+                            <div className="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mb-4">
+                                <BookOpen className="w-10 h-10 text-slate-300" />
+                            </div>
+                            <h3 className="text-lg font-medium text-slate-600 mb-1">Diccionario de Inglés</h3>
+                            <p className="text-sm max-w-xs mx-auto">
+                                Escribe una palabra en el buscador para ver su definición, pronunciación y ejemplos.
+                            </p>
                         </motion.div>
                     )}
 

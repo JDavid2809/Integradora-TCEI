@@ -2,7 +2,7 @@
 
 import { useEffect, useCallback, useState } from "react";
 import { motion } from "framer-motion";
-import { BookOpen, Home, GraduationCap, CheckSquare, Calendar, BrainCircuit, Sparkles, Mic } from "lucide-react";
+import { BookOpen, Home, GraduationCap, CheckSquare, Calendar, BrainCircuit, Sparkles, Mic, Book } from "lucide-react";
 import Image from "next/image";
 import { driver } from "driver.js";
 import "driver.js/dist/driver.css";
@@ -31,6 +31,7 @@ export default function BottomTabs({ activeSection, setActiveSection }: BottomTa
         { id: "activities", label: "Actividades", icon: CheckSquare },
         { id: "schedule", label: "Horario", icon: Calendar },
         { id: "speaking", label: "Speaking", icon: Mic },
+        { id: "dictionary", label: "Diccionario", icon: Book },
     ];
 
     const startBottomTabsTour = useCallback(() => {

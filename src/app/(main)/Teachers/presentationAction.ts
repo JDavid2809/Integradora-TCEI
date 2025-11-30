@@ -24,7 +24,13 @@ interface PresentationData {
   slides: Slide[]
 }
 
-export async function generatePresentation(prompt: string): Promise<{ success: boolean; data?: PresentationData; error?: string }> {
+export interface GenerationOptions {
+  audience: string
+  tone: string
+  slideCount: number
+}
+
+export async function generatePresentation(prompt: string, options?: GenerationOptions): Promise<{ success: boolean; data?: PresentationData; error?: string }> {
   try {
     const apiKey = process.env.OPENROUTER_API_KEY
 
@@ -35,6 +41,12 @@ export async function generatePresentation(prompt: string): Promise<{ success: b
     const systemPrompt = `You are a WORLD-CLASS PROFESSIONAL presentation designer specialized in creating SPECTACULAR educational presentations in Prezi style with stunning 3D transitions.
 
 Your goal: Create visually IMPRESSIVE presentations with HIGH-END design, vibrant and modern colors, and concise but impactful content.
+
+CONTEXT:
+- Topic: "${prompt}"
+- Target Audience: "${options?.audience || 'General Audience'}"
+- Tone: "${options?.tone || 'Professional and Engaging'}"
+- Number of Slides: ${options?.slideCount || 8} (Generate exactly this amount)
 
 IMPORTANT: ALL CONTENT MUST BE IN ENGLISH. The user is learning English or teaching English, so the presentation language must be 100% ENGLISH.
 
@@ -338,7 +350,7 @@ Emociones: 😊 😄 🤔 🥳 😎 🤩 💖 ❤️ 👍 👏
         // model: 'google/gemini-2.0-flash-exp:free',
         messages: [
           { role: 'system', content: systemPrompt },
-          { role: 'user', content: prompt }
+          { role: 'user', content: `Generate a presentation about: ${prompt}` }
         ],
         temperature: 0.8,
         max_tokens: 4000,

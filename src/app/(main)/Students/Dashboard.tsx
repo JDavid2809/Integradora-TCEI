@@ -15,6 +15,7 @@ import { Session } from "next-auth"
 import { CursoFromDB } from "@/types/courses"
 import Activitys from "./Activitys"
 import SpeakingEvaluator from "@/components/SpeakingEvaluator"
+import DictionaryContent from "./DictionaryContent"
 
 interface DashboardProps {
     onLogout: () => void
@@ -58,6 +59,8 @@ export default function Dashboard({ onLogout, user, studentCourses, allCourses, 
                 return <Activitys key="activities" />
             case "speaking":
                 return <SpeakingEvaluator key="speaking" />
+            case "dictionary":
+                return <DictionaryContent key="dictionary" />
             case "chat":
                 return <React.Suspense key="assistant-chat" fallback={<div>Cargando asistente...</div>}><AssistantContent /></React.Suspense>
             default:

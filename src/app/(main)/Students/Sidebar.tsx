@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useCallback, useState } from "react";
-import { BookOpen, Home, Calendar, X, CheckSquare, BrainCircuit, Sparkles, LogOut, Mic } from "lucide-react";
+import { BookOpen, Home, Calendar, X, CheckSquare, BrainCircuit, Sparkles, LogOut, Mic, Book } from "lucide-react";
 import Image from "next/image";
 import { driver } from "driver.js";
 import "driver.js/dist/driver.css";
@@ -52,6 +52,7 @@ export default function Sidebar({
         { id: "activities", label: "Mis Actividades", icon: CheckSquare },  
         { id: "schedule", label: "Mi Horario", icon: Calendar },
         { id: "speaking", label: "Speaking Practice", icon: Mic },
+        { id: "dictionary", label: "Diccionario", icon: Book },
     ];
 
     const startSidebarTour = useCallback(() => {

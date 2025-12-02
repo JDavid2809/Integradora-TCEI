@@ -3,9 +3,31 @@
 import Image from "next/image"
 import Link from "next/link"
 import { Facebook, Instagram, Twitter, Linkedin, Mail, Phone, MapPin, ArrowRight } from "lucide-react"
+import Lottie from "lottie-react"
+import { useState, useEffect, useRef } from "react"
+import { useInView } from "framer-motion"
 
 export function Footer() {
     const currentYear = new Date().getFullYear()
+    const [animationData, setAnimationData] = useState<any>(null)
+    const [loopCount, setLoopCount] = useState(0)
+    const containerRef = useRef(null)
+    const lottieRef = useRef<any>(null)
+    const isInView = useInView(containerRef, { amount: 0.5, once: true })
+
+    useEffect(() => {
+        if (isInView && lottieRef.current && loopCount === 0) {
+            lottieRef.current.goToAndPlay(45, true)
+        }
+    }, [isInView, loopCount])
+
+    useEffect(() => {
+        fetch('/animaciones/animacion_saludo_mascota.json')
+            .then(res => res.json())
+            .then(data => setAnimationData(data))
+            .catch(err => console.error("Failed to load footer animation:", err))
+    }, [])
+
 
     const quickLinks = [
         { name: "Inicio", href: "/" },
@@ -39,14 +61,33 @@ export function Footer() {
                     {/* Logo with Background */}
                     <div className="inline-block mb-6 relative">
                         <div className="absolute inset-0 bg-gradient-to-br from-[#00246A]/5 to-[#E30F28]/5 rounded-full blur-2xl scale-150"></div>
-                        <div className="relative bg-white p-4 rounded-full shadow-xl border-4 border-gray-100">
-                            <Image
-                                src="/logos/TCEILogo.png"
-                                alt="TCEI - Triunfando con el Inglés"
-                                width={120}
-                                height={120}
-                                className="mx-auto"
-                            />
+                        <div ref={containerRef} className="relative bg-white p-4 rounded-full shadow-xl border-4 border-gray-100 w-[150px] h-[150px] flex items-center justify-center overflow-hidden">
+                            {animationData ? (
+                                <div className="w-[120%] h-[120%] -mt-2">
+                                    <Lottie 
+                                        lottieRef={lottieRef}
+                                        animationData={animationData} 
+                                        loop={false}
+                                        autoplay={false}
+                                        initialSegment={[45, 90]}
+                                        onComplete={() => {
+                                            if (loopCount < 2) {
+                                                setLoopCount(prev => prev + 1)
+                                                lottieRef.current?.goToAndPlay(45, true)
+                                            }
+                                        }}
+                                        className="w-full h-full"
+                                    />
+                                </div>
+                            ) : (
+                                <Image
+                                    src="/logos/TCEILogo.png"
+                                    alt="TCEI - Triunfando con el Inglés"
+                                    width={120}
+                                    height={120}
+                                    className="mx-auto"
+                                />
+                            )}
                         </div>
                     </div>
 

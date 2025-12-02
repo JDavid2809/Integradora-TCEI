@@ -5,6 +5,7 @@ import { useState, useEffect } from "react"
 import { CheckCircle, Users, BookOpen, Clock } from "lucide-react"
 import Image from "next/image"
 import TextType from "@/components/TextType"
+import Lottie from "lottie-react"
 
 const PARTICLES = [
   { id: 0, x: -120, y: 80, size: 8, duration: 3.5, delay: 0.5 },
@@ -28,10 +29,22 @@ export function Hero() {
   const [isHoveredStart, setIsHoveredStart] = useState(false)
   const [isHoveredCourses, setIsHoveredCourses] = useState(false)
   const [isMounted, setIsMounted] = useState(false)
+  const [animationData, setAnimationData] = useState<any>(null)
+  const [loopCount, setLoopCount] = useState(0)
 
   useEffect(() => {
     setIsMounted(true)
+    
+    // Load animation
+    fetch('/animaciones/animacion_cara_mascota.json')
+      .then(res => res.json())
+      .then(data => setAnimationData(data))
+      .catch(err => console.error("Failed to load animation:", err))
   }, [])
+
+
+
+
 
   const stats = [
     { value: "98%", label: "Éxito", color: "#E30F28", delay: 1.1 },
@@ -129,21 +142,35 @@ export function Hero() {
               }}
             />
 
-            {/* Logo */}
+            {/* Logo / Animation */}
             <motion.div
-              className="relative z-10 w-48 h-48 sm:w-64 sm:h-64 rounded-full flex items-center justify-center shadow-2xl overflow-hidden"
-              style={{ backgroundColor: "" }}
+              className="relative z-10 w-48 h-48 sm:w-64 sm:h-64 flex items-center justify-center"
               whileHover={{ scale: 1.05 }}
               transition={{ type: "spring", stiffness: 300 }}
             >
-              <Image
-                src="/logos/TCEILogo.png"
-                alt="TCE - Triunfando con el Inglés"
-                width={256}
-                height={256}
-                className="w-full h-full object-cover"
-                priority
-              />
+              {animationData ? (
+                <div className="w-[140%] h-[140%] -mt-4">
+                  <Lottie 
+                    animationData={animationData} 
+                    loop={loopCount < 2} 
+                    onLoopComplete={() => {
+                      setLoopCount(prev => prev + 1)
+                    }}
+                    className="w-full h-full"
+                  />
+                </div>
+              ) : (
+                <div className="w-full h-full rounded-full overflow-hidden shadow-2xl">
+                  <Image
+                    src="/logos/TCEILogo.png"
+                    alt="TCE - Triunfando con el Inglés"
+                    width={256}
+                    height={256}
+                    className="w-full h-full object-cover"
+                    priority
+                  />
+                </div>
+              )}
             </motion.div>
           </motion.div>
 

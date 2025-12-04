@@ -87,7 +87,7 @@ export default  function ResetPasswordPage({ token }: { token: string }) {
   if (valid === null) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <p className="text-gray-600">Validando enlace...</p>
+        <p className="text-gray-600 dark:text-gray-400">Validando enlace...</p>
       </div>
     )
   }
@@ -96,16 +96,16 @@ export default  function ResetPasswordPage({ token }: { token: string }) {
   if (valid === false) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <p className="text-red-600 font-bold">El enlace no es válido o ya fue usado.</p>
+        <p className="text-red-600 dark:text-red-400 font-bold">El enlace no es válido o ya fue usado.</p>
       </div>
     )
   }
 
   // Vista si el token es válido
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
-      <form onSubmit={handleSubmit} className="bg-white p-8 rounded-xl shadow-md w-full max-w-md space-y-4">
-        <h1 className="text-2xl font-bold text-center">Restablecer contraseña</h1>
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-slate-900 p-4">
+      <form onSubmit={handleSubmit} className="bg-white dark:bg-slate-800 p-8 rounded-xl shadow-md w-full max-w-md space-y-4">
+        <h1 className="text-2xl font-bold text-center dark:text-white">Restablecer contraseña</h1>
 
         {/* Input nueva contraseña */}
         <div className="relative">
@@ -114,13 +114,13 @@ export default  function ResetPasswordPage({ token }: { token: string }) {
             placeholder="Nueva contraseña"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="w-full border px-3 py-2 rounded-lg pr-10"
+            className="w-full border dark:border-slate-600 dark:bg-slate-700 dark:text-white px-3 py-2 rounded-lg pr-10"
             required
           />
           <button
             type="button"
             onClick={() => setShowPassword(!showPassword)}
-            className="absolute right-3 top-2.5 text-gray-500 hover:text-gray-700"
+            className="absolute right-3 top-2.5 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
           >
             {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
           </button>
@@ -133,13 +133,13 @@ export default  function ResetPasswordPage({ token }: { token: string }) {
             placeholder="Confirmar contraseña"
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
-            className="w-full border px-3 py-2 rounded-lg pr-10"
+            className="w-full border dark:border-slate-600 dark:bg-slate-700 dark:text-white px-3 py-2 rounded-lg pr-10"
             required
           />
           <button
             type="button"
             onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-            className="absolute right-3 top-2.5 text-gray-500 hover:text-gray-700"
+            className="absolute right-3 top-2.5 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
           >
             {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
           </button>
@@ -148,14 +148,14 @@ export default  function ResetPasswordPage({ token }: { token: string }) {
         {/* Botón */}
         <button
           type="submit"
-          className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition"
+          className="w-full bg-blue-600 dark:bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-700 dark:hover:bg-blue-600 transition"
         >
           Cambiar contraseña
         </button>
 
         {/* Mensajes */}
-        {message && <p className="mt-2 text-green-600 text-center">{message}</p>}
-        {error && <p className="mt-2 text-red-600 text-center">{error}</p>}
+        {message && <p className="mt-2 text-green-600 dark:text-green-400 text-center">{message}</p>}
+        {error && <p className="mt-2 text-red-600 dark:text-red-400 text-center">{error}</p>}
       </form>
     </div>
   )

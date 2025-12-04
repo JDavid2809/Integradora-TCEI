@@ -46,21 +46,21 @@ export default function ClassesContent() {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: index * 0.1 }}
-                        className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100"
+                        className="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-sm border border-slate-100 dark:border-slate-700"
                     >
                         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                             <div className="flex-1">
                                 <div className="flex items-center space-x-3 mb-2">
-                                    <h3 className="text-lg font-semibold text-[#00246a]">{classItem.title}</h3>
+                                    <h3 className="text-lg font-semibold text-[#00246a] dark:text-blue-400">{classItem.title}</h3>
                                     <span
-                                        className={`text-xs font-medium px-2 py-1 rounded-full ${classItem.status === "upcoming" ? "bg-blue-100 text-blue-600" : "bg-green-100 text-green-600"
+                                        className={`text-xs font-medium px-2 py-1 rounded-full ${classItem.status === "upcoming" ? "bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-300" : "bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-300"
                                             }`}
                                     >
                                         {classItem.status === "upcoming" ? "Próxima" : "Completada"}
                                     </span>
                                 </div>
-                                <p className="text-slate-600 mb-1">Instructor: {classItem.instructor}</p>
-                                <div className="flex items-center space-x-4 text-sm text-slate-500">
+                                <p className="text-slate-600 dark:text-slate-300 mb-1">Instructor: {classItem.instructor}</p>
+                                <div className="flex items-center space-x-4 text-sm text-slate-500 dark:text-slate-400">
                                     <span className="flex items-center space-x-1">
                                         <Clock className="w-4 h-4" />
                                         <span>{classItem.time}</span>
@@ -78,7 +78,7 @@ export default function ClassesContent() {
                                         Unirse
                                     </button>
                                 ) : (
-                                    <button className="bg-slate-100 hover:bg-slate-200 text-[#00246a] px-6 py-2 rounded-xl font-medium transition-colors duration-200">
+                                    <button className="bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-[#00246a] dark:text-blue-300 px-6 py-2 rounded-xl font-medium transition-colors duration-200">
                                         Ver Grabación
                                     </button>
                                 )}

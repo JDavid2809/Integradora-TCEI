@@ -374,7 +374,7 @@ export default function AdminPaymentCrud() {
       )}
 
       {/* Filters - Responsive */}
-      <div className="bg-white p-3 md:p-4 rounded-lg shadow-md">
+      <div className="bg-white dark:bg-slate-800 p-3 md:p-4 rounded-lg shadow-md">
         <div className="space-y-3 lg:space-y-0 lg:flex lg:gap-4 lg:items-center">
           {/* Search - Full width on mobile */}
           <div className="flex-1 relative">
@@ -384,7 +384,7 @@ export default function AdminPaymentCrud() {
               placeholder="Buscar pagos..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-9 md:pl-10 pr-4 py-2 text-sm md:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00246a] focus:border-transparent"
+              className="w-full pl-9 md:pl-10 pr-4 py-2 text-sm md:text-base border border-gray-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-lg focus:ring-2 focus:ring-[#00246a] focus:border-transparent"
             />
           </div>
           
@@ -395,7 +395,7 @@ export default function AdminPaymentCrud() {
               <select
                 value={typeFilter}
                 onChange={(e) => setTypeFilter(e.target.value)}
-                className="flex-1 px-3 py-2 text-sm md:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00246a] focus:border-transparent"
+                className="flex-1 px-3 py-2 text-sm md:text-base border border-gray-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-lg focus:ring-2 focus:ring-[#00246a] focus:border-transparent"
               >
                 <option value="ALL">Todos los tipos</option>
                 <option value="Mensualidad">Mensualidad</option>
@@ -408,7 +408,7 @@ export default function AdminPaymentCrud() {
                 type="month"
                 value={dateFilter}
                 onChange={(e) => setDateFilter(e.target.value)}
-                className="flex-1 px-3 py-2 text-sm md:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00246a] focus:border-transparent"
+                className="flex-1 px-3 py-2 text-sm md:text-base border border-gray-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-lg focus:ring-2 focus:ring-[#00246a] focus:border-transparent"
               />
             </div>
           </div>
@@ -416,46 +416,46 @@ export default function AdminPaymentCrud() {
       </div>
 
       {/* Payments Table/Cards - Responsive */}
-      <div className="bg-white rounded-lg shadow-md overflow-hidden">
+      <div className="bg-white dark:bg-slate-800 rounded-lg shadow-md overflow-hidden">
         {loading ? (
           <div className="p-6 md:p-8 text-center">
             <div className="animate-spin rounded-full h-6 w-6 md:h-8 md:w-8 border-b-2 border-[#00246a] mx-auto"></div>
-            <p className="mt-2 text-gray-600 text-sm md:text-base">Cargando pagos...</p>
+            <p className="mt-2 text-gray-600 dark:text-gray-400 text-sm md:text-base">Cargando pagos...</p>
           </div>
         ) : (
           <>
             {/* Desktop Table - Hidden on mobile */}
             <div className="hidden lg:block overflow-x-auto">
               <table className="w-full">
-                <thead className="bg-gray-50">
+                <thead className="bg-gray-50 dark:bg-slate-700">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                       Fecha
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                       Estudiante
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                       Curso/Clase
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                       Tipo
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                       Monto
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                       Acciones
                     </th>
                   </tr>
                 </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
+                <tbody className="bg-white dark:bg-slate-800 divide-y divide-gray-200 dark:divide-slate-700">
                   {payments.map((payment) => (
-                    <tr key={payment.id_pago} className="hover:bg-gray-50">
+                    <tr key={payment.id_pago} className="hover:bg-gray-50 dark:hover:bg-slate-700/50">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center gap-1">
                         <Calendar className="w-4 h-4 text-gray-400" />
-                        <span className="text-sm text-gray-900">
+                        <span className="text-sm text-gray-900 dark:text-gray-100">
                           {formatDate(payment.fecha_pago)}
                         </span>
                       </div>
@@ -465,10 +465,10 @@ export default function AdminPaymentCrud() {
                         <div className="flex items-center gap-2">
                           <User className="w-4 h-4 text-gray-400" />
                           <div>
-                            <div className="text-sm font-medium text-gray-900">
+                            <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
                               {payment.estudiante.nombre} {payment.estudiante.paterno}
                             </div>
-                            <div className="text-xs text-gray-500">
+                            <div className="text-xs text-gray-500 dark:text-gray-400">
                               {payment.estudiante.usuario?.email || 'Sin email'}
                             </div>
                           </div>
@@ -481,24 +481,24 @@ export default function AdminPaymentCrud() {
                       <div className="flex items-center gap-2">
                         <BookOpen className="w-4 h-4 text-gray-400" />
                         <div>
-                          <div className="text-sm font-medium text-gray-900">
+                          <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
                             {payment.imparte?.curso?.nombre || 'Sin curso'}
                           </div>
-                          <div className="text-xs text-gray-500">
+                          <div className="text-xs text-gray-500 dark:text-gray-400">
                             {(payment.imparte?.profesor?.nombre || 'Sin profesor') + ' ' + (payment.imparte?.profesor?.paterno || '') + ' • ' + (payment.imparte?.nivel?.nombre || 'Sin nivel')}
                           </div>
                         </div>
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
+                      <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300">
                         {payment.tipo}
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center gap-1">
-                        <DollarSign className="w-4 h-4 text-green-600" />
-                        <span className="text-sm font-semibold text-green-600">
+                        <DollarSign className="w-4 h-4 text-green-600 dark:text-green-400" />
+                        <span className="text-sm font-semibold text-green-600 dark:text-green-400">
                           {formatCurrency(payment.monto)}
                         </span>
                       </div>
@@ -507,14 +507,14 @@ export default function AdminPaymentCrud() {
                       <div className="flex items-center gap-2">
                         <button
                           onClick={() => handleEditPayment(payment)}
-                          className="text-blue-600 hover:text-blue-900 p-1 rounded"
+                          className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 p-1 rounded"
                           title="Editar"
                         >
                           <Edit className="w-4 h-4" />
                         </button>
                         <button
                           onClick={() => handleDeletePayment(payment.id_pago)}
-                          className="text-red-600 hover:text-red-900 p-1 rounded"
+                          className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 p-1 rounded"
                           title="Eliminar"
                         >
                           <Trash2 className="w-4 h-4" />
@@ -530,18 +530,18 @@ export default function AdminPaymentCrud() {
             {/* Mobile Cards - Visible on mobile/tablet */}
             <div className="lg:hidden space-y-4 p-4">
               {payments.map((payment) => (
-                <div key={payment.id_pago} className="border border-gray-200 rounded-lg p-4 space-y-3">
+                <div key={payment.id_pago} className="border border-gray-200 dark:border-slate-700 rounded-lg p-4 space-y-3">
                   {/* Payment Header */}
                   <div className="flex justify-between items-start">
                     <div className="flex items-center gap-2">
                       <Calendar className="w-4 h-4 text-gray-400 flex-shrink-0" />
-                      <span className="text-sm font-medium text-gray-900">
+                      <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
                         {formatDate(payment.fecha_pago)}
                       </span>
                     </div>
                     <div className="flex items-center gap-1">
-                      <DollarSign className="w-4 h-4 text-green-600" />
-                      <span className="text-sm font-bold text-green-600">
+                      <DollarSign className="w-4 h-4 text-green-600 dark:text-green-400" />
+                      <span className="text-sm font-bold text-green-600 dark:text-green-400">
                         {formatCurrency(payment.monto)}
                       </span>
                     </div>
@@ -552,10 +552,10 @@ export default function AdminPaymentCrud() {
                     <div className="flex items-start gap-2">
                       <User className="w-4 h-4 text-gray-400 flex-shrink-0 mt-0.5" />
                       <div className="min-w-0">
-                        <div className="text-sm font-medium text-gray-900 truncate">
+                        <div className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
                           {payment.estudiante.nombre} {payment.estudiante.paterno}
                         </div>
-                        <div className="text-xs text-gray-500 truncate">
+                        <div className="text-xs text-gray-500 dark:text-gray-400 truncate">
                           {payment.estudiante.usuario?.email || 'Sin email'}
                         </div>
                       </div>
@@ -566,10 +566,10 @@ export default function AdminPaymentCrud() {
                   <div className="flex items-start gap-2">
                     <BookOpen className="w-4 h-4 text-gray-400 flex-shrink-0 mt-0.5" />
                     <div className="min-w-0">
-                      <div className="text-sm font-medium text-gray-900 truncate">
+                      <div className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
                         {payment.imparte?.curso?.nombre || 'Sin curso'}
                       </div>
-                      <div className="text-xs text-gray-500 truncate">
+                      <div className="text-xs text-gray-500 dark:text-gray-400 truncate">
                         Prof. {payment.imparte?.profesor?.nombre || 'Sin profesor'} {payment.imparte?.profesor?.paterno || ''} • {payment.imparte?.nivel?.nombre || 'Sin nivel'}
                       </div>
                     </div>
@@ -577,7 +577,7 @@ export default function AdminPaymentCrud() {
 
                   {/* Type Badge */}
                   <div className="flex items-center justify-between">
-                    <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
+                    <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300">
                       {payment.tipo}
                     </span>
 
@@ -585,14 +585,14 @@ export default function AdminPaymentCrud() {
                     <div className="flex items-center gap-2">
                       <button
                         onClick={() => handleEditPayment(payment)}
-                        className="flex items-center gap-1 text-blue-600 hover:text-blue-900 px-2 py-1 rounded text-xs"
+                        className="flex items-center gap-1 text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 px-2 py-1 rounded text-xs"
                       >
                         <Edit className="w-3 h-3" />
                         Editar
                       </button>
                       <button
                         onClick={() => handleDeletePayment(payment.id_pago)}
-                        className="flex items-center gap-1 text-red-600 hover:text-red-900 px-2 py-1 rounded text-xs"
+                        className="flex items-center gap-1 text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 px-2 py-1 rounded text-xs"
                       >
                         <Trash2 className="w-3 h-3" />
                         Eliminar
@@ -607,24 +607,24 @@ export default function AdminPaymentCrud() {
 
         {/* Responsive Pagination */}
         {!loading && totalPages > 1 && (
-          <div className="bg-white px-3 md:px-4 py-3 border-t border-gray-200">
+          <div className="bg-white dark:bg-slate-800 px-3 md:px-4 py-3 border-t border-gray-200 dark:border-slate-700">
             <div className="flex items-center justify-between">
               {/* Mobile pagination */}
               <div className="flex-1 flex justify-between sm:hidden">
                 <button
                   onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
                   disabled={currentPage === 1}
-                  className="relative inline-flex items-center px-3 py-2 border border-gray-300 text-xs font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
+                  className="relative inline-flex items-center px-3 py-2 border border-gray-300 dark:border-slate-600 text-xs font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-slate-700 hover:bg-gray-50 dark:hover:bg-slate-600 disabled:opacity-50"
                 >
                   Anterior
                 </button>
-                <span className="text-xs text-gray-700 flex items-center">
+                <span className="text-xs text-gray-700 dark:text-gray-300 flex items-center">
                   {currentPage} de {totalPages}
                 </span>
                 <button
                   onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
                   disabled={currentPage === totalPages}
-                  className="relative inline-flex items-center px-3 py-2 border border-gray-300 text-xs font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
+                  className="relative inline-flex items-center px-3 py-2 border border-gray-300 dark:border-slate-600 text-xs font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-slate-700 hover:bg-gray-50 dark:hover:bg-slate-600 disabled:opacity-50"
                 >
                   Siguiente
                 </button>
@@ -633,7 +633,7 @@ export default function AdminPaymentCrud() {
               {/* Desktop pagination */}
               <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
                 <div>
-                  <p className="text-sm text-gray-700">
+                  <p className="text-sm text-gray-700 dark:text-gray-300">
                     Página <span className="font-medium">{currentPage}</span> de{' '}
                     <span className="font-medium">{totalPages}</span>
                   </p>
@@ -643,14 +643,14 @@ export default function AdminPaymentCrud() {
                     <button
                       onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
                       disabled={currentPage === 1}
-                      className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
+                      className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-sm font-medium text-gray-500 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-600 disabled:opacity-50"
                     >
                       Anterior
                     </button>
                     <button
                       onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
                       disabled={currentPage === totalPages}
-                      className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
+                      className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-sm font-medium text-gray-500 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-600 disabled:opacity-50"
                     >
                       Siguiente
                     </button>
@@ -665,15 +665,15 @@ export default function AdminPaymentCrud() {
       {/* Responsive Modal */}
       {showModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+          <div className="bg-white dark:bg-slate-800 rounded-lg w-full max-w-2xl max-h-[90vh] overflow-y-auto">
             {/* Modal Header */}
-            <div className="flex justify-between items-center p-4 md:p-6 border-b">
-              <h2 className="text-lg md:text-xl font-bold text-[#00246a]">
+            <div className="flex justify-between items-center p-4 md:p-6 border-b dark:border-slate-700">
+              <h2 className="text-lg md:text-xl font-bold text-[#00246a] dark:text-blue-400">
                 {editingPayment ? 'Editar Pago' : 'Registrar Nuevo Pago'}
               </h2>
               <button
                 onClick={() => setShowModal(false)}
-                className="text-gray-400 hover:text-gray-600"
+                className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
               >
                 <X className="w-5 h-5 md:w-6 md:h-6" />
               </button>
@@ -682,7 +682,7 @@ export default function AdminPaymentCrud() {
             {/* Modal Content */}
             <div className="p-4 md:p-6">
               {errors.general && (
-                <div className="mb-4 bg-red-100 border border-red-400 text-red-700 px-3 md:px-4 py-2 md:py-3 rounded flex items-start gap-2 text-sm">
+                <div className="mb-4 bg-red-100 dark:bg-red-900/30 border border-red-400 dark:border-red-700 text-red-700 dark:text-red-300 px-3 md:px-4 py-2 md:py-3 rounded flex items-start gap-2 text-sm">
                   <AlertTriangle className="w-4 h-4 md:w-5 md:h-5 flex-shrink-0 mt-0.5" />
                   <span>{errors.general}</span>
                 </div>
@@ -691,7 +691,7 @@ export default function AdminPaymentCrud() {
               <form onSubmit={(e) => { e.preventDefault(); handleSubmit(); }} className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                       Monto *
                     </label>
                     <div className="relative">
@@ -702,51 +702,51 @@ export default function AdminPaymentCrud() {
                         min="0"
                         value={formData.monto}
                         onChange={(e) => setFormData({ ...formData, monto: e.target.value })}
-                        className={`w-full pl-9 md:pl-10 pr-4 py-2 text-sm md:text-base border rounded-lg focus:ring-2 focus:ring-[#00246a] focus:border-transparent ${
-                          errors.monto ? 'border-red-500' : 'border-gray-300'
+                        className={`w-full pl-9 md:pl-10 pr-4 py-2 text-sm md:text-base border rounded-lg focus:ring-2 focus:ring-[#00246a] focus:border-transparent dark:bg-slate-700 dark:text-white ${
+                          errors.monto ? 'border-red-500' : 'border-gray-300 dark:border-slate-600'
                         }`}
                         placeholder="0.00"
                       />
                     </div>
-                    {errors.monto && <p className="mt-1 text-xs text-red-600">{errors.monto}</p>}
+                    {errors.monto && <p className="mt-1 text-xs text-red-600 dark:text-red-400">{errors.monto}</p>}
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                       Fecha de Pago *
                     </label>
                     <input
                       type="date"
                       value={formData.fecha_pago}
                       onChange={(e) => setFormData({ ...formData, fecha_pago: e.target.value })}
-                      className={`w-full px-3 py-2 text-sm md:text-base border rounded-lg focus:ring-2 focus:ring-[#00246a] focus:border-transparent ${
-                        errors.fecha_pago ? 'border-red-500' : 'border-gray-300'
+                      className={`w-full px-3 py-2 text-sm md:text-base border rounded-lg focus:ring-2 focus:ring-[#00246a] focus:border-transparent dark:bg-slate-700 dark:text-white ${
+                        errors.fecha_pago ? 'border-red-500' : 'border-gray-300 dark:border-slate-600'
                       }`}
                     />
-                    {errors.fecha_pago && <p className="mt-1 text-xs text-red-600">{errors.fecha_pago}</p>}
+                    {errors.fecha_pago && <p className="mt-1 text-xs text-red-600 dark:text-red-400">{errors.fecha_pago}</p>}
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                       Tipo de Pago
                     </label>
                     <select
                       value={formData.tipo}
                       onChange={(e) => setFormData({ ...formData, tipo: e.target.value as 'Mensualidad' })}
-                      className="w-full px-3 py-2 text-sm md:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00246a] focus:border-transparent"
+                      className="w-full px-3 py-2 text-sm md:text-base border border-gray-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-lg focus:ring-2 focus:ring-[#00246a] focus:border-transparent"
                     >
                       <option value="Mensualidad">Mensualidad</option>
                     </select>
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                       Estudiante
                     </label>
                     <select
                       value={formData.id_estudiante || ''}
                       onChange={(e) => setFormData({ ...formData, id_estudiante: e.target.value ? parseInt(e.target.value) : null })}
-                      className="w-full px-3 py-2 text-sm md:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00246a] focus:border-transparent"
+                      className="w-full px-3 py-2 text-sm md:text-base border border-gray-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-lg focus:ring-2 focus:ring-[#00246a] focus:border-transparent"
                     >
                       <option value="">Seleccionar estudiante (opcional)</option>
                       {students.map((student, index) => (
@@ -758,14 +758,14 @@ export default function AdminPaymentCrud() {
                   </div>
 
                   <div className="md:col-span-2">
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                       Curso/Clase *
                     </label>
                     <select
                       value={formData.id_imparte}
                       onChange={(e) => setFormData({ ...formData, id_imparte: parseInt(e.target.value) })}
-                      className={`w-full px-3 py-2 text-sm md:text-base border rounded-lg focus:ring-2 focus:ring-[#00246a] focus:border-transparent ${
-                        errors.id_imparte ? 'border-red-500' : 'border-gray-300'
+                      className={`w-full px-3 py-2 text-sm md:text-base border rounded-lg focus:ring-2 focus:ring-[#00246a] focus:border-transparent dark:bg-slate-700 dark:text-white ${
+                        errors.id_imparte ? 'border-red-500' : 'border-gray-300 dark:border-slate-600'
                       }`}
                     >
                       <option value="">Seleccionar curso/clase</option>
@@ -776,23 +776,23 @@ export default function AdminPaymentCrud() {
                         </option>
                       ))}
                     </select>
-                    {errors.id_imparte && <p className="mt-1 text-xs text-red-600">{errors.id_imparte}</p>}
+                    {errors.id_imparte && <p className="mt-1 text-xs text-red-600 dark:text-red-400">{errors.id_imparte}</p>}
                   </div>
                 </div>
 
                 {/* Responsive Action Buttons */}
-                <div className="flex flex-col sm:flex-row justify-end gap-3 pt-4 border-t">
+                <div className="flex flex-col sm:flex-row justify-end gap-3 pt-4 border-t dark:border-slate-700">
                   <button
                     type="button"
                     onClick={() => setShowModal(false)}
-                    className="w-full sm:w-auto px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors text-sm md:text-base"
+                    className="w-full sm:w-auto px-4 py-2 text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-slate-700 rounded-lg hover:bg-gray-200 dark:hover:bg-slate-600 transition-colors text-sm md:text-base"
                   >
                     Cancelar
                   </button>
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2 bg-[#00246a] text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 text-sm md:text-base"
+                    className="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2 bg-[#00246a] dark:bg-blue-600 text-white rounded-lg hover:bg-blue-700 dark:hover:bg-blue-500 transition-colors disabled:opacity-50 text-sm md:text-base"
                   >
                     {isSubmitting ? (
                       <>

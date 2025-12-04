@@ -78,14 +78,14 @@ const DAY_NAMES = {
 
 // Mapeo de tipos de actividades
 const ACTIVITY_TYPES = {
-  ASSIGNMENT: { icon: FileText, label: 'Tarea', color: 'bg-blue-100 text-blue-800' },
-  QUIZ: { icon: CheckCircle, label: 'Quiz', color: 'bg-green-100 text-green-800' },
-  PROJECT: { icon: PenTool, label: 'Proyecto', color: 'bg-purple-100 text-purple-800' },
-  READING: { icon: BookOpen, label: 'Lectura', color: 'bg-orange-100 text-orange-800' },
-  VIDEO: { icon: Video, label: 'Video', color: 'bg-red-100 text-red-800' },
-  PRACTICE: { icon: PenTool, label: 'Práctica', color: 'bg-yellow-100 text-yellow-800' },
-  DISCUSSION: { icon: MessageSquare, label: 'Discusión', color: 'bg-indigo-100 text-indigo-800' },
-  EXAM: { icon: AlertCircle, label: 'Examen', color: 'bg-red-100 text-red-800' }
+  ASSIGNMENT: { icon: FileText, label: 'Tarea', color: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300' },
+  QUIZ: { icon: CheckCircle, label: 'Quiz', color: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300' },
+  PROJECT: { icon: PenTool, label: 'Proyecto', color: 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300' },
+  READING: { icon: BookOpen, label: 'Lectura', color: 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300' },
+  VIDEO: { icon: Video, label: 'Video', color: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300' },
+  PRACTICE: { icon: PenTool, label: 'Práctica', color: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300' },
+  DISCUSSION: { icon: MessageSquare, label: 'Discusión', color: 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-300' },
+  EXAM: { icon: AlertCircle, label: 'Examen', color: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300' }
 }
 
 // Componente de calendario mensual
@@ -217,10 +217,10 @@ function MonthlyCalendar({ schedules }: { schedules: CourseSchedule[] }) {
   }
 
   return (
-    <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-      <div className="p-6 border-b border-slate-100">
+    <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 overflow-hidden">
+      <div className="p-6 border-b border-slate-100 dark:border-slate-700">
         <div className="flex items-center justify-between mb-4">
-          <h3 id="calendar-header" className="text-lg font-semibold text-[#00246a] flex items-center gap-2">
+          <h3 id="calendar-header" className="text-lg font-semibold text-[#00246a] dark:text-blue-100 flex items-center gap-2">
             <CalendarDays className="w-5 h-5" />
             Calendario Mensual
           </h3>
@@ -231,7 +231,7 @@ function MonthlyCalendar({ schedules }: { schedules: CourseSchedule[] }) {
               id="filter-button"
               onClick={() => setShowFilters(!showFilters)}
               className={`p-2 rounded-lg transition-colors ${
-                showFilters ? 'bg-blue-100 text-blue-600' : 'hover:bg-slate-100 text-slate-600'
+                showFilters ? 'bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-300' : 'hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300'
               }`}
               title="Filtros"
             >
@@ -242,12 +242,12 @@ function MonthlyCalendar({ schedules }: { schedules: CourseSchedule[] }) {
             <div id="month-navigation" className="flex items-center gap-2">
               <button
                 onClick={prevMonth}
-                className="p-2 hover:bg-slate-100 rounded-lg transition-colors"
+                className="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors"
                 title="Mes anterior"
               >
-                <ChevronLeft className="w-5 h-5 text-slate-600" />
+                <ChevronLeft className="w-5 h-5 text-slate-600 dark:text-slate-300" />
               </button>
-              <span className="text-sm font-medium text-slate-700 min-w-[150px] text-center">
+              <span className="text-sm font-medium text-slate-700 dark:text-slate-200 min-w-[150px] text-center">
                 {currentDate.toLocaleDateString('es-ES', { 
                   month: 'long',
                   year: 'numeric'
@@ -255,24 +255,24 @@ function MonthlyCalendar({ schedules }: { schedules: CourseSchedule[] }) {
               </span>
               <button
                 onClick={nextMonth}
-                className="p-2 hover:bg-slate-100 rounded-lg transition-colors"
+                className="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors"
                 title="Mes siguiente"
               >
-                <ChevronRight className="w-5 h-5 text-slate-600" />
+                <ChevronRight className="w-5 h-5 text-slate-600 dark:text-slate-300" />
               </button>
             </div>
           </div>
         </div>
         
         <div className="flex justify-between items-center">
-          <div className="text-sm text-slate-600">
+          <div className="text-sm text-slate-600 dark:text-slate-400">
             {schedules.length} {schedules.length === 1 ? 'curso' : 'cursos'} • 
             {visibleCourses.length} {visibleCourses.length === 1 ? 'visible' : 'visibles'}
           </div>
           <button
             id="today-button"
             onClick={goToToday}
-            className="text-sm bg-[#e30f28] text-white px-4 py-2 rounded-lg hover:bg-[#e30f28]/90 transition-colors"
+            className="text-sm bg-[#e30f28] hover:bg-[#e30f28]/90 dark:bg-red-600 dark:hover:bg-red-700 text-white px-4 py-2 rounded-lg transition-colors"
           >
             Ir a Hoy
           </button>
@@ -284,13 +284,13 @@ function MonthlyCalendar({ schedules }: { schedules: CourseSchedule[] }) {
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
-            className="mt-4 p-4 bg-slate-50 rounded-lg border"
+            className="mt-4 p-4 bg-slate-50 dark:bg-slate-700/50 rounded-lg border dark:border-slate-600"
           >
             <div className="flex items-center justify-between mb-3">
-              <h4 className="font-medium text-slate-700">Filtrar por curso</h4>
+              <h4 className="font-medium text-slate-700 dark:text-slate-200">Filtrar por curso</h4>
               <button
                 onClick={toggleAllCourses}
-                className="text-sm text-blue-600 hover:text-blue-700 transition-colors"
+                className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors"
               >
                 {visibleCourses.length === schedules.length ? 'Ocultar todos' : 'Mostrar todos'}
               </button>
@@ -302,8 +302,8 @@ function MonthlyCalendar({ schedules }: { schedules: CourseSchedule[] }) {
                   onClick={() => toggleCourseVisibility(courseSchedule.curso.id)}
                   className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${
                     visibleCourses.includes(courseSchedule.curso.id)
-                      ? 'bg-blue-100 text-blue-800 border-2 border-blue-300'
-                      : 'bg-slate-200 text-slate-600 border-2 border-transparent hover:bg-slate-300'
+                      ? 'bg-blue-100 text-blue-800 border-2 border-blue-300 dark:bg-blue-900/30 dark:text-blue-300 dark:border-blue-700'
+                      : 'bg-slate-200 text-slate-600 border-2 border-transparent hover:bg-slate-300 dark:bg-slate-700 dark:text-slate-400 dark:hover:bg-slate-600'
                   }`}
                 >
                   <Eye className={`w-3 h-3 inline mr-1 ${
@@ -318,10 +318,10 @@ function MonthlyCalendar({ schedules }: { schedules: CourseSchedule[] }) {
       </div>
 
       {/* Encabezado de días de la semana */}
-      <div className="grid grid-cols-7 border-b border-slate-100">
+      <div className="grid grid-cols-7 border-b border-slate-100 dark:border-slate-700">
         {Object.values(DAY_NAMES).map((dayName) => (
-          <div key={dayName} className="p-3 text-center border-r border-slate-100 last:border-r-0 bg-slate-50">
-            <div className="text-sm font-medium text-slate-700">{dayName.substring(0, 3)}</div>
+          <div key={dayName} className="p-3 text-center border-r border-slate-100 dark:border-slate-700 last:border-r-0 bg-slate-50 dark:bg-slate-800/50">
+            <div className="text-sm font-medium text-slate-700 dark:text-slate-300">{dayName.substring(0, 3)}</div>
           </div>
         ))}
       </div>
@@ -337,14 +337,14 @@ function MonthlyCalendar({ schedules }: { schedules: CourseSchedule[] }) {
           return (
             <div
               key={index}
-              className={`min-h-[120px] border-r border-b border-slate-100 last:border-r-0 p-2 ${
-                !currentMonth ? 'bg-slate-50/50' : ''
-              } ${today ? 'bg-blue-50 border-blue-200' : ''}`}
+              className={`min-h-[120px] border-r border-b border-slate-100 dark:border-slate-700 last:border-r-0 p-2 ${
+                !currentMonth ? 'bg-slate-50/50 dark:bg-slate-800/30' : ''
+              } ${today ? 'bg-blue-50 border-blue-200 dark:bg-blue-900/20 dark:border-blue-800' : ''}`}
             >
               <div className="flex justify-between items-start mb-2">
                 <span className={`text-sm font-medium ${
-                  !currentMonth ? 'text-slate-400' : 
-                  today ? 'text-blue-600 font-bold' : 'text-slate-700'
+                  !currentMonth ? 'text-slate-400 dark:text-slate-600' : 
+                  today ? 'text-blue-600 dark:text-blue-400 font-bold' : 'text-slate-700 dark:text-slate-300'
                 }`}>
                   {date.getDate()}
                 </span>
@@ -375,7 +375,7 @@ function MonthlyCalendar({ schedules }: { schedules: CourseSchedule[] }) {
                 {/* Actividades del día */}
                 {dayActivities.map((activity, activityIndex) => {
                   const ActivityIcon = ACTIVITY_TYPES[activity.activity_type as keyof typeof ACTIVITY_TYPES]?.icon || FileText
-                  const activityColor = ACTIVITY_TYPES[activity.activity_type as keyof typeof ACTIVITY_TYPES]?.color || 'bg-gray-100 text-gray-800'
+                  const activityColor = ACTIVITY_TYPES[activity.activity_type as keyof typeof ACTIVITY_TYPES]?.color || 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200'
                   
                   return (
                     <motion.div
@@ -383,7 +383,7 @@ function MonthlyCalendar({ schedules }: { schedules: CourseSchedule[] }) {
                       initial={{ opacity: 0, scale: 0.9 }}
                       animate={{ opacity: 1, scale: 1 }}
                       transition={{ delay: (dayClasses.length + activityIndex) * 0.05 }}
-                      className="bg-orange-100 border border-orange-200 text-orange-800 rounded p-2 text-xs cursor-pointer hover:bg-orange-200 transition-colors"
+                      className="bg-orange-100 border border-orange-200 text-orange-800 dark:bg-orange-900/30 dark:border-orange-800 dark:text-orange-200 rounded p-2 text-xs cursor-pointer hover:bg-orange-200 dark:hover:bg-orange-900/50 transition-colors"
                       title={`${activity.title} - ${activity.curso.nombre}`}
                     >
                       <div className="flex items-center gap-1">
@@ -400,28 +400,28 @@ function MonthlyCalendar({ schedules }: { schedules: CourseSchedule[] }) {
       </div>
 
       {/* Leyenda y estadísticas */}
-      <div id="calendar-legend" className="p-4 border-t border-slate-100 bg-slate-50">
+      <div id="calendar-legend" className="p-4 border-t border-slate-100 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50">
         <div className="flex flex-wrap gap-4 justify-center text-xs mb-3">
           <div className="flex items-center gap-1">
             <div className="w-3 h-3 bg-blue-500 rounded"></div>
-            <span>Clases regulares</span>
+            <span className="text-slate-600 dark:text-slate-300">Clases regulares</span>
           </div>
           <div className="flex items-center gap-1">
-            <div className="w-3 h-3 bg-orange-200 border border-orange-300 rounded"></div>
-            <span>Actividades/Tareas</span>
+            <div className="w-3 h-3 bg-orange-200 border border-orange-300 dark:bg-orange-900/50 dark:border-orange-700 rounded"></div>
+            <span className="text-slate-600 dark:text-slate-300">Actividades/Tareas</span>
           </div>
           <div className="flex items-center gap-1">
-            <div className="w-3 h-3 bg-blue-50 border border-blue-200 rounded"></div>
-            <span>Día actual</span>
+            <div className="w-3 h-3 bg-blue-50 border border-blue-200 dark:bg-blue-900/30 dark:border-blue-700 rounded"></div>
+            <span className="text-slate-600 dark:text-slate-300">Día actual</span>
           </div>
           <div className="flex items-center gap-1">
-            <div className="w-3 h-3 bg-slate-100 rounded"></div>
-            <span>Otros meses</span>
+            <div className="w-3 h-3 bg-slate-100 dark:bg-slate-700 rounded"></div>
+            <span className="text-slate-600 dark:text-slate-300">Otros meses</span>
           </div>
         </div>
         
         {/* Estadísticas rápidas */}
-        <div className="text-center text-xs text-slate-600">
+        <div className="text-center text-xs text-slate-600 dark:text-slate-400">
           <span>
             Clases este mes: {
               calendarDays.filter(date => 
@@ -457,10 +457,10 @@ function MonthlyCalendar({ schedules }: { schedules: CourseSchedule[] }) {
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.9, opacity: 0 }}
             onClick={(e) => e.stopPropagation()}
-            className="bg-white rounded-2xl p-6 max-w-md w-full max-h-[80vh] overflow-y-auto"
+            className="bg-white dark:bg-slate-800 rounded-2xl p-6 max-w-md w-full max-h-[80vh] overflow-y-auto"
           >
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-[#00246a]">
+              <h3 className="text-lg font-semibold text-[#00246a] dark:text-blue-100">
                 {selectedDay.toLocaleDateString('es-ES', { 
                   weekday: 'long',
                   day: 'numeric',
@@ -470,9 +470,9 @@ function MonthlyCalendar({ schedules }: { schedules: CourseSchedule[] }) {
               </h3>
               <button
                 onClick={() => setSelectedDay(null)}
-                className="p-2 hover:bg-slate-100 rounded-lg transition-colors"
+                className="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors"
               >
-                <X className="w-5 h-5 text-slate-600" />
+                <X className="w-5 h-5 text-slate-600 dark:text-slate-300" />
               </button>
             </div>
             
@@ -480,15 +480,15 @@ function MonthlyCalendar({ schedules }: { schedules: CourseSchedule[] }) {
               {/* Clases del día */}
               {getDayClasses(selectedDay).length > 0 && (
                 <div>
-                  <h4 className="font-medium text-slate-700 mb-2 flex items-center gap-2">
-                    <Clock className="w-4 h-4 text-blue-600" />
+                  <h4 className="font-medium text-slate-700 dark:text-slate-200 mb-2 flex items-center gap-2">
+                    <Clock className="w-4 h-4 text-blue-600 dark:text-blue-400" />
                     Clases programadas
                   </h4>
                   <div className="space-y-2">
                     {getDayClasses(selectedDay).map((classItem) => (
-                      <div key={classItem.id} className="p-3 bg-blue-50 rounded-lg border border-blue-200">
-                        <div className="font-medium text-blue-800">{classItem.curso.nombre}</div>
-                        <div className="text-sm text-slate-600 mt-1">
+                      <div key={classItem.id} className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+                        <div className="font-medium text-blue-800 dark:text-blue-200">{classItem.curso.nombre}</div>
+                        <div className="text-sm text-slate-600 dark:text-slate-300 mt-1">
                           <div>⏰ {classItem.start_time} ({classItem.duration_minutes} min)</div>
                           <div>👨‍🏫 {classItem.teacher.nombre} {classItem.teacher.apellido}</div>
                           {classItem.classroom && <div>📍 {classItem.classroom}</div>}
@@ -502,20 +502,20 @@ function MonthlyCalendar({ schedules }: { schedules: CourseSchedule[] }) {
               {/* Actividades del día */}
               {getDayActivities(selectedDay).length > 0 && (
                 <div>
-                  <h4 className="font-medium text-slate-700 mb-2 flex items-center gap-2">
-                    <AlertCircle className="w-4 h-4 text-orange-600" />
+                  <h4 className="font-medium text-slate-700 dark:text-slate-200 mb-2 flex items-center gap-2">
+                    <AlertCircle className="w-4 h-4 text-orange-600 dark:text-orange-400" />
                     Actividades que vencen
                   </h4>
                   <div className="space-y-2">
                     {getDayActivities(selectedDay).map((activity) => {
                       const ActivityIcon = ACTIVITY_TYPES[activity.activity_type as keyof typeof ACTIVITY_TYPES]?.icon || FileText
                       return (
-                        <div key={activity.id} className="p-3 bg-orange-50 rounded-lg border border-orange-200">
+                        <div key={activity.id} className="p-3 bg-orange-50 dark:bg-orange-900/20 rounded-lg border border-orange-200 dark:border-orange-800">
                           <div className="flex items-center gap-2 mb-1">
-                            <ActivityIcon className="w-4 h-4 text-orange-600" />
-                            <div className="font-medium text-orange-800">{activity.title}</div>
+                            <ActivityIcon className="w-4 h-4 text-orange-600 dark:text-orange-400" />
+                            <div className="font-medium text-orange-800 dark:text-orange-200">{activity.title}</div>
                           </div>
-                          <div className="text-sm text-slate-600">
+                          <div className="text-sm text-slate-600 dark:text-slate-300">
                             📚 {activity.curso.nombre}
                           </div>
                         </div>
@@ -528,8 +528,8 @@ function MonthlyCalendar({ schedules }: { schedules: CourseSchedule[] }) {
               {/* Si no hay eventos */}
               {getDayClasses(selectedDay).length === 0 && getDayActivities(selectedDay).length === 0 && (
                 <div className="text-center py-8">
-                  <Calendar className="w-12 h-12 text-slate-400 mx-auto mb-2" />
-                  <p className="text-slate-600">No hay clases ni actividades programadas para este día</p>
+                  <Calendar className="w-12 h-12 text-slate-400 dark:text-slate-500 mx-auto mb-2" />
+                  <p className="text-slate-600 dark:text-slate-300">No hay clases ni actividades programadas para este día</p>
                 </div>
               )}
             </div>
@@ -543,23 +543,23 @@ function MonthlyCalendar({ schedules }: { schedules: CourseSchedule[] }) {
 // Componente del horario tradicional
 function TraditionalSchedule({ schedules }: { schedules: CourseSchedule[] }) {
   return (
-    <div className="bg-white rounded-2xl shadow-sm border border-slate-100">
-      <div className="p-6 border-b border-slate-100">
-        <h3 className="text-lg font-semibold text-[#00246a]">Horario de Clases</h3>
+    <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700">
+      <div className="p-6 border-b border-slate-100 dark:border-slate-700">
+        <h3 className="text-lg font-semibold text-[#00246a] dark:text-blue-100">Horario de Clases</h3>
       </div>
       <div className="p-6">
         <div className="space-y-4">
           {schedules.map((courseSchedule) => (
-            <div key={courseSchedule.curso.id} className="border border-slate-200 rounded-xl overflow-hidden">
-              <div className="bg-slate-50 p-4 border-b border-slate-200">
+            <div key={courseSchedule.curso.id} className="border border-slate-200 dark:border-slate-700 rounded-xl overflow-hidden">
+              <div className="bg-slate-50 dark:bg-slate-700/50 p-4 border-b border-slate-200 dark:border-slate-700">
                 <div className="flex items-center justify-between">
                   <div>
-                    <h4 className="font-semibold text-[#00246a]">{courseSchedule.curso.nombre}</h4>
-                    <p className="text-sm text-slate-600">
+                    <h4 className="font-semibold text-[#00246a] dark:text-blue-100">{courseSchedule.curso.nombre}</h4>
+                    <p className="text-sm text-slate-600 dark:text-slate-300">
                       {courseSchedule.curso.modalidad} • Nivel {courseSchedule.curso.nivel}
                     </p>
                   </div>
-                  <div className="text-right text-sm text-slate-600">
+                  <div className="text-right text-sm text-slate-600 dark:text-slate-300">
                     {courseSchedule.schedules.length} {courseSchedule.schedules.length === 1 ? 'clase' : 'clases'} por semana
                   </div>
                 </div>
@@ -567,24 +567,24 @@ function TraditionalSchedule({ schedules }: { schedules: CourseSchedule[] }) {
               <div className="p-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   {courseSchedule.schedules.map((schedule) => (
-                    <div key={schedule.id} className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg p-4">
+                    <div key={schedule.id} className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-slate-700 dark:to-slate-600 rounded-lg p-4">
                       <div className="flex items-center gap-2 mb-3">
-                        <Calendar className="w-4 h-4 text-blue-600" />
-                        <span className="font-medium text-slate-800">
+                        <Calendar className="w-4 h-4 text-blue-600 dark:text-blue-300" />
+                        <span className="font-medium text-slate-800 dark:text-slate-200">
                           {DAY_NAMES[schedule.day_of_week as keyof typeof DAY_NAMES]}
                         </span>
                       </div>
                       <div className="space-y-2 text-sm">
-                        <div className="flex items-center gap-2 text-slate-700">
+                        <div className="flex items-center gap-2 text-slate-700 dark:text-slate-300">
                           <Clock className="w-4 h-4" />
                           <span>{schedule.start_time} ({schedule.duration_minutes} min)</span>
                         </div>
-                        <div className="flex items-center gap-2 text-slate-700">
+                        <div className="flex items-center gap-2 text-slate-700 dark:text-slate-300">
                           <User className="w-4 h-4" />
                           <span>{schedule.teacher.nombre} {schedule.teacher.apellido}</span>
                         </div>
                         {schedule.classroom && (
-                          <div className="flex items-center gap-2 text-slate-700">
+                          <div className="flex items-center gap-2 text-slate-700 dark:text-slate-300">
                             <MapPin className="w-4 h-4" />
                             <span>{schedule.classroom}</span>
                           </div>
@@ -620,30 +620,30 @@ function UpcomingActivities({ schedules }: { schedules: CourseSchedule[] }) {
   }
 
   const getUrgencyColor = (daysUntil: number) => {
-    if (daysUntil <= 1) return 'border-red-200 bg-red-50'
-    if (daysUntil <= 3) return 'border-orange-200 bg-orange-50'
-    if (daysUntil <= 7) return 'border-yellow-200 bg-yellow-50'
-    return 'border-blue-200 bg-blue-50'
+    if (daysUntil <= 1) return 'border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-900/20'
+    if (daysUntil <= 3) return 'border-orange-200 bg-orange-50 dark:border-orange-800 dark:bg-orange-900/20'
+    if (daysUntil <= 7) return 'border-yellow-200 bg-yellow-50 dark:border-yellow-800 dark:bg-yellow-900/20'
+    return 'border-blue-200 bg-blue-50 dark:border-blue-800 dark:bg-blue-900/20'
   }
 
   if (allActivities.length === 0) {
     return (
-      <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
-        <h3 className="text-lg font-semibold text-[#00246a] mb-4">Actividades Próximas</h3>
+      <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 p-6">
+        <h3 className="text-lg font-semibold text-[#00246a] dark:text-blue-100 mb-4">Actividades Próximas</h3>
         <div className="text-center py-8">
           <CheckCircle className="w-16 h-16 text-green-400 mx-auto mb-4" />
-          <p className="text-slate-600">¡No tienes actividades pendientes!</p>
+          <p className="text-slate-600 dark:text-slate-300">¡No tienes actividades pendientes!</p>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="bg-white rounded-2xl shadow-sm border border-slate-100">
-      <div className="p-6 border-b border-slate-100">
+    <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700">
+      <div className="p-6 border-b border-slate-100 dark:border-slate-700">
         <div className="flex items-center gap-2">
           <AlertCircle className="w-5 h-5 text-orange-500" />
-          <h3 className="text-lg font-semibold text-[#00246a]">Actividades Próximas</h3>
+          <h3 className="text-lg font-semibold text-[#00246a] dark:text-blue-100">Actividades Próximas</h3>
         </div>
       </div>
       <div className="p-6">
@@ -662,20 +662,20 @@ function UpcomingActivities({ schedules }: { schedules: CourseSchedule[] }) {
               >
                 <div className="flex items-start gap-3">
                   <div className="mt-1">
-                    <ActivityIcon className="w-5 h-5 text-slate-600" />
+                    <ActivityIcon className="w-5 h-5 text-slate-600 dark:text-slate-300" />
                   </div>
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-1">
-                      <h4 className="font-medium text-slate-800">{activity.title}</h4>
+                      <h4 className="font-medium text-slate-800 dark:text-slate-200">{activity.title}</h4>
                       {activityTypeData && (
                         <span className={`text-xs px-2 py-1 rounded-full ${activityTypeData.color}`}>
                           {activityTypeData.label}
                         </span>
                       )}
                     </div>
-                    <p className="text-sm text-slate-600 mb-2">{activity.course_name}</p>
+                    <p className="text-sm text-slate-600 dark:text-slate-300 mb-2">{activity.course_name}</p>
                     <div className="flex items-center gap-4 text-sm">
-                      <span className="text-slate-600">
+                      <span className="text-slate-600 dark:text-slate-400">
                         Vence: {new Date(activity.due_date).toLocaleDateString('es-ES', { 
                           weekday: 'short',
                           month: 'short', 
@@ -683,9 +683,9 @@ function UpcomingActivities({ schedules }: { schedules: CourseSchedule[] }) {
                         })}
                       </span>
                       <span className={`font-medium ${
-                        daysUntil <= 1 ? 'text-red-600' :
-                        daysUntil <= 3 ? 'text-orange-600' :
-                        daysUntil <= 7 ? 'text-yellow-600' : 'text-blue-600'
+                        daysUntil <= 1 ? 'text-red-600 dark:text-red-400' :
+                        daysUntil <= 3 ? 'text-orange-600 dark:text-orange-400' :
+                        daysUntil <= 7 ? 'text-yellow-600 dark:text-yellow-400' : 'text-blue-600 dark:text-blue-400'
                       }`}>
                         {daysUntil <= 0 ? 'Vencido' : 
                          daysUntil === 1 ? 'Mañana' : 
@@ -835,9 +835,9 @@ export default function ScheduleContent() {
         animate={{ opacity: 1 }}
         className="space-y-6"
       >
-        <div className="bg-white rounded-2xl p-8 shadow-sm border border-slate-100 text-center">
+        <div className="bg-white dark:bg-slate-800 rounded-2xl p-8 shadow-sm border border-slate-100 dark:border-slate-700 text-center">
           <div className="animate-spin w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full mx-auto mb-4"></div>
-          <p className="text-slate-600">Cargando tu horario...</p>
+          <p className="text-slate-600 dark:text-slate-300">Cargando tu horario...</p>
         </div>
       </motion.div>
     )
@@ -850,13 +850,13 @@ export default function ScheduleContent() {
         animate={{ opacity: 1, y: 0 }}
         className="space-y-6"
       >
-        <div className="bg-white rounded-2xl p-8 shadow-sm border border-slate-100 text-center">
+        <div className="bg-white dark:bg-slate-800 rounded-2xl p-8 shadow-sm border border-slate-100 dark:border-slate-700 text-center">
           <AlertCircle className="w-16 h-16 text-red-400 mx-auto mb-4" />
-          <h3 className="text-lg font-semibold text-[#00246a] mb-2">Error al cargar horario</h3>
-          <p className="text-slate-600 mb-4">{error || 'No se pudo cargar la información'}</p>
+          <h3 className="text-lg font-semibold text-[#00246a] dark:text-blue-100 mb-2">Error al cargar horario</h3>
+          <p className="text-slate-600 dark:text-slate-300 mb-4">{error || 'No se pudo cargar la información'}</p>
           <button 
             onClick={() => window.location.reload()}
-            className="bg-[#e30f28] text-white px-6 py-2 rounded-xl font-medium hover:bg-[#e30f28]/90 transition-colors"
+            className="bg-[#e30f28] hover:bg-[#e30f28]/90 dark:bg-red-600 dark:hover:bg-red-700 text-white px-6 py-2 rounded-xl font-medium transition-colors"
           >
             Reintentar
           </button>
@@ -872,15 +872,15 @@ export default function ScheduleContent() {
         animate={{ opacity: 1, y: 0 }}
         className="space-y-6"
       >
-        <div className="bg-white rounded-2xl p-8 shadow-sm border border-slate-100 text-center">
-          <Calendar className="w-16 h-16 text-slate-400 mx-auto mb-4" />
-          <h3 className="text-lg font-semibold text-[#00246a] mb-2">No tienes clases programadas</h3>
-          <p className="text-slate-600 mb-4">
+        <div className="bg-white dark:bg-slate-800 rounded-2xl p-8 shadow-sm border border-slate-100 dark:border-slate-700 text-center">
+          <Calendar className="w-16 h-16 text-slate-400 dark:text-slate-500 mx-auto mb-4" />
+          <h3 className="text-lg font-semibold text-[#00246a] dark:text-blue-100 mb-2">No tienes clases programadas</h3>
+          <p className="text-slate-600 dark:text-slate-300 mb-4">
             Inscríbete en cursos para ver tu horario de clases aquí.
           </p>
           <button 
             onClick={() => window.location.href = '/Courses'}
-            className="bg-[#e30f28] text-white px-6 py-2 rounded-xl font-medium hover:bg-[#e30f28]/90 transition-colors"
+            className="bg-[#e30f28] hover:bg-[#e30f28]/90 dark:bg-red-600 dark:hover:bg-red-700 text-white px-6 py-2 rounded-xl font-medium transition-colors"
           >
             Explorar Cursos
           </button>
@@ -900,12 +900,12 @@ export default function ScheduleContent() {
       {/* Header */}
       <div id="schedule-header" className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-[#00246a]">Mi Horario</h2>
-          <p className="text-slate-600">
+          <h2 className="text-2xl font-bold text-[#00246a] dark:text-blue-100">Mi Horario</h2>
+          <p className="text-slate-600 dark:text-slate-300">
             Hola {scheduleData.student_name}, aquí está tu horario de clases
           </p>
         </div>
-        <div className="text-right text-sm text-slate-600">
+        <div className="text-right text-sm text-slate-600 dark:text-slate-300">
           {scheduleData.horarios.length} {scheduleData.horarios.length === 1 ? 'curso' : 'cursos'} activos
         </div>
       </div>

@@ -35,8 +35,8 @@ export default function CoursesContent() {
                 className="flex items-center justify-center h-64"
             >
                 <div className="text-center">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#00246a] mx-auto mb-4"></div>
-                    <p className="text-gray-600">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#00246a] dark:border-blue-400 mx-auto mb-4"></div>
+                    <p className="text-gray-600 dark:text-gray-300">
                         {!hasSession 
                             ? "Cargando sesión..." 
                             : !isTeacher 
@@ -45,7 +45,7 @@ export default function CoursesContent() {
                         }
                     </p>
                     {hasSession && isTeacher && !session?.user?.extra?.id_profesor && (
-                        <p className="text-red-600 text-sm mt-2">
+                        <p className="text-red-600 dark:text-red-400 text-sm mt-2">
                             ⚠️ Problema con el registro del profesor. Contacte al administrador.
                         </p>
                     )}

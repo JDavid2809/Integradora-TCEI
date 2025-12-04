@@ -124,7 +124,7 @@ export default function BottomTabs({ activeSection, setActiveSection }: BottomTa
     return (
         <div
             id="bottom-tabs"
-            className="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 z-50"
+            className="fixed bottom-0 left-0 right-0 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 z-50 transition-colors duration-300"
         >
             <div className="flex items-center justify-around px-1 py-1.5 safe-area-pb">
                 {/* Primeros 2 tabs */}
@@ -136,7 +136,7 @@ export default function BottomTabs({ activeSection, setActiveSection }: BottomTa
                             id={`tab-${item.id}`}
                             onClick={() => setActiveSection(item.id)}
                             className={`relative flex flex-col items-center justify-center p-1.5 rounded-lg transition-all duration-200 min-w-0 flex-1 ${
-                                isActive ? "text-[#e30f28]" : "text-slate-500"
+                                isActive ? "text-[#e30f28] dark:text-red-400" : "text-slate-500 dark:text-slate-400"
                             }`}
                             whileTap={{ scale: 0.95 }}
                         >
@@ -144,7 +144,7 @@ export default function BottomTabs({ activeSection, setActiveSection }: BottomTa
                             {isActive && (
                                 <motion.div
                                     layoutId="activeTab"
-                                    className="absolute inset-0 bg-[#e30f28]/10 rounded-lg"
+                                    className="absolute inset-0 bg-[#e30f28]/10 dark:bg-red-400/10 rounded-lg"
                                     initial={false}
                                     transition={{
                                         type: "spring",
@@ -158,7 +158,7 @@ export default function BottomTabs({ activeSection, setActiveSection }: BottomTa
                             <div className="relative z-10 mb-0.5">
                                 <item.icon
                                     className={`w-4.5 h-4.5 ${
-                                        isActive ? "text-[#e30f28]" : "text-slate-500"
+                                        isActive ? "text-[#e30f28] dark:text-red-400" : "text-slate-500 dark:text-slate-400"
                                     }`}
                                 />
                             </div>
@@ -166,7 +166,7 @@ export default function BottomTabs({ activeSection, setActiveSection }: BottomTa
                             {/* Label */}
                             <span
                                 className={`text-[10px] font-medium relative z-10 ${
-                                    isActive ? "text-[#e30f28]" : "text-slate-500"
+                                    isActive ? "text-[#e30f28] dark:text-red-400" : "text-slate-500 dark:text-slate-400"
                                 }`}
                             >
                                 {item.label}
@@ -175,7 +175,7 @@ export default function BottomTabs({ activeSection, setActiveSection }: BottomTa
                             {/* Active dot */}
                             {isActive && (
                                 <motion.div
-                                    className="absolute -top-0.5 w-1 h-1 bg-[#e30f28] rounded-full"
+                                    className="absolute -top-0.5 w-1 h-1 bg-[#e30f28] dark:bg-red-400 rounded-full"
                                     initial={{ scale: 0 }}
                                     animate={{ scale: 1 }}
                                     transition={{ delay: 0.1 }}
@@ -207,7 +207,7 @@ export default function BottomTabs({ activeSection, setActiveSection }: BottomTa
                         />
 
                         {/* Button Content */}
-                        <div className="relative bg-white rounded-xl px-2 py-1.5 flex flex-col items-center">
+                        <div className="relative bg-white dark:bg-slate-800 rounded-xl px-2 py-1.5 flex flex-col items-center transition-colors duration-300">
                             {/* Icon with glow */}
                             <div className="relative mb-0.5">
                                 <div
@@ -215,7 +215,7 @@ export default function BottomTabs({ activeSection, setActiveSection }: BottomTa
                                         activeSection === "assistant" ? "opacity-40" : "opacity-0"
                                     }`}
                                 />
-                                <div className="relative bg-gradient-to-br from-[#ffffff] to-[#ffffff] p-1 rounded-md">
+                                <div className="relative bg-gradient-to-br from-[#ffffff] to-[#ffffff] dark:from-slate-200 dark:to-slate-200 p-1 rounded-md">
                                     <div className="relative w-3.5 h-3.5">
                                         <Image
                                             src="/ChatBot.png"
@@ -232,7 +232,7 @@ export default function BottomTabs({ activeSection, setActiveSection }: BottomTa
                                 className={`text-[9px] font-semibold transition-colors duration-300 text-center leading-tight ${
                                     activeSection === "assistant"
                                         ? "text-[#00c2a8]"
-                                        : "text-slate-600"
+                                        : "text-slate-600 dark:text-slate-300"
                                 }`}
                             >
                                 Asistente
@@ -244,14 +244,14 @@ export default function BottomTabs({ activeSection, setActiveSection }: BottomTa
                                     className={`w-2 h-2 transition-all duration-300 ${
                                         activeSection === "assistant"
                                             ? "text-[#8b5cf6] animate-pulse"
-                                            : "text-slate-400"
+                                            : "text-slate-400 dark:text-slate-500"
                                     }`}
                                 />
                                 <span
                                     className={`text-[7px] font-medium transition-colors duration-300 ${
                                         activeSection === "assistant"
                                             ? "text-[#06b6d4]"
-                                            : "text-slate-400"
+                                            : "text-slate-400 dark:text-slate-500"
                                     }`}
                                 >
                                     IA
@@ -291,7 +291,7 @@ export default function BottomTabs({ activeSection, setActiveSection }: BottomTa
                             id={`tab-${item.id}`}
                             onClick={() => setActiveSection(item.id)}
                             className={`relative flex flex-col items-center justify-center p-1.5 rounded-lg transition-all duration-200 min-w-0 flex-1 ${
-                                isActive ? "text-[#e30f28]" : "text-slate-500"
+                                isActive ? "text-[#e30f28] dark:text-red-400" : "text-slate-500 dark:text-slate-400"
                             }`}
                             whileTap={{ scale: 0.95 }}
                         >
@@ -299,7 +299,7 @@ export default function BottomTabs({ activeSection, setActiveSection }: BottomTa
                             {isActive && (
                                 <motion.div
                                     layoutId="activeTab"
-                                    className="absolute inset-0 bg-[#e30f28]/10 rounded-lg"
+                                    className="absolute inset-0 bg-[#e30f28]/10 dark:bg-red-400/10 rounded-lg"
                                     initial={false}
                                     transition={{
                                         type: "spring",
@@ -313,7 +313,7 @@ export default function BottomTabs({ activeSection, setActiveSection }: BottomTa
                             <div className="relative z-10 mb-0.5">
                                 <item.icon
                                     className={`w-4.5 h-4.5 ${
-                                        isActive ? "text-[#e30f28]" : "text-slate-500"
+                                        isActive ? "text-[#e30f28] dark:text-red-400" : "text-slate-500 dark:text-slate-400"
                                     }`}
                                 />
                             </div>
@@ -321,7 +321,7 @@ export default function BottomTabs({ activeSection, setActiveSection }: BottomTa
                             {/* Label */}
                             <span
                                 className={`text-[10px] font-medium relative z-10 ${
-                                    isActive ? "text-[#e30f28]" : "text-slate-500"
+                                    isActive ? "text-[#e30f28] dark:text-red-400" : "text-slate-500 dark:text-slate-400"
                                 }`}
                             >
                                 {item.label}
@@ -330,7 +330,7 @@ export default function BottomTabs({ activeSection, setActiveSection }: BottomTa
                             {/* Active dot */}
                             {isActive && (
                                 <motion.div
-                                    className="absolute -top-0.5 w-1 h-1 bg-[#e30f28] rounded-full"
+                                    className="absolute -top-0.5 w-1 h-1 bg-[#e30f28] dark:bg-red-400 rounded-full"
                                     initial={{ scale: 0 }}
                                     animate={{ scale: 1 }}
                                     transition={{ delay: 0.1 }}

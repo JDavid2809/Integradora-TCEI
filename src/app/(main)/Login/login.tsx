@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { motion } from "framer-motion"
 import { Eye, EyeOff } from "lucide-react"
-import Image from "next/image"
+// Image removed from login page per instruction (logo kept in navbar only)
 import {useRouter} from "next/navigation"
 import { signIn } from "next-auth/react"
 
@@ -99,14 +99,8 @@ export default  function LoginForm({ toggleMode }: LoginFormProps) {
             <div className="bg-white rounded-3xl shadow-xl border border-slate-100 p-8">
                 {/* Mobile header */}
                 <motion.div variants={itemVariants} className="lg:hidden flex items-center justify-center space-x-3 mb-8">
-                    <div className="relative w-10 h-10 rounded-xl overflow-hidden">
-                        <Image
-                            src="/logos/logoIngles.jpg"
-                            alt="Triunfando con el Inglés Logo"
-                            fill
-                            className="object-contain"
-                            priority
-                        />
+                    <div className="w-10 h-10 bg-gradient-to-br from-[#e30f28] to-[#00246a] rounded-xl flex items-center justify-center">
+                        <span className="text-white font-bold">T</span>
                     </div>
                     <h1 className="text-xl font-bold text-[#00246a] text-center">Triunfando con el Inglés</h1>
                 </motion.div>

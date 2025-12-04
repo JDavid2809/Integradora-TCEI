@@ -74,15 +74,15 @@ export default function DictionaryContent() {
     return (
         <div className="h-[calc(100vh-100px)] flex flex-col gap-6 max-w-5xl mx-auto w-full p-4">
             {/* Header & Search - Compact & Consistent */}
-            <div className="flex-shrink-0 bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+            <div className="flex-shrink-0 bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700">
                 <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
                     <div className="flex items-center gap-3 self-start md:self-center">
                         <div className="p-2 bg-indigo-50 rounded-lg">
                             <BookOpen className="w-6 h-6 text-indigo-600" />
                         </div>
                         <div>
-                            <h1 className="text-xl font-bold text-slate-900">Diccionario</h1>
-                            <p className="text-sm text-slate-500">Consulta definiciones y pronunciación</p>
+                            <h1 className="text-xl font-bold text-slate-900 dark:text-slate-100">Diccionario</h1>
+                            <p className="text-sm text-slate-500 dark:text-slate-400">Consulta definiciones y pronunciación</p>
                         </div>
                     </div>
 
@@ -92,7 +92,7 @@ export default function DictionaryContent() {
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                             placeholder="Buscar palabra..."
-                            className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all"
+                            className="w-full pl-10 pr-4 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all text-slate-900 dark:text-white"
                         />
                         <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
                         <button 
@@ -126,9 +126,9 @@ export default function DictionaryContent() {
                         <motion.div
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
-                            className="flex flex-col items-center justify-center h-full text-center text-slate-400"
+                            className="flex flex-col items-center justify-center h-full text-center text-slate-400 dark:text-slate-400"
                         >
-                            <div className="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mb-4">
+                            <div className="w-20 h-20 bg-slate-50 dark:bg-slate-700 rounded-full flex items-center justify-center mb-4">
                                 <BookOpen className="w-10 h-10 text-slate-300" />
                             </div>
                             <h3 className="text-lg font-medium text-slate-600 mb-1">Diccionario de Inglés</h3>
@@ -146,10 +146,10 @@ export default function DictionaryContent() {
                             className="space-y-4"
                         >
                             {/* Word Header */}
-                            <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                            <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700">
                                 <div className="flex flex-wrap items-start justify-between gap-4">
                                     <div>
-                                        <h2 className="text-3xl font-bold text-slate-900 capitalize mb-1">
+                                        <h2 className="text-3xl font-bold text-slate-900 dark:text-slate-100 capitalize mb-1">
                                             {result.word}
                                         </h2>
                                         <div className="flex items-center gap-3 text-indigo-600">
@@ -163,7 +163,7 @@ export default function DictionaryContent() {
                                                 <button
                                                     key={index}
                                                     onClick={() => playAudio(phonetic.audio!)}
-                                                    className="flex items-center gap-2 px-3 py-1.5 bg-indigo-50 text-indigo-700 rounded-full hover:bg-indigo-100 transition-colors text-sm font-medium"
+                                                    className="flex items-center gap-2 px-3 py-1.5 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-700 dark:text-indigo-200 rounded-full hover:bg-indigo-100 dark:hover:bg-indigo-800 transition-colors text-sm font-medium"
                                                 >
                                                     {audioPlaying === phonetic.audio ? (
                                                         <PauseCircle className="w-4 h-4" />
@@ -177,7 +177,7 @@ export default function DictionaryContent() {
                                     </div>
                                 </div>
                                 {result.origin && (
-                                    <p className="mt-4 text-sm text-slate-500 border-t border-slate-100 pt-3">
+                                    <p className="mt-4 text-sm text-slate-500 dark:text-slate-300 border-t border-slate-100 dark:border-slate-700 pt-3">
                                         <span className="font-semibold text-slate-700">Origen:</span> {result.origin}
                                     </p>
                                 )}
@@ -186,12 +186,12 @@ export default function DictionaryContent() {
                             {/* Meanings */}
                             <div className="space-y-4">
                                 {result.meanings.map((meaning, index) => (
-                                    <div key={index} className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                                    <div key={index} className="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700">
                                         <div className="flex items-center gap-3 mb-4">
-                                            <span className="px-2.5 py-1 bg-slate-100 text-slate-700 rounded-md text-xs font-bold uppercase tracking-wider border border-slate-200">
+                                            <span className="px-2.5 py-1 bg-slate-100 dark:bg-slate-700/30 text-slate-700 dark:text-slate-300 rounded-md text-xs font-bold uppercase tracking-wider border border-slate-200 dark:border-slate-700">
                                                 {meaning.partOfSpeech}
                                             </span>
-                                            <div className="h-px flex-1 bg-slate-100"></div>
+                                            <div className="h-px flex-1 bg-slate-100 dark:bg-slate-700/40"></div>
                                         </div>
                                         
                                         <ul className="space-y-6">
@@ -201,11 +201,11 @@ export default function DictionaryContent() {
                                                         {idx + 1}
                                                     </span>
                                                     <div className="space-y-2 flex-1">
-                                                        <p className="text-slate-800 leading-relaxed">
+                                                        <p className="text-slate-800 dark:text-slate-100 leading-relaxed">
                                                             {def.definition}
                                                         </p>
                                                         {def.example && (
-                                                            <p className="text-slate-500 text-sm italic pl-3 border-l-2 border-indigo-200">
+                                                            <p className="text-slate-500 dark:text-slate-400 text-sm italic pl-3 border-l-2 border-indigo-200">
                                                                 "{def.example}"
                                                             </p>
                                                         )}
@@ -216,7 +216,7 @@ export default function DictionaryContent() {
                                                                     <div className="flex flex-wrap gap-1 text-xs items-center">
                                                                         <span className="text-emerald-600 font-medium">Sinónimos:</span>
                                                                         {def.synonyms.slice(0, 3).map((syn, i) => (
-                                                                            <span key={i} className="text-slate-600 bg-slate-50 px-1.5 py-0.5 rounded border border-slate-100">
+                                                                            <span key={i} className="text-slate-600 dark:text-slate-300 bg-slate-50 dark:bg-slate-700/30 px-1.5 py-0.5 rounded border border-slate-100 dark:border-slate-700">
                                                                                 {syn}
                                                                             </span>
                                                                         ))}
@@ -226,7 +226,7 @@ export default function DictionaryContent() {
                                                                     <div className="flex flex-wrap gap-1 text-xs items-center">
                                                                         <span className="text-rose-600 font-medium">Antónimos:</span>
                                                                         {def.antonyms.slice(0, 3).map((ant, i) => (
-                                                                            <span key={i} className="text-slate-600 bg-slate-50 px-1.5 py-0.5 rounded border border-slate-100">
+                                                                            <span key={i} className="text-slate-600 dark:text-slate-300 bg-slate-50 dark:bg-slate-700/30 px-1.5 py-0.5 rounded border border-slate-100 dark:border-slate-700">
                                                                                 {ant}
                                                                             </span>
                                                                         ))}

@@ -7,14 +7,24 @@ import { CourseSearchParams, PaginatedCourses } from "@/types/courses"
 import { createSlug } from '@/lib/slugUtils'
 import { redirect } from 'next/navigation'
 
+// Caché para evitar JSON.parse repetitivos
+const lessonCountCache = new Map<string, number>()
+
 // Función para contar lecciones desde el contenido del curso
-function countLessonsFromContent(courseContent: string | null): number {
+function countLessonsFromContent(courseContent: string | null, courseId?: number): number {
   if (!courseContent) return 0
+  
+  // Usar caché si hay courseId
+  const cacheKey = courseId ? `course-${courseId}-lessons` : courseContent.substring(0, 50)
+  if (lessonCountCache.has(cacheKey)) {
+    return lessonCountCache.get(cacheKey)!
+  }
   
   try {
     const content = JSON.parse(courseContent)
+    let count = 0
     if (Array.isArray(content)) {
-      return content.reduce((total, module) => {
+      count = content.reduce((total, module) => {
         if (module.lessons && Array.isArray(module.lessons)) {
           return total + module.lessons.length
         }
@@ -22,7 +32,8 @@ function countLessonsFromContent(courseContent: string | null): number {
         return total + 1
       }, 0)
     }
-    return 0
+    lessonCountCache.set(cacheKey, count)
+    return count
   } catch {
     // Si no es JSON válido, retornar 0
     return 0
@@ -146,7 +157,7 @@ export async function getPaginatedCourses(params: CourseSearchParams = {}): Prom
     const cursosConLecciones = cursos.map(curso => ({
       ...curso,
       precio: curso.precio ? Number(curso.precio) : null,
-      total_lecciones_calculadas: countLessonsFromContent(curso.course_content)
+      total_lecciones_calculadas: countLessonsFromContent(curso.course_content, curso.id_curso)
     }))
 
     // Calcular información de paginación
@@ -227,12 +238,33 @@ export async function getCourseById(courseId: number) {
 }
 
 // Obtener todos los cursos disponibles (para compatibilidad)
+// ⚠️ DEPRECADO: Usar getPaginatedCourses o getCoursesForSelect
 export async function getAllCourses() {
   try {
-    const result = await getPaginatedCourses({ limit: 1000 }) // Obtener todos
+    const result = await getPaginatedCourses({ limit: 100 }) // Limitado para rendimiento
     return result.cursos
   } catch (error) {
     console.error('Error fetching courses:', error)
+    throw new Error('Error al obtener los cursos')
+  }
+}
+
+// Obtener cursos para selectores (solo datos mínimos)
+export async function getCoursesForSelect() {
+  try {
+    return await prisma.curso.findMany({
+      where: { b_activo: true },
+      select: { 
+        id_curso: true, 
+        nombre: true,
+        slug: true,
+        modalidad: true
+      },
+      take: 100,
+      orderBy: { nombre: 'asc' }
+    })
+  } catch (error) {
+    console.error('Error fetching courses for select:', error)
     throw new Error('Error al obtener los cursos')
   }
 }
@@ -294,67 +326,59 @@ export async function getStudentCourses(userId: number) {
               }
             }
           }
-        },
-        // Incluir entregas del estudiante
-        submissions: {
-          select: {
-            activity_id: true,
-            status: true,
-            score: true
-          }
         }
       }
     })
 
-    return cursosInscritos.map(inscripcion => {
-      // Calcular progreso basado en actividades aprobadas
-      const totalActivities = inscripcion.course.activities.length
-      let passedActivities = 0
+    // ✅ OPTIMIZADO: Calcular progreso con lógica simplificada y más eficiente
+    const coursesWithProgress = await Promise.all(
+      cursosInscritos.map(async (inscripcion) => {
+        const totalActivities = inscripcion.course.activities.length
+        let passedActivities = 0
 
-      if (totalActivities > 0) {
-        // Agrupar entregas por actividad (mejor intento)
-        const submissionsByActivity = new Map<number, { status: string; score: number | null }>()
-        
-        for (const submission of inscripcion.submissions) {
-          const existing = submissionsByActivity.get(submission.activity_id)
-          if (!existing || 
-              (submission.status === 'GRADED' && existing.status !== 'GRADED') ||
-              (submission.status === 'GRADED' && existing.status === 'GRADED' && 
-               (submission.score || 0) > (existing.score || 0))) {
-            submissionsByActivity.set(submission.activity_id, {
-              status: submission.status,
-              score: submission.score
-            })
-          }
-        }
+        if (totalActivities > 0) {
+          // Obtener solo la mejor entrega de cada actividad usando agregación
+          const passedSubmissions = await prisma.activity_submission.groupBy({
+            by: ['activity_id'],
+            where: {
+              enrollment_id: inscripcion.id,
+              status: 'GRADED',
+              score: { not: null }
+            },
+            _max: {
+              score: true
+            }
+          })
 
-        // Contar actividades aprobadas
-        for (const activity of inscripcion.course.activities) {
-          const submission = submissionsByActivity.get(activity.id)
-          if (submission && submission.status === 'GRADED' && submission.score !== null) {
-            const minScore = activity.min_passing_score || Math.floor(activity.total_points * 0.6)
-            if (submission.score >= minScore) {
-              passedActivities++
+          // Contar cuántas actividades fueron aprobadas
+          for (const submission of passedSubmissions) {
+            const activity = inscripcion.course.activities.find(a => a.id === submission.activity_id)
+            if (activity && submission._max.score) {
+              const minScore = activity.min_passing_score || Math.floor(activity.total_points * 0.6)
+              if (submission._max.score >= minScore) {
+                passedActivities++
+              }
             }
           }
         }
-      }
 
-      const progress = totalActivities > 0 
-        ? Math.round((passedActivities / totalActivities) * 100) 
-        : 0
+        const progress = totalActivities > 0 
+          ? Math.round((passedActivities / totalActivities) * 100) 
+          : 0
 
-      return {
-        ...inscripcion.course,
-        precio: inscripcion.course.precio ? Number(inscripcion.course.precio) : null,
-        // Agregar información de progreso
-        activityProgress: {
-          total: totalActivities,
-          passed: passedActivities,
-          percentage: progress
+        return {
+          ...inscripcion.course,
+          precio: inscripcion.course.precio ? Number(inscripcion.course.precio) : null,
+          activityProgress: {
+            total: totalActivities,
+            passed: passedActivities,
+            percentage: progress
+          }
         }
-      }
-    })
+      })
+    )
+
+    return coursesWithProgress
   } catch (error) {
     console.error('Error fetching student courses:', error)
     throw new Error('Error al obtener los cursos del estudiante')
@@ -454,9 +478,13 @@ export async function createCourse(data: {
       throw new Error("Solo los administradores pueden crear cursos")
     }
 
+    // Generar slug a partir del nombre
+    const slug = createSlug(data.nombre)
+
     const curso = await prisma.curso.create({
       data: {
         nombre: data.nombre,
+        slug: slug,
         modalidad: data.modalidad,
         inicio: data.inicio,
         fin: data.fin,
@@ -484,9 +512,15 @@ export async function updateCourse(id: number, data: {
       throw new Error("Solo los administradores pueden actualizar cursos")
     }
 
+    // Si se actualiza el nombre, regenerar slug
+    const updateData: typeof data & { slug?: string } = { ...data }
+    if (data.nombre) {
+      updateData.slug = createSlug(data.nombre)
+    }
+
     const curso = await prisma.curso.update({
       where: { id_curso: id },
-      data: data
+      data: updateData
     })
 
     return curso
@@ -519,9 +553,10 @@ export async function deleteCourse(id: number) {
 // Obtener curso por slug (nombre del curso convertido a slug)
 export async function getCourseBySlug(slug: string) {
   try {
-    // Obtener todos los cursos activos para comparar con el slug
-    const cursos = await prisma.curso.findMany({
+    // Consultar directamente por el campo slug
+    const curso = await prisma.curso.findUnique({
       where: {
+        slug: slug,
         b_activo: true
       },
       select: {
@@ -611,28 +646,82 @@ export async function getCourseBySlug(slug: string) {
           },
           orderBy: {
             created_at: 'desc'
-          }
+          },
+          take: 10 // ✅ OPTIMIZADO: Solo cargar las primeras 10 reviews
         }
       }
     })
-
-    // Buscar el curso cuyo nombre coincida con el slug
-    const curso = cursos.find((c) => createSlug(c.nombre) === slug)
 
     if (!curso) {
       redirect('/Courses')
     }
 
-    // Agregar lecciones calculadas desde el contenido
-    const cursoConLecciones = {
+    // ✅ OPTIMIZADO: Parsear JSON en el servidor para reducir carga del cliente
+    const cursoConDatosParsed = {
       ...curso,
       precio: curso.precio ? Number(curso.precio) : null,
-      total_lecciones_calculadas: countLessonsFromContent(curso.course_content)
+      total_lecciones_calculadas: countLessonsFromContent(curso.course_content, curso.id_curso),
+      // Parsear campos JSON
+      what_you_learn: curso.what_you_learn ? JSON.parse(curso.what_you_learn) : [],
+      features: curso.features ? JSON.parse(curso.features) : [],
+      requirements: curso.requirements ? JSON.parse(curso.requirements) : [],
+      target_audience: curso.target_audience ? JSON.parse(curso.target_audience) : [],
+      course_content: curso.course_content ? JSON.parse(curso.course_content) : []
     }
 
-    return cursoConLecciones
+    return cursoConDatosParsed
   } catch (error) {
     console.error('Error fetching course by slug:', error)
     throw new Error('Error al obtener el curso')
+  }
+}
+
+// ✅ NUEVO: Cargar más reviews con paginación
+export async function getCourseReviews(courseId: number, page = 1, limit = 10) {
+  try {
+    const skip = (page - 1) * limit
+    
+    const reviews = await prisma.review.findMany({
+      where: { 
+        course_id: courseId, 
+        is_active: true 
+      },
+      include: {
+        student: {
+          include: {
+            usuario: {
+              select: {
+                id: true,
+                nombre: true,
+                apellido: true
+              }
+            }
+          }
+        }
+      },
+      orderBy: {
+        created_at: 'desc'
+      },
+      take: limit,
+      skip
+    })
+
+    const totalReviews = await prisma.review.count({
+      where: { 
+        course_id: courseId, 
+        is_active: true 
+      }
+    })
+
+    return {
+      reviews,
+      totalReviews,
+      currentPage: page,
+      totalPages: Math.ceil(totalReviews / limit),
+      hasMore: skip + reviews.length < totalReviews
+    }
+  } catch (error) {
+    console.error('Error fetching course reviews:', error)
+    throw new Error('Error al obtener las reseñas del curso')
   }
 }

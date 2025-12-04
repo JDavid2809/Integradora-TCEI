@@ -32,8 +32,6 @@ export default async function page() {
     getStudentCourses(+session.user.id),
     getAllCourses()
   ])
-
-  console.log('✅ Student access granted:', session.user.email, 'Role:', session.user.rol)
  
   return (
     <Intermedio 

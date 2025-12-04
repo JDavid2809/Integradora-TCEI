@@ -321,7 +321,7 @@ export default function Activitys() {
             <div className="flex items-center justify-center min-h-[400px]">
                 <div className="text-center">
                     <Loader2 className="w-12 h-12 text-[#00246a] animate-spin mx-auto mb-4" />
-                    <p className="text-slate-600">Cargando tus actividades...</p>
+                    <p className="text-slate-600 dark:text-slate-300">Cargando tus actividades...</p>
                 </div>
             </div>
         )
@@ -332,7 +332,7 @@ export default function Activitys() {
         return (
             <div className="bg-red-50 border border-red-200 rounded-xl p-6 text-center">
                 <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
-                <h3 className="text-lg font-semibold text-red-800 mb-2">Error al cargar actividades</h3>
+                <h3 className="text-lg font-semibold text-red-800 dark:text-red-200 mb-2">Error al cargar actividades</h3>
                 <p className="text-red-600 mb-4">{error}</p>
                 <button
                     onClick={loadActivities}
@@ -356,8 +356,8 @@ export default function Activitys() {
             {/* Header */}
             <div id="activities-header" className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
-                    <h2 className="text-2xl md:text-3xl font-bold text-[#00246a]">Mis Actividades</h2>
-                    <p className="text-slate-600 text-sm md:text-base">Gestiona todas tus tareas y proyectos en un solo lugar</p>
+                    <h2 className="text-2xl md:text-3xl font-bold text-[#00246a] dark:text-blue-100">Mis Actividades</h2>
+                    <p className="text-slate-600 dark:text-slate-300 text-sm md:text-base">Gestiona todas tus tareas y proyectos en un solo lugar</p>
                 </div>
                 <div className="flex items-center gap-3">
                     <span className="text-sm text-slate-600">
@@ -365,10 +365,10 @@ export default function Activitys() {
                     </span>
                     <button
                         onClick={loadActivities}
-                        className="p-2 hover:bg-slate-100 rounded-lg transition-colors"
+                        className="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors"
                         title="Actualizar actividades"
                     >
-                        <RefreshCw className="w-5 h-5 text-slate-600" />
+                        <RefreshCw className="w-5 h-5 text-slate-600 dark:text-slate-300" />
                     </button>
                 </div>
             </div>
@@ -421,7 +421,7 @@ export default function Activitys() {
             </div>
 
             {/* Search and Filters */}
-            <div className="bg-gradient-to-br from-white to-slate-50 rounded-xl shadow-md border border-slate-200 p-4 md:p-6">
+            <div className="bg-gradient-to-br from-white to-slate-50 dark:from-slate-900 dark:to-slate-800 rounded-xl shadow-md border border-slate-200 dark:border-slate-700 p-4 md:p-6">
                 <div className="flex flex-col md:flex-row gap-3 md:gap-4">
                     {/* Search */}
                     <div id="search-bar" className="flex-1">
@@ -432,7 +432,7 @@ export default function Activitys() {
                                 placeholder="Buscar por título o descripción..."
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
-                                className="w-full pl-10 pr-4 py-3 border-2 border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00246a] focus:border-[#00246a] bg-white text-slate-900 placeholder:text-slate-500 font-medium transition-all hover:border-slate-400"
+                                className="w-full pl-10 pr-4 py-3 border-2 border-slate-300 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00246a] dark:focus:ring-blue-500 focus:border-[#00246a] dark:focus:border-blue-500 bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-slate-400 font-medium transition-all hover:border-slate-400 dark:hover:border-slate-600"
                             />
                         </div>
                     </div>
@@ -443,8 +443,8 @@ export default function Activitys() {
                         onClick={() => setShowFilters(!showFilters)}
                         className={`flex items-center justify-center gap-2 px-5 py-3 rounded-lg font-semibold transition-all min-w-[120px] ${
                             showFilters
-                                ? 'bg-gradient-to-r from-[#00246a] to-[#003a8c] text-white shadow-lg transform scale-105'
-                                : 'bg-white text-[#00246a] border-2 border-[#00246a] hover:bg-[#00246a] hover:text-white shadow-md'
+                                ? 'bg-gradient-to-r from-[#00246a] to-[#003a8c] dark:from-blue-600 dark:to-blue-800 text-white shadow-lg transform scale-105'
+                                : 'bg-white dark:bg-slate-800 text-[#00246a] dark:text-blue-400 border-2 border-[#00246a] dark:border-blue-400 hover:bg-[#00246a] dark:hover:bg-blue-600 hover:text-white shadow-md'
                         }`}
                     >
                         <Filter className="w-5 h-5" />
@@ -457,13 +457,13 @@ export default function Activitys() {
                     </button>
 
                     {/* View Toggle */}
-                    <div id="view-toggle" className="flex bg-slate-200 rounded-lg p-1 shadow-inner">
+                    <div id="view-toggle" className="flex bg-slate-200 dark:bg-slate-700 rounded-lg p-1 shadow-inner">
                         <button
                             onClick={() => setViewMode('grid')}
                             className={`p-2.5 rounded-md transition-all ${
                                 viewMode === 'grid'
-                                    ? 'bg-gradient-to-br from-white to-slate-50 shadow-md text-[#00246a] scale-105'
-                                    : 'text-slate-600 hover:bg-slate-300 hover:text-slate-900'
+                                    ? 'bg-gradient-to-br from-white to-slate-50 dark:from-slate-600 dark:to-slate-500 shadow-md text-[#00246a] dark:text-white scale-105'
+                                    : 'text-slate-600 dark:text-slate-300 hover:bg-slate-300 dark:hover:bg-slate-600 hover:text-slate-900 dark:hover:text-white'
                             }`}
                             title="Vista de cuadrícula"
                         >
@@ -473,8 +473,8 @@ export default function Activitys() {
                             onClick={() => setViewMode('list')}
                             className={`p-2.5 rounded-md transition-all ${
                                 viewMode === 'list'
-                                    ? 'bg-gradient-to-br from-white to-slate-50 shadow-md text-[#00246a] scale-105'
-                                    : 'text-slate-600 hover:bg-slate-300 hover:text-slate-900'
+                                    ? 'bg-gradient-to-br from-white to-slate-50 dark:from-slate-600 dark:to-slate-500 shadow-md text-[#00246a] dark:text-white scale-105'
+                                    : 'text-slate-600 dark:text-slate-300 hover:bg-slate-300 dark:hover:bg-slate-600 hover:text-slate-900 dark:hover:text-white'
                             }`}
                             title="Vista de lista"
                         >
@@ -491,12 +491,12 @@ export default function Activitys() {
                             animate={{ opacity: 1, height: 'auto' }}
                             exit={{ opacity: 0, height: 0 }}
                             transition={{ duration: 0.3 }}
-                            className="mt-5 pt-5 border-t-2 border-slate-300"
+                            className="mt-5 pt-5 border-t-2 border-slate-300 dark:border-slate-700"
                         >
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
                                 {/* Estado */}
                                 <div>
-                                    <label className="flex items-center gap-2 text-sm font-bold text-[#00246a] mb-3">
+                                    <label className="flex items-center gap-2 text-sm font-bold text-[#00246a] dark:text-blue-400 mb-3">
                                         <CheckCircle className="w-4 h-4" />
                                         Estado de la Actividad
                                     </label>
@@ -504,7 +504,7 @@ export default function Activitys() {
                                         <select
                                             value={selectedStatus}
                                             onChange={(e) => setSelectedStatus(e.target.value)}
-                                            className="w-full px-4 py-3 pr-10 border-2 border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00246a] focus:border-[#00246a] bg-white text-slate-900 font-semibold appearance-none cursor-pointer transition-all hover:border-slate-400 shadow-sm"
+                                            className="w-full px-4 py-3 pr-10 border-2 border-slate-300 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00246a] dark:focus:ring-blue-500 focus:border-[#00246a] dark:focus:border-blue-500 bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-semibold appearance-none cursor-pointer transition-all hover:border-slate-400 dark:hover:border-slate-600 shadow-sm"
                                         >
                                             <option value="all">Todos los estados</option>
                                             <option value="pending">Pendientes</option>
@@ -518,7 +518,7 @@ export default function Activitys() {
 
                                 {/* Tipo */}
                                 <div>
-                                    <label className="flex items-center gap-2 text-sm font-bold text-[#00246a] mb-3">
+                                    <label className="flex items-center gap-2 text-sm font-bold text-[#00246a] dark:text-blue-400 mb-3">
                                         <FileText className="w-4 h-4" />
                                         Tipo de Actividad
                                     </label>
@@ -526,7 +526,7 @@ export default function Activitys() {
                                         <select
                                             value={selectedType}
                                             onChange={(e) => setSelectedType(e.target.value)}
-                                            className="w-full px-4 py-3 pr-10 border-2 border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00246a] focus:border-[#00246a] bg-white text-slate-900 font-semibold appearance-none cursor-pointer transition-all hover:border-slate-400 shadow-sm"
+                                            className="w-full px-4 py-3 pr-10 border-2 border-slate-300 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00246a] dark:focus:ring-blue-500 focus:border-[#00246a] dark:focus:border-blue-500 bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-semibold appearance-none cursor-pointer transition-all hover:border-slate-400 dark:hover:border-slate-600 shadow-sm"
                                         >
                                             <option value="all">Todos los tipos</option>
                                             {Object.entries(ACTIVITY_CONFIG).map(([key, config]) => (
@@ -541,7 +541,7 @@ export default function Activitys() {
 
                                 {/* Curso */}
                                 <div>
-                                    <label className="flex items-center gap-2 text-sm font-bold text-[#00246a] mb-3">
+                                    <label className="flex items-center gap-2 text-sm font-bold text-[#00246a] dark:text-blue-400 mb-3">
                                         <BookOpen className="w-4 h-4" />
                                         Curso
                                     </label>
@@ -549,7 +549,7 @@ export default function Activitys() {
                                         <select
                                             value={selectedCourse}
                                             onChange={(e) => setSelectedCourse(e.target.value)}
-                                            className="w-full px-4 py-3 pr-10 border-2 border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00246a] focus:border-[#00246a] bg-white text-slate-900 font-semibold appearance-none cursor-pointer transition-all hover:border-slate-400 shadow-sm"
+                                            className="w-full px-4 py-3 pr-10 border-2 border-slate-300 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00246a] dark:focus:ring-blue-500 focus:border-[#00246a] dark:focus:border-blue-500 bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-semibold appearance-none cursor-pointer transition-all hover:border-slate-400 dark:hover:border-slate-600 shadow-sm"
                                         >
                                             <option value="all">Todos los cursos</option>
                                             {uniqueCourses.map((course) => (
@@ -565,10 +565,10 @@ export default function Activitys() {
 
                             {/* Clear Filters */}
                             {(selectedStatus !== 'all' || selectedType !== 'all' || selectedCourse !== 'all') && (
-                                <div className="mt-5 flex items-center justify-between bg-gradient-to-r from-[#e30f28]/10 to-[#e30f28]/5 border-2 border-[#e30f28]/30 rounded-lg p-4">
+                                <div className="mt-5 flex items-center justify-between bg-gradient-to-r from-[#e30f28]/10 to-[#e30f28]/5 dark:from-red-900/20 dark:to-red-900/10 border-2 border-[#e30f28]/30 dark:border-red-500/30 rounded-lg p-4">
                                     <div className="flex items-center gap-2">
-                                        <AlertCircle className="w-5 h-5 text-[#e30f28]" />
-                                        <span className="text-sm font-semibold text-slate-700">
+                                        <AlertCircle className="w-5 h-5 text-[#e30f28] dark:text-red-400" />
+                                        <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">
                                             {[selectedStatus !== 'all', selectedType !== 'all', selectedCourse !== 'all'].filter(Boolean).length} filtro(s) activo(s)
                                         </span>
                                     </div>
@@ -593,10 +593,10 @@ export default function Activitys() {
             {/* Activities Container */}
             <div id="activities-container">
                 {filteredActivities.length === 0 ? (
-                    <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-12 text-center">
-                        <FileText className="w-16 h-16 text-slate-300 mx-auto mb-4" />
-                        <h3 className="text-lg font-semibold text-slate-700 mb-2">No se encontraron actividades</h3>
-                        <p className="text-slate-500">
+                    <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 p-12 text-center">
+                        <FileText className="w-16 h-16 text-slate-300 dark:text-slate-600 mx-auto mb-4" />
+                        <h3 className="text-lg font-semibold text-slate-700 dark:text-slate-200 mb-2">No se encontraron actividades</h3>
+                        <p className="text-slate-500 dark:text-slate-400">
                             {searchTerm || selectedStatus !== 'all' || selectedType !== 'all' || selectedCourse !== 'all'
                                 ? 'Intenta ajustar los filtros de búsqueda'
                                 : '¡Genial! No tienes actividades pendientes'}
@@ -624,7 +624,7 @@ export default function Activitys() {
                                     transition={{ delay: index * 0.05 }}
                                     whileHover={{ scale: 1.02 }}
                                     onClick={() => setSelectedActivity(activity)}
-                                    className={`bg-white rounded-xl shadow-sm border-2 ${urgencyColor} cursor-pointer transition-all hover:shadow-lg ${viewMode === 'list' ? 'p-4' : 'p-6'
+                                    className={`bg-white dark:bg-slate-800 rounded-xl shadow-sm border-2 ${urgencyColor} cursor-pointer transition-all hover:shadow-lg ${viewMode === 'list' ? 'p-4' : 'p-6'
                                         }`}
                                 >
                                     {viewMode === 'grid' ? (
@@ -642,10 +642,10 @@ export default function Activitys() {
 
                                             {/* Title */}
                                             <div>
-                                                <h3 className="font-semibold text-slate-800 mb-1 line-clamp-2">
+                                                <h3 className="font-semibold text-slate-800 dark:text-white mb-1 line-clamp-2">
                                                     {activity.title}
                                                 </h3>
-                                                <p className="text-sm text-slate-600 line-clamp-2">
+                                                <p className="text-sm text-slate-600 dark:text-slate-400 line-clamp-2">
                                                     {activity.description}
                                                 </p>
                                             </div>
@@ -653,7 +653,7 @@ export default function Activitys() {
                                             {/* Course */}
                                             <div className="flex items-center gap-2">
                                                 <div className={`w-3 h-3 rounded-full ${activity.course.color}`} />
-                                                <span className="text-sm text-slate-600">{activity.course.nombre}</span>
+                                                <span className="text-sm text-slate-600 dark:text-slate-400">{activity.course.nombre}</span>
                                             </div>
 
                                             {/* Progress Bar */}
@@ -663,7 +663,7 @@ export default function Activitys() {
                                                         <span>Progreso</span>
                                                         <span>{activity.progress}%</span>
                                                     </div>
-                                                    <div className="w-full bg-slate-200 rounded-full h-2">
+                                                    <div className="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-2">
                                                         <div
                                                             className="bg-gradient-to-r from-blue-500 to-blue-600 h-2 rounded-full transition-all"
                                                             style={{ width: `${activity.progress}%` }}
@@ -673,8 +673,8 @@ export default function Activitys() {
                                             )}
 
                                             {/* Footer */}
-                                            <div className="flex items-center justify-between pt-3 border-t border-slate-100">
-                                                <div className="flex items-center gap-1 text-sm text-slate-600">
+                                            <div className="flex items-center justify-between pt-3 border-t border-slate-100 dark:border-slate-700">
+                                                <div className="flex items-center gap-1 text-sm text-slate-600 dark:text-slate-400">
                                                     <Clock className="w-4 h-4" />
                                                     <span>
                                                         {activity.status === 'overdue'
@@ -691,7 +691,7 @@ export default function Activitys() {
                                                         }
                                                     </span>
                                                 </div>
-                                                <div className="flex items-center gap-1 text-sm font-medium text-slate-700">
+                                                <div className="flex items-center gap-1 text-sm font-medium text-slate-700 dark:text-slate-300">
                                                     <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
                                                     <span>{activity.points}/{activity.total_points}</span>
                                                 </div>
@@ -706,17 +706,17 @@ export default function Activitys() {
 
                                             <div className="flex-1 min-w-0">
                                                 <div className="flex items-start justify-between gap-2 mb-1">
-                                                    <h3 className="font-semibold text-slate-800 truncate">
+                                                    <h3 className="font-semibold text-slate-800 dark:text-white truncate">
                                                         {activity.title}
                                                     </h3>
                                                     <span className={`px-2.5 py-1 rounded-full text-xs font-medium whitespace-nowrap ${statusConfig.color}`}>
                                                         {statusConfig.label}
                                                     </span>
                                                 </div>
-                                                <p className="text-sm text-slate-600 mb-2 line-clamp-1">
+                                                <p className="text-sm text-slate-600 dark:text-slate-400 mb-2 line-clamp-1">
                                                     {activity.description}
                                                 </p>
-                                                <div className="flex flex-wrap items-center gap-4 text-sm text-slate-600">
+                                                <div className="flex flex-wrap items-center gap-4 text-sm text-slate-600 dark:text-slate-400">
                                                     <div className="flex items-center gap-1">
                                                         <div className={`w-2 h-2 rounded-full ${activity.course.color}`} />
                                                         <span>{activity.course.nombre}</span>
@@ -742,7 +742,7 @@ export default function Activitys() {
                                                     </div>
                                                     {activity.progress > 0 && (
                                                         <div className="flex items-center gap-2">
-                                                            <div className="w-20 bg-slate-200 rounded-full h-1.5">
+                                                            <div className="w-20 bg-slate-200 dark:bg-slate-700 rounded-full h-1.5">
                                                                 <div
                                                                     className="bg-blue-500 h-1.5 rounded-full"
                                                                     style={{ width: `${activity.progress}%` }}
@@ -777,7 +777,7 @@ export default function Activitys() {
                             animate={{ scale: 1, opacity: 1 }}
                             exit={{ scale: 0.9, opacity: 0 }}
                             onClick={(e) => e.stopPropagation()}
-                            className="bg-white rounded-2xl p-6 md:p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl"
+                            className="bg-white dark:bg-slate-800 rounded-2xl p-6 md:p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl"
                         >
                             {/* Header */}
                             <div className="flex items-start justify-between mb-6">
@@ -789,7 +789,7 @@ export default function Activitys() {
                                         )}
                                     </div>
                                     <div className="flex-1">
-                                        <h2 className="text-2xl font-bold text-[#00246a] mb-2">
+                                        <h2 className="text-2xl font-bold text-[#00246a] dark:text-white mb-2">
                                             {selectedActivity.title}
                                         </h2>
                                         <div className="flex flex-wrap gap-2">
@@ -804,9 +804,9 @@ export default function Activitys() {
                                 </div>
                                 <button
                                     onClick={() => setSelectedActivity(null)}
-                                    className="p-2 hover:bg-slate-100 rounded-lg transition-colors flex-shrink-0"
+                                    className="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors flex-shrink-0"
                                 >
-                                    <X className="w-6 h-6 text-slate-600" />
+                                    <X className="w-6 h-6 text-slate-600 dark:text-slate-400" />
                                 </button>
                             </div>
 
@@ -814,29 +814,29 @@ export default function Activitys() {
                             <div className="space-y-6">
                                 {/* Description */}
                                 <div>
-                                    <h3 className="font-semibold text-slate-800 mb-2">Descripción</h3>
-                                    <p className="text-slate-600 leading-relaxed">{selectedActivity.description}</p>
+                                    <h3 className="font-semibold text-slate-800 dark:text-white mb-2">Descripción</h3>
+                                    <p className="text-slate-600 dark:text-slate-300 leading-relaxed">{selectedActivity.description}</p>
                                 </div>
 
                                 {/* Course Info */}
-                                <div className="bg-slate-50 rounded-xl p-4">
+                                <div className="bg-slate-50 dark:bg-slate-700/50 rounded-xl p-4">
                                     <div className="flex items-center gap-3">
                                         <div className={`w-4 h-4 rounded-full ${selectedActivity.course.color}`} />
                                         <div>
-                                            <p className="font-medium text-slate-800">{selectedActivity.course.nombre}</p>
-                                            <p className="text-sm text-slate-600">Nivel {selectedActivity.course.nivel}</p>
+                                            <p className="font-medium text-slate-800 dark:text-white">{selectedActivity.course.nombre}</p>
+                                            <p className="text-sm text-slate-600 dark:text-slate-400">Nivel {selectedActivity.course.nivel}</p>
                                         </div>
                                     </div>
                                 </div>
 
                                 {/* Details Grid */}
                                 <div className="grid grid-cols-2 gap-4">
-                                    <div className="bg-blue-50 rounded-xl p-4">
-                                        <div className="flex items-center gap-2 text-blue-600 mb-1">
+                                    <div className="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-4">
+                                        <div className="flex items-center gap-2 text-blue-600 dark:text-blue-400 mb-1">
                                             <Calendar className="w-5 h-5" />
                                             <span className="font-medium">Fecha de Entrega</span>
                                         </div>
-                                        <p className="text-slate-800 font-semibold">
+                                        <p className="text-slate-800 dark:text-slate-200 font-semibold">
                                             {selectedActivity.due_date 
                                                 ? new Date(selectedActivity.due_date).toLocaleDateString('es-ES', {
                                                     weekday: 'long',
@@ -849,12 +849,12 @@ export default function Activitys() {
                                         </p>
                                     </div>
 
-                                    <div className="bg-purple-50 rounded-xl p-4">
-                                        <div className="flex items-center gap-2 text-purple-600 mb-1">
+                                    <div className="bg-purple-50 dark:bg-purple-900/20 rounded-xl p-4">
+                                        <div className="flex items-center gap-2 text-purple-600 dark:text-purple-400 mb-1">
                                             <Award className="w-5 h-5" />
                                             <span className="font-medium">Puntuación</span>
                                         </div>
-                                        <p className="text-slate-800 font-semibold">
+                                        <p className="text-slate-800 dark:text-slate-200 font-semibold">
                                             {selectedActivity.points} / {selectedActivity.total_points} puntos
                                         </p>
                                     </div>
@@ -864,10 +864,10 @@ export default function Activitys() {
                                 {selectedActivity.progress > 0 && (
                                     <div>
                                         <div className="flex justify-between items-center mb-2">
-                                            <span className="font-medium text-slate-800">Progreso</span>
-                                            <span className="text-lg font-bold text-blue-600">{selectedActivity.progress}%</span>
+                                            <span className="font-medium text-slate-800 dark:text-slate-200">Progreso</span>
+                                            <span className="text-lg font-bold text-blue-600 dark:text-blue-400">{selectedActivity.progress}%</span>
                                         </div>
-                                        <div className="w-full bg-slate-200 rounded-full h-3">
+                                        <div className="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-3">
                                             <div
                                                 className="bg-gradient-to-r from-blue-500 to-blue-600 h-3 rounded-full transition-all"
                                                 style={{ width: `${selectedActivity.progress}%` }}
@@ -877,7 +877,7 @@ export default function Activitys() {
                                 )}
 
                                 {/* Actions */}
-                                <div className="flex flex-wrap gap-3 pt-4 border-t border-slate-200">
+                                <div className="flex flex-wrap gap-3 pt-4 border-t border-slate-200 dark:border-slate-700">
                                     {selectedActivity.status !== 'completed' && (
                                         <>
                                             <button 
@@ -889,7 +889,7 @@ export default function Activitys() {
                                             </button>
                                             <button 
                                                 onClick={() => window.location.href = `/Students/courses/${selectedActivity.course.id}`}
-                                                className="flex-1 bg-slate-100 text-slate-700 px-6 py-3 rounded-xl font-medium hover:bg-slate-200 transition-all flex items-center justify-center gap-2"
+                                                className="flex-1 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 px-6 py-3 rounded-xl font-medium hover:bg-slate-200 dark:hover:bg-slate-600 transition-all flex items-center justify-center gap-2"
                                             >
                                                 <Eye className="w-5 h-5" />
                                                 Ver Detalles
@@ -900,7 +900,7 @@ export default function Activitys() {
                                         <>
                                             <button 
                                                 onClick={() => window.location.href = `/Students/courses/${selectedActivity.course.id}`}
-                                                className="flex-1 bg-green-100 text-green-700 px-6 py-3 rounded-xl font-medium hover:bg-green-200 transition-all flex items-center justify-center gap-2"
+                                                className="flex-1 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 px-6 py-3 rounded-xl font-medium hover:bg-green-200 dark:hover:bg-green-900/50 transition-all flex items-center justify-center gap-2"
                                             >
                                                 <CheckCircle className="w-5 h-5" />
                                                 Ver en Curso

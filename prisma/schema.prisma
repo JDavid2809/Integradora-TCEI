@@ -307,6 +307,9 @@ model curso {
   nivel_ingles    String?   @db.VarChar(20)
 
   duracion_horas Int?
+  
+  imagen_url      String?   // URL de la imagen miniatura del curso (Cloudinary)
+  video_url       String?   // URL del video introductorio del curso (Cloudinary)
 
   certificado     Boolean?          @default(true) // Incluye certificado
   inscripciones   Inscripcion[]

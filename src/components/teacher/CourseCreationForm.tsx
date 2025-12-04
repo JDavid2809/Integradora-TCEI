@@ -62,11 +62,143 @@ export default function CourseCreationForm({
     courseContent: []
   })
 
+  // Estados para subida de archivos
+  const [imageFile, setImageFile] = useState<File | null>(null)
+  const [videoFile, setVideoFile] = useState<File | null>(null)
+  const [imagePreview, setImagePreview] = useState<string>('')
+  const [videoPreview, setVideoPreview] = useState<string>('')
+  const [uploadingImage, setUploadingImage] = useState(false)
+  const [uploadingVideo, setUploadingVideo] = useState(false)
+  const [imageUrl, setImageUrl] = useState<string>('')
+  const [videoUrl, setVideoUrl] = useState<string>('')
+
   // ========================================
   // FUNCIONES AUXILIARES
   // ========================================
 
   const generateId = () => Math.random().toString(36).substr(2, 9)
+
+  // Función para subir imagen a Cloudinary
+  const uploadImageToCloudinary = async (file: File): Promise<string> => {
+    const formData = new FormData()
+    formData.append('file', file)
+    formData.append('upload_preset', process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET_IMAGENES || 'cursos_imagenes')
+    formData.append('cloud_name', process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || 'dqqqhegoa')
+
+    const response = await fetch(
+      `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || 'dqqqhegoa'}/image/upload`,
+      {
+        method: 'POST',
+        body: formData,
+      }
+    )
+
+    if (!response.ok) {
+      throw new Error('Error al subir la imagen')
+    }
+
+    const data = await response.json()
+    return data.secure_url
+  }
+
+  // Función para subir video a Cloudinary
+  const uploadVideoToCloudinary = async (file: File): Promise<string> => {
+    const formData = new FormData()
+    formData.append('file', file)
+    formData.append('upload_preset', process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET_VIDEOS || 'cursos_videos')
+    formData.append('cloud_name', process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || 'dqqqhegoa')
+
+    const response = await fetch(
+      `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || 'dqqqhegoa'}/video/upload`,
+      {
+        method: 'POST',
+        body: formData,
+      }
+    )
+
+    if (!response.ok) {
+      throw new Error('Error al subir el video')
+    }
+
+    const data = await response.json()
+    return data.secure_url
+  }
+
+  // Manejar selección de imagen
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      // Validar tipo de archivo
+      if (!file.type.startsWith('image/')) {
+        alert('Por favor selecciona un archivo de imagen válido')
+        return
+      }
+      // Validar tamaño (máx 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        alert('La imagen no debe superar los 5MB')
+        return
+      }
+      setImageFile(file)
+      setImagePreview(URL.createObjectURL(file))
+    }
+  }
+
+  // Manejar selección de video
+  const handleVideoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      // Validar tipo de archivo
+      if (!file.type.startsWith('video/')) {
+        alert('Por favor selecciona un archivo de video válido')
+        return
+      }
+      // Validar tamaño (máx 100MB)
+      if (file.size > 100 * 1024 * 1024) {
+        alert('El video no debe superar los 100MB')
+        return
+      }
+      setVideoFile(file)
+      setVideoPreview(URL.createObjectURL(file))
+    }
+  }
+
+  // Subir imagen
+  const handleUploadImage = async () => {
+    if (!imageFile) return
+
+    setUploadingImage(true)
+    try {
+      const url = await uploadImageToCloudinary(imageFile)
+      setImageUrl(url)
+      setImageFile(null) // Limpiar el archivo después de subir
+      setSubmitMessage('Imagen subida exitosamente')
+      setTimeout(() => setSubmitMessage(''), 3000)
+    } catch (error) {
+      setSubmitError('Error al subir la imagen')
+      setTimeout(() => setSubmitError(''), 3000)
+    } finally {
+      setUploadingImage(false)
+    }
+  }
+
+  // Subir video
+  const handleUploadVideo = async () => {
+    if (!videoFile) return
+
+    setUploadingVideo(true)
+    try {
+      const url = await uploadVideoToCloudinary(videoFile)
+      setVideoUrl(url)
+      setVideoFile(null) // Limpiar el archivo después de subir
+      setSubmitMessage('Video subido exitosamente')
+      setTimeout(() => setSubmitMessage(''), 3000)
+    } catch (error) {
+      setSubmitError('Error al subir el video')
+      setTimeout(() => setSubmitError(''), 3000)
+    } finally {
+      setUploadingVideo(false)
+    }
+  }
 
   // ========================================
   // CARGAR DATOS PARA EDICIÓN
@@ -90,6 +222,16 @@ export default function CourseCreationForm({
               precio: courseDetails.precio || undefined,
               nivel_ingles: courseDetails.nivel_ingles || undefined
             })
+
+            // Cargar URLs de imagen y video si existen
+            if (courseDetails.imagen_url) {
+              setImageUrl(courseDetails.imagen_url)
+              setImagePreview(courseDetails.imagen_url)
+            }
+            if (courseDetails.video_url) {
+              setVideoUrl(courseDetails.video_url)
+              setVideoPreview(courseDetails.video_url)
+            }
 
             // Cargar detalles con verificación de estructura
             setDetails({
@@ -305,7 +447,11 @@ export default function CourseCreationForm({
 
     try {
       const courseData: CourseCreationData = {
-        basicInfo,
+        basicInfo: {
+          ...basicInfo,
+          imagen_url: imageUrl || undefined,
+          video_url: videoUrl || undefined
+        },
         details: {
           ...details,
           // Filtrar elementos vacíos
@@ -526,6 +672,172 @@ export default function CourseCreationForm({
                   placeholder="0.00"
                 />
                 <p className="text-xs text-gray-500 mt-1">Dejar vacío para curso gratuito</p>
+              </div>
+            </div>
+
+            {/* Sección de Imagen y Video */}
+            <div className="border-t pt-6 mt-6">
+              <h3 className="text-lg font-semibold text-gray-700 mb-2">Multimedia del Curso</h3>
+              <p className="text-sm text-gray-500 mb-4">
+                {isEditing 
+                  ? 'Actualiza la imagen y/o video del curso. Si subes nuevos archivos, reemplazarán los actuales.' 
+                  : 'Agrega una imagen miniatura y un video introductorio para hacer tu curso más atractivo.'}
+              </p>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Imagen del Curso */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Imagen del Curso (Miniatura)
+                  </label>
+                  <div className="space-y-3">
+                    {/* Mostrar imagen actual si existe */}
+                    {imagePreview && (
+                      <div className="relative">
+                        <img 
+                          src={imagePreview} 
+                          alt="Preview" 
+                          className="w-full h-48 object-cover rounded-lg border-2 border-gray-200"
+                        />
+                        {imageUrl && (
+                          <div className="absolute top-2 right-2 bg-green-500 text-white px-2 py-1 rounded-full text-xs flex items-center gap-1">
+                            <CheckCircle className="w-3 h-3" />
+                            <span>Guardada</span>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                    
+                    {/* Input de archivo */}
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageChange}
+                      className="text-gray-700 w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00246a] focus:border-transparent"
+                    />
+                    
+                    {/* Botones de acción */}
+                    <div className="flex gap-2">
+                      {/* Mostrar botón de subir cuando hay un archivo seleccionado y aún no se ha subido */}
+                      {imageFile && (
+                        <button
+                          type="button"
+                          onClick={handleUploadImage}
+                          disabled={uploadingImage}
+                          className="flex-1 bg-[#00246a] hover:bg-[#001a4d] text-white px-4 py-2 rounded-lg transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+                        >
+                          {uploadingImage ? (
+                            <>
+                              <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
+                              <span>Subiendo...</span>
+                            </>
+                          ) : (
+                            <>
+                              <Save className="w-4 h-4" />
+                              <span>{imageUrl ? 'Actualizar Imagen' : 'Subir Imagen'}</span>
+                            </>
+                          )}
+                        </button>
+                      )}
+                      {/* Mostrar botón de eliminar solo si ya hay una imagen guardada Y no hay un archivo pendiente */}
+                      {imageUrl && !imageFile && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setImageUrl('')
+                            setImagePreview('')
+                            setImageFile(null)
+                          }}
+                          className="flex-1 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg transition-colors flex items-center justify-center gap-2"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                          <span>Eliminar Imagen</span>
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                  <p className="text-xs text-gray-500 mt-1">
+                    Formatos: JPG, PNG, WEBP. Máx 5MB
+                    {isEditing && imageUrl && <span className="block mt-1 text-blue-600">💡 Sube una nueva imagen para reemplazar la actual</span>}
+                  </p>
+                </div>
+
+                {/* Video del Curso */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Video Introductorio
+                  </label>
+                  <div className="space-y-3">
+                    {/* Mostrar video actual si existe */}
+                    {videoPreview && (
+                      <div className="relative">
+                        <video 
+                          src={videoPreview} 
+                          controls 
+                          className="w-full h-48 object-cover rounded-lg border-2 border-gray-200"
+                        />
+                        {videoUrl && (
+                          <div className="absolute top-2 right-2 bg-green-500 text-white px-2 py-1 rounded-full text-xs flex items-center gap-1">
+                            <CheckCircle className="w-3 h-3" />
+                            <span>Guardado</span>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                    
+                    {/* Input de archivo */}
+                    <input
+                      type="file"
+                      accept="video/*"
+                      onChange={handleVideoChange}
+                      className="text-gray-700 w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00246a] focus:border-transparent"
+                    />
+                    
+                    {/* Botones de acción */}
+                    <div className="flex gap-2">
+                      {/* Mostrar botón de subir cuando hay un archivo seleccionado y aún no se ha subido */}
+                      {videoFile && (
+                        <button
+                          type="button"
+                          onClick={handleUploadVideo}
+                          disabled={uploadingVideo}
+                          className="flex-1 bg-[#00246a] hover:bg-[#001a4d] text-white px-4 py-2 rounded-lg transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+                        >
+                          {uploadingVideo ? (
+                            <>
+                              <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
+                              <span>Subiendo...</span>
+                            </>
+                          ) : (
+                            <>
+                              <Save className="w-4 h-4" />
+                              <span>{videoUrl ? 'Actualizar Video' : 'Subir Video'}</span>
+                            </>
+                          )}
+                        </button>
+                      )}
+                      {/* Mostrar botón de eliminar solo si ya hay un video guardado Y no hay un archivo pendiente */}
+                      {videoUrl && !videoFile && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setVideoUrl('')
+                            setVideoPreview('')
+                            setVideoFile(null)
+                          }}
+                          className="flex-1 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg transition-colors flex items-center justify-center gap-2"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                          <span>Eliminar Video</span>
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                  <p className="text-xs text-gray-500 mt-1">
+                    Formatos: MP4, MOV, AVI. Máx 100MB
+                    {isEditing && videoUrl && <span className="block mt-1 text-blue-600">💡 Sube un nuevo video para reemplazar el actual</span>}
+                  </p>
+                </div>
               </div>
             </div>
           </div>

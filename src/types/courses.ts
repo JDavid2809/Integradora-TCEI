@@ -8,6 +8,8 @@ export interface CursoFromDB {
   inicio: Date | null
   fin: Date | null
   precio?: number | null
+  imagen_url?: string | null
+  video_url?: string | null
   b_activo: boolean | null
   course_content?: string | null
   total_lecciones_calculadas?: number

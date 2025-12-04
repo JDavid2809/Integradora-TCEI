@@ -45,6 +45,8 @@ interface CourseDataFromDB {
     fin?: Date | null
     precio?: number | null
     nivel_ingles?: string | null
+    imagen_url?: string | null
+    video_url?: string | null
     what_you_learn?: string | null    // JSON
     features?: string | null          // JSON
     requirements?: string | null      // JSON
@@ -626,18 +628,33 @@ export default function CourseDetails({ courseData }: CourseDetailsProps) {
                         <div className="lg:col-span-1 order-first lg:order-last">
                             <div className="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden sticky top-24">
                                 <div className="relative">
-                                    <Image
-                                        src="/logos/logoIngles1.jpg"
-                                        alt={courseData.nombre}
-                                        width={400}
-                                        height={225}
-                                        className="w-full h-36 sm:h-48 object-cover"
-                                    />
-                                    <div className="absolute inset-0 bg-black bg-opacity-30 flex items-center justify-center">
-                                        <button className="bg-white hover:bg-gray-100 rounded-full p-2 sm:p-3 transition-all transform hover:scale-110 shadow-lg">
-                                            <Play className="w-5 h-5 sm:w-6 sm:h-6 text-[#e30f28] ml-1" />
-                                        </button>
-                                    </div>
+                                    {/* Mostrar video si existe, de lo contrario mostrar imagen */}
+                                    {courseData.video_url ? (
+                                        <video
+                                            src={courseData.video_url}
+                                            controls
+                                            className="w-full h-36 sm:h-48 object-cover"
+                                            poster={courseData.imagen_url || "/logos/logoIngles1.jpg"}
+                                        >
+                                            Tu navegador no soporta videos HTML5.
+                                        </video>
+                                    ) : (
+                                        <>
+                                            <Image
+                                                src={courseData.imagen_url || "/logos/logoIngles1.jpg"}
+                                                alt={courseData.nombre}
+                                                width={400}
+                                                height={225}
+                                                className="w-full h-36 sm:h-48 object-cover"
+                                            />
+                                            {/* Solo mostrar botón de play si no hay video */}
+                                            <div className="absolute inset-0 bg-black bg-opacity-30 flex items-center justify-center">
+                                                <div className="bg-white/80 rounded-full p-2 sm:p-3">
+                                                    <Play className="w-5 h-5 sm:w-6 sm:h-6 text-[#e30f28] ml-1" />
+                                                </div>
+                                            </div>
+                                        </>
+                                    )}
                                 </div>
                                 
                                 <div className="p-4 sm:p-6">

@@ -106,6 +106,8 @@ export async function getPaginatedCourses(params: CourseSearchParams = {}): Prom
         inicio: true,
         fin: true,
         precio: true,
+        imagen_url: true,
+        video_url: true,
         b_activo: true,
         course_content: true,
         imparte: {
@@ -532,6 +534,8 @@ export async function getCourseBySlug(slug: string) {
         fin: true,
         precio: true,
         nivel_ingles: true,
+        imagen_url: true,
+        video_url: true,
         what_you_learn: true,
         features: true,
         requirements: true,

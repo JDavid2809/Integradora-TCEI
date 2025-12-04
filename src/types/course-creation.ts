@@ -52,6 +52,8 @@ export interface CourseBasicInfo {
   fin: string
   precio?: number
   nivel_ingles?: string
+  imagen_url?: string
+  video_url?: string
 }
 
 export interface CourseDetails {
@@ -81,6 +83,8 @@ export interface CourseFromDB {
   fin: Date | null
   precio?: number | null
   nivel_ingles?: string | null
+  imagen_url?: string | null
+  video_url?: string | null
   b_activo: boolean | null
   what_you_learn: string | null
   features: string | null

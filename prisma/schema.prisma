@@ -289,6 +289,7 @@ model usuario {
 model curso {
   id_curso        Int       @id @default(autoincrement())
   nombre          String    @db.VarChar(100)
+  slug            String    @unique @db.VarChar(150) // Slug único para URLs amigables
   modalidad       Modalidad
   inicio          DateTime? @db.Date
   fin             DateTime? @db.Date
@@ -343,6 +344,9 @@ model Inscripcion {
   @@index([student_id])
   @@index([course_id])
   @@index([status])
+  @@index([student_id, status]) // Para consultas de estudiante activo
+  @@index([course_id, status])  // Para consultas de curso activo
+  @@index([status, enrolled_at]) // Para reportes por fecha
 }
 
 model payment {
@@ -358,6 +362,8 @@ model payment {
 
   @@index([enrollment_id])
   @@index([status])
+  @@index([enrollment_id, status]) // Para verificar pagos pendientes
+  @@index([status, payment_date])  // Para reportes financieros
 }
 
 model attendance {
@@ -668,7 +674,9 @@ model activity_submission {
   @@index([student_id])
   @@index([enrollment_id])
   @@index([status])
-  @@index([submitted_at])
+  @@index([enrollment_id, status])   // Para consultas de entregas calificadas
+  @@index([student_id, activity_id]) // Para verificar entregas existentes
+  @@index([submitted_at])            // Para ordenar por fecha de entrega
 }
 
 // 4. Archivos enviados por el estudiante

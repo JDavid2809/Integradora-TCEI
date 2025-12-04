@@ -2,7 +2,7 @@
 
 import { useEffect, useCallback, useState } from "react"
 import { BookOpen, Home, GraduationCap, Calendar, X, CheckSquare, SquareActivity, CalendarDays, Sparkles } from "lucide-react"
-import Image from "next/image"
+// Image removed from sidebar per design instruction: using brand text instead
 import { driver } from "driver.js"
 import "driver.js/dist/driver.css"
 
@@ -146,29 +146,20 @@ export default function Sidebar({
 
     return (
         <div
-            className={`fixed top-[76px] bottom-0 left-0 w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:top-0 lg:h-screen ${sidebarOpen ? "translate-x-0 z-[45]" : "-translate-x-full z-[-1]"
+            className={`fixed top-[76px] bottom-0 left-0 w-64 bg-white dark:bg-slate-800 shadow-lg transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:top-0 lg:h-screen ${sidebarOpen ? "translate-x-0 z-[45]" : "-translate-x-full z-[-1]"
                 } lg:z-auto overflow-y-auto`}
         >
             <div className="flex flex-col h-full">
                 {/* Header */}
-                <div className="flex items-center justify-between h-16 px-6 border-b border-slate-200 flex-shrink-0">
+                <div className="flex items-center justify-between h-16 px-6 border-b border-slate-200 dark:border-slate-700 flex-shrink-0">
                     <div className="flex items-center space-x-3">
-                        <div className="relative w-12 h-12">
-                            <Image
-                                src="/logos/logoIngles.jpg"
-                                alt="Triunfando con el Inglés Logo"
-                                fill
-                                className="object-contain rounded-lg"
-                                priority
-                            />
-                        </div>
-                        <h1 className="text-lg font-bold text-[#00246a]">EnglishPro</h1>
+                        <h1 className="text-lg font-bold text-[#00246a] dark:text-blue-400">EnglishPro</h1>
                     </div>
                     <button
                         onClick={() => setSidebarOpen(false)}
-                        className="lg:hidden p-1 hover:bg-slate-100 rounded-lg transition-colors duration-200"
+                        className="lg:hidden p-1 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors duration-200"
                     >
-                        <X className="w-5 h-5 text-slate-600" />
+                        <X className="w-5 h-5 text-slate-600 dark:text-slate-300" />
                     </button>
                 </div>
 
@@ -183,8 +174,8 @@ export default function Sidebar({
                                 setSidebarOpen(false)
                             }}
                             className={`w-full flex items-center space-x-3 px-3 py-3 rounded-xl text-left transition-all duration-200 mb-1 ${activeSection === item.id
-                                ? "bg-blue-600/10 text-blue-600 border-r-2 border-blue-600"
-                                : "text-slate-600 hover:bg-blue-50 hover:text-blue-700"
+                                ? "bg-blue-600/10 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400 border-r-2 border-blue-600 dark:border-blue-400"
+                                : "text-slate-600 dark:text-slate-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:text-blue-700 dark:hover:text-blue-300"
                                 }`}
                         >
                             <item.icon className="w-5 h-5" />

@@ -3,11 +3,11 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Eye, EyeOff } from "lucide-react";
-import Image from "next/image";
+// Image removed from register page per instruction (logo kept in navbar only)
 import { registerUser } from "@/actions/auth/Auth-actions";
 import { useForm } from "react-hook-form";
 import { FormValues } from "@/types";
-import Error from "@/components/ui/Error";
+import Error from "../../../../docs/ui/Error";
 
 interface RegisterFormProps {
   toggleMode: () => void;
@@ -82,14 +82,8 @@ export default function RegisterForm({ toggleMode }: RegisterFormProps) {
           variants={itemVariants}
           className="lg:hidden flex items-center justify-center space-x-3 mb-8"
         >
-          <div className="relative w-10 h-10 rounded-xl overflow-hidden">
-            <Image
-              src="/logos/logoIngles.jpg"
-              alt="Triunfando con el Inglés Logo"
-              fill
-              className="object-contain"
-              priority
-            />
+          <div className="w-10 h-10 bg-gradient-to-br from-[#e30f28] to-[#00246a] rounded-xl flex items-center justify-center">
+            <span className="text-white font-bold">T</span>
           </div>
           <h1 className="text-xl font-bold text-[#00246a] text-center">
             Triunfando con el Inglés

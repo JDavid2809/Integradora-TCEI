@@ -148,7 +148,7 @@ export default function CourseDetails({ courseData }: CourseDetailsProps) {
         }
     }, [session, courseData.inscripciones])
 
-    // Parsear campos JSON si existen
+    // ✅ OPTIMIZADO: Los datos ya vienen parseados del servidor, solo procesar
     let whatYouLearn: string[] = []
     let features: {icon: LucideIcon; title: string; description: string}[] = []
     let requirements: string[] = []
@@ -156,35 +156,30 @@ export default function CourseDetails({ courseData }: CourseDetailsProps) {
     let courseContent: {title: string; duration: string; lessons: number; topics: string[]}[] = []
 
     try {
-        if (courseData.what_you_learn) {
-            const parsed = JSON.parse(courseData.what_you_learn)
-            // Manejar tanto arrays de strings como arrays de objetos {id, text}
-            whatYouLearn = Array.isArray(parsed) ? parsed.map(item => 
+        // Los datos ya están parseados, solo normalizar
+        whatYouLearn = Array.isArray(courseData.what_you_learn) 
+            ? courseData.what_you_learn.map(item => 
                 typeof item === 'string' ? item : (item.text || item.title || String(item))
-            ) : []
-        }
-        if (courseData.features) {
-            const parsed = JSON.parse(courseData.features)
-            features = Array.isArray(parsed) ? parsed : []
-        }
-        if (courseData.requirements) {
-            const parsed = JSON.parse(courseData.requirements)
-            requirements = Array.isArray(parsed) ? parsed.map(item => 
+            ) 
+            : []
+        
+        features = Array.isArray(courseData.features) ? courseData.features : []
+        
+        requirements = Array.isArray(courseData.requirements) 
+            ? courseData.requirements.map(item => 
                 typeof item === 'string' ? item : (item.text || item.title || String(item))
-            ) : []
-        }
-        if (courseData.target_audience) {
-            const parsed = JSON.parse(courseData.target_audience)
-            targetAudience = Array.isArray(parsed) ? parsed.map(item => 
+            ) 
+            : []
+        
+        targetAudience = Array.isArray(courseData.target_audience) 
+            ? courseData.target_audience.map(item => 
                 typeof item === 'string' ? item : (item.text || item.title || String(item))
-            ) : []
-        }
-        if (courseData.course_content) {
-            const parsed = JSON.parse(courseData.course_content)
-            courseContent = Array.isArray(parsed) ? parsed : []
-        }
+            ) 
+            : []
+        
+        courseContent = Array.isArray(courseData.course_content) ? courseData.course_content : []
     } catch (error) {
-        console.error('Error parsing JSON fields:', error)
+        console.error('Error processing course data:', error)
     }
 
     const handleEnroll = async () => {
@@ -625,14 +620,11 @@ export default function CourseDetails({ courseData }: CourseDetailsProps) {
                         {/* Tarjeta de precio */}
                         <div className="lg:col-span-1 order-first lg:order-last">
                             <div className="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden sticky top-24">
-                                <div className="relative">
-                                    <Image
-                                        src="/logos/logoIngles1.jpg"
-                                        alt={courseData.nombre}
-                                        width={400}
-                                        height={225}
-                                        className="w-full h-36 sm:h-48 object-cover"
-                                    />
+                                <div className="relative bg-gradient-to-br from-slate-200 to-slate-100 dark:from-slate-700 dark:to-slate-600">
+                                    {/* Placeholder cover: logo removed per instruction */}
+                                    <div className="w-full h-36 sm:h-48 flex items-center justify-center text-slate-600 dark:text-slate-200">
+                                        <span className="text-lg font-semibold">{courseData.nombre}</span>
+                                    </div>
                                     <div className="absolute inset-0 bg-black bg-opacity-30 flex items-center justify-center">
                                         <button className="bg-white hover:bg-gray-100 rounded-full p-2 sm:p-3 transition-all transform hover:scale-110 shadow-lg">
                                             <Play className="w-5 h-5 sm:w-6 sm:h-6 text-[#e30f28] ml-1" />

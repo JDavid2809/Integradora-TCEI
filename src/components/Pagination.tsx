@@ -36,10 +36,10 @@ const Pagination: React.FC<PaginationProps> = ({
         <button
           key={i}
           onClick={() => handlePageChange(i)}
-          className={`px-3 py-2 text-sm rounded-md ${
+          className={`px-3 py-2 text-sm rounded-md transition-colors ${
             i === page
-              ? 'bg-[#00246a] text-white'
-              : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100'
+              ? 'bg-[#00246a] dark:bg-blue-600 text-white'
+              : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-slate-800'
           }`}
         >
           {i}
@@ -55,18 +55,18 @@ const Pagination: React.FC<PaginationProps> = ({
   }
 
   return (
-    <div className={`flex items-center justify-between px-6 py-3 bg-white border-t border-gray-200 ${className}`}>
-      <div className="text-sm text-gray-700">
+    <div className={`flex items-center justify-between px-6 py-3 bg-white dark:bg-slate-900 border-t border-gray-200 dark:border-slate-800 ${className}`}>
+      <div className="text-sm text-gray-700 dark:text-gray-300">
         Página {page} de {totalPages}
       </div>
       <div className="flex items-center space-x-1">
         <button
           onClick={() => handlePageChange(page - 1)}
           disabled={page <= 1}
-          className={`p-2 rounded-md ${
+          className={`p-2 rounded-md transition-colors ${
             page <= 1
-              ? 'text-gray-300 cursor-not-allowed'
-              : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100'
+              ? 'text-gray-300 dark:text-gray-600 cursor-not-allowed'
+              : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-slate-800'
           }`}
         >
           <ChevronLeft className="w-5 h-5" />
@@ -77,10 +77,10 @@ const Pagination: React.FC<PaginationProps> = ({
         <button
           onClick={() => handlePageChange(page + 1)}
           disabled={page >= totalPages}
-          className={`p-2 rounded-md ${
+          className={`p-2 rounded-md transition-colors ${
             page >= totalPages
-              ? 'text-gray-300 cursor-not-allowed'
-              : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100'
+              ? 'text-gray-300 dark:text-gray-600 cursor-not-allowed'
+              : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-slate-800'
           }`}
         >
           <ChevronRight className="w-5 h-5" />

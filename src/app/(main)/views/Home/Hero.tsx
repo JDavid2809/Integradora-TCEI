@@ -47,7 +47,7 @@ export function Hero() {
   ]
 
   return (
-    <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden bg-white">
+    <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden bg-white dark:bg-slate-900">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10 py-12 pb-32">
         <div className="flex flex-col lg:flex-row items-center justify-center gap-12 lg:gap-20">
           {/* Logo Section with Animations */}
@@ -155,7 +155,7 @@ export function Hero() {
             transition={{ duration: 0.8, delay: 0.3 }}
           >
             <TextType
-            className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-4 leading-tight text-[#00246A]"
+            className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-4 leading-tight text-[#00246A] dark:text-blue-400"
             text={["Bienvenido!!!", "Listo para aprender inglés?", "Triunfando con el Inglés!"]}
             typingSpeed={115}
             pauseDuration={2500}
@@ -182,13 +182,13 @@ export function Hero() {
                 animate={{ scale: [1, 1.5, 1] }}
                 transition={{ duration: 1.5, repeat: Number.POSITIVE_INFINITY }}
               />
-              <span className="text-sm font-bold text-[#00246A]">
+              <span className="text-sm font-bold text-[#00246A] dark:text-blue-300">
                 Tu mejor opción para aprender inglés
               </span>
             </motion.div>
 
             <motion.p
-              className="text-xl sm:text-2xl lg:text-3xl mb-6 font-semibold leading-relaxed text-[#00246A]"
+              className="text-xl sm:text-2xl lg:text-3xl mb-6 font-semibold leading-relaxed text-[#00246A] dark:text-blue-400"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.7 }}
@@ -198,7 +198,7 @@ export function Hero() {
 
             {/* Description Text */}
             <motion.p
-              className="text-base sm:text-lg text-gray-600 mb-8 leading-relaxed max-w-xl"
+              className="text-base sm:text-lg text-gray-600 dark:text-gray-300 mb-8 leading-relaxed max-w-xl"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.75 }}
@@ -291,7 +291,7 @@ export function Hero() {
                   >
                     {stat.value}
                   </motion.div>
-                  <div className="text-xs sm:text-sm font-semibold text-gray-700 relative z-10">{stat.label}</div>
+                  <div className="text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300 relative z-10">{stat.label}</div>
                 </motion.div>
               ))}
             </motion.div>
@@ -318,10 +318,10 @@ export function Hero() {
                       <Icon className="w-5 h-5 text-white" strokeWidth={2.5} />
                     </div>
                     <div>
-                      <span className="font-bold text-sm block text-[#00246A]">
+                      <span className="font-bold text-sm block text-[#00246A] dark:text-blue-300">
                         {feature.title}
                       </span>
-                      <span className="text-xs text-gray-600">{feature.subtitle}</span>
+                      <span className="text-xs text-gray-600 dark:text-gray-400">{feature.subtitle}</span>
                     </div>
                   </motion.div>
                 )

@@ -398,7 +398,7 @@ export default function AssistantContent() {
       {/* CHAT AREA */}
       <div
         id="chat-area"
-        className="flex-1 bg-white sm:rounded-xl border-t sm:border border-gray-200 p-4 sm:p-5 overflow-y-auto mb-0 sm:mb-4 flex flex-col"
+        className="flex-1 bg-white dark:bg-slate-800 sm:rounded-xl border-t sm:border border-gray-200 dark:border-slate-700 p-4 sm:p-5 overflow-y-auto mb-0 sm:mb-4 flex flex-col"
         style={{ 
           height: 'calc(100vh - 300px)',
           minHeight: '400px'
@@ -406,9 +406,9 @@ export default function AssistantContent() {
       >
         {messages.length === 0 ? (
           <div className="flex flex-col items-center justify-center flex-1 text-center px-4">
-            <div className="w-16 h-16 bg-[#00246a]/5 rounded-2xl flex items-center justify-center mb-4">
+            <div className="w-16 h-16 bg-[#00246a]/5 dark:bg-blue-500/10 rounded-2xl flex items-center justify-center mb-4">
               <svg
-                className="w-9 h-9 text-[#00246a]"
+                className="w-9 h-9 text-[#00246a] dark:text-blue-400"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -421,17 +421,17 @@ export default function AssistantContent() {
                 />
               </svg>
             </div>
-            <h3 className="text-gray-800 text-lg font-semibold mb-1">
+            <h3 className="text-gray-800 dark:text-gray-100 text-lg font-semibold mb-1">
               {language === 'es' ? '¡Hola! Soy tu asistente' : 'Hello! I\'m your assistant'}
             </h3>
-            <p className="text-gray-500 text-sm mb-6">
+            <p className="text-gray-500 dark:text-gray-400 text-sm mb-6">
               {language === 'es' 
                 ? 'Pregúntame sobre inglés: gramática, vocabulario o ejercicios'
                 : 'Ask me about English: grammar, vocabulary or exercises'}
             </p>
             
             {/* Sugerencias */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 w-full max-w-xl text-gray-600">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 w-full max-w-xl text-gray-600 dark:text-gray-300">
               {(language === 'es' ? [
                 '¿Cómo uso el present perfect?',
                 'Diferencia entre make y do',
@@ -446,7 +446,7 @@ export default function AssistantContent() {
                 <button
                   key={idx}
                   onClick={() => setPrompt(suggestion)}
-                  className="text-sm text-left px-4 py-2.5 bg-gray-50 hover:bg-gray-100 border border-gray-200 hover:border-[#00246a] rounded-lg transition-all"
+                  className="text-sm text-left px-4 py-2.5 bg-gray-50 dark:bg-slate-700 hover:bg-gray-100 dark:hover:bg-slate-600 border border-gray-200 dark:border-slate-600 hover:border-[#00246a] dark:hover:border-blue-400 rounded-lg transition-all"
                 >
                   {suggestion}
                 </button>
@@ -464,8 +464,8 @@ export default function AssistantContent() {
               >
                 {/* Avatar */}
                 {m.role === "assistant" && (
-                  <div className="w-9 h-9 rounded-full bg-[#00246a]/5 flex items-center justify-center flex-shrink-0 border border-[#00246a]/10">
-                    <svg className="w-5 h-5 text-[#00246a]" fill="currentColor" viewBox="0 0 20 20">
+                  <div className="w-9 h-9 rounded-full bg-[#00246a]/5 dark:bg-blue-500/10 flex items-center justify-center flex-shrink-0 border border-[#00246a]/10 dark:border-blue-500/20">
+                    <svg className="w-5 h-5 text-[#00246a] dark:text-blue-400" fill="currentColor" viewBox="0 0 20 20">
                       <path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z" />
                     </svg>
                   </div>
@@ -475,7 +475,7 @@ export default function AssistantContent() {
                   className={`max-w-[85%] sm:max-w-[75%] ${
                     m.role === "user"
                       ? "bg-[#00246a] text-white rounded-2xl rounded-tr-md"
-                      : "bg-gray-50 text-gray-900 rounded-2xl rounded-tl-md border border-gray-200"
+                      : "bg-gray-50 dark:bg-slate-700 text-gray-900 dark:text-gray-100 rounded-2xl rounded-tl-md border border-gray-200 dark:border-slate-600"
                   } px-4 py-2.5 shadow-sm`}
                 >
                   <div className="text-sm sm:text-base leading-relaxed whitespace-pre-wrap break-words">
@@ -484,7 +484,7 @@ export default function AssistantContent() {
                   
                   {m.time && (
                     <div className={`text-xs mt-1.5 ${
-                      m.role === "user" ? "text-white/60" : "text-gray-400"
+                      m.role === "user" ? "text-white/60" : "text-gray-400 dark:text-gray-500"
                     }`}>
                       {m.time}
                     </div>
@@ -494,7 +494,7 @@ export default function AssistantContent() {
                   {m.role === "assistant" && m.text && (
                     <button
                       onClick={() => copyToClipboard(m.text)}
-                      className="mt-2 text-xs font-medium text-[#00246a] hover:text-[#e30f28] px-2 py-1 rounded transition-colors flex items-center gap-1"
+                      className="mt-2 text-xs font-medium text-[#00246a] dark:text-blue-400 hover:text-[#e30f28] dark:hover:text-red-400 px-2 py-1 rounded transition-colors flex items-center gap-1"
                     >
                       <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
@@ -511,13 +511,13 @@ export default function AssistantContent() {
 
         {/* Loading */}
         {loading && (
-          <div className="flex items-center gap-3 bg-gray-50 px-4 py-3 rounded-xl border border-gray-200">
+          <div className="flex items-center gap-3 bg-gray-50 dark:bg-slate-700 px-4 py-3 rounded-xl border border-gray-200 dark:border-slate-600">
             <div className="flex gap-1">
-              <span className="w-2 h-2 bg-[#00246a] rounded-full animate-bounce"></span>
-              <span className="w-2 h-2 bg-[#00246a] rounded-full animate-bounce [animation-delay:0.15s]"></span>
-              <span className="w-2 h-2 bg-[#00246a] rounded-full animate-bounce [animation-delay:0.3s]"></span>
+              <span className="w-2 h-2 bg-[#00246a] dark:bg-blue-400 rounded-full animate-bounce"></span>
+              <span className="w-2 h-2 bg-[#00246a] dark:bg-blue-400 rounded-full animate-bounce [animation-delay:0.15s]"></span>
+              <span className="w-2 h-2 bg-[#00246a] dark:bg-blue-400 rounded-full animate-bounce [animation-delay:0.3s]"></span>
             </div>
-            <span className="text-sm text-gray-600">
+            <span className="text-sm text-gray-600 dark:text-gray-300">
               {language === 'es' ? 'Escribiendo...' : 'Writing...'}
             </span>
           </div>
@@ -527,16 +527,16 @@ export default function AssistantContent() {
       {/* INPUT AREA */}
       <form
         onSubmit={submit}
-        className="bg-white border-t sm:border-0 sm:bg-transparent p-4 sm:p-0"
+        className="bg-white dark:bg-slate-800 border-t sm:border-0 sm:bg-transparent p-4 sm:p-0"
       >
         <div className="flex items-stretch gap-2">
           {/* Input con botón limpiar */}
           <div 
             id="input-area"
-            className="flex-1 flex items-center bg-white sm:bg-white border-2 border-gray-300 rounded-xl focus-within:border-[#00246a] transition-all"
+            className="flex-1 flex items-center bg-white dark:bg-slate-800 sm:bg-white sm:dark:bg-slate-800 border-2 border-gray-300 dark:border-slate-600 rounded-xl focus-within:border-[#00246a] dark:focus-within:border-blue-400 transition-all"
           >
             <input
-              className="flex-1 px-4 py-3 bg-transparent focus:outline-none text-gray-900 placeholder:text-gray-400 text-sm rounded-l-xl"
+              className="flex-1 px-4 py-3 bg-transparent focus:outline-none text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 text-sm rounded-l-xl"
               placeholder={language === "es" ? "Escribe tu pregunta..." : "Type your question..."}
               value={prompt}
               onChange={(e) => setPrompt(e.target.value)}
@@ -552,7 +552,7 @@ export default function AssistantContent() {
                   setMessages([])
                   setPrompt('')
                 }}
-                className="p-2 text-gray-400 hover:text-gray-600 transition-colors disabled:opacity-40"
+                className="p-2 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors disabled:opacity-40"
                 disabled={loading}
               >
                 <BrushCleaning className="w-5 h-5" />
@@ -588,7 +588,7 @@ export default function AssistantContent() {
               type="button"
               onClick={regenerateLast}
               disabled={loading}
-              className="hidden sm:flex items-center gap-2 px-4 py-3 border-2 border-[#00246a] text-[#00246a] hover:bg-[#00246a] hover:text-white rounded-xl font-medium transition-all disabled:opacity-50"
+              className="hidden sm:flex items-center gap-2 px-4 py-3 border-2 border-[#00246a] dark:border-blue-400 text-[#00246a] dark:text-blue-400 hover:bg-[#00246a] dark:hover:bg-blue-500 hover:text-white rounded-xl font-medium transition-all disabled:opacity-50"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />

@@ -18,7 +18,7 @@ export default function BottomTabs({ activeSection, setActiveSection }: BottomTa
     ]
 
     return (
-        <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 z-30">
+        <div className="fixed bottom-0 left-0 right-0 bg-white dark:bg-slate-800 border-t border-slate-200 dark:border-slate-700 z-30">
             <div className="flex items-center justify-around px-2 py-2 safe-area-pb">
                 {tabItems.map((item) => {
                     const isActive = activeSection === item.id
@@ -26,7 +26,7 @@ export default function BottomTabs({ activeSection, setActiveSection }: BottomTa
                         <motion.button
                             key={item.id}
                             onClick={() => setActiveSection(item.id)}
-                            className={`relative flex flex-col items-center justify-center p-2 rounded-xl transition-all duration-200 min-w-0 flex-1 ${isActive ? "text-blue-600" : "text-slate-500"
+                            className={`relative flex flex-col items-center justify-center p-2 rounded-xl transition-all duration-200 min-w-0 flex-1 ${isActive ? "text-blue-600 dark:text-blue-400" : "text-slate-500 dark:text-slate-400"
                                 }`}
                             whileTap={{ scale: 0.95 }}
                         >
@@ -34,7 +34,7 @@ export default function BottomTabs({ activeSection, setActiveSection }: BottomTa
                             {isActive && (
                                 <motion.div
                                     layoutId="activeTab"
-                                    className="absolute inset-0 bg-blue-600/10 rounded-xl"
+                                    className="absolute inset-0 bg-blue-600/10 dark:bg-blue-500/20 rounded-xl"
                                     initial={false}
                                     transition={{
                                         type: "spring",
@@ -46,18 +46,18 @@ export default function BottomTabs({ activeSection, setActiveSection }: BottomTa
 
                             {/* Icon */}
                             <div className="relative z-10 mb-1">
-                                <item.icon className={`w-5 h-5 ${isActive ? "text-blue-600" : "text-slate-500"}`} />
+                                <item.icon className={`w-5 h-5 ${isActive ? "text-blue-600 dark:text-blue-400" : "text-slate-500 dark:text-slate-400"}`} />
                             </div>
 
                             {/* Label */}
-                            <span className={`text-xs font-medium relative z-10 ${isActive ? "text-blue-600" : "text-slate-500"}`}>
+                            <span className={`text-xs font-medium relative z-10 ${isActive ? "text-blue-600 dark:text-blue-400" : "text-slate-500 dark:text-slate-400"}`}>
                                 {item.label}
                             </span>
 
                             {/* Active dot */}
                             {isActive && (
                                 <motion.div
-                                    className="absolute -top-1 w-1 h-1 bg-blue-600 rounded-full"
+                                    className="absolute -top-1 w-1 h-1 bg-blue-600 dark:bg-blue-400 rounded-full"
                                     initial={{ scale: 0 }}
                                     animate={{ scale: 1 }}
                                     transition={{ delay: 0.1 }}

@@ -8,9 +8,10 @@ Documentación completa del sistema de mensajería, incluyendo arquitectura, fun
 ### 🏗️ Arquitectura Principal
 - **[SISTEMA_CHAT.md](./SISTEMA_CHAT.md)** - Arquitectura y diseño general del sistema de chat
 
-### 📨 Sistema de Mensajería
+### Sistema de Mensajería
 - **[MESSAGE_STATUS_SYSTEM.md](./MESSAGE_STATUS_SYSTEM.md)** - Estados de mensajes (entregado/visto)
 - **[USER_VISIBILITY_SYSTEM.md](./USER_VISIBILITY_SYSTEM.md)** - Sistema de visibilidad de usuarios
+- **[FILE_SHARING_IMPLEMENTATION.md](./FILE_SHARING_IMPLEMENTATION.md)** - Sistema de compartir archivos e imágenes
 
 ### 🔍 Funcionalidades de Búsqueda
 - **[SEARCH_INTEGRATION_UPDATE.md](./SEARCH_INTEGRATION_UPDATE.md)** - Búsqueda integrada de usuarios

@@ -176,7 +176,7 @@ export default function SpeakingEvaluator() {
   const showFreeSpeaking = isFreeSpeaking;
 
   return (
-    <div className="w-full min-h-screen bg-slate-50/50 p-4 md:p-8">
+    <div className="w-full min-h-screen bg-slate-50/50 dark:bg-slate-900/50 p-4 md:p-8">
       {showGrid && (
         <ScenarioGrid 
           onSelectScenario={handleScenarioSelect}
@@ -188,9 +188,9 @@ export default function SpeakingEvaluator() {
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="max-w-5xl mx-auto bg-white rounded-[2.5rem] shadow-2xl overflow-hidden border border-slate-100 relative min-h-[600px] flex flex-col"
+          className="max-w-5xl mx-auto bg-white dark:bg-slate-800 rounded-[2.5rem] shadow-2xl overflow-hidden border border-slate-100 dark:border-slate-700 relative min-h-[600px] flex flex-col"
         >
-          <div className="absolute top-0 left-0 w-full h-32 bg-gradient-to-r from-[#00246a] to-[#0044cc] opacity-10" />
+          <div className="absolute top-0 left-0 w-full h-32 bg-gradient-to-r from-[#00246a] to-[#0044cc] dark:from-blue-900 dark:to-blue-800 opacity-10" />
           
           <div className="relative z-10 p-6 md:p-12 flex-1 flex flex-col">
             
@@ -229,7 +229,7 @@ export default function SpeakingEvaluator() {
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
-                  className="flex items-center gap-3 p-4 bg-red-50 text-red-600 text-sm rounded-xl border border-red-100 max-w-md mx-auto mb-8"
+                  className="flex items-center gap-3 p-4 bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 text-sm rounded-xl border border-red-100 dark:border-red-900/50 max-w-md mx-auto mb-8"
                 >
                   <AlertCircle className="w-5 h-5 flex-shrink-0" />
                   {errorMsg}
@@ -245,8 +245,8 @@ export default function SpeakingEvaluator() {
                   exit={{ opacity: 0 }}
                   className="flex flex-col items-center gap-4 py-8"
                 >
-                  <Loader2 className="w-10 h-10 text-[#00246a] animate-spin" />
-                  <span className="text-slate-500 font-medium animate-pulse">Analyzing your pronunciation...</span>
+                  <Loader2 className="w-10 h-10 text-[#00246a] dark:text-blue-400 animate-spin" />
+                  <span className="text-slate-500 dark:text-slate-400 font-medium animate-pulse">Analyzing your pronunciation...</span>
                 </motion.div>
               )}
             </AnimatePresence>
@@ -258,8 +258,8 @@ export default function SpeakingEvaluator() {
             </AnimatePresence>
           </div>
           
-          <div className="bg-slate-50 border-t border-slate-100 p-4 text-center">
-             <p className="text-[10px] text-slate-400 font-medium uppercase tracking-widest">
+          <div className="bg-slate-50 dark:bg-slate-900 border-t border-slate-100 dark:border-slate-700 p-4 text-center">
+             <p className="text-[10px] text-slate-400 dark:text-slate-500 font-medium uppercase tracking-widest">
                Powered by Web Speech API & DeepSeek AI
              </p>
           </div>

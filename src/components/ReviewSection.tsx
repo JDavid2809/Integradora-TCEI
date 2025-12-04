@@ -169,21 +169,21 @@ export default function ReviewSection({
   }
 
   return (
-    <div className="bg-white rounded-lg border border-gray-200 p-4 sm:p-6 lg:p-8">
+    <div className="bg-white dark:bg-slate-900 rounded-lg border border-gray-200 dark:border-slate-700 p-4 sm:p-6 lg:p-8">
       <div className="flex flex-col sm:flex-row justify-between items-start gap-4 sm:gap-0 mb-6">
         <div>
-          <h2 className="text-xl sm:text-2xl font-bold text-[#00246a] mb-2">
+          <h2 className="text-xl sm:text-2xl font-bold text-[#00246a] dark:text-blue-100 mb-2">
             Reseñas de estudiantes
           </h2>
           {reviews.length > 0 && (
             <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
               <div className="flex items-center gap-1">
                 {renderStars(averageRating)}
-                <span className="text-base sm:text-lg font-semibold text-gray-900 ml-2">
+                <span className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white ml-2">
                   {averageRating.toFixed(1)}
                 </span>
               </div>
-              <span className="text-sm sm:text-base text-gray-600">
+              <span className="text-sm sm:text-base text-gray-600 dark:text-gray-400">
                 ({reviews.length} {reviews.length === 1 ? 'reseña' : 'reseñas'})
               </span>
             </div>
@@ -194,7 +194,7 @@ export default function ReviewSection({
         {isEnrolled && !userReview && (
           <button
             onClick={() => setShowAddForm(!showAddForm)}
-            className="flex items-center justify-center gap-2 px-3 sm:px-4 py-2 bg-[#e30f28] text-white rounded-lg hover:bg-[#c20e24] transition-colors text-sm sm:text-base w-full sm:w-auto"
+            className="flex items-center justify-center gap-2 px-3 sm:px-4 py-2 bg-[#e30f28] dark:bg-red-600 text-white rounded-lg hover:bg-[#c20e24] dark:hover:bg-red-700 transition-colors text-sm sm:text-base w-full sm:w-auto"
           >
             <MessageCircle className="w-4 h-4" />
             {showAddForm ? 'Cancelar' : 'Escribir reseña'}
@@ -203,7 +203,7 @@ export default function ReviewSection({
 
         {/* Mensaje si ya tiene una reseña */}
         {isEnrolled && userReview && (
-          <div className="flex items-center gap-2 text-sm text-gray-600">
+          <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
             <CheckCircle className="w-4 h-4 text-green-500" />
             Ya escribiste una reseña para este curso
           </div>
@@ -212,32 +212,32 @@ export default function ReviewSection({
 
       {/* Formulario para agregar reseña */}
       {showAddForm && (
-        <form onSubmit={handleSubmitReview} className="bg-gray-50 rounded-lg p-4 sm:p-6 mb-6">
-          <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-4">
+        <form onSubmit={handleSubmitReview} className="bg-gray-50 dark:bg-slate-800 rounded-lg p-4 sm:p-6 mb-6">
+          <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white mb-4">
             Comparte tu experiencia
           </h3>
           
           <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Calificación
             </label>
             {renderStars(newRating, true, setNewRating)}
           </div>
 
           <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Comentario
             </label>
             <textarea
               value={newComment}
               onChange={(e) => setNewComment(e.target.value)}
               placeholder="Cuéntanos sobre tu experiencia con este curso..."
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#e30f28] focus:border-transparent resize-none text-sm sm:text-base"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-[#e30f28] dark:focus:ring-red-500 focus:border-transparent resize-none text-sm sm:text-base bg-white dark:bg-slate-900 text-gray-900 dark:text-white"
               rows={4}
               required
               maxLength={500}
             />
-            <div className="text-right text-xs sm:text-sm text-gray-500 mt-1">
+            <div className="text-right text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-1">
               {newComment.length}/500
             </div>
           </div>
@@ -246,14 +246,14 @@ export default function ReviewSection({
             <button
               type="button"
               onClick={() => setShowAddForm(false)}
-              className="px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors text-sm sm:text-base"
+              className="px-4 py-2 text-gray-600 dark:text-gray-300 border border-gray-300 dark:border-slate-600 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors text-sm sm:text-base"
             >
               Cancelar
             </button>
             <button
               type="submit"
               disabled={isSubmitting || !newComment.trim()}
-              className="px-4 py-2 bg-[#e30f28] text-white rounded-lg hover:bg-[#c20e24] transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
+              className="px-4 py-2 bg-[#e30f28] dark:bg-red-600 text-white rounded-lg hover:bg-[#c20e24] dark:hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
             >
               {isSubmitting ? 'Enviando...' : 'Publicar reseña'}
             </button>
@@ -263,12 +263,12 @@ export default function ReviewSection({
 
       {/* Mensaje si no está inscrito */}
       {!isEnrolled && reviews.length === 0 && (
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 sm:p-4 mb-6">
+        <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3 sm:p-4 mb-6">
           <div className="flex items-start gap-3">
-            <AlertCircle className="w-4 sm:w-5 h-4 sm:h-5 text-blue-600 mt-0.5 shrink-0" />
+            <AlertCircle className="w-4 sm:w-5 h-4 sm:h-5 text-blue-600 dark:text-blue-400 mt-0.5 shrink-0" />
             <div>
-              <p className="text-blue-800 font-medium text-sm sm:text-base">¡Únete al curso!</p>
-              <p className="text-blue-700 text-xs sm:text-sm">
+              <p className="text-blue-800 dark:text-blue-200 font-medium text-sm sm:text-base">¡Únete al curso!</p>
+              <p className="text-blue-700 dark:text-blue-300 text-xs sm:text-sm">
                 Debes estar inscrito en el curso para dejar reseñas.
               </p>
             </div>
@@ -278,12 +278,12 @@ export default function ReviewSection({
 
       {/* Mensaje explicativo sobre una reseña por curso */}
       {isEnrolled && !userReview && showAddForm && (
-        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 sm:p-4 mb-6">
+        <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-3 sm:p-4 mb-6">
           <div className="flex items-start gap-3">
-            <AlertCircle className="w-4 sm:w-5 h-4 sm:h-5 text-yellow-600 mt-0.5 shrink-0" />
+            <AlertCircle className="w-4 sm:w-5 h-4 sm:h-5 text-yellow-600 dark:text-yellow-400 mt-0.5 shrink-0" />
             <div>
-              <p className="text-yellow-800 font-medium text-sm sm:text-base">Una reseña por curso</p>
-              <p className="text-yellow-700 text-xs sm:text-sm">
+              <p className="text-yellow-800 dark:text-yellow-200 font-medium text-sm sm:text-base">Una reseña por curso</p>
+              <p className="text-yellow-700 dark:text-yellow-300 text-xs sm:text-sm">
                 Puedes escribir una reseña por curso. Si deseas cambiarla más tarde, podrás editarla. 
                 Si tu reseña anterior fue eliminada, puedes escribir una nueva.
               </p>
@@ -296,17 +296,17 @@ export default function ReviewSection({
       {reviews.length > 0 ? (
         <div className="space-y-4 sm:space-y-6">
           {reviews.map((review) => (
-            <div key={review.id} className="border-b border-gray-200 pb-4 sm:pb-6 last:border-b-0 last:pb-0">
+            <div key={review.id} className="border-b border-gray-200 dark:border-slate-700 pb-4 sm:pb-6 last:border-b-0 last:pb-0">
               <div className="flex flex-col sm:flex-row justify-between items-start gap-3 sm:gap-0 mb-3">
                 <div className="flex items-start gap-3 min-w-0 flex-1">
-                  <div className="w-8 h-8 sm:w-10 sm:h-10 bg-[#00246a] rounded-full flex items-center justify-center text-white font-medium text-xs sm:text-sm shrink-0">
+                  <div className="w-8 h-8 sm:w-10 sm:h-10 bg-[#00246a] dark:bg-blue-600 rounded-full flex items-center justify-center text-white font-medium text-xs sm:text-sm shrink-0">
                     {review.student.usuario.nombre[0]}{review.student.usuario.apellido[0]}
                   </div>
                   <div className="min-w-0 flex-1">
-                    <h4 className="font-semibold text-gray-900 text-sm sm:text-base">
+                    <h4 className="font-semibold text-gray-900 dark:text-white text-sm sm:text-base">
                       {review.student.usuario.nombre} {review.student.usuario.apellido}
                       {canUserEditReview(review) && (
-                        <span className="ml-2 text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full">
+                        <span className="ml-2 text-xs bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 px-2 py-1 rounded-full">
                           Tu comentario
                         </span>
                       )}
@@ -314,13 +314,13 @@ export default function ReviewSection({
                     <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 mt-1">
                       {editingReview === review.id ? (
                         <div className="flex items-center gap-2">
-                          <span className="text-xs sm:text-sm text-gray-600">Calificación:</span>
+                          <span className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">Calificación:</span>
                           {renderStars(editRating, true, setEditRating)}
                         </div>
                       ) : (
                         renderStars(review.rating)
                       )}
-                      <div className="flex items-center gap-1 text-xs sm:text-sm text-gray-500">
+                      <div className="flex items-center gap-1 text-xs sm:text-sm text-gray-500 dark:text-gray-400">
                         <Calendar className="w-3 h-3" />
                         <span className="hidden sm:inline">
                           {new Date(review.created_at).toLocaleDateString('es-ES', {
@@ -337,7 +337,7 @@ export default function ReviewSection({
                           })}
                         </span>
                         {review.updated_at && review.updated_at !== review.created_at && (
-                          <span className="text-xs text-gray-400 ml-2">
+                          <span className="text-xs text-gray-400 dark:text-gray-500 ml-2">
                             (editado)
                           </span>
                         )}
@@ -352,7 +352,7 @@ export default function ReviewSection({
                   {canUserEditReview(review) && editingReview !== review.id && (
                     <button
                       onClick={() => startEditing(review)}
-                      className="p-1.5 sm:p-2 text-gray-400 hover:text-blue-500 transition-colors"
+                      className="p-1.5 sm:p-2 text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 transition-colors"
                       title="Editar reseña"
                     >
                       <svg className="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -366,7 +366,7 @@ export default function ReviewSection({
                     <div className="relative">
                       {deleteConfirm === review.id ? (
                         <div className="flex items-center gap-1 sm:gap-2">
-                          <span className="text-xs sm:text-sm text-gray-600">¿Eliminar?</span>
+                          <span className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">¿Eliminar?</span>
                           <button
                             onClick={() => handleDeleteReview(review.id)}
                             className="px-1.5 sm:px-2 py-1 bg-red-500 text-white text-xs rounded hover:bg-red-600 transition-colors"
@@ -383,7 +383,7 @@ export default function ReviewSection({
                       ) : (
                         <button
                           onClick={() => setDeleteConfirm(review.id)}
-                          className="p-1.5 sm:p-2 text-gray-400 hover:text-red-500 transition-colors"
+                          className="p-1.5 sm:p-2 text-gray-400 hover:text-red-500 dark:hover:text-red-400 transition-colors"
                           title="Eliminar reseña"
                         >
                           <Trash2 className="w-3 h-3 sm:w-4 sm:h-4" />
@@ -396,21 +396,21 @@ export default function ReviewSection({
 
               {/* Contenido del comentario */}
               {editingReview === review.id ? (
-                <form onSubmit={handleEditReview} className="ml-0 sm:ml-13 bg-gray-50 rounded-lg p-3 sm:p-4">
+                <form onSubmit={handleEditReview} className="ml-0 sm:ml-13 bg-gray-50 dark:bg-slate-800 rounded-lg p-3 sm:p-4">
                   <div className="mb-4">
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                       Comentario
                     </label>
                     <textarea
                       value={editComment}
                       onChange={(e) => setEditComment(e.target.value)}
                       placeholder="Actualiza tu comentario..."
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#e30f28] focus:border-transparent resize-none text-sm sm:text-base"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-[#e30f28] dark:focus:ring-red-500 focus:border-transparent resize-none text-sm sm:text-base bg-white dark:bg-slate-900 text-gray-900 dark:text-white"
                       rows={3}
                       required
                       maxLength={500}
                     />
-                    <div className="text-right text-xs sm:text-sm text-gray-500 mt-1">
+                    <div className="text-right text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-1">
                       {editComment.length}/500
                     </div>
                   </div>
@@ -419,21 +419,21 @@ export default function ReviewSection({
                     <button
                       type="button"
                       onClick={cancelEditing}
-                      className="px-3 py-1 text-gray-600 border border-gray-300 rounded hover:bg-gray-50 transition-colors text-sm sm:text-base"
+                      className="px-3 py-1 text-gray-600 dark:text-gray-300 border border-gray-300 dark:border-slate-600 rounded hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors text-sm sm:text-base"
                     >
                       Cancelar
                     </button>
                     <button
                       type="submit"
                       disabled={isSubmitting || !editComment.trim()}
-                      className="px-3 py-1 bg-[#e30f28] text-white rounded hover:bg-[#c20e24] transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
+                      className="px-3 py-1 bg-[#e30f28] dark:bg-red-600 text-white rounded hover:bg-[#c20e24] dark:hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
                     >
                       {isSubmitting ? 'Guardando...' : 'Guardar'}
                     </button>
                   </div>
                 </form>
               ) : (
-                <p className="text-gray-700 leading-relaxed ml-0 sm:ml-13 text-sm sm:text-base">
+                <p className="text-gray-700 dark:text-gray-300 leading-relaxed ml-0 sm:ml-13 text-sm sm:text-base">
                   {review.comment}
                 </p>
               )}
@@ -441,8 +441,8 @@ export default function ReviewSection({
           ))}
         </div>
       ) : (
-        <div className="text-center py-8 sm:py-12 text-gray-500">
-          <MessageCircle className="w-8 h-8 sm:w-12 sm:h-12 mx-auto mb-4 text-gray-300" />
+        <div className="text-center py-8 sm:py-12 text-gray-500 dark:text-gray-400">
+          <MessageCircle className="w-8 h-8 sm:w-12 sm:h-12 mx-auto mb-4 text-gray-300 dark:text-gray-600" />
           <p className="text-base sm:text-lg font-medium mb-2">Aún no hay reseñas</p>
           <p className="text-sm sm:text-base">Sé el primero en compartir tu experiencia con este curso.</p>
           {!isEnrolled && (

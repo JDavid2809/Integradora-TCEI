@@ -87,10 +87,10 @@ export default function StudentsContent() {
         return (
             <div className="p-6">
                 <div className="animate-pulse">
-                    <div className="h-8 bg-gray-300 rounded mb-4"></div>
+                    <div className="h-8 bg-gray-300 dark:bg-gray-700 rounded mb-4"></div>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                         {[...Array(6)].map((_, i) => (
-                            <div key={i} className="h-48 bg-gray-200 rounded"></div>
+                            <div key={i} className="h-48 bg-gray-200 dark:bg-gray-800 rounded"></div>
                         ))}
                     </div>
                 </div>
@@ -101,8 +101,8 @@ export default function StudentsContent() {
     if (error) {
         return (
             <div className="p-6">
-                <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-                    <p className="text-red-600">Error: {error}</p>
+                <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
+                    <p className="text-red-600 dark:text-red-400">Error: {error}</p>
                 </div>
             </div>
         )
@@ -115,17 +115,17 @@ export default function StudentsContent() {
             className="p-6"
         >
             <div id="students-header" className="flex items-center mb-6">
-                <Users className="w-8 h-8 text-blue-600 mr-3" />
-                <h2 className="text-2xl font-bold text-slate-800">Mis Estudiantes</h2>
-                <span id="students-count" className="ml-4 bg-blue-100 text-blue-800 text-sm px-3 py-1 rounded-full">
+                <Users className="w-8 h-8 text-blue-600 dark:text-blue-400 mr-3" />
+                <h2 className="text-2xl font-bold text-slate-800 dark:text-white">Mis Estudiantes</h2>
+                <span id="students-count" className="ml-4 bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 text-sm px-3 py-1 rounded-full">
                     {students.length} estudiantes
                 </span>
             </div>
 
             {students.length === 0 ? (
                 <div className="text-center py-12">
-                    <User className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                    <p className="text-gray-500 text-lg">No tienes estudiantes asignados</p>
+                    <User className="w-16 h-16 text-gray-400 dark:text-gray-600 mx-auto mb-4" />
+                    <p className="text-gray-500 dark:text-gray-400 text-lg">No tienes estudiantes asignados</p>
                 </div>
             ) : (
                 <div id="students-grid" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -134,20 +134,20 @@ export default function StudentsContent() {
                             key={student.id_estudiante}
                             initial={{ opacity: 0, scale: 0.95 }}
                             animate={{ opacity: 1, scale: 1 }}
-                            className="bg-white rounded-lg border border-slate-200 p-6 hover:shadow-md transition-shadow"
+                            className="bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 p-6 hover:shadow-md transition-shadow"
                         >
                             <div className="flex items-center mb-4">
-                                <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mr-4">
-                                    <User className="w-6 h-6 text-blue-600" />
+                                <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center mr-4">
+                                    <User className="w-6 h-6 text-blue-600 dark:text-blue-400" />
                                 </div>
                                 <div>
-                                    <h3 className="font-semibold text-slate-800">
+                                    <h3 className="font-semibold text-slate-800 dark:text-white">
                                         {student.nombre} {student.paterno} {student.materno}
                                     </h3>
                                     <span className={`inline-block text-xs px-2 py-1 rounded-full ${
                                         student.activo 
-                                            ? 'bg-green-100 text-green-800' 
-                                            : 'bg-gray-100 text-gray-800'
+                                            ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300' 
+                                            : 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300'
                                     }`}>
                                         {student.activo ? 'Activo' : 'Inactivo'}
                                     </span>
@@ -155,37 +155,37 @@ export default function StudentsContent() {
                             </div>
 
                             <div className="space-y-2 text-sm">
-                                <div className="flex items-center text-slate-600">
+                                <div className="flex items-center text-slate-600 dark:text-slate-300">
                                     <Mail className="w-4 h-4 mr-2" />
                                     {student.email}
                                 </div>
                                 
                                 {student.telefono && (
-                                    <div className="flex items-center text-slate-600">
+                                    <div className="flex items-center text-slate-600 dark:text-slate-300">
                                         <Phone className="w-4 h-4 mr-2" />
                                         {student.telefono}
                                     </div>
                                 )}
 
-                                <div className="flex items-center text-slate-600">
+                                <div className="flex items-center text-slate-600 dark:text-slate-300">
                                     <User className="w-4 h-4 mr-2" />
                                     Edad: {student.edad} años
                                 </div>
 
                                 {student.categoria_edad && (
-                                    <div className="flex items-center text-slate-600">
+                                    <div className="flex items-center text-slate-600 dark:text-slate-300">
                                         <span className="w-4 h-4 mr-2"></span>
                                         Categoría: {student.categoria_edad}
                                     </div>
                                 )}
                             </div>
 
-                            <div className="mt-4 pt-4 border-t border-slate-200">
-                                <div className="flex items-center text-sm text-slate-600">
+                            <div className="mt-4 pt-4 border-t border-slate-200 dark:border-slate-700">
+                                <div className="flex items-center text-sm text-slate-600 dark:text-slate-300">
                                     <BookOpen className="w-4 h-4 mr-2" />
                                     <div>
                                         <p className="font-medium">{student.curso.nombre}</p>
-                                        <p className="text-xs text-slate-500">
+                                        <p className="text-xs text-slate-500 dark:text-slate-400">
                                             {student.curso.modalidad} • Nivel {student.nivel}
                                         </p>
                                     </div>
@@ -193,22 +193,22 @@ export default function StudentsContent() {
                             </div>
 
                             {student.descripcion && (
-                                <div className="mt-3 p-3 bg-gray-50 rounded text-sm text-slate-600">
+                                <div className="mt-3 p-3 bg-gray-50 dark:bg-slate-700/50 rounded text-sm text-slate-600 dark:text-slate-300">
                                     {student.descripcion}
                                 </div>
                             )}
 
                             {student.estadisticas && (
                                 <div className="mt-4 grid grid-cols-2 gap-2 text-xs">
-                                    <div className="bg-blue-50 p-2 rounded">
-                                        <div className="font-medium text-blue-800">Asistencia</div>
-                                        <div className="text-blue-600">
+                                    <div className="bg-blue-50 dark:bg-blue-900/20 p-2 rounded">
+                                        <div className="font-medium text-blue-800 dark:text-blue-300">Asistencia</div>
+                                        <div className="text-blue-600 dark:text-blue-400">
                                             {student.estadisticas.asistencia.porcentaje}%
                                         </div>
                                     </div>
-                                    <div className="bg-green-50 p-2 rounded">
-                                        <div className="font-medium text-green-800">Promedio</div>
-                                        <div className="text-green-600">
+                                    <div className="bg-green-50 dark:bg-green-900/20 p-2 rounded">
+                                        <div className="font-medium text-green-800 dark:text-green-300">Promedio</div>
+                                        <div className="text-green-600 dark:text-green-400">
                                             {student.estadisticas.calificaciones.promedio}
                                         </div>
                                     </div>

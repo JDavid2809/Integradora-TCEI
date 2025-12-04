@@ -50,14 +50,14 @@ export default function CoursesContent({ studentCourses = [], allCourses = [] }:
 
     const getLevelColor = (level: string) => {
         const colors = {
-            A1: "bg-green-100 text-green-800",
-            A2: "bg-blue-100 text-blue-800",
-            B1: "bg-yellow-100 text-yellow-800",
-            B2: "bg-orange-100 text-orange-800",
-            C1: "bg-purple-100 text-purple-800",
-            C2: "bg-red-100 text-red-800",
+            A1: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300",
+            A2: "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300",
+            B1: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300",
+            B2: "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300",
+            C1: "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300",
+            C2: "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300",
         };
-        return colors[level as keyof typeof colors] || "bg-gray-100 text-gray-800";
+        return colors[level as keyof typeof colors] || "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300";
     };
 
     // 🎯 --- Implementación Driver.js (tour interactivo) ---
@@ -127,12 +127,12 @@ export default function CoursesContent({ studentCourses = [], allCourses = [] }:
                 id="courses-header"
                 className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"
             >
-                <div className="text-2xl font-bold text-[#00246a]">
+                <div className="text-2xl font-bold text-[#00246a] dark:text-blue-100">
                     Mis Cursos {courses.length > 0 && `(${courses.length})`}
                 </div>
                 <button
                     id="explore-courses-btn"
-                    className="bg-[#e30f28] hover:bg-[#e30f28]/90 text-white px-6 py-2 rounded-xl font-medium transition-colors duration-200"
+                    className="bg-[#e30f28] hover:bg-[#e30f28]/90 dark:bg-red-600 dark:hover:bg-red-700 text-white px-6 py-2 rounded-xl font-medium transition-colors duration-200"
                     onClick={handleExploreCourses}
                 >
                     Explorar Cursos
@@ -141,11 +141,11 @@ export default function CoursesContent({ studentCourses = [], allCourses = [] }:
 
             {courses.length === 0 ? (
                 <div className="text-center py-12">
-                    <BookOpen className="w-16 h-16 text-slate-400 mx-auto mb-4" />
-                    <h3 className="text-xl font-semibold text-slate-600 mb-2">No tienes cursos inscritos</h3>
-                    <p className="text-slate-500 mb-6">Explora nuestro catálogo y comienza tu aprendizaje</p>
+                    <BookOpen className="w-16 h-16 text-slate-400 dark:text-slate-500 mx-auto mb-4" />
+                    <h3 className="text-xl font-semibold text-slate-600 dark:text-slate-300 mb-2">No tienes cursos inscritos</h3>
+                    <p className="text-slate-500 dark:text-slate-400 mb-6">Explora nuestro catálogo y comienza tu aprendizaje</p>
                     <button
-                        className="bg-[#e30f28] hover:bg-[#e30f28]/90 text-white px-8 py-3 rounded-xl font-medium transition-colors duration-200"
+                        className="bg-[#e30f28] hover:bg-[#e30f28]/90 dark:bg-red-600 dark:hover:bg-red-700 text-white px-8 py-3 rounded-xl font-medium transition-colors duration-200"
                         onClick={handleExploreCourses}
                     >
                         Ver Cursos Disponibles
@@ -159,10 +159,10 @@ export default function CoursesContent({ studentCourses = [], allCourses = [] }:
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: index * 0.1 }}
-                            className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden hover:shadow-md transition-shadow duration-200"
+                            className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 overflow-hidden hover:shadow-md transition-shadow duration-200"
                         >
-                            <div className="h-48 bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center relative">
-                                <BookOpen className="w-16 h-16 text-blue-400" />
+                            <div className="h-48 bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-slate-700 dark:to-slate-600 flex items-center justify-center relative">
+                                <BookOpen className="w-16 h-16 text-blue-400 dark:text-blue-300" />
                                 <div className="absolute top-4 right-4">
                                     <span
                                         className={`text-xs font-medium px-2 py-1 rounded-full ${getLevelColor(
@@ -172,7 +172,7 @@ export default function CoursesContent({ studentCourses = [], allCourses = [] }:
                                         {course.level}
                                     </span>
                                 </div>
-                                <div className="absolute bottom-4 left-4 text-blue-600">
+                                <div className="absolute bottom-4 left-4 text-blue-600 dark:text-blue-300">
                                     <div className="flex items-center gap-1 text-sm font-medium">
                                         <Award className="w-4 h-4" />
                                         {course.modalidad}
@@ -181,17 +181,17 @@ export default function CoursesContent({ studentCourses = [], allCourses = [] }:
                             </div>
                             <div className="p-6">
                                 <div className="flex items-center justify-between mb-2">
-                                    <span className="text-xs font-medium text-slate-500">
+                                    <span className="text-xs font-medium text-slate-500 dark:text-slate-400">
                                         {course.instructor}
                                     </span>
-                                    <span className="text-sm text-slate-500 flex items-center gap-1">
+                                    <span className="text-sm text-slate-500 dark:text-slate-400 flex items-center gap-1">
                                         <Users className="w-3 h-3" />
                                         {course.students}
                                     </span>
                                 </div>
-                                <h3 className="text-lg font-semibold text-[#00246a] mb-3">{course.title}</h3>
+                                <h3 className="text-lg font-semibold text-[#00246a] dark:text-blue-100 mb-3">{course.title}</h3>
 
-                                <div className="text-sm text-slate-600 mb-4">
+                                <div className="text-sm text-slate-600 dark:text-slate-300 mb-4">
                                     <div className="flex items-center gap-1 mb-1">
                                         <Clock className="w-3 h-3" />
                                         <span>Inicio: {course.inicio}</span>
@@ -204,12 +204,12 @@ export default function CoursesContent({ studentCourses = [], allCourses = [] }:
 
                                 <div className="mb-4">
                                     <div className="flex items-center justify-between text-sm mb-1">
-                                        <span className="text-slate-600">
+                                        <span className="text-slate-600 dark:text-slate-300">
                                             Progreso {course.totalActivities > 0 && `(${course.passedActivities}/${course.totalActivities})`}
                                         </span>
-                                        <span className="font-medium text-[#00246a]">{course.progress}%</span>
+                                        <span className="font-medium text-[#00246a] dark:text-blue-100">{course.progress}%</span>
                                     </div>
-                                    <div className="w-full bg-slate-200 rounded-full h-2">
+                                    <div className="w-full bg-slate-200 dark:bg-slate-600 rounded-full h-2">
                                         <div
                                             className={`h-2 rounded-full transition-all duration-300 ${
                                                 course.progress >= 100 
@@ -218,7 +218,7 @@ export default function CoursesContent({ studentCourses = [], allCourses = [] }:
                                                         ? 'bg-blue-500' 
                                                         : course.progress > 0 
                                                             ? 'bg-yellow-500' 
-                                                            : 'bg-slate-300'
+                                                            : 'bg-slate-300 dark:bg-slate-500'
                                             }`}
                                             style={{ width: `${course.progress}%` }}
                                         ></div>
@@ -226,7 +226,7 @@ export default function CoursesContent({ studentCourses = [], allCourses = [] }:
                                 </div>
                                 <button
                                     onClick={() => router.push(`/Students/courses/${course.id}`)}
-                                    className="w-full bg-[#00246a] hover:bg-[#001a4d] text-white font-medium py-3 rounded-xl transition-colors duration-200 flex items-center justify-center gap-2"
+                                    className="w-full bg-[#00246a] hover:bg-[#001a4d] dark:bg-blue-600 dark:hover:bg-blue-700 text-white font-medium py-3 rounded-xl transition-colors duration-200 flex items-center justify-center gap-2"
                                 >
                                     <span>Ingresar</span>
                                     <ArrowRight className="w-4 h-4" />

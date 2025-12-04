@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion"
 import {  Users, Award, Brain } from "lucide-react"
-import Image from "next/image"
+// Image removed from branding per instruction (logo kept in navbar only)
 
 export default function BrandingSection() {
     const containerVariants = {
@@ -29,15 +29,9 @@ export default function BrandingSection() {
     return (
         <motion.div variants={containerVariants} initial="hidden" animate="visible" className="space-y-8 px-8">
             <motion.div variants={itemVariants} className="space-y-4">
-                <div className="flex items-center space-x-4">
-                    <div className="relative w-14 h-14 rounded-2xl overflow-hidden">
-                        <Image
-                            src="/logos/logoIngles.jpg"
-                            alt="Triunfando con el Inglés Logo"
-                            fill
-                            className="object-contain"
-                            priority
-                        />
+                    <div className="flex items-center space-x-4">
+                    <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#e30f28] to-[#00246a] flex items-center justify-center">
+                        <span className="text-white font-bold">TCEI</span>
                     </div>
                     <div>
                         <h1 className="text-3xl font-bold text-[#00246a]">Triunfando con el Inglés</h1>

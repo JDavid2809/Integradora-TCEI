@@ -289,6 +289,7 @@ model usuario {
 model curso {
   id_curso        Int       @id @default(autoincrement())
   nombre          String    @db.VarChar(100)
+  slug            String    @unique @db.VarChar(120)
   modalidad       Modalidad
   inicio          DateTime? @db.Date
   fin             DateTime? @db.Date

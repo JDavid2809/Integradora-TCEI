@@ -10,6 +10,7 @@ import {
   CourseWithDetails
 } from '@/types/course-creation'
 import { revalidatePath } from 'next/cache'
+import { createSlug } from '@/lib/slugUtils'
 
 // ========================================
 // HELPER FUNCTIONS
@@ -110,6 +111,7 @@ export async function createCourse(
     const course = await prisma.curso.create({
       data: {
         nombre: data.basicInfo.nombre.trim(),
+        slug: createSlug(data.basicInfo.nombre),
         descripcion: data.basicInfo.descripcion.trim(),
         resumen: data.basicInfo.resumen.trim(),
         modalidad: data.basicInfo.modalidad,
@@ -351,6 +353,7 @@ export async function updateCourse(
       },
       data: {
         nombre: data.basicInfo.nombre.trim(),
+        slug: createSlug(data.basicInfo.nombre),
         descripcion: data.basicInfo.descripcion.trim(),
         resumen: data.basicInfo.resumen.trim(),
         modalidad: data.basicInfo.modalidad,

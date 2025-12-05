@@ -50,16 +50,19 @@ export const authOptions: NextAuthOptions = {
         console.timeEnd("findUser");
 
         if (!user) {
-          throw new Error("usuario no encontrado");
+          console.log('❌ User not found:', normalizedEmail);
+          return null;
         }
         if (!user.verificado) {
-          throw new Error("Por favor, verifica tu correo antes de iniciar sesión.");
+          console.log('❌ Email not verified:', normalizedEmail);
+          return null;
         }
 
         console.time("bcrypt");
         const isValid = await bcrypt.compare(credentials.password, user.password);
         if (!isValid) {
-          throw new Error("Correo o contraseña incorrectos");
+          console.log('❌ Invalid password for:', normalizedEmail);
+          return null;
         }
 
         console.timeEnd("bcrypt");
@@ -98,7 +101,8 @@ export const authOptions: NextAuthOptions = {
           ) : null,
         };
       } catch (error) {
-        throw new Error(error!.toString());
+        console.error('❌ Auth error:', error);
+        return null;
       }
 
       },

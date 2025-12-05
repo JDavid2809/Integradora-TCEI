@@ -651,7 +651,6 @@ export default function CourseDetails({ courseData }: CourseDetailsProps) {
                                         </>
                                     )}
                                 </div>
-                                </div>
                                 
                                 <div className="p-4 sm:p-6">
                                     <div className="text-center mb-6">

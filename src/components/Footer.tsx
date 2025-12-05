@@ -89,7 +89,6 @@ export function Footer() {
                                 />
                             )}
                         </div>
-                        </div>
                     </div>
 
                     <h3 className="text-3xl font-black text-[#00246A] dark:text-blue-100 mb-3">

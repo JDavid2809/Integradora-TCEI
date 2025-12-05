@@ -4,9 +4,11 @@ import { redirect } from 'next/navigation'
 import { authOptions } from '@/lib/authOptions'
 import { Benefist } from './views/Home/benefist'
 import { Testimonials } from './views/testimonials'
-import { Hero } from './views/Home/Hero'
 import { SplashScreen } from '@/components/Splash'
 import { Footer } from '@/components/Footer'
+import { AiMascotSection } from '../views/ia-mascota'
+import { Hero } from './views/Home/Hero'
+
 
 // Marcar como ruta dinámica
 export const dynamic = 'force-dynamic'
@@ -47,6 +49,7 @@ export default async function Home() {
       <SplashScreen />
       <Hero />
       <Benefist/>
+      <AiMascotSection />
       <Testimonials/>
       <Footer/>
     </div>

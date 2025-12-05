@@ -484,7 +484,7 @@ export async function createCourse(data: {
     const curso = await prisma.curso.create({
       data: {
         nombre: data.nombre,
-        slug: slug,
+        slug: createSlug(data.nombre),
         modalidad: data.modalidad,
         inicio: data.inicio,
         fin: data.fin,
@@ -512,7 +512,7 @@ export async function updateCourse(id: number, data: {
       throw new Error("Solo los administradores pueden actualizar cursos")
     }
 
-    // Si se actualiza el nombre, regenerar slug
+    // Si se actualiza el nombre, también actualizar el slug
     const updateData: typeof data & { slug?: string } = { ...data }
     if (data.nombre) {
       updateData.slug = createSlug(data.nombre)

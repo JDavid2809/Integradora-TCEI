@@ -15,8 +15,7 @@ WORKDIR /app
 FROM base AS deps
 
 # Copiar archivos de configuración de dependencias
-COPY production.package.json package.json
-COPY package-lock.json* ./
+COPY package.json package-lock.json* ./
 
 # Instalar dependencias de producción
 RUN npm ci --only=production && npm cache clean --force
@@ -33,7 +32,7 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
 # Copiar el package.json de producción
-COPY production.package.json package.json
+COPY package.json package.json
 
 # Generar cliente de Prisma
 RUN npx prisma generate

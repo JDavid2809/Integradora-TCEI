@@ -13,7 +13,11 @@ import {
   FileText,
   Send,
   CheckCircle,
-  AlertCircle
+  AlertCircle,
+  X,
+  Loader2,
+  Upload,
+  Paperclip
 } from 'lucide-react'
 
 interface TeacherRequestForm {
@@ -27,6 +31,7 @@ interface TeacherRequestForm {
   direccion?: string
   nivel_estudios?: string
   observaciones?: string
+  documentos_adjuntos?: { name: string; url: string; type: string }[]
 }
 
 interface RequestStatus {
@@ -42,13 +47,61 @@ export default function TeacherRequestPage() {
   const [error, setError] = useState<string | null>(null)
   const [requestStatus, setRequestStatus] = useState<RequestStatus | null>(null)
   const [checkingEmail, setCheckingEmail] = useState('')
+  const [uploadedFiles, setUploadedFiles] = useState<{ name: string; url: string; type: string }[]>([])
+  const [isUploading, setIsUploading] = useState(false)
 
   const {
     register,
     handleSubmit,
     formState: { errors },
-    reset
+    reset,
+    setValue
   } = useForm<TeacherRequestForm>()
+
+  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files
+    if (!files || files.length === 0) return
+
+    setIsUploading(true)
+    const newFiles: { name: string; url: string; type: string }[] = []
+
+    try {
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i]
+        const formData = new FormData()
+        formData.append('file', file)
+        formData.append('upload_preset', process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET || 'tareas_estudiantes')
+
+        const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME
+        const response = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/upload`, {
+          method: 'POST',
+          body: formData
+        })
+
+        if (!response.ok) throw new Error('Error uploading file')
+
+        const data = await response.json()
+        newFiles.push({
+          name: file.name,
+          url: data.secure_url,
+          type: file.type
+        })
+      }
+
+      setUploadedFiles(prev => [...prev, ...newFiles])
+    } catch (error) {
+      console.error('Error uploading files:', error)
+      setError('Error al subir archivos. Intenta de nuevo.')
+    } finally {
+      setIsUploading(false)
+      // Limpiar input
+      e.target.value = ''
+    }
+  }
+
+  const removeFile = (index: number) => {
+    setUploadedFiles(prev => prev.filter((_, i) => i !== index))
+  }
 
   const onSubmit = async (data: TeacherRequestForm) => {
     setIsLoading(true)
@@ -60,7 +113,10 @@ export default function TeacherRequestPage() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(data),
+        body: JSON.stringify({
+          ...data,
+          documentos_adjuntos: uploadedFiles
+        }),
       })
 
       const result = await response.json()
@@ -71,6 +127,7 @@ export default function TeacherRequestPage() {
 
       setIsSubmitted(true)
       reset()
+      setUploadedFiles([])
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error desconocido')
     } finally {
@@ -354,7 +411,7 @@ export default function TeacherRequestPage() {
                     Información Adicional
                   </h3>
                   
-                  <div>
+                  <div className="mb-4">
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Cuéntanos sobre ti
                     </label>
@@ -364,6 +421,70 @@ export default function TeacherRequestPage() {
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00246a] focus:border-transparent"
                       placeholder="Experiencia docente, certificaciones, especialidades, etc."
                     />
+                  </div>
+
+                  {/* Subida de Documentos */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Documentos de Soporte (CV, Certificaciones, etc.)
+                    </label>
+                    <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-lg hover:border-[#00246a] transition-colors">
+                      <div className="space-y-1 text-center">
+                        {isUploading ? (
+                          <div className="flex flex-col items-center">
+                            <Loader2 className="mx-auto h-12 w-12 text-gray-400 animate-spin" />
+                            <p className="mt-2 text-sm text-gray-500">Subiendo archivos...</p>
+                          </div>
+                        ) : (
+                          <>
+                            <Upload className="mx-auto h-12 w-12 text-gray-400" />
+                            <div className="flex text-sm text-gray-600">
+                              <label
+                                htmlFor="file-upload"
+                                className="relative cursor-pointer bg-white rounded-md font-medium text-[#00246a] hover:text-[#003875] focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-[#00246a]"
+                              >
+                                <span>Sube un archivo</span>
+                                <input
+                                  id="file-upload"
+                                  name="file-upload"
+                                  type="file"
+                                  className="sr-only"
+                                  multiple
+                                  onChange={handleFileSelect}
+                                  accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+                                />
+                              </label>
+                              <p className="pl-1">o arrastra y suelta</p>
+                            </div>
+                            <p className="text-xs text-gray-500">
+                              PDF, DOC, DOCX, PNG, JPG hasta 10MB
+                            </p>
+                          </>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Lista de archivos subidos */}
+                    {uploadedFiles.length > 0 && (
+                      <div className="mt-4 space-y-2">
+                        <h4 className="text-sm font-medium text-gray-700">Archivos adjuntos:</h4>
+                        {uploadedFiles.map((file, index) => (
+                          <div key={index} className="flex items-center justify-between p-2 bg-gray-50 rounded-lg border border-gray-200">
+                            <div className="flex items-center gap-2 overflow-hidden">
+                              <Paperclip className="w-4 h-4 text-gray-500 flex-shrink-0" />
+                              <span className="text-sm text-gray-600 truncate">{file.name}</span>
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => removeFile(index)}
+                              className="p-1 text-gray-400 hover:text-red-500 transition-colors"
+                            >
+                              <X className="w-4 h-4" />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 </div>
 

@@ -36,7 +36,8 @@ export default function IAPresentation() {
     if (presentation?.slides) {
       presentation.slides.forEach(slide => {
         if (slide.imageUrl) {
-          const img = new Image()
+          // Ensure we use the browser DOM Image constructor and not a shadowed React component
+          const img = new (window as any).Image()
           img.src = slide.imageUrl
         }
       })
@@ -237,32 +238,32 @@ export default function IAPresentation() {
   ]
 
   return (
-    <div className="h-screen overflow-hidden bg-gradient-to-br from-blue-50 to-indigo-50 flex flex-col">
+    <div className="h-screen overflow-hidden bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-slate-900 dark:to-slate-800 flex flex-col">
       <div className="flex-1 overflow-y-auto">
         <div className="max-w-7xl mx-auto p-4 space-y-4">
           {/* Header compacto */}
-          <div className="bg-white rounded-xl shadow-md p-4">
+          <div className="bg-white dark:bg-slate-800 rounded-xl shadow-md p-4">
             <div className="flex items-center gap-3 mb-3">
               <div className="bg-gradient-to-r from-purple-500 to-blue-500 p-2 rounded-lg">
                 <Sparkles className="w-6 h-6 text-white" />
               </div>
               <div>
-                <h1 className="text-xl font-bold text-gray-900">AI Presentations</h1>
-                <p className="text-sm text-gray-600">Create professional presentations in seconds</p>
+                <h1 className="text-xl font-bold text-gray-900 dark:text-white">AI Presentations</h1>
+                <p className="text-sm text-gray-600 dark:text-gray-300">Create professional presentations in seconds</p>
               </div>
             </div>
 
           {/* Input y botón */}
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Describe your presentation
               </label>
               <textarea
                 value={prompt}
                 onChange={(e) => setPrompt(e.target.value)}
                 placeholder="Example: Create a presentation about numbers in English from 1 to 20"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none text-sm"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none text-sm dark:bg-slate-700 dark:text-white"
                 rows={2}
                 disabled={loading}
               />
@@ -287,15 +288,15 @@ export default function IAPresentation() {
             </button>
 
             {/* Ejemplos rápidos */}
-            <div className="pt-3 border-t border-gray-200">
-              <p className="text-xs font-medium text-gray-700 mb-2">Quick examples:</p>
+            <div className="pt-3 border-t border-gray-200 dark:border-slate-700">
+              <p className="text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">Quick examples:</p>
               <div className="flex flex-wrap gap-1.5">
                 {examplePrompts.map((example, index) => (
                   <button
                     key={index}
                     onClick={() => setPrompt(example)}
                     disabled={loading}
-                    className="text-[10px] bg-blue-50 hover:bg-blue-100 text-blue-700 px-2 py-1 rounded-full transition-colors disabled:opacity-50"
+                    className="text-[10px] bg-blue-50 dark:bg-blue-900/30 hover:bg-blue-100 dark:hover:bg-blue-900/50 text-blue-700 dark:text-blue-300 px-2 py-1 rounded-full transition-colors disabled:opacity-50"
                   >
                     {example}
                   </button>
@@ -306,7 +307,7 @@ export default function IAPresentation() {
 
           {/* Error */}
           {error && (
-            <div className="mt-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+            <div className="mt-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 px-4 py-3 rounded-lg">
               {error}
             </div>
           )}
@@ -314,11 +315,11 @@ export default function IAPresentation() {
 
           {/* Preview y controles */}
           {presentation && (
-            <div className="bg-white rounded-xl shadow-md p-6">
+            <div className="bg-white dark:bg-slate-800 rounded-xl shadow-md p-6">
               <div className="flex items-center justify-between mb-4">
                 <div>
-                  <h2 className="text-xl font-bold text-gray-900">{presentation.title}</h2>
-                  <p className="text-sm text-gray-600">{presentation.subtitle}</p>
+                  <h2 className="text-xl font-bold text-gray-900 dark:text-white">{presentation.title}</h2>
+                  <p className="text-sm text-gray-600 dark:text-gray-300">{presentation.subtitle}</p>
                 </div>
                 <div className="flex gap-2">
                   <button
@@ -326,7 +327,7 @@ export default function IAPresentation() {
                       setPresentation(null)
                       setPrompt('')
                     }}
-                    className="flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors text-sm"
+                    className="flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-slate-700 hover:bg-gray-200 dark:hover:bg-slate-600 text-gray-700 dark:text-gray-200 rounded-lg transition-colors text-sm"
                   >
                     <RefreshCw className="w-4 h-4" />
                     New
@@ -342,12 +343,12 @@ export default function IAPresentation() {
               </div>
 
               {/* Botón para abrir en nueva ventana */}
-              <div className="text-center py-12 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg border-2 border-dashed border-blue-300">
+              <div className="text-center py-12 bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-slate-900 dark:to-slate-800 rounded-lg border-2 border-dashed border-blue-300 dark:border-blue-700">
                 <div className="mb-4">
                   <Sparkles className="w-16 h-16 mx-auto text-blue-500" />
                 </div>
-                <h3 className="text-2xl font-bold text-gray-900 mb-2">Presentation Ready!</h3>
-                <p className="text-gray-600 mb-6 max-w-md mx-auto">
+                <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Presentation Ready!</h3>
+                <p className="text-gray-600 dark:text-gray-300 mb-6 max-w-md mx-auto">
                   Your presentation is ready. Open it in a new window to view it.
                 </p>
                 <button
@@ -357,12 +358,12 @@ export default function IAPresentation() {
                   <Play className="w-5 h-5" />
                   Open Presentation
                 </button>
-                <p className="text-xs text-gray-500 mt-3">
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-3">
                   Opens in a new tab
                 </p>
               </div>
 
-              <div className="mt-4 text-xs text-gray-600 bg-blue-50 p-3 rounded-lg">
+              <div className="mt-4 text-xs text-gray-600 dark:text-gray-300 bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg">
                 <p className="font-semibold mb-1">💡 Controls:</p>
                 <div className="flex flex-wrap gap-3">
                   <span>← → Navigate</span>

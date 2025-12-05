@@ -18,7 +18,8 @@ export async function POST(request: NextRequest) {
       rfc,
       direccion,
       nivel_estudios,
-      observaciones
+      observaciones,
+      documentos_adjuntos
     } = body
 
     // Validaciones básicas
@@ -82,6 +83,7 @@ export async function POST(request: NextRequest) {
         direccion: direccion?.trim() || null,
         nivel_estudios: nivel_estudios?.trim() || null,
         observaciones: observaciones?.trim() || null,
+        documentos_adjuntos: documentos_adjuntos ? JSON.stringify(documentos_adjuntos) : null,
         estado: 'PENDIENTE'
       }
     })

@@ -265,7 +265,7 @@ export default function CourseDetails({ courseData }: CourseDetailsProps) {
         maxStudents: 25,
         price: '$199',
         originalPrice: '$299',
-        image: "/logos/logoIngles1.jpg",
+        image: "",
         features: [],
         curriculum: [],
         enrolledStudentsList: (courseData.inscripciones || []).map((inscripcion) => ({

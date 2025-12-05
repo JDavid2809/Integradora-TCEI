@@ -77,7 +77,7 @@ interface ChatContextType {
   
   // Acciones
   setActiveRoom: (room: ChatRoom | null) => void
-  sendMessage: (contenido: string, tipo?: 'TEXTO' | 'IMAGEN' | 'ARCHIVO') => Promise<void>
+  sendMessage: (contenido: string, tipo?: 'TEXTO' | 'IMAGEN' | 'ARCHIVO', archivo_url?: string, archivo_nombre?: string) => Promise<void>
   loadMessages: (roomId: number) => Promise<void>
   loadChatRooms: () => Promise<void>
   createChatRoom: (nombre: string, descripcion?: string, tipo?: 'GENERAL' | 'CLASE' | 'PRIVADO' | 'SOPORTE') => Promise<ChatRoom | null>
@@ -86,6 +86,8 @@ interface ChatContextType {
   markAsRead: (roomId: number) => Promise<void>
   markMessageAsDelivered: (messageId: number) => Promise<void>
   markMessageAsRead: (messageId: number) => Promise<void>
+  editMessage: (messageId: number, contenido: string) => Promise<void>
+  deleteMessage: (messageId: number) => Promise<void>
   
   // Chat privado
   startPrivateChat: (targetUserId: number) => Promise<ChatRoom | null>
@@ -153,13 +155,23 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
   }
 
   // Enviar mensaje
-  const sendMessage = async (contenido: string, tipo: 'TEXTO' | 'IMAGEN' | 'ARCHIVO' = 'TEXTO') => {
+  const sendMessage = async (
+    contenido: string, 
+    tipo: 'TEXTO' | 'IMAGEN' | 'ARCHIVO' = 'TEXTO',
+    archivo_url?: string,
+    archivo_nombre?: string
+  ) => {
     if (!activeRoom || !session?.user) return
     
     try {
       const newMessage = await api(`/api/chat/rooms/${activeRoom.id}/messages`, {
         method: 'POST',
-        body: JSON.stringify({ contenido, tipo })
+        body: JSON.stringify({ 
+          contenido, 
+          tipo,
+          archivo_url,
+          archivo_nombre
+        })
       })
       
       setMessages(prev => [...prev, newMessage])
@@ -334,6 +346,43 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
     }
   }
 
+  // Editar mensaje
+  const editMessage = async (messageId: number, contenido: string): Promise<void> => {
+    if (!session?.user) return
+    
+    try {
+      const updatedMessage = await api(`/api/chat/messages/${messageId}`, {
+        method: 'PUT',
+        body: JSON.stringify({ contenido })
+      })
+      
+      setMessages(prev => prev.map(msg => 
+        msg.id === messageId ? updatedMessage : msg
+      ))
+    } catch (error) {
+      console.error('Error editing message:', error)
+      throw error
+    }
+  }
+
+  // Eliminar mensaje
+  const deleteMessage = async (messageId: number): Promise<void> => {
+    if (!session?.user) return
+    
+    try {
+      const deletedMessage = await api(`/api/chat/messages/${messageId}`, {
+        method: 'DELETE'
+      })
+      
+      setMessages(prev => prev.map(msg => 
+        msg.id === messageId ? deletedMessage : msg
+      ))
+    } catch (error) {
+      console.error('Error deleting message:', error)
+      throw error
+    }
+  }
+
   // Actualizar estado de usuario (conectado/desconectado)
   const updateUserStatus = async (isOnline: boolean): Promise<void> => {
     if (!session?.user) return
@@ -401,6 +450,8 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
     markMessageAsRead,
     startPrivateChat,
     searchUsers,
+    editMessage,
+    deleteMessage,
     updateUserStatus
   }
 

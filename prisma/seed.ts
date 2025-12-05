@@ -145,6 +145,7 @@ async function main(){
     const curso1 = await prisma.curso.create({
       data: {
         nombre: "English Conversation Mastery",
+        slug: "english-conversation-mastery",
         modalidad: "PRESENCIAL",
         inicio: new Date('2024-01-15'),
         fin: new Date('2024-04-15'),
@@ -155,6 +156,7 @@ async function main(){
     const curso2 = await prisma.curso.create({
       data: {
         nombre: "Business English Professional",
+        slug: "business-english-professional",
         modalidad: "ONLINE",
         inicio: new Date('2024-02-01'),
         fin: new Date('2024-05-01'),
@@ -165,6 +167,7 @@ async function main(){
     const curso3 = await prisma.curso.create({
       data: {
         nombre: "English Foundations",
+        slug: "english-foundations",
         modalidad: "PRESENCIAL",
         inicio: new Date('2024-03-01'),
         fin: new Date('2024-07-01'),

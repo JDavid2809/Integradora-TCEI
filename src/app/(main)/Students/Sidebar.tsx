@@ -156,32 +156,23 @@ export default function Sidebar({
 
     return (
         <div
-            className={`fixed top-0 bottom-0 left-0 w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out 
+            className={`fixed top-0 bottom-0 left-0 w-64 bg-white dark:bg-slate-900 shadow-lg transform transition-transform duration-300 ease-in-out 
             lg:translate-x-0 lg:static lg:h-screen pt-[76px] lg:pt-0
             ${sidebarOpen ? "translate-x-0 z-[45]" : "-translate-x-full z-0"} 
-            lg:z-auto overflow-y-auto`}
+            lg:z-auto overflow-y-auto border-r border-slate-200 dark:border-slate-700`}
         >
             <div className="flex flex-col h-full">
                 {/* Header */}
-                <div className="flex items-center justify-between h-16 px-6 border-b border-slate-200 flex-shrink-0">
+                <div className="flex items-center justify-between h-16 px-6 border-b border-slate-200 dark:border-slate-700 flex-shrink-0">
                     <div className="flex items-center space-x-3">
-                        <div className="relative w-12 h-12">
-                            <Image
-                                src="/logos/logoIngles.jpg"
-                                alt="Triunfando con el Inglés Logo"
-                                fill
-                                className="object-contain rounded-lg"
-                                priority
-                            />
+                            <h1 className="text-lg font-bold text-[#00246a] dark:text-blue-100">Bienvenido</h1>
                         </div>
-                        <h1 className="text-lg font-bold text-[#00246a]">Bienvenido</h1>
-                    </div>
                     <button
                         onClick={() => setSidebarOpen(false)}
-                        className="lg:hidden p-1 hover:bg-slate-100 rounded-lg transition-colors duration-200"
+                        className="lg:hidden p-1 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors duration-200"
                         aria-label="Cerrar menú"
                     >
-                        <X className="w-5 h-5 text-slate-600" />
+                        <X className="w-5 h-5 text-slate-600 dark:text-slate-400" />
                     </button>
                 </div>
 
@@ -200,12 +191,12 @@ export default function Sidebar({
                                 }}
                                 className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-left transition-all duration-200 mb-2
                                     ${isActive 
-                                        ? "bg-[#e30f28]/10 text-[#e30f28] shadow-sm" 
-                                        : "text-slate-700 hover:bg-slate-50 hover:text-slate-900"
+                                        ? "bg-[#e30f28]/10 dark:bg-red-900/20 text-[#e30f28] dark:text-red-400 shadow-sm" 
+                                        : "text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white"
                                     }`}
                                 aria-current={isActive ? "page" : undefined}
                             >
-                                <item.icon className={`w-5 h-5 ${isActive ? "text-[#e30f28]" : ""}`} />
+                                <item.icon className={`w-5 h-5 ${isActive ? "text-[#e30f28] dark:text-red-400" : ""}`} />
                                 <span className="font-medium">{item.label}</span>
                             </button>
                         );
@@ -233,8 +224,8 @@ export default function Sidebar({
                             {/* Button Content - Fondo más claro cuando está activo */}
                             <div className={`relative flex items-center space-x-3 px-4 py-4 rounded-2xl transition-all duration-300
                                 ${activeSection === "assistant" 
-                                    ? "bg-white shadow-inner" 
-                                    : "bg-white group-hover:bg-gradient-to-br group-hover:from-[#00c2a8]/5 group-hover:via-[#06b6d4]/5 group-hover:to-[#8b5cf6]/5"
+                                    ? "bg-white dark:bg-slate-800 shadow-inner" 
+                                    : "bg-white dark:bg-slate-900 group-hover:bg-gradient-to-br group-hover:from-[#00c2a8]/5 group-hover:via-[#06b6d4]/5 group-hover:to-[#8b5cf6]/5 dark:group-hover:from-[#00c2a8]/10 dark:group-hover:via-[#06b6d4]/10 dark:group-hover:to-[#8b5cf6]/10"
                                 }`}
                             >
                                 {/* Icon with animated glow */}
@@ -242,7 +233,7 @@ export default function Sidebar({
                                     <div className={`absolute inset-0 bg-gradient-to-br from-[#00c2a8] to-[#06b6d4] rounded-lg blur-md transition-opacity duration-300
                                         ${activeSection === "assistant" ? "opacity-40" : "opacity-0 group-hover:opacity-30"}`}
                                     />
-                                    <div className="relative bg-gradient-to-br from-[#ffffff] to-[#ffffff] p-2 rounded-lg shadow-sm">
+                                    <div className="relative bg-gradient-to-br from-[#ffffff] to-[#ffffff] dark:from-slate-700 dark:to-slate-700 p-2 rounded-lg shadow-sm">
                                         <div className="relative w-6 h-6">
                                             <Image
                                                 src="/ChatBot.png"
@@ -259,7 +250,7 @@ export default function Sidebar({
                                     <span className={`font-semibold text-sm transition-colors duration-300
                                         ${activeSection === "assistant" 
                                             ? "text-[#00c2a8]" 
-                                            : "text-slate-800 group-hover:text-[#00c2a8]"
+                                            : "text-slate-800 dark:text-slate-200 group-hover:text-[#00c2a8]"
                                         }`}
                                     >
                                         Asistente Virtual
@@ -270,7 +261,7 @@ export default function Sidebar({
                                 <Sparkles className={`w-4 h-4 flex-shrink-0 transition-all duration-300
                                     ${activeSection === "assistant" 
                                         ? "text-[#8b5cf6] animate-pulse" 
-                                        : "text-slate-400 group-hover:text-[#00c2a8]"
+                                        : "text-slate-400 dark:text-slate-500 group-hover:text-[#00c2a8]"
                                     }`}
                                 />
 
@@ -299,12 +290,12 @@ export default function Sidebar({
                                 }}
                                 className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-left transition-all duration-200 mb-2
                                     ${isActive 
-                                        ? "bg-[#e30f28]/10 text-[#e30f28] shadow-sm" 
-                                        : "text-slate-700 hover:bg-slate-50 hover:text-slate-900"
+                                        ? "bg-[#e30f28]/10 dark:bg-red-900/20 text-[#e30f28] dark:text-red-400 shadow-sm" 
+                                        : "text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white"
                                     }`}
                                 aria-current={isActive ? "page" : undefined}
                             >
-                                <item.icon className={`w-5 h-5 ${isActive ? "text-[#e30f28]" : ""}`} />
+                                <item.icon className={`w-5 h-5 ${isActive ? "text-[#e30f28] dark:text-red-400" : ""}`} />
                                 <span className="font-medium">{item.label}</span>
                             </button>
                         );

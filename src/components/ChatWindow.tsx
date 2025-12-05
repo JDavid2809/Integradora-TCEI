@@ -29,7 +29,14 @@ import {
   CheckCheck,
   Clock,
   Wifi,
-  WifiOff
+  WifiOff,
+  Paperclip,
+  FileText,
+  ImageIcon,
+  Loader2,
+  MoreVertical,
+  Trash2,
+  Edit2
 } from 'lucide-react'
 import { useSession } from 'next-auth/react'
 
@@ -61,10 +68,15 @@ export default function ChatWindow({ isOpen, onClose, isMinimized, onToggleMinim
     markMessageAsRead,
     startPrivateChat,
     searchUsers,
-    updateUserStatus
+    updateUserStatus,
+    editMessage,
+    deleteMessage
   } = useChat()
 
   const [newMessage, setNewMessage] = useState('')
+  const [editingMessageId, setEditingMessageId] = useState<number | null>(null)
+  const [editContent, setEditContent] = useState('')
+  const [showOptionsForMessage, setShowOptionsForMessage] = useState<number | null>(null)
   const [showCreateRoom, setShowCreateRoom] = useState(false)
   const [newRoomName, setNewRoomName] = useState('')
   const [newRoomDescription, setNewRoomDescription] = useState('')
@@ -75,18 +87,29 @@ export default function ChatWindow({ isOpen, onClose, isMinimized, onToggleMinim
   const [showPrivateChat, setShowPrivateChat] = useState(false)
   const [selectedUser, setSelectedUser] = useState<any>(null)
   const [isFullScreen, setIsFullScreen] = useState(false)
-  const [isChatListMinimized, setIsChatListMinimized] = useState(() => {
-    if (typeof window !== 'undefined') {
-      return localStorage.getItem('chatListMinimized') === 'true'
+  const [isUploading, setIsUploading] = useState(false)
+  const [isChatListMinimized, setIsChatListMinimized] = useState<boolean>(() => {
+    try {
+      if (typeof window !== 'undefined') {
+        return localStorage.getItem('chatListMinimized') === 'true'
+      }
+    } catch (e) {
+      // localStorage may be blocked or unavailable in some environments
+      console.warn('localStorage not available:', e)
     }
     return false
   })
 
   // Estados para posición y tamaño de la ventana
-  const [position, setPosition] = useState(() => ({
-    x: Math.max(0, window.innerWidth - 420),
-    y: Math.max(0, window.innerHeight - 650)
-  }))
+  const [position, setPosition] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return {
+        x: Math.max(0, window.innerWidth - 420),
+        y: Math.max(0, window.innerHeight - 650)
+      }
+    }
+    return { x: 0, y: 0 }
+  })
   const [size, setSize] = useState({ width: 384, height: 600 })
   const [isDragging, setIsDragging] = useState(false)
   const [isResizing, setIsResizing] = useState(false)
@@ -103,6 +126,7 @@ export default function ChatWindow({ isOpen, onClose, isMinimized, onToggleMinim
 
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const messageInputRef = useRef<HTMLInputElement>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
   const chatWindowRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -158,9 +182,68 @@ export default function ChatWindow({ isOpen, onClose, isMinimized, onToggleMinim
     }
   }, [activeRoom, session])
 
+  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file || !activeRoom) return
+
+    try {
+      setIsUploading(true)
+      
+      const formData = new FormData()
+      formData.append('file', file)
+      formData.append('upload_preset', process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET || 'tareas_estudiantes')
+
+      const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME
+      const response = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/upload`, {
+        method: 'POST',
+        body: formData
+      })
+
+      if (!response.ok) {
+        throw new Error('Error uploading file')
+      }
+
+      const data = await response.json()
+      
+      // Determinar tipo de mensaje
+      const type = file.type.startsWith('image/') ? 'IMAGEN' : 'ARCHIVO'
+      
+      await sendMessage(
+        file.name, // El contenido es el nombre del archivo
+        type,
+        data.secure_url,
+        file.name
+      )
+
+    } catch (error) {
+      console.error('Error uploading file:', error)
+      alert('Error al subir el archivo')
+    } finally {
+      setIsUploading(false)
+      if (fileInputRef.current) {
+        fileInputRef.current.value = ''
+      }
+    }
+  }
+
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!newMessage.trim() || !activeRoom) return
+    if (!activeRoom) return
+
+    if (editingMessageId) {
+      if (!editContent.trim()) return
+      try {
+        await editMessage(editingMessageId, editContent.trim())
+        setEditingMessageId(null)
+        setEditContent('')
+        setNewMessage('')
+      } catch (error) {
+        console.error('Error editing message:', error)
+      }
+      return
+    }
+
+    if (!newMessage.trim()) return
 
     try {
       await sendMessage(newMessage.trim())
@@ -168,6 +251,31 @@ export default function ChatWindow({ isOpen, onClose, isMinimized, onToggleMinim
       messageInputRef.current?.focus()
     } catch (error) {
       console.error('Error sending message:', error)
+    }
+  }
+
+  const handleStartEdit = (message: any) => {
+    setEditingMessageId(message.id)
+    setEditContent(message.contenido)
+    setNewMessage(message.contenido)
+    setShowOptionsForMessage(null)
+    messageInputRef.current?.focus()
+  }
+
+  const handleCancelEdit = () => {
+    setEditingMessageId(null)
+    setEditContent('')
+    setNewMessage('')
+  }
+
+  const handleDeleteMessage = async (messageId: number) => {
+    if (confirm('¿Estás seguro de que quieres eliminar este mensaje?')) {
+      try {
+        await deleteMessage(messageId)
+        setShowOptionsForMessage(null)
+      } catch (error) {
+        console.error('Error deleting message:', error)
+      }
     }
   }
 
@@ -355,7 +463,7 @@ export default function ChatWindow({ isOpen, onClose, isMinimized, onToggleMinim
       }
     }
 
-    if (isFullScreen) {
+      if (isFullScreen) {
       document.addEventListener('keydown', handleKeyDown)
       // También deshabilitar scroll del body
       document.body.style.overflow = 'hidden'
@@ -364,8 +472,10 @@ export default function ChatWindow({ isOpen, onClose, isMinimized, onToggleMinim
     }
 
     return () => {
-      document.removeEventListener('keydown', handleKeyDown)
-      document.body.style.overflow = 'unset'
+      if (typeof document !== 'undefined') {
+        document.removeEventListener('keydown', handleKeyDown)
+        document.body.style.overflow = 'unset'
+      }
     }
   }, [isFullScreen])
 
@@ -385,8 +495,8 @@ export default function ChatWindow({ isOpen, onClose, isMinimized, onToggleMinim
     if (isDragging) {
       const deltaX = e.clientX - dragStart.x
       const deltaY = e.clientY - dragStart.y
-      const newX = Math.max(0, Math.min(window.innerWidth - size.width, dragStart.startX + deltaX))
-      const newY = Math.max(0, Math.min(window.innerHeight - size.height, dragStart.startY + deltaY))
+      const newX = typeof window !== 'undefined' ? Math.max(0, Math.min(window.innerWidth - size.width, dragStart.startX + deltaX)) : dragStart.startX + deltaX
+      const newY = typeof window !== 'undefined' ? Math.max(0, Math.min(window.innerHeight - size.height, dragStart.startY + deltaY)) : dragStart.startY + deltaY
       setPosition({ x: newX, y: newY })
     }
     
@@ -401,7 +511,7 @@ export default function ChatWindow({ isOpen, onClose, isMinimized, onToggleMinim
 
       // Redimensionar según la dirección
       if (resizeDirection.includes('right')) {
-        newWidth = Math.max(350, Math.min(window.innerWidth - newX, resizeStart.startWidth + deltaX))
+        newWidth = typeof window !== 'undefined' ? Math.max(350, Math.min(window.innerWidth - newX, resizeStart.startWidth + deltaX)) : Math.max(350, resizeStart.startWidth + deltaX)
       }
       if (resizeDirection.includes('left')) {
         const widthDelta = -deltaX
@@ -412,7 +522,7 @@ export default function ChatWindow({ isOpen, onClose, isMinimized, onToggleMinim
         }
       }
       if (resizeDirection.includes('bottom')) {
-        newHeight = Math.max(450, Math.min(window.innerHeight - newY, resizeStart.startHeight + deltaY))
+        newHeight = typeof window !== 'undefined' ? Math.max(450, Math.min(window.innerHeight - newY, resizeStart.startHeight + deltaY)) : Math.max(450, resizeStart.startHeight + deltaY)
       }
       if (resizeDirection.includes('top')) {
         const heightDelta = -deltaY
@@ -453,14 +563,18 @@ export default function ChatWindow({ isOpen, onClose, isMinimized, onToggleMinim
 
   useEffect(() => {
     if (isDragging || isResizing) {
-      document.addEventListener('mousemove', handleMouseMove)
-      document.addEventListener('mouseup', handleMouseUp)
-      document.body.style.userSelect = 'none'
+      if (typeof document !== 'undefined') {
+        document.addEventListener('mousemove', handleMouseMove)
+        document.addEventListener('mouseup', handleMouseUp)
+        document.body.style.userSelect = 'none'
+      }
       
       return () => {
-        document.removeEventListener('mousemove', handleMouseMove)
-        document.removeEventListener('mouseup', handleMouseUp)
-        document.body.style.userSelect = 'auto'
+        if (typeof document !== 'undefined') {
+          document.removeEventListener('mousemove', handleMouseMove)
+          document.removeEventListener('mouseup', handleMouseUp)
+          document.body.style.userSelect = 'auto'
+        }
       }
     }
   }, [isDragging, isResizing, handleMouseMove, handleMouseUp])
@@ -476,17 +590,17 @@ export default function ChatWindow({ isOpen, onClose, isMinimized, onToggleMinim
 
   // Centrar ventana cuando se abre por primera vez
   useEffect(() => {
-    if (isOpen && !isDragging) {
+    if (isOpen && !isDragging && typeof window !== 'undefined') {
       const centerX = Math.max(0, (window.innerWidth - size.width) / 2)
       const centerY = Math.max(0, (window.innerHeight - size.height) / 2)
       
       // Solo centrar si la ventana está en la posición inicial
-      if (position.x === Math.max(0, window.innerWidth - 420) && 
+      if (typeof window !== 'undefined' && position.x === Math.max(0, window.innerWidth - 420) && 
           position.y === Math.max(0, window.innerHeight - 650)) {
         setPosition({ x: centerX, y: centerY })
       }
     }
-  }, [isOpen])
+  }, [isOpen, isDragging, size.width, size.height, position.x, position.y])
 
   if (!isOpen) return null
 
@@ -510,14 +624,14 @@ export default function ChatWindow({ isOpen, onClose, isMinimized, onToggleMinim
         transition: isDragging || isResizing ? 'none' : 'all 0.2s ease',
       }}
     >
-      <div className={`bg-white h-full flex flex-col overflow-hidden ${
+      <div className={`bg-white dark:bg-slate-900 h-full flex flex-col overflow-hidden ${
         isFullScreen ? 'rounded-none border-0' : 'rounded-xl shadow-2xl border-2'
       } ${
-        isDragging ? 'border-[#00246a] shadow-3xl' : 'border-gray-200'
-      } ${isResizing ? 'border-[#e30f28]' : ''}`}>
+        isDragging ? 'border-[#00246a] dark:border-blue-500 shadow-3xl' : 'border-gray-200 dark:border-slate-700'
+      } ${isResizing ? 'border-[#e30f28] dark:border-red-500' : ''}`}>
         {/* Header */}
         <div 
-          className={`flex items-center justify-between p-4 border-b bg-gradient-to-r from-[#00246a] to-[#003875] text-white ${
+          className={`flex items-center justify-between p-4 border-b dark:border-slate-700 bg-gradient-to-r from-[#00246a] to-[#003875] dark:from-slate-800 dark:to-slate-900 text-white ${
             isFullScreen ? 'rounded-none' : 'rounded-t-xl'
           } ${
             isDragging && !isFullScreen ? 'cursor-grabbing' : !isFullScreen ? 'cursor-move' : 'cursor-default'
@@ -525,12 +639,12 @@ export default function ChatWindow({ isOpen, onClose, isMinimized, onToggleMinim
           onMouseDown={!isFullScreen ? handleMouseDown : undefined}
         >
           <div className="flex items-center gap-3">
-            <div className="p-1.5 bg-white/20 rounded-lg">
+            <div className="p-1.5 bg-white/20 dark:bg-white/10 rounded-lg">
               <MessageCircle className="w-5 h-5" />
             </div>
             <div>
               <span className="font-semibold text-lg">Chat</span>
-              <div className="flex items-center gap-2 text-sm text-white/80">
+              <div className="flex items-center gap-2 text-sm text-white/80 dark:text-gray-300">
                 {isConnected ? (
                   <Wifi className="w-3 h-3 text-green-400" />
                 ) : (
@@ -549,14 +663,14 @@ export default function ChatWindow({ isOpen, onClose, isMinimized, onToggleMinim
           <div className="flex items-center gap-2">
             <button
               onClick={() => setIsFullScreen(!isFullScreen)}
-              className="p-2 hover:bg-white/20 rounded-lg transition-colors"
+              className="p-2 hover:bg-white/20 dark:hover:bg-white/10 rounded-lg transition-colors"
               title={isFullScreen ? "Salir de pantalla completa (Esc)" : "Ver en pantalla completa"}
             >
               {isFullScreen ? <Minimize2 className="w-4 h-4" /> : <Maximize className="w-4 h-4" />}
             </button>
             <button
               onClick={onClose}
-              className="p-2 hover:bg-white/20 rounded-lg transition-colors"
+              className="p-2 hover:bg-white/20 dark:hover:bg-white/10 rounded-lg transition-colors"
             >
               <X className="w-4 h-4" />
             </button>
@@ -566,11 +680,11 @@ export default function ChatWindow({ isOpen, onClose, isMinimized, onToggleMinim
         {!isMinimized && (
           <div className="flex flex-1 min-h-0">
             {/* Sidebar de salas */}
-            <div className={`${isChatListMinimized ? 'w-16' : 'w-64'} border-r border-gray-200 flex flex-col bg-gray-50/50 min-w-0 transition-all duration-300`}>
+            <div className={`${isChatListMinimized ? 'w-16' : 'w-64'} border-r border-gray-200 dark:border-slate-700 flex flex-col bg-gray-50/50 dark:bg-slate-900/50 min-w-0 transition-all duration-300`}>
               {/* Header de salas */}
-              <div className="p-4 border-b border-gray-200 bg-white flex-shrink-0">
+              <div className="p-4 border-b border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-900 flex-shrink-0">
                 <div className="flex items-center justify-between mb-2">
-                  {!isChatListMinimized && <span className="font-semibold text-[#00246a]">Salas de Chat</span>}
+                  {!isChatListMinimized && <span className="font-semibold text-[#00246a] dark:text-blue-100">Salas de Chat</span>}
                   <div className="flex items-center gap-1">
                     {!isChatListMinimized && (
                       <>
@@ -579,7 +693,7 @@ export default function ChatWindow({ isOpen, onClose, isMinimized, onToggleMinim
                           className={`p-2 rounded-lg transition-all duration-200 ${
                             isSearchMode 
                               ? 'bg-[#e30f28] text-white' 
-                              : 'hover:bg-[#e30f28] hover:text-white text-[#00246a]'
+                              : 'hover:bg-[#e30f28] hover:text-white text-[#00246a] dark:text-blue-200 dark:hover:bg-red-600'
                           }`}
                           title={isSearchMode ? "Cancelar búsqueda" : "Buscar usuarios"}
                         >
@@ -587,7 +701,7 @@ export default function ChatWindow({ isOpen, onClose, isMinimized, onToggleMinim
                         </button>
                         <button
                           onClick={() => setShowCreateRoom(true)}
-                          className="p-2 hover:bg-[#e30f28] hover:text-white rounded-lg transition-all duration-200 text-[#00246a]"
+                          className="p-2 hover:bg-[#e30f28] hover:text-white rounded-lg transition-all duration-200 text-[#00246a] dark:text-blue-200 dark:hover:bg-red-600"
                           title="Crear sala"
                         >
                           <Plus className="w-4 h-4" />
@@ -596,7 +710,7 @@ export default function ChatWindow({ isOpen, onClose, isMinimized, onToggleMinim
                     )}
                     <button
                       onClick={() => setIsChatListMinimized(!isChatListMinimized)}
-                      className="p-2 hover:bg-[#e30f28] hover:text-white rounded-lg transition-all duration-200 text-[#00246a]"
+                      className="p-2 hover:bg-[#e30f28] hover:text-white rounded-lg transition-all duration-200 text-[#00246a] dark:text-blue-200 dark:hover:bg-red-600"
                       title={isChatListMinimized ? "Expandir lista de chats" : "Minimizar lista de chats"}
                     >
                       {isChatListMinimized ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
@@ -607,13 +721,13 @@ export default function ChatWindow({ isOpen, onClose, isMinimized, onToggleMinim
 
               {/* Botones de acceso rápido cuando está minimizado */}
               {isChatListMinimized && (
-                <div className="p-2 space-y-2 border-b border-gray-200">
+                <div className="p-2 space-y-2 border-b border-gray-200 dark:border-slate-700">
                   <button
                     onClick={handleToggleSearchMode}
                     className={`w-full p-2 rounded-lg transition-all duration-200 flex items-center justify-center ${
                       isSearchMode 
                         ? 'bg-[#e30f28] text-white' 
-                        : 'hover:bg-[#e30f28] hover:text-white text-[#00246a]'
+                        : 'hover:bg-[#e30f28] hover:text-white text-[#00246a] dark:text-blue-200 dark:hover:bg-red-600'
                     }`}
                     title={isSearchMode ? "Cancelar búsqueda" : "Buscar usuarios"}
                   >
@@ -621,7 +735,7 @@ export default function ChatWindow({ isOpen, onClose, isMinimized, onToggleMinim
                   </button>
                   <button
                     onClick={() => setShowCreateRoom(true)}
-                    className="w-full p-2 hover:bg-[#e30f28] hover:text-white rounded-lg transition-all duration-200 text-[#00246a] flex items-center justify-center"
+                    className="w-full p-2 hover:bg-[#e30f28] hover:text-white rounded-lg transition-all duration-200 text-[#00246a] dark:text-blue-200 dark:hover:bg-red-600 flex items-center justify-center"
                     title="Crear sala"
                   >
                     <Plus className="w-4 h-4" />
@@ -631,13 +745,13 @@ export default function ChatWindow({ isOpen, onClose, isMinimized, onToggleMinim
 
               {/* Barra de búsqueda */}
               {isSearchMode && (
-                <div className="p-2 border-b border-gray-200">
+                <div className="p-2 border-b border-gray-200 dark:border-slate-700">
                   {!isChatListMinimized ? (
                     <input
                       type="text"
                       value={searchQuery}
                       onChange={(e) => handleUserSearch(e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00246a] text-sm"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00246a] dark:focus:ring-blue-500 bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm"
                       placeholder="Buscar usuarios por nombre o email..."
                       autoFocus
                     />
@@ -647,7 +761,7 @@ export default function ChatWindow({ isOpen, onClose, isMinimized, onToggleMinim
                         type="text"
                         value={searchQuery}
                         onChange={(e) => handleUserSearch(e.target.value)}
-                        className="w-full px-2 py-1 border border-gray-300 rounded text-xs focus:outline-none focus:ring-1 focus:ring-[#00246a]"
+                        className="w-full px-2 py-1 border border-gray-300 dark:border-slate-600 rounded text-xs focus:outline-none focus:ring-1 focus:ring-[#00246a] dark:focus:ring-blue-500 bg-white dark:bg-slate-800 text-gray-900 dark:text-white"
                         placeholder="Buscar..."
                         autoFocus
                       />
@@ -662,7 +776,7 @@ export default function ChatWindow({ isOpen, onClose, isMinimized, onToggleMinim
                   // Mostrar resultados de búsqueda
                   <div className="space-y-2">
                     {searchResults.length === 0 ? (
-                      <div className="text-center py-8 text-gray-500">
+                      <div className="text-center py-8 text-gray-500 dark:text-gray-400">
                         <User className="w-8 h-8 mx-auto mb-2 opacity-50" />
                         <p className="text-sm font-medium mb-2">
                           {searchQuery ? 'No se encontraron usuarios' : 'Escribe para buscar usuarios'}
@@ -683,24 +797,24 @@ export default function ChatWindow({ isOpen, onClose, isMinimized, onToggleMinim
                       searchResults.map(user => (
                         <div
                           key={user.id}
-                          className="p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+                          className="p-3 border border-gray-200 dark:border-slate-700 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors"
                         >
                           <div className="flex items-center justify-between">
                             <div className="flex items-center gap-3">
-                              <div className="w-8 h-8 bg-[#00246a] text-white rounded-full flex items-center justify-center text-sm font-medium">
+                              <div className="w-8 h-8 bg-[#00246a] dark:bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-medium">
                                 {user.nombre?.charAt(0)?.toUpperCase() || 'U'}
                               </div>
                               {!isChatListMinimized && (
                                 <div>
-                                  <p className="font-medium text-gray-900">{user.nombre}</p>
-                                  <p className="text-sm text-gray-500">{user.email}</p>
-                                  <p className="text-xs text-gray-400 capitalize">{user.role?.toLowerCase()}</p>
+                                  <p className="font-medium text-gray-900 dark:text-white">{user.nombre}</p>
+                                  <p className="text-sm text-gray-500 dark:text-gray-400">{user.email}</p>
+                                  <p className="text-xs text-gray-400 dark:text-gray-500 capitalize">{user.role?.toLowerCase()}</p>
                                 </div>
                               )}
                             </div>
                             <button
                               onClick={() => handleStartPrivateChat(user.id)}
-                              className="px-3 py-1 bg-[#00246a] text-white text-sm rounded-lg hover:bg-[#003875] transition-colors"
+                              className="px-3 py-1 bg-[#00246a] dark:bg-blue-600 text-white text-sm rounded-lg hover:bg-[#003875] dark:hover:bg-blue-700 transition-colors"
                               title={isChatListMinimized ? (user.hasExistingChat ? 'Abrir Chat' : 'Iniciar Chat') : undefined}
                             >
                               {isChatListMinimized ? '💬' : (user.hasExistingChat ? 'Abrir Chat' : 'Iniciar Chat')}
@@ -711,17 +825,17 @@ export default function ChatWindow({ isOpen, onClose, isMinimized, onToggleMinim
                     )}
                   </div>
                 ) : loading ? (
-                  <div className="text-center py-8 text-gray-500">
+                  <div className="text-center py-8 text-gray-500 dark:text-gray-400">
                     <MessageCircle className={`${isChatListMinimized ? 'w-6 h-6' : 'w-8 h-8'} animate-spin mx-auto mb-2`} />
                     {!isChatListMinimized && <p className="text-sm">Cargando salas...</p>}
                   </div>
                 ) : chatRooms.length === 0 ? (
-                  <div className="text-center py-8 text-gray-500">
+                  <div className="text-center py-8 text-gray-500 dark:text-gray-400">
                     <MessageCircle className={`${isChatListMinimized ? 'w-6 h-6' : 'w-8 h-8'} mx-auto mb-2 opacity-50`} />
                     {!isChatListMinimized && (
                       <>
                         <p className="text-sm font-medium">No hay salas disponibles</p>
-                        <p className="text-xs text-gray-400 mt-1">Crea una nueva sala para empezar</p>
+                        <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">Crea una nueva sala para empezar</p>
                       </>
                     )}
                   </div>
@@ -733,8 +847,8 @@ export default function ChatWindow({ isOpen, onClose, isMinimized, onToggleMinim
                           onClick={() => setActiveRoom(room)}
                           className={`w-full ${isChatListMinimized ? 'p-2' : 'p-3'} text-left rounded-lg transition-all duration-200 ${
                             activeRoom?.id === room.id 
-                              ? 'bg-gradient-to-r from-[#00246a]/10 to-[#e30f28]/10 border border-[#e30f28]/30' 
-                              : 'hover:bg-white/80'
+                              ? 'bg-gradient-to-r from-[#00246a]/10 to-[#e30f28]/10 dark:from-blue-900/30 dark:to-red-900/30 border border-[#e30f28]/30 dark:border-red-500/30' 
+                              : 'hover:bg-white/80 dark:hover:bg-slate-800/80'
                           }`}
                           title={isChatListMinimized ? room.nombre : undefined}
                         >
@@ -743,13 +857,13 @@ export default function ChatWindow({ isOpen, onClose, isMinimized, onToggleMinim
                             <div className="flex items-center justify-center relative">
                               <div className={`p-2 rounded-lg transition-all duration-200 ${
                                 activeRoom?.id === room.id 
-                                  ? 'bg-[#e30f28] text-white' 
-                                  : 'bg-gray-100 text-gray-600 group-hover:bg-[#00246a] group-hover:text-white'
+                                  ? 'bg-[#e30f28] dark:bg-red-600 text-white' 
+                                  : 'bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-gray-400 group-hover:bg-[#00246a] dark:group-hover:bg-blue-600 group-hover:text-white'
                               }`}>
                                 {getRoomIcon(room.tipo)}
                               </div>
                               {(room.mensajes_no_leidos ?? 0) > 0 && (
-                                <div className="absolute -top-1 -right-1 bg-[#e30f28] text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-medium">
+                                <div className="absolute -top-1 -right-1 bg-[#e30f28] dark:bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-medium">
                                   {(room.mensajes_no_leidos ?? 0) > 9 ? '9+' : room.mensajes_no_leidos}
                                 </div>
                               )}
@@ -759,28 +873,28 @@ export default function ChatWindow({ isOpen, onClose, isMinimized, onToggleMinim
                             <div className="flex items-start gap-3">
                               <div className={`p-2 rounded-lg transition-all duration-200 ${
                                 activeRoom?.id === room.id 
-                                  ? 'bg-[#e30f28] text-white' 
-                                  : 'bg-gray-100 text-gray-600 group-hover:bg-[#00246a] group-hover:text-white'
+                                  ? 'bg-[#e30f28] dark:bg-red-600 text-white' 
+                                  : 'bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-gray-400 group-hover:bg-[#00246a] dark:group-hover:bg-blue-600 group-hover:text-white'
                               }`}>
                                 {getRoomIcon(room.tipo)}
                               </div>
                               <div className="flex-1 min-w-0">
                                 <div className="flex items-center gap-2 mb-1">
                                   <span className={`font-medium text-sm truncate ${
-                                    activeRoom?.id === room.id ? 'text-[#00246a]' : 'text-gray-900'
+                                    activeRoom?.id === room.id ? 'text-[#00246a] dark:text-blue-200' : 'text-gray-900 dark:text-white'
                                   }`}>
                                     {room.nombre}
                                   </span>
                                   {(room.mensajes_no_leidos ?? 0) > 0 && (
-                                    <span className="bg-[#e30f28] text-white text-xs rounded-full px-2 py-0.5 min-w-[20px] text-center font-medium">
+                                    <span className="bg-[#e30f28] dark:bg-red-500 text-white text-xs rounded-full px-2 py-0.5 min-w-[20px] text-center font-medium">
                                       {room.mensajes_no_leidos}
                                     </span>
                                   )}
                                 </div>
-                                <p className="text-xs text-gray-500 truncate">{room.descripcion || 'Sin descripción'}</p>
+                                <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{room.descripcion || 'Sin descripción'}</p>
                                 <div className="flex items-center gap-1 mt-1">
-                                  <Users className="w-3 h-3 text-gray-400" />
-                                  <span className="text-xs text-gray-400">
+                                  <Users className="w-3 h-3 text-gray-400 dark:text-gray-500" />
+                                  <span className="text-xs text-gray-400 dark:text-gray-500">
                                     {room.participantes?.length || 0} participantes
                                   </span>
                                 </div>
@@ -798,7 +912,7 @@ export default function ChatWindow({ isOpen, onClose, isMinimized, onToggleMinim
                                   e.stopPropagation()
                                   handleLeaveRoom(room.id)
                                 }}
-                                className="p-1 bg-red-100 hover:bg-red-200 text-red-600 rounded transition-colors"
+                                className="p-1 bg-red-100 dark:bg-red-900/30 hover:bg-red-200 dark:hover:bg-red-900/50 text-red-600 dark:text-red-400 rounded transition-colors"
                                 title="Salir de la sala"
                               >
                                 <LogOut className="w-3 h-3" />
@@ -809,7 +923,7 @@ export default function ChatWindow({ isOpen, onClose, isMinimized, onToggleMinim
                                   e.stopPropagation()
                                   handleJoinRoom(room.id)
                                 }}
-                                className="p-1 bg-green-100 hover:bg-green-200 text-green-600 rounded transition-colors"
+                                className="p-1 bg-green-100 dark:bg-green-900/30 hover:bg-green-200 dark:hover:bg-green-900/50 text-green-600 dark:text-green-400 rounded transition-colors"
                                 title="Unirse a la sala"
                               >
                                 <UserPlus className="w-3 h-3" />
@@ -825,31 +939,33 @@ export default function ChatWindow({ isOpen, onClose, isMinimized, onToggleMinim
             </div>
 
             {/* Área principal de chat */}
-            <div className="flex-1 flex flex-col min-w-0">
+            <div className="flex-1 flex flex-col min-w-0 bg-white dark:bg-slate-900">
               {activeRoom ? (
                 <>
                   {/* Header de la sala activa */}
-                  <div className="p-3 border-b bg-gray-50 flex items-center justify-between flex-shrink-0">
+                  <div className="p-3 border-b border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-800 flex items-center justify-between flex-shrink-0">
                     <div className="flex items-center gap-2">
-                      {getRoomIcon(activeRoom.tipo)}
+                      <div className="text-gray-600 dark:text-gray-300">
+                        {getRoomIcon(activeRoom.tipo)}
+                      </div>
                       <div>
-                        <h3 className="font-medium text-gray-900">{activeRoom.nombre}</h3>
-                        <p className="text-xs text-gray-500">{activeRoom.descripcion}</p>
+                        <h3 className="font-medium text-gray-900 dark:text-white">{activeRoom.nombre}</h3>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">{activeRoom.descripcion}</p>
                       </div>
                     </div>
                     <div className="flex items-center gap-1">
-                      <Users className="w-4 h-4 text-gray-400" />
-                      <span className="text-sm text-gray-600">{participants.length}</span>
+                      <Users className="w-4 h-4 text-gray-400 dark:text-gray-500" />
+                      <span className="text-sm text-gray-600 dark:text-gray-400">{participants.length}</span>
                     </div>
                   </div>
 
                   {/* Mensajes */}
-                  <div className="flex-1 overflow-y-auto p-4 space-y-3 min-h-0">
+                  <div className="flex-1 overflow-y-auto p-4 space-y-3 min-h-0 bg-white dark:bg-slate-900">
                     {messages.length === 0 ? (
-                      <div className="text-center py-8 text-gray-500">
+                      <div className="text-center py-8 text-gray-500 dark:text-gray-400">
                         <MessageCircle className="w-8 h-8 mx-auto mb-2 opacity-50" />
                         <p className="text-sm">No hay mensajes en esta sala</p>
-                        <p className="text-xs text-gray-400">¡Sé el primero en enviar un mensaje!</p>
+                        <p className="text-xs text-gray-400 dark:text-gray-500">¡Sé el primero en enviar un mensaje!</p>
                       </div>
                     ) : (
                       messages.map((message) => (
@@ -860,22 +976,95 @@ export default function ChatWindow({ isOpen, onClose, isMinimized, onToggleMinim
                           }`}
                         >
                           <div
-                            className={`max-w-xs lg:max-w-md px-3 py-2 rounded-lg ${
+                            className={`max-w-xs lg:max-w-md px-3 py-2 rounded-lg relative group ${
                               message.usuario_id === Number(session?.user?.id)
-                                ? 'bg-[#00246a] text-white'
-                                : 'bg-gray-100 text-gray-900'
+                                ? 'bg-[#00246a] dark:bg-blue-600 text-white'
+                                : 'bg-gray-100 dark:bg-slate-800 text-gray-900 dark:text-gray-100'
                             }`}
                           >
+                            {/* Botón de opciones para mensajes propios */}
+                            {message.usuario_id === Number(session?.user?.id) && !message.eliminado && (
+                              <div className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <button
+                                  onClick={() => setShowOptionsForMessage(showOptionsForMessage === message.id ? null : message.id)}
+                                  className="p-1 hover:bg-white/20 rounded-full"
+                                >
+                                  <MoreVertical className="w-3 h-3" />
+                                </button>
+                                {showOptionsForMessage === message.id && (
+                                  <div className="absolute right-0 top-6 bg-white dark:bg-slate-800 shadow-lg rounded-lg py-1 z-10 min-w-[100px] border border-gray-200 dark:border-slate-700">
+                                    <button
+                                      onClick={() => handleStartEdit(message)}
+                                      className="w-full px-3 py-1 text-left text-xs text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700 flex items-center gap-2"
+                                    >
+                                      <Edit2 className="w-3 h-3" /> Editar
+                                    </button>
+                                    <button
+                                      onClick={() => handleDeleteMessage(message.id)}
+                                      className="w-full px-3 py-1 text-left text-xs text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 flex items-center gap-2"
+                                    >
+                                      <Trash2 className="w-3 h-3" /> Eliminar
+                                    </button>
+                                  </div>
+                                )}
+                              </div>
+                            )}
+
                             {message.usuario_id !== Number(session?.user?.id) && (
-                              <p className="text-xs font-medium mb-1 opacity-70">
+                              <p className="text-xs font-medium mb-1 opacity-70 text-gray-600 dark:text-gray-400">
                                 {message.usuario?.nombre || 'Usuario'}
                               </p>
                             )}
-                            <p className="text-sm">{message.contenido}</p>
+                            
+                            {message.eliminado ? (
+                              <p className="text-sm italic opacity-60 flex items-center gap-1">
+                                <Trash2 className="w-3 h-3" /> Mensaje eliminado
+                              </p>
+                            ) : (
+                              <>
+                                {message.tipo === 'IMAGEN' && message.archivo_url ? (
+                                  <div className="mb-2">
+                                    <img 
+                                      src={message.archivo_url} 
+                                      alt={message.archivo_nombre || 'Imagen compartida'} 
+                                      className="max-w-full rounded-lg cursor-pointer hover:opacity-90 transition-opacity"
+                                      style={{ maxHeight: '200px', objectFit: 'cover' }}
+                                      onClick={() => window.open(message.archivo_url, '_blank')}
+                                    />
+                                  </div>
+                                ) : message.tipo === 'ARCHIVO' && message.archivo_url ? (
+                                  <div className="mb-2">
+                                    <a 
+                                      href={message.archivo_url} 
+                                      target="_blank" 
+                                      rel="noopener noreferrer"
+                                      className={`flex items-center gap-2 p-2 rounded-lg ${
+                                        message.usuario_id === Number(session?.user?.id)
+                                          ? 'bg-white/10 hover:bg-white/20' 
+                                          : 'bg-gray-200 dark:bg-slate-700 hover:bg-gray-300 dark:hover:bg-slate-600'
+                                      } transition-colors`}
+                                    >
+                                      <FileText className="w-4 h-4" />
+                                      <span className="text-sm underline truncate max-w-[200px]">
+                                        {message.archivo_nombre || 'Archivo adjunto'}
+                                      </span>
+                                    </a>
+                                  </div>
+                                ) : null}
+
+                                <p className="text-sm whitespace-pre-wrap">{message.contenido}</p>
+                                {message.editado_en && (
+                                  <p className="text-[10px] opacity-60 text-right mt-1 italic">
+                                    (editado)
+                                  </p>
+                                )}
+                              </>
+                            )}
+
                             <div className={`flex items-center justify-between text-xs mt-1 ${
                               message.usuario_id === Number(session?.user?.id)
                                 ? 'text-white/70'
-                                : 'text-gray-500'
+                                : 'text-gray-500 dark:text-gray-400'
                             }`}>
                               <span>{formatTime(message.enviado_en)}</span>
                               {getMessageStatusIcon(message)}
@@ -888,29 +1077,60 @@ export default function ChatWindow({ isOpen, onClose, isMinimized, onToggleMinim
                   </div>
 
                   {/* Input de mensaje */}
-                  <form onSubmit={handleSendMessage} className="p-4 border-t bg-gray-50 flex-shrink-0">
+                  <form onSubmit={handleSendMessage} className="p-4 border-t border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-800 flex-shrink-0">
+                    {editingMessageId && (
+                      <div className="mb-2 flex items-center justify-between bg-blue-50 dark:bg-blue-900/30 p-2 rounded text-xs text-blue-800 dark:text-blue-200">
+                        <span>Editando mensaje...</span>
+                        <button 
+                          type="button" 
+                          onClick={handleCancelEdit}
+                          className="text-blue-600 dark:text-blue-400 hover:underline"
+                        >
+                          Cancelar
+                        </button>
+                      </div>
+                    )}
                     <div className="flex gap-2">
+                      <input
+                        type="file"
+                        ref={fileInputRef}
+                        className="hidden"
+                        onChange={handleFileSelect}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => fileInputRef.current?.click()}
+                        disabled={loading || isUploading || !!editingMessageId}
+                        className="p-2 text-gray-500 dark:text-gray-400 hover:text-[#00246a] dark:hover:text-blue-400 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-lg transition-colors disabled:opacity-50"
+                        title="Adjuntar archivo"
+                      >
+                        {isUploading ? (
+                          <Loader2 className="w-5 h-5 animate-spin" />
+                        ) : (
+                          <Paperclip className="w-5 h-5" />
+                        )}
+                      </button>
                       <input
                         ref={messageInputRef}
                         type="text"
-                        value={newMessage}
-                        onChange={(e) => setNewMessage(e.target.value)}
-                        placeholder="Escribe un mensaje..."
-                        className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00246a] focus:border-transparent"
-                        disabled={loading}
+                        value={editingMessageId ? editContent : newMessage}
+                        onChange={(e) => editingMessageId ? setEditContent(e.target.value) : setNewMessage(e.target.value)}
+                        placeholder={editingMessageId ? "Edita tu mensaje..." : "Escribe un mensaje..."}
+                        className="flex-1 px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00246a] dark:focus:ring-blue-500 focus:border-transparent bg-white dark:bg-slate-900 text-gray-900 dark:text-white"
+                        disabled={loading || isUploading}
                       />
                       <button
                         type="submit"
-                        disabled={!newMessage.trim() || loading}
-                        className="px-4 py-2 bg-[#00246a] text-white rounded-lg hover:bg-[#003875] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                        disabled={!(editingMessageId ? editContent : newMessage).trim() || loading || isUploading}
+                        className="px-4 py-2 bg-[#00246a] dark:bg-blue-600 text-white rounded-lg hover:bg-[#003875] dark:hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                       >
-                        <Send className="w-4 h-4" />
+                        {editingMessageId ? <Check className="w-4 h-4" /> : <Send className="w-4 h-4" />}
                       </button>
                     </div>
                   </form>
                 </>
               ) : (
-                <div className="flex-1 flex items-center justify-center text-gray-500">
+                <div className="flex-1 flex items-center justify-center text-gray-500 dark:text-gray-400">
                   <div className="text-center">
                     <MessageCircle className="w-12 h-12 mx-auto mb-4 opacity-50" />
                     <h3 className="text-lg font-medium mb-2">Bienvenido al Chat</h3>
@@ -929,8 +1149,8 @@ export default function ChatWindow({ isOpen, onClose, isMinimized, onToggleMinim
             <div
               className={`absolute top-0 left-3 right-3 h-2 cursor-n-resize transition-all duration-200 rounded-b-sm ${
                 isResizing && resizeDirection === 'top'
-                  ? 'bg-[#e30f28]/60 shadow-lg' 
-                  : 'hover:bg-[#00246a]/20'
+                  ? 'bg-[#e30f28]/60 dark:bg-red-500/60 shadow-lg' 
+                  : 'hover:bg-[#00246a]/20 dark:hover:bg-blue-500/20'
               }`}
               onMouseDown={(e) => handleResizeMouseDown(e, 'top')}
               title="Redimensionar desde arriba"
@@ -940,8 +1160,8 @@ export default function ChatWindow({ isOpen, onClose, isMinimized, onToggleMinim
             <div
               className={`absolute bottom-0 left-3 right-3 h-2 cursor-s-resize transition-all duration-200 rounded-t-sm ${
                 isResizing && resizeDirection === 'bottom'
-                  ? 'bg-[#e30f28]/60 shadow-lg' 
-                  : 'hover:bg-[#00246a]/20'
+                  ? 'bg-[#e30f28]/60 dark:bg-red-500/60 shadow-lg' 
+                  : 'hover:bg-[#00246a]/20 dark:hover:bg-blue-500/20'
               }`}
               onMouseDown={(e) => handleResizeMouseDown(e, 'bottom')}
               title="Redimensionar desde abajo"
@@ -951,8 +1171,8 @@ export default function ChatWindow({ isOpen, onClose, isMinimized, onToggleMinim
             <div
               className={`absolute left-0 top-3 bottom-3 w-2 cursor-w-resize transition-all duration-200 rounded-r-sm ${
                 isResizing && resizeDirection === 'left'
-                  ? 'bg-[#e30f28]/60 shadow-lg' 
-                  : 'hover:bg-[#00246a]/20'
+                  ? 'bg-[#e30f28]/60 dark:bg-red-500/60 shadow-lg' 
+                  : 'hover:bg-[#00246a]/20 dark:hover:bg-blue-500/20'
               }`}
               onMouseDown={(e) => handleResizeMouseDown(e, 'left')}
               title="Redimensionar desde la izquierda"
@@ -962,8 +1182,8 @@ export default function ChatWindow({ isOpen, onClose, isMinimized, onToggleMinim
             <div
               className={`absolute right-0 top-3 bottom-3 w-2 cursor-e-resize transition-all duration-200 rounded-l-sm ${
                 isResizing && resizeDirection === 'right'
-                  ? 'bg-[#e30f28]/60 shadow-lg' 
-                  : 'hover:bg-[#00246a]/20'
+                  ? 'bg-[#e30f28]/60 dark:bg-red-500/60 shadow-lg' 
+                  : 'hover:bg-[#00246a]/20 dark:hover:bg-blue-500/20'
               }`}
               onMouseDown={(e) => handleResizeMouseDown(e, 'right')}
               title="Redimensionar desde la derecha"
@@ -974,8 +1194,8 @@ export default function ChatWindow({ isOpen, onClose, isMinimized, onToggleMinim
             <div
               className={`absolute top-0 left-0 w-4 h-4 cursor-nw-resize transition-all duration-200 rounded-br-lg ${
                 isResizing && resizeDirection === 'top-left'
-                  ? 'bg-[#e30f28]/60 shadow-lg' 
-                  : 'hover:bg-[#00246a]/30'
+                  ? 'bg-[#e30f28]/60 dark:bg-red-500/60 shadow-lg' 
+                  : 'hover:bg-[#00246a]/30 dark:hover:bg-blue-500/30'
               }`}
               onMouseDown={(e) => handleResizeMouseDown(e, 'top-left')}
               title="Redimensionar desde esquina superior izquierda"
@@ -985,8 +1205,8 @@ export default function ChatWindow({ isOpen, onClose, isMinimized, onToggleMinim
             <div
               className={`absolute top-0 right-0 w-4 h-4 cursor-ne-resize transition-all duration-200 rounded-bl-lg ${
                 isResizing && resizeDirection === 'top-right'
-                  ? 'bg-[#e30f28]/60 shadow-lg' 
-                  : 'hover:bg-[#00246a]/30'
+                  ? 'bg-[#e30f28]/60 dark:bg-red-500/60 shadow-lg' 
+                  : 'hover:bg-[#00246a]/30 dark:hover:bg-blue-500/30'
               }`}
               onMouseDown={(e) => handleResizeMouseDown(e, 'top-right')}
               title="Redimensionar desde esquina superior derecha"
@@ -996,8 +1216,8 @@ export default function ChatWindow({ isOpen, onClose, isMinimized, onToggleMinim
             <div
               className={`absolute bottom-0 left-0 w-4 h-4 cursor-sw-resize transition-all duration-200 rounded-tr-lg ${
                 isResizing && resizeDirection === 'bottom-left'
-                  ? 'bg-[#e30f28]/60 shadow-lg' 
-                  : 'hover:bg-[#00246a]/30'
+                  ? 'bg-[#e30f28]/60 dark:bg-red-500/60 shadow-lg' 
+                  : 'hover:bg-[#00246a]/30 dark:hover:bg-blue-500/30'
               }`}
               onMouseDown={(e) => handleResizeMouseDown(e, 'bottom-left')}
               title="Redimensionar desde esquina inferior izquierda"
@@ -1007,14 +1227,14 @@ export default function ChatWindow({ isOpen, onClose, isMinimized, onToggleMinim
             <div
               className={`absolute bottom-0 right-0 w-6 h-6 cursor-se-resize transition-all duration-200 ${
                 isResizing && resizeDirection === 'bottom-right'
-                  ? 'bg-[#e30f28]/50 border-2 border-[#e30f28] shadow-lg' 
-                  : 'bg-[#00246a]/15 hover:bg-[#00246a]/35 border border-[#00246a]/30'
+                  ? 'bg-[#e30f28]/50 dark:bg-red-500/50 border-2 border-[#e30f28] dark:border-red-500 shadow-lg' 
+                  : 'bg-[#00246a]/15 dark:bg-blue-500/15 hover:bg-[#00246a]/35 dark:hover:bg-blue-500/35 border border-[#00246a]/30 dark:border-blue-500/30'
               } rounded-tl-lg flex items-center justify-center group`}
               onMouseDown={(e) => handleResizeMouseDown(e, 'bottom-right')}
               title="Redimensionar desde esquina inferior derecha"
             >
               <CornerDownRight className={`w-4 h-4 transition-colors ${
-                isResizing && resizeDirection === 'bottom-right' ? 'text-[#e30f28]' : 'text-[#00246a] group-hover:text-[#00246a]'
+                isResizing && resizeDirection === 'bottom-right' ? 'text-[#e30f28] dark:text-red-500' : 'text-[#00246a] dark:text-blue-400 group-hover:text-[#00246a] dark:group-hover:text-blue-300'
               }`} />
             </div>
           </>
@@ -1023,42 +1243,42 @@ export default function ChatWindow({ isOpen, onClose, isMinimized, onToggleMinim
         {/* Modal para crear sala */}
         {showCreateRoom && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-60">
-            <div className="bg-white rounded-lg p-6 w-96 max-w-[90vw]">
-              <h3 className="text-lg font-semibold mb-4 text-[#00246a]">Crear Nueva Sala</h3>
+            <div className="bg-white dark:bg-slate-800 rounded-lg p-6 w-96 max-w-[90vw] border border-gray-200 dark:border-slate-700 shadow-xl">
+              <h3 className="text-lg font-semibold mb-4 text-[#00246a] dark:text-blue-100">Crear Nueva Sala</h3>
               <form onSubmit={handleCreateRoom} className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     Nombre de la sala
                   </label>
                   <input
                     type="text"
                     value={newRoomName}
                     onChange={(e) => setNewRoomName(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00246a]"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00246a] dark:focus:ring-blue-500 bg-white dark:bg-slate-900 text-gray-900 dark:text-white"
                     placeholder="Ej: Sala General"
                     required
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     Descripción (opcional)
                   </label>
                   <textarea
                     value={newRoomDescription}
                     onChange={(e) => setNewRoomDescription(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00246a] resize-none"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00246a] dark:focus:ring-blue-500 resize-none bg-white dark:bg-slate-900 text-gray-900 dark:text-white"
                     rows={3}
                     placeholder="Descripción de la sala..."
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     Tipo de sala
                   </label>
                   <select
                     value={newRoomType}
                     onChange={(e) => setNewRoomType(e.target.value as 'GENERAL' | 'SOPORTE' | 'CLASE')}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00246a]"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00246a] dark:focus:ring-blue-500 bg-white dark:bg-slate-900 text-gray-900 dark:text-white"
                   >
                     <option value="GENERAL">General</option>
                     <option value="SOPORTE">Soporte</option>
@@ -1074,14 +1294,14 @@ export default function ChatWindow({ isOpen, onClose, isMinimized, onToggleMinim
                       setNewRoomDescription('')
                       setNewRoomType('GENERAL')
                     }}
-                    className="flex-1 px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                    className="flex-1 px-4 py-2 text-gray-600 dark:text-gray-300 border border-gray-300 dark:border-slate-600 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors"
                   >
                     Cancelar
                   </button>
                   <button
                     type="submit"
                     disabled={!newRoomName.trim()}
-                    className="flex-1 px-4 py-2 bg-[#00246a] text-white rounded-lg hover:bg-[#003875] disabled:opacity-50 transition-colors"
+                    className="flex-1 px-4 py-2 bg-[#00246a] dark:bg-blue-600 text-white rounded-lg hover:bg-[#003875] dark:hover:bg-blue-700 disabled:opacity-50 transition-colors"
                   >
                     Crear Sala
                   </button>

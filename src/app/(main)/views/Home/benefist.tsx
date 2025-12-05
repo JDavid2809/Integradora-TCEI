@@ -6,18 +6,18 @@ import { useState } from "react"
 
 export function Benefist() {
   return (
-    <section className="bg-white py-16">
+    <section className="bg-white dark:bg-slate-900 py-16 transition-colors duration-300">
       <div className="container mx-auto px-4">
         {/* Hero Section */}
         <div className="grid lg:grid-cols-2 gap-16 items-center mb-24">
           {/* Left: Headline */}
           <div className="space-y-8">
             <div className="inline-block">
-              <p className="text-[#e30f28] text-sm font-bold uppercase tracking-wider bg-[#e30f28]/10 px-4 py-2 rounded-full">
+              <p className="text-[#e30f28] dark:text-red-400 text-sm font-bold uppercase tracking-wider bg-[#e30f28]/10 dark:bg-[#e30f28]/20 px-4 py-2 rounded-full">
                 Líderes en educación de inglés online
               </p>
             </div>
-            <h1 className="text-5xl md:text-7xl font-black text-[#00246a] leading-[1.1] text-balance">
+            <h1 className="text-5xl md:text-7xl font-black text-[#00246a] dark:text-blue-400 leading-[1.1] text-balance">
               ¿Por qué elegir nuestra plataforma de inglés?
             </h1>
             <div className="h-1 w-24 bg-[#e30f28]"></div>
@@ -95,7 +95,7 @@ export function Benefist() {
                   strokeLinecap="round"
                   strokeLinejoin="round"
                   strokeWidth={2}
-                  d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 014.438 0 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"
+                  d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 014.438 0 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"
                 />
               </svg>
             }
@@ -124,7 +124,7 @@ function FeatureCard({
   return (
     
     <div
-      className="relative overflow-hidden bg-white rounded-2xl shadow-lg cursor-pointer border border-gray-100"
+      className="relative overflow-hidden bg-white dark:bg-slate-800 rounded-2xl shadow-lg cursor-pointer border border-gray-100 dark:border-slate-700 transition-colors duration-300"
       style={{ height: "280px" }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
@@ -145,7 +145,7 @@ function FeatureCard({
         >
           {icon}
         </div>
-        <h3 className="text-xl font-bold text-[#00246a] leading-tight">{title}</h3>
+        <h3 className="text-xl font-bold text-[#00246a] dark:text-white leading-tight">{title}</h3>
       </motion.div>
 
       <motion.div

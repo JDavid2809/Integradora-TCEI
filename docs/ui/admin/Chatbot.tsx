@@ -359,7 +359,7 @@ export default function Chatbot() {
       {/* Chat Box - Solo en desktop */}
       {!isMobile && (
       <div
-        className={`fixed w-[90vw] max-w-[440px] h-[90vh] bg-white rounded-3xl shadow-2xl border border-gray-200 flex flex-col transform transition-all duration-500 z-[99998] ${
+        className={`fixed w-[90vw] max-w-[440px] h-[90vh] bg-white dark:bg-slate-800 rounded-3xl shadow-2xl border border-gray-200 dark:border-slate-700 flex flex-col transform transition-all duration-500 z-[99998] ${
           open ? "opacity-100 scale-100 pointer-events-auto" : "opacity-0 scale-95 pointer-events-none"
         }`}
         style={{
@@ -369,21 +369,21 @@ export default function Chatbot() {
         }}
       >
         {/* Header */}
-        <div className="flex justify-between items-center p-4 border-b border-gray-200">
+        <div className="flex justify-between items-center p-4 border-b border-gray-200 dark:border-slate-700">
           <div>
-            <h2 className="font-bold text-lg text-gray-700">Chatbot AI</h2>
-            <p className="text-sm text-gray-700">Tu asistente inteligente</p>
+            <h2 className="font-bold text-lg text-gray-700 dark:text-gray-100">Chatbot AI</h2>
+            <p className="text-sm text-gray-700 dark:text-gray-300">Tu asistente inteligente</p>
           </div>
           <div className="flex gap-2">
             <button
               onClick={resetChat}
-              className="text-sm text-blue-600 hover:text-blue-800 px-2 py-1 rounded hover:bg-blue-50 transition"
+              className="text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 px-2 py-1 rounded hover:bg-blue-50 dark:hover:bg-slate-700 transition"
             >
               Reiniciar
             </button>
             <button
               onClick={() => setOpen(false)}
-              className="text-gray-500 hover:text-gray-700 px-2 py-1 rounded hover:bg-gray-100 transition"
+              className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 px-2 py-1 rounded hover:bg-gray-100 dark:hover:bg-slate-700 transition"
             >
               ✕
             </button>
@@ -391,11 +391,11 @@ export default function Chatbot() {
         </div>
 
         {/* Messages */}
-        <div ref={listRef} className="flex-1 overflow-y-auto p-4 space-y-4">
+        <div ref={listRef} className="flex-1 overflow-y-auto p-4 space-y-4 bg-white dark:bg-slate-800">
           {messages.map((msg) => (
             <div key={msg.id} className={`flex gap-3 ${msg.sender === "You" ? "justify-end" : "justify-start"}`}>
               {msg.sender === "AI" && (
-                <div className="flex items-center justify-center w-10 h-10 rounded-full bg-white shadow-lg border-2 border-blue-400">
+                <div className="flex items-center justify-center w-10 h-10 rounded-full bg-white dark:bg-slate-700 shadow-lg border-2 border-blue-400 dark:border-blue-500">
                   <Image 
                     src="/ChatBot.png" 
                     alt="ChatBot" 
@@ -408,14 +408,14 @@ export default function Chatbot() {
               <div
                 className={`px-5 py-3 rounded-2xl max-w-[70%] shadow-lg relative ${
                   msg.sender === "You"
-                    ? "bg-red-500 text-white"
-                    : "bg-gradient-to-tr from-blue-100 to-blue-50 text-gray-800"
+                    ? "bg-red-500 dark:bg-red-600 text-white"
+                    : "bg-gradient-to-tr from-blue-100 to-blue-50 dark:from-slate-700 dark:to-slate-600 text-gray-800 dark:text-white"
                 }`}
               >
                 {msg.text}
               </div>
               {msg.sender === "You" && (
-                <div className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-300 text-black font-bold">
+                <div className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-300 dark:bg-slate-600 text-black dark:text-white font-bold">
                   Tú
                 </div>
               )}
@@ -423,7 +423,7 @@ export default function Chatbot() {
           ))}
           {typing && (
             <div className="flex gap-3">
-              <div className="flex items-center justify-center w-10 h-10 rounded-full bg-white shadow-lg border-2 border-blue-400 animate-pulse">
+              <div className="flex items-center justify-center w-10 h-10 rounded-full bg-white dark:bg-slate-700 shadow-lg border-2 border-blue-400 dark:border-blue-500 animate-pulse">
                 <Image 
                   src="/ChatBot.png" 
                   alt="ChatBot" 
@@ -432,17 +432,17 @@ export default function Chatbot() {
                   className="object-contain"
                 />
               </div>
-              <p className="bg-blue-50 px-5 py-3 rounded-2xl shadow-lg max-w-[70%] animate-pulse">...</p>
+              <p className="bg-blue-50 dark:bg-slate-700 px-5 py-3 rounded-2xl shadow-lg max-w-[70%] animate-pulse dark:text-white">...</p>
             </div>
           )}
         </div>
 
         {/* Botón mostrar/ocultar opciones */}
-        <div className="p-2 border-t border-gray-200 flex justify-between items-center bg-gray-50">
-          <span className="text-sm text-gray-700">Opciones rápidas</span>
+        <div className="p-2 border-t border-gray-200 dark:border-slate-700 flex justify-between items-center bg-gray-50 dark:bg-slate-900">
+          <span className="text-sm text-gray-700 dark:text-gray-300">Opciones rápidas</span>
           <button
             onClick={() => setShowOptions(!showOptions)}
-            className="text-xs text-blue-600 hover:text-blue-800 transition px-2 py-1 rounded hover:bg-blue-100"
+            className="text-xs text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 transition px-2 py-1 rounded hover:bg-blue-100 dark:hover:bg-slate-800"
           >
             {showOptions ? "Ocultar" : "Mostrar"}
           </button>
@@ -450,13 +450,13 @@ export default function Chatbot() {
 
         {/* Opciones persistentes */}
         {showOptions && options.length > 0 && (
-          <div className="p-4 border-t border-gray-200 flex flex-wrap gap-2 bg-gray-50 shadow-inner overflow-x-auto">
+          <div className="p-4 border-t border-gray-200 dark:border-slate-700 flex flex-wrap gap-2 bg-gray-50 dark:bg-slate-900 shadow-inner overflow-x-auto">
             {options.map((opt) => (
               <button
                 key={opt}
                 onClick={() => !typing && sendMessage(opt)}
                 disabled={typing}
-                className="bg-white px-4 py-2 rounded-2xl shadow hover:bg-blue-100 hover:scale-105 transition transform text-sm flex items-center gap-1 whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed text-gray-700"
+                className="bg-white dark:bg-slate-700 px-4 py-2 rounded-2xl shadow hover:bg-blue-100 dark:hover:bg-slate-600 hover:scale-105 transition transform text-sm flex items-center gap-1 whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed text-gray-700 dark:text-white"
               >
                 💡 {opt}
               </button>
@@ -472,26 +472,26 @@ export default function Chatbot() {
               sendMessage(input);
             }
           }}
-          className="flex p-4 border-t border-gray-200 gap-2"
+          className="flex p-4 border-t border-gray-200 dark:border-slate-700 gap-2"
         >
           <input
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder="Escribe tu mensaje..."
             disabled={typing}
-            className="flex-1 rounded-2xl border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#002469] disabled:opacity-50"
+            className="flex-1 rounded-2xl border border-gray-300 dark:border-slate-600 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#002469] dark:bg-slate-700 dark:text-white disabled:opacity-50"
           />
           <button 
             type="submit" 
             disabled={typing || !input.trim()}
-            className="bg-[#002469] text-white px-5 py-2 rounded-2xl hover:bg-[#001a4d] transition disabled:opacity-50 disabled:cursor-not-allowed"
+            className="bg-[#002469] dark:bg-blue-600 text-white px-5 py-2 rounded-2xl hover:bg-[#001a4d] dark:hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {typing ? "..." : "Enviar"}
           </button>
         </form>
 
         {/* Footer */}
-        <div className="p-2 text-xs text-gray-700 text-center">English App • Soporte: contacto@xdxdxd.com</div>
+        <div className="p-2 text-xs text-gray-700 dark:text-gray-400 text-center">English App • Soporte: contacto@xdxdxd.com</div>
       </div>
       )}
     </>

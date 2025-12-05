@@ -125,7 +125,7 @@ export function useCourseConverter(paginatedData: PaginatedCourses) {
         rating: generateRating(), // Puede ser null si no hay suficientes estudiantes
         price: curso.precio ? `$${curso.precio.toFixed(2)}` : 'Gratis',
         level: curso.imparte[0]?.nivel?.nombre || 'A1',
-        image: curso.imagen_url || "/logos/logoIngles1.jpg", // Usar imagen del curso o fallback
+  image: curso.imagen_url || "/logos/logoIngles1.jpg", // Usar imagen del curso o fallback
         skills: generateSkills(),
         lessons: curso.total_lecciones_calculadas || Math.floor(Math.random() * 20) + 15, // Lecciones dinámicas
         modalidad: curso.modalidad,

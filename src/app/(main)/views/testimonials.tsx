@@ -2,18 +2,18 @@ import CardSwap, {Card} from "@/components/CardSwap"
 
 export function Testimonials() {
     return (
-        <section className="py-16 bg-gradient-to-br from-blue-50 via-white to-purple-50 relative overflow-hidden">
+        <section className="py-16 bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 relative overflow-hidden transition-colors duration-300">
             {/* Decorative background elements */}
-            <div className="absolute top-0 left-0 w-72 h-72 bg-blue-200 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob"></div>
-            <div className="absolute top-0 right-0 w-72 h-72 bg-purple-200 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-2000"></div>
-            <div className="absolute bottom-0 left-1/2 w-72 h-72 bg-pink-200 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-4000"></div>
+            <div className="absolute top-0 left-0 w-72 h-72 bg-blue-200 dark:bg-blue-900/20 rounded-full mix-blend-multiply dark:mix-blend-screen filter blur-xl opacity-20 animate-blob"></div>
+            <div className="absolute top-0 right-0 w-72 h-72 bg-purple-200 dark:bg-purple-900/20 rounded-full mix-blend-multiply dark:mix-blend-screen filter blur-xl opacity-20 animate-blob animation-delay-2000"></div>
+            <div className="absolute bottom-0 left-1/2 w-72 h-72 bg-pink-200 dark:bg-pink-900/20 rounded-full mix-blend-multiply dark:mix-blend-screen filter blur-xl opacity-20 animate-blob animation-delay-4000"></div>
             
             <div className="container mx-auto px-6 relative z-10">
                 <div className="text-center mb-16">
                     <h2 className="text-4xl md:text-5xl font-bold mb-4 text-balance bg-[#ef182e] bg-clip-text text-transparent">
                         Lo que dicen nuestros estudiantes
                     </h2>
-                    <p className="text-xl text-gray-600 max-w-3xl mx-auto text-balance">
+                    <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto text-balance">
                         Miles de personas han transformado sus vidas aprendiendo inglés con nosotros
                     </p>
                 </div>
@@ -22,14 +22,14 @@ export function Testimonials() {
                     {/* Lado izquierdo - Mensaje descriptivo mejorado */}
                     <div className="space-y-8 max-lg:text-center">
                         <div className="space-y-4">
-                            <h3 className="text-4xl md:text-5xl font-bold text-gray-900 leading-tight">
+                            <h3 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white leading-tight">
                                 Historias reales de{' '}
                                 <span className="bg-[#ef182e] bg-clip-text text-transparent">
                                     éxito
                                 </span>
                             </h3>
                             
-                            <p className="text-lg text-gray-600 leading-relaxed">
+                            <p className="text-lg text-gray-600 dark:text-gray-300 leading-relaxed">
                                 Nuestros estudiantes no solo aprenden inglés, construyen nuevas oportunidades. 
                                 Desde conseguir mejores empleos hasta viajar con confianza por el mundo.
                             </p>
@@ -37,55 +37,55 @@ export function Testimonials() {
 
                         {/* Estadísticas destacadas */}
                         <div className="grid grid-cols-3 gap-4 py-6">
-                            <div className="text-center p-4 bg-white rounded-xl shadow-md border border-blue-100">
-                                <div className="text-3xl font-bold text-blue-600">95%</div>
-                                <div className="text-sm text-gray-600 mt-1">Satisfacción</div>
+                            <div className="text-center p-4 bg-white dark:bg-slate-800 rounded-xl shadow-md border border-blue-100 dark:border-slate-700 transition-colors duration-300">
+                                <div className="text-3xl font-bold text-blue-600 dark:text-blue-400">95%</div>
+                                <div className="text-sm text-gray-600 dark:text-gray-400 mt-1">Satisfacción</div>
                             </div>
-                            <div className="text-center p-4 bg-white rounded-xl shadow-md border border-purple-100">
-                                <div className="text-3xl font-bold text-purple-600">10k+</div>
-                                <div className="text-sm text-gray-600 mt-1">Estudiantes</div>
+                            <div className="text-center p-4 bg-white dark:bg-slate-800 rounded-xl shadow-md border border-purple-100 dark:border-slate-700 transition-colors duration-300">
+                                <div className="text-3xl font-bold text-purple-600 dark:text-purple-400">10k+</div>
+                                <div className="text-sm text-gray-600 dark:text-gray-400 mt-1">Estudiantes</div>
                             </div>
-                            <div className="text-center p-4 bg-white rounded-xl shadow-md border border-green-100">
-                                <div className="text-3xl font-bold text-green-600">4.9</div>
-                                <div className="text-sm text-gray-600 mt-1">Rating</div>
+                            <div className="text-center p-4 bg-white dark:bg-slate-800 rounded-xl shadow-md border border-green-100 dark:border-slate-700 transition-colors duration-300">
+                                <div className="text-3xl font-bold text-green-600 dark:text-green-400">4.9</div>
+                                <div className="text-sm text-gray-600 dark:text-gray-400 mt-1">Rating</div>
                             </div>
                         </div>
 
                         {/* Beneficios mejorados */}
                         <div className="space-y-4">
-                            <div className="flex items-start gap-4 p-4 bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow max-lg:justify-center border border-blue-50">
+                            <div className="flex items-start gap-4 p-4 bg-white dark:bg-slate-800 rounded-xl shadow-md hover:shadow-lg transition-all duration-300 max-lg:justify-center border border-blue-50 dark:border-slate-700">
                                 <div className="flex-shrink-0 w-14 h-14 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center text-white shadow-lg">
                                     <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                                     </svg>
                                 </div>
                                 <div className="text-left flex-1">
-                                    <h4 className="font-bold text-gray-900 text-lg">Método comprobado</h4>
-                                    <p className="text-gray-600 text-sm mt-1">Aprende de forma práctica y efectiva con resultados garantizados</p>
+                                    <h4 className="font-bold text-gray-900 dark:text-white text-lg">Método comprobado</h4>
+                                    <p className="text-gray-600 dark:text-gray-400 text-sm mt-1">Aprende de forma práctica y efectiva con resultados garantizados</p>
                                 </div>
                             </div>
 
-                            <div className="flex items-start gap-4 p-4 bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow max-lg:justify-center border border-green-50">
+                            <div className="flex items-start gap-4 p-4 bg-white dark:bg-slate-800 rounded-xl shadow-md hover:shadow-lg transition-all duration-300 max-lg:justify-center border border-green-50 dark:border-slate-700">
                                 <div className="flex-shrink-0 w-14 h-14 bg-gradient-to-br from-green-500 to-green-600 rounded-2xl flex items-center justify-center text-white shadow-lg">
                                     <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
                                     </svg>
                                 </div>
                                 <div className="text-left flex-1">
-                                    <h4 className="font-bold text-gray-900 text-lg">Profesores expertos</h4>
-                                    <p className="text-gray-600 text-sm mt-1">Guía personalizada en cada paso de tu aprendizaje</p>
+                                    <h4 className="font-bold text-gray-900 dark:text-white text-lg">Profesores expertos</h4>
+                                    <p className="text-gray-600 dark:text-gray-400 text-sm mt-1">Guía personalizada en cada paso de tu aprendizaje</p>
                                 </div>
                             </div>
 
-                            <div className="flex items-start gap-4 p-4 bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow max-lg:justify-center border border-purple-50">
+                            <div className="flex items-start gap-4 p-4 bg-white dark:bg-slate-800 rounded-xl shadow-md hover:shadow-lg transition-all duration-300 max-lg:justify-center border border-purple-50 dark:border-slate-700">
                                 <div className="flex-shrink-0 w-14 h-14 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center text-white shadow-lg">
                                     <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
                                     </svg>
                                 </div>
                                 <div className="text-left flex-1">
-                                    <h4 className="font-bold text-gray-900 text-lg">Resultados garantizados</h4>
-                                    <p className="text-gray-600 text-sm mt-1">Mejora visible desde la primera semana de clases</p>
+                                    <h4 className="font-bold text-gray-900 dark:text-white text-lg">Resultados garantizados</h4>
+                                    <p className="text-gray-600 dark:text-gray-400 text-sm mt-1">Mejora visible desde la primera semana de clases</p>
                                 </div>
                             </div>
                         </div>

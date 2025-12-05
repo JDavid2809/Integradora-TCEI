@@ -125,23 +125,23 @@ export default function DashboardContent() {
                 {[
                     { 
                         title: "Cursos Activos", 
-                        value: stats.activeCourses.toString(), 
+                        value: stats?.activeCourses.toString() || "0", 
                         icon: BookOpen, 
                         color: "text-blue-600 dark:text-blue-300", 
                         bg: "bg-blue-100 dark:bg-blue-900/30",
-                        subtitle: `${stats.completedCourses} completados`
+                        subtitle: `${stats?.completedCourses || 0} completados`
                     },
                     { 
                         title: "Actividades Completadas", 
-                        value: stats.completedActivities.toString(), 
+                        value: stats?.completedActivities.toString() || "0", 
                         icon: GraduationCap, 
                         color: "text-green-600 dark:text-green-300", 
                         bg: "bg-green-100 dark:bg-green-900/30",
-                        subtitle: `De ${stats.totalActivities} totales`
+                        subtitle: `De ${stats?.totalActivities || 0} totales`
                     },
                     { 
                         title: "Promedio General", 
-                        value: stats.averageGrade !== null ? `${stats.averageGrade}%` : "N/A", 
+                        value: stats?.averageGrade !== null ? `${stats?.averageGrade}%` : "N/A", 
                         icon: TrendingUp, 
                         color: "text-purple-600 dark:text-purple-300", 
                         bg: "bg-purple-100 dark:bg-purple-900/30",
@@ -149,7 +149,7 @@ export default function DashboardContent() {
                     },
                     { 
                         title: "Certificados", 
-                        value: stats.certificates.toString(), 
+                        value: stats?.certificates.toString() || "0", 
                         icon: Award, 
                         color: "text-yellow-600 dark:text-yellow-300", 
                         bg: "bg-yellow-100 dark:bg-yellow-900/30",
@@ -276,13 +276,13 @@ export default function DashboardContent() {
                             </div>
                             <div className="flex-1">
                                 <p className="font-medium text-[#00246a] dark:text-blue-100">Ver Mis Cursos</p>
-                                <p className="text-sm text-slate-600 dark:text-slate-300">{stats.activeCourses} curso{stats.activeCourses !== 1 ? 's' : ''} activo{stats.activeCourses !== 1 ? 's' : ''}</p>
+                                <p className="text-sm text-slate-600 dark:text-slate-300">{stats?.activeCourses || 0} curso{(stats?.activeCourses || 0) !== 1 ? 's' : ''} activo{(stats?.activeCourses || 0) !== 1 ? 's' : ''}</p>
                             </div>
                             <ChevronRight className="w-5 h-5 text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors duration-200" />
                         </button>
 
                         {/* Mensaje si no hay acciones */}
-                        {!pendingActivity && nextClasses.length === 0 && stats.activeCourses === 0 && (
+                        {!pendingActivity && nextClasses.length === 0 && (stats?.activeCourses || 0) === 0 && (
                             <div className="text-center py-8">
                                 <Calendar className="w-12 h-12 text-slate-300 dark:text-slate-600 mx-auto mb-2" />
                                 <p className="text-sm text-slate-500 dark:text-slate-400">No hay acciones pendientes</p>
@@ -315,23 +315,23 @@ export default function DashboardContent() {
                 {[
                     { 
                         title: "Cursos Activos", 
-                        value: stats.activeCourses.toString(), 
+                        value: stats?.activeCourses.toString() || "0", 
                         icon: BookOpen, 
                         color: "text-blue-600", 
                         bg: "bg-blue-100",
-                        subtitle: `${stats.completedCourses} completados`
+                        subtitle: `${stats?.completedCourses || 0} completados`
                     },
                     { 
                         title: "Actividades Completadas", 
-                        value: stats.completedActivities.toString(), 
+                        value: stats?.completedActivities.toString() || "0", 
                         icon: GraduationCap, 
                         color: "text-green-600", 
                         bg: "bg-green-100",
-                        subtitle: `De ${stats.totalActivities} totales`
+                        subtitle: `De ${stats?.totalActivities || 0} totales`
                     },
                     { 
                         title: "Promedio General", 
-                        value: stats.averageGrade !== null ? `${stats.averageGrade}%` : "N/A", 
+                        value: stats?.averageGrade !== null ? `${stats?.averageGrade}%` : "N/A", 
                         icon: TrendingUp, 
                         color: "text-purple-600", 
                         bg: "bg-purple-100",
@@ -339,7 +339,7 @@ export default function DashboardContent() {
                     },
                     { 
                         title: "Certificados", 
-                        value: stats.certificates.toString(), 
+                        value: stats?.certificates.toString() || "0", 
                         icon: Award, 
                         color: "text-yellow-600", 
                         bg: "bg-yellow-100",
@@ -466,13 +466,13 @@ export default function DashboardContent() {
                             </div>
                             <div className="flex-1">
                                 <p className="font-medium text-[#00246a] dark:text-blue-100">Ver Mis Cursos</p>
-                                <p className="text-sm text-slate-600 dark:text-slate-300">{stats.activeCourses} curso{stats.activeCourses !== 1 ? 's' : ''} activo{stats.activeCourses !== 1 ? 's' : ''}</p>
+                                <p className="text-sm text-slate-600 dark:text-slate-300">{stats?.activeCourses || 0} curso{(stats?.activeCourses || 0) !== 1 ? 's' : ''} activo{(stats?.activeCourses || 0) !== 1 ? 's' : ''}</p>
                             </div>
                             <ChevronRight className="w-5 h-5 text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors duration-200" />
                         </button>
 
                         {/* Mensaje si no hay acciones */}
-                        {!pendingActivity && nextClasses.length === 0 && stats.activeCourses === 0 && (
+                        {!pendingActivity && nextClasses.length === 0 && (stats?.activeCourses || 0) === 0 && (
                             <div className="text-center py-8">
                                 <Calendar className="w-12 h-12 text-slate-300 dark:text-slate-600 mx-auto mb-2" />
                                 <p className="text-sm text-slate-500 dark:text-slate-400">No hay acciones pendientes</p>

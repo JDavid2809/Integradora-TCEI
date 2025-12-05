@@ -40,22 +40,22 @@ export default function ConfirmPage({ token }: ConfirmPageProps) {
 
   return (
     <div className="flex items-center justify-center mt-16  px-4">
-      <div className="bg-white border border-gray-200 rounded-2xl shadow-lg 
+      <div className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-2xl shadow-lg 
                       p-10 w-full max-w-md flex flex-col items-center gap-6 text-center">
         
         {/* Icono */}
         {estado === "loading" && (
-          <Loader2 className="w-16 h-16 text-purple-600 animate-spin" />
+          <Loader2 className="w-16 h-16 text-purple-600 dark:text-purple-400 animate-spin" />
         )}
         {estado === "success" && (
-          <CheckCircleIcon className="w-16 h-16 text-green-500" />
+          <CheckCircleIcon className="w-16 h-16 text-green-500 dark:text-green-400" />
         )}
         {estado === "error" && (
-          <XCircleIcon className="w-16 h-16 text-red-500" />
+          <XCircleIcon className="w-16 h-16 text-red-500 dark:text-red-400" />
         )}
 
         {/* Mensaje */}
-        <h1 className="text-xl md:text-2xl font-semibold text-gray-800">
+        <h1 className="text-xl md:text-2xl font-semibold text-gray-800 dark:text-gray-100">
           {mensaje}
         </h1>
 
@@ -63,8 +63,8 @@ export default function ConfirmPage({ token }: ConfirmPageProps) {
         {estado === "success" && (
           <button
             onClick={() => router.push("/Login")}
-            className="mt-2 px-5 py-2.5 bg-purple-600 text-white font-medium rounded-lg 
-                       shadow hover:bg-purple-700 transition-colors"
+            className="mt-2 px-5 py-2.5 bg-purple-600 dark:bg-purple-500 text-white font-medium rounded-lg 
+                       shadow hover:bg-purple-700 dark:hover:bg-purple-600 transition-colors"
           >
             Ir al login
           </button>

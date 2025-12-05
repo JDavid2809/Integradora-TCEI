@@ -96,6 +96,7 @@ async function main() {
   const curso = await prisma.curso.create({
     data: {
       nombre: 'Inglés Básico',
+      slug: 'ingles-basico',
       modalidad: 'PRESENCIAL',
       inicio: new Date(),
       fin: new Date(Date.now() + 60 * 24 * 60 * 60 * 1000),

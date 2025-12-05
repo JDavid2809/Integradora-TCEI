@@ -77,13 +77,13 @@ export default function TasksContent() {
     const getPriorityColor = (priority: string) => {
         switch (priority) {
             case "high":
-                return "text-red-600 bg-red-50"
+                return "text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20"
             case "medium":
-                return "text-yellow-600 bg-yellow-50"
+                return "text-yellow-600 dark:text-yellow-400 bg-yellow-50 dark:bg-yellow-900/20"
             case "low":
-                return "text-green-600 bg-green-50"
+                return "text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/20"
             default:
-                return "text-slate-600 bg-slate-50"
+                return "text-slate-600 dark:text-slate-400 bg-slate-50 dark:bg-slate-700"
         }
     }
 
@@ -116,11 +116,11 @@ export default function TasksContent() {
                 <div className="flex items-center space-x-4">
                     <div className="flex items-center space-x-2 text-sm">
                         <div className="w-3 h-3 bg-red-500 rounded-full"></div>
-                        <span className="text-slate-600">{pendingTasks.length} pendientes</span>
+                        <span className="text-slate-600 dark:text-slate-300">{pendingTasks.length} pendientes</span>
                     </div>
                     <div className="flex items-center space-x-2 text-sm">
                         <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                        <span className="text-slate-600">{completedTasks.length} completadas</span>
+                        <span className="text-slate-600 dark:text-slate-300">{completedTasks.length} completadas</span>
                     </div>
                 </div>
             </div>
@@ -131,15 +131,15 @@ export default function TasksContent() {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.1 }}
-                    className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100"
+                    className="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-sm border border-slate-100 dark:border-slate-700"
                 >
                     <div className="flex items-center justify-between">
                         <div>
-                            <p className="text-sm text-slate-600 mb-1">Tareas Pendientes</p>
-                            <p className="text-2xl font-bold text-red-600">{pendingTasks.length}</p>
+                            <p className="text-sm text-slate-600 dark:text-slate-400 mb-1">Tareas Pendientes</p>
+                            <p className="text-2xl font-bold text-red-600 dark:text-red-400">{pendingTasks.length}</p>
                         </div>
-                        <div className="w-12 h-12 bg-red-50 rounded-xl flex items-center justify-center">
-                            <AlertCircle className="w-6 h-6 text-red-600" />
+                        <div className="w-12 h-12 bg-red-50 dark:bg-red-900/20 rounded-xl flex items-center justify-center">
+                            <AlertCircle className="w-6 h-6 text-red-600 dark:text-red-400" />
                         </div>
                     </div>
                 </motion.div>
@@ -148,15 +148,15 @@ export default function TasksContent() {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.2 }}
-                    className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100"
+                    className="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-sm border border-slate-100 dark:border-slate-700"
                 >
                     <div className="flex items-center justify-between">
                         <div>
-                            <p className="text-sm text-slate-600 mb-1">Completadas</p>
-                            <p className="text-2xl font-bold text-green-600">{completedTasks.length}</p>
+                            <p className="text-sm text-slate-600 dark:text-slate-400 mb-1">Completadas</p>
+                            <p className="text-2xl font-bold text-green-600 dark:text-green-400">{completedTasks.length}</p>
                         </div>
-                        <div className="w-12 h-12 bg-green-50 rounded-xl flex items-center justify-center">
-                            <CheckSquare className="w-6 h-6 text-green-600" />
+                        <div className="w-12 h-12 bg-green-50 dark:bg-green-900/20 rounded-xl flex items-center justify-center">
+                            <CheckSquare className="w-6 h-6 text-green-600 dark:text-green-400" />
                         </div>
                     </div>
                 </motion.div>
@@ -165,15 +165,15 @@ export default function TasksContent() {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.3 }}
-                    className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100"
+                    className="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-sm border border-slate-100 dark:border-slate-700"
                 >
                     <div className="flex items-center justify-between">
                         <div>
-                            <p className="text-sm text-slate-600 mb-1">Total de Tareas</p>
-                            <p className="text-2xl font-bold text-[#00246a]">{tasks.length}</p>
+                            <p className="text-sm text-slate-600 dark:text-slate-400 mb-1">Total de Tareas</p>
+                            <p className="text-2xl font-bold text-[#00246a] dark:text-blue-400">{tasks.length}</p>
                         </div>
-                        <div className="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center">
-                            <Calendar className="w-6 h-6 text-blue-600" />
+                        <div className="w-12 h-12 bg-blue-50 dark:bg-blue-900/20 rounded-xl flex items-center justify-center">
+                            <Calendar className="w-6 h-6 text-blue-600 dark:text-blue-400" />
                         </div>
                     </div>
                 </motion.div>
@@ -181,7 +181,7 @@ export default function TasksContent() {
 
             {/* Pending Tasks */}
             <div className="space-y-4">
-                <h3 className="text-lg font-semibold text-[#00246a]">Tareas Pendientes</h3>
+                <h3 className="text-lg font-semibold text-[#00246a] dark:text-blue-400">Tareas Pendientes</h3>
                 {pendingTasks.length > 0 ? (
                     <div className="space-y-4">
                         {pendingTasks.map((task, index) => {
@@ -192,17 +192,17 @@ export default function TasksContent() {
                                     initial={{ opacity: 0, y: 20 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     transition={{ delay: index * 0.1 }}
-                                    className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 hover:shadow-md transition-shadow duration-200"
+                                    className="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-sm border border-slate-100 dark:border-slate-700 hover:shadow-md transition-shadow duration-200"
                                 >
                                     <div className="flex items-start space-x-4">
-                                        <div className="w-12 h-12 bg-slate-100 rounded-xl flex items-center justify-center flex-shrink-0">
-                                            <TaskIcon className="w-6 h-6 text-slate-600" />
+                                        <div className="w-12 h-12 bg-slate-100 dark:bg-slate-700 rounded-xl flex items-center justify-center flex-shrink-0">
+                                            <TaskIcon className="w-6 h-6 text-slate-600 dark:text-slate-300" />
                                         </div>
                                         <div className="flex-1 min-w-0">
                                             <div className="flex items-start justify-between mb-2">
                                                 <div className="flex-1">
-                                                    <h4 className="text-lg font-semibold text-[#00246a] mb-1">{task.title}</h4>
-                                                    <p className="text-sm text-slate-600 mb-2">{task.course}</p>
+                                                    <h4 className="text-lg font-semibold text-[#00246a] dark:text-blue-400 mb-1">{task.title}</h4>
+                                                    <p className="text-sm text-slate-600 dark:text-slate-300 mb-2">{task.course}</p>
                                                 </div>
                                                 <div className="flex items-center space-x-2 ml-4">
                                                     <span
@@ -210,18 +210,18 @@ export default function TasksContent() {
                                                     >
                                                         {getPriorityLabel(task.priority)}
                                                     </span>
-                                                    <span className="text-sm text-slate-500 flex items-center space-x-1">
+                                                    <span className="text-sm text-slate-500 dark:text-slate-400 flex items-center space-x-1">
                                                         <Clock className="w-4 h-4" />
                                                         <span>{task.dueDate}</span>
                                                     </span>
                                                 </div>
                                             </div>
-                                            <p className="text-sm text-slate-600 mb-4">{task.description}</p>
+                                            <p className="text-sm text-slate-600 dark:text-slate-300 mb-4">{task.description}</p>
                                             <div className="flex items-center space-x-3">
-                                                <button className="bg-[#e30f28] hover:bg-[#e30f28]/90 text-white px-4 py-2 rounded-lg font-medium transition-colors duration-200">
+                                                <button className="bg-[#e30f28] hover:bg-[#e30f28]/90 dark:bg-red-600 dark:hover:bg-red-700 text-white px-4 py-2 rounded-lg font-medium transition-colors duration-200">
                                                     Completar
                                                 </button>
-                                                <button className="text-slate-600 hover:text-slate-800 px-4 py-2 rounded-lg font-medium transition-colors duration-200">
+                                                <button className="text-slate-600 dark:text-slate-300 hover:text-slate-800 dark:hover:text-white px-4 py-2 rounded-lg font-medium transition-colors duration-200">
                                                     Ver Detalles
                                                 </button>
                                             </div>
@@ -232,10 +232,10 @@ export default function TasksContent() {
                         })}
                     </div>
                 ) : (
-                    <div className="bg-white rounded-2xl p-8 shadow-sm border border-slate-100 text-center">
-                        <CheckSquare className="w-16 h-16 text-slate-400 mx-auto mb-4" />
-                        <h3 className="text-lg font-semibold text-[#00246a] mb-2">¡Todas las tareas completadas!</h3>
-                        <p className="text-slate-600">No tienes tareas pendientes en este momento.</p>
+                    <div className="bg-white dark:bg-slate-800 rounded-2xl p-8 shadow-sm border border-slate-100 dark:border-slate-700 text-center">
+                        <CheckSquare className="w-16 h-16 text-slate-400 dark:text-slate-500 mx-auto mb-4" />
+                        <h3 className="text-lg font-semibold text-[#00246a] dark:text-blue-400 mb-2">¡Todas las tareas completadas!</h3>
+                        <p className="text-slate-600 dark:text-slate-300">No tienes tareas pendientes en este momento.</p>
                     </div>
                 )}
             </div>
@@ -243,7 +243,7 @@ export default function TasksContent() {
             {/* Completed Tasks */}
             {completedTasks.length > 0 && (
                 <div className="space-y-4">
-                    <h3 className="text-lg font-semibold text-[#00246a]">Tareas Completadas</h3>
+                    <h3 className="text-lg font-semibold text-[#00246a] dark:text-blue-400">Tareas Completadas</h3>
                     <div className="space-y-4">
                         {completedTasks.map((task, index) => {
                             const TaskIcon = getTaskIcon(task.type)
@@ -254,21 +254,21 @@ export default function TasksContent() {
                                     initial={{ opacity: 0, y: 20 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     transition={{ delay: index * 0.1 }}
-                                    className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 opacity-75"
+                                    className="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-sm border border-slate-100 dark:border-slate-700 opacity-75"
                                 >
                                     <div className="flex items-start space-x-4">
-                                        <div className="w-12 h-12 bg-green-50 rounded-xl flex items-center justify-center flex-shrink-0">
-                                            <CheckSquare className="w-6 h-6 text-green-600" />
+                                        <div className="w-12 h-12 bg-green-50 dark:bg-green-900/20 rounded-xl flex items-center justify-center flex-shrink-0">
+                                            <CheckSquare className="w-6 h-6 text-green-600 dark:text-green-400" />
                                         </div>
                                         <div className="flex-1 min-w-0">
                                             <div className="flex items-start justify-between mb-2">
                                                 <div className="flex-1">
-                                                    <h4 className="text-lg font-semibold text-[#00246a] mb-1 line-through">{task.title}</h4>
-                                                    <p className="text-sm text-slate-600 mb-2">{task.course}</p>
+                                                    <h4 className="text-lg font-semibold text-[#00246a] dark:text-blue-400 mb-1 line-through">{task.title}</h4>
+                                                    <p className="text-sm text-slate-600 dark:text-slate-300 mb-2">{task.course}</p>
                                                 </div>
-                                                <span className="text-sm text-green-600 font-medium">Completada</span>
+                                                <span className="text-sm text-green-600 dark:text-green-400 font-medium">Completada</span>
                                             </div>
-                                            <p className="text-sm text-slate-600">{task.description}</p>
+                                            <p className="text-sm text-slate-600 dark:text-slate-300">{task.description}</p>
                                         </div>
                                     </div>
                                 </motion.div>

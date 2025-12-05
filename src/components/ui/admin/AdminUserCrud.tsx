@@ -1,10 +1,10 @@
 "use client"
 
 import React, { useState, useEffect, useCallback, useRef } from 'react'
-import { useDebounce } from '../../../hooks/useDebounce'
-import api from '../../../lib/api'
-import FeedbackAlert from '../../FeedbackAlert'
-import Pagination from '../../Pagination'
+import { useDebounce } from '@/hooks/useDebounce'
+import api from '@/lib/api'
+import FeedbackAlert from '@/components/FeedbackAlert'
+import Pagination from '@/components/Pagination'
 import { 
   Users, 
   Edit, 
@@ -368,7 +368,7 @@ export default function AdminUserCrud() {
       )}
 
       {/* Filters - Responsive */}
-      <div className="bg-white p-3 md:p-4 rounded-lg shadow-md">
+      <div className="bg-white dark:bg-slate-800 p-3 md:p-4 rounded-lg shadow-md">
         <div className="flex flex-col lg:flex-row gap-3 md:gap-4">
           {/* Search - Full width on mobile */}
           <div className="flex-1 relative">
@@ -378,7 +378,7 @@ export default function AdminUserCrud() {
               placeholder="Buscar usuarios..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-9 md:pl-10 pr-4 py-2 text-sm md:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00246a] focus:border-transparent"
+              className="w-full pl-9 md:pl-10 pr-4 py-2 text-sm md:text-base border border-gray-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-lg focus:ring-2 focus:ring-[#00246a] focus:border-transparent"
             />
           </div>
           
@@ -389,7 +389,7 @@ export default function AdminUserCrud() {
               <select
                 value={roleFilter}
                 onChange={(e) => setRoleFilter(e.target.value)}
-                className="px-3 py-2 text-sm md:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00246a] focus:border-transparent min-w-0 flex-1"
+                className="px-3 py-2 text-sm md:text-base border border-gray-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-lg focus:ring-2 focus:ring-[#00246a] focus:border-transparent min-w-0 flex-1"
               >
                 <option value="ALL">Todos los roles</option>
                 <option value="ESTUDIANTE">Estudiantes</option>
@@ -401,7 +401,7 @@ export default function AdminUserCrud() {
             <select
               value={verificationFilter}
               onChange={(e) => setVerificationFilter(e.target.value)}
-              className="px-3 py-2 text-sm md:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00246a] focus:border-transparent min-w-0 flex-1"
+              className="px-3 py-2 text-sm md:text-base border border-gray-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-lg focus:ring-2 focus:ring-[#00246a] focus:border-transparent min-w-0 flex-1"
             >
               <option value="ALL">Todos los estados</option>
               <option value="VERIFIED">Verificados</option>
@@ -412,45 +412,45 @@ export default function AdminUserCrud() {
       </div>
 
       {/* Users Table/Cards - Responsive */}
-      <div className="bg-white rounded-lg shadow-md overflow-hidden">
+      <div className="bg-white dark:bg-slate-800 rounded-lg shadow-md overflow-hidden">
         {loading ? (
           <div className="p-8 text-center">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#00246a] mx-auto"></div>
-            <p className="mt-2 text-gray-600 text-sm md:text-base">Cargando usuarios...</p>
+            <p className="mt-2 text-gray-600 dark:text-gray-400 text-sm md:text-base">Cargando usuarios...</p>
           </div>
         ) : (
           <>
             {/* Desktop Table - Hidden on mobile */}
             <div className="hidden lg:block overflow-x-auto">
               <table className="w-full">
-                <thead className="bg-gray-50">
+                <thead className="bg-gray-50 dark:bg-slate-700">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                       Usuario
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                       Rol
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                       Contacto
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                       Estado
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                       Acciones
                     </th>
                   </tr>
                 </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
+                <tbody className="bg-white dark:bg-slate-800 divide-y divide-gray-200 dark:divide-slate-700">
                   {users.map((user) => (
-                    <tr key={user.id} className="hover:bg-gray-50">
+                    <tr key={user.id} className="hover:bg-gray-50 dark:hover:bg-slate-700/50">
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div>
-                          <div className="text-sm font-medium text-gray-900">
+                          <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
                             {user.nombre} {user.apellido}
                           </div>
-                          <div className="text-sm text-gray-500 flex items-center gap-1">
+                          <div className="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-1">
                             <Mail className="w-4 h-4" />
                             {user.email}
                           </div>
@@ -461,7 +461,7 @@ export default function AdminUserCrud() {
                           {user.rol}
                         </span>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
                         <div className="space-y-1">
                           {(user.estudiante?.telefono || user.profesor?.telefono) && (
                             <div className="flex items-center gap-1">
@@ -485,8 +485,8 @@ export default function AdminUserCrud() {
                           {/* Estado de actividad */}
                           <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
                             (user.estudiante?.b_activo ?? user.profesor?.b_activo ?? user.administrador?.b_activo ?? true)
-                              ? 'bg-green-100 text-green-800' 
-                              : 'bg-red-100 text-red-800'
+                              ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300' 
+                              : 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300'
                           }`}>
                             {(user.estudiante?.b_activo ?? user.profesor?.b_activo ?? user.administrador?.b_activo ?? true)
                               ? 'Activo' 
@@ -496,8 +496,8 @@ export default function AdminUserCrud() {
                           {/* Estado de verificación */}
                           <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
                             user.verificado
-                              ? 'bg-blue-100 text-blue-800' 
-                              : 'bg-yellow-100 text-yellow-800'
+                              ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300' 
+                              : 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300'
                           }`}>
                             {user.verificado ? 'Verificado' : 'No verificado'}
                           </span>
@@ -507,7 +507,7 @@ export default function AdminUserCrud() {
                         <div className="flex items-center gap-2">
                           <button
                             onClick={() => handleEditUser(user)}
-                            className="text-blue-600 hover:text-blue-900 p-1 rounded"
+                            className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 p-1 rounded"
                             title="Editar"
                           >
                             <Edit className="w-4 h-4" />
@@ -518,11 +518,11 @@ export default function AdminUserCrud() {
                             <button
                               onClick={() => handleResendVerification(user.id, user.email)}
                               disabled={resendingEmail === user.id}
-                              className="text-orange-600 hover:text-orange-900 p-1 rounded disabled:opacity-50"
+                              className="text-orange-600 hover:text-orange-900 dark:text-orange-400 dark:hover:text-orange-300 p-1 rounded disabled:opacity-50"
                               title="Reenviar correo de verificación"
                             >
                               {resendingEmail === user.id ? (
-                                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-orange-600"></div>
+                                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-orange-600 dark:border-orange-400"></div>
                               ) : (
                                 <RotateCcw className="w-4 h-4" />
                               )}
@@ -531,7 +531,7 @@ export default function AdminUserCrud() {
                           
                           <button
                             onClick={() => handleDeleteUser(user.id)}
-                            className="text-red-600 hover:text-red-900 p-1 rounded"
+                            className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 p-1 rounded"
                             title="Eliminar"
                           >
                             <Trash2 className="w-4 h-4" />
@@ -547,14 +547,14 @@ export default function AdminUserCrud() {
             {/* Mobile Cards - Visible on mobile/tablet */}
             <div className="lg:hidden space-y-4 p-4">
               {users.map((user) => (
-                <div key={user.id} className="border border-gray-200 rounded-lg p-4 space-y-3">
+                <div key={user.id} className="border border-gray-200 dark:border-slate-700 rounded-lg p-4 space-y-3">
                   {/* User Header */}
                   <div className="flex justify-between items-start">
                     <div>
-                      <h3 className="font-medium text-gray-900 text-sm">
+                      <h3 className="font-medium text-gray-900 dark:text-gray-100 text-sm">
                         {user.nombre} {user.apellido}
                       </h3>
-                      <p className="text-xs text-gray-500 flex items-center gap-1 mt-1">
+                      <p className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1 mt-1">
                         <Mail className="w-3 h-3" />
                         {user.email}
                       </p>
@@ -567,7 +567,7 @@ export default function AdminUserCrud() {
                   {/* Contact Info */}
                   <div className="space-y-1">
                     {(user.estudiante?.telefono || user.profesor?.telefono) && (
-                      <div className="flex items-center gap-1 text-xs text-gray-600">
+                      <div className="flex items-center gap-1 text-xs text-gray-600 dark:text-gray-400">
                         <Phone className="w-3 h-3" />
                         {user.estudiante?.telefono || user.profesor?.telefono}
                       </div>
@@ -575,7 +575,7 @@ export default function AdminUserCrud() {
                     {(() => {
                       const edad = user.estudiante?.edad || user.profesor?.edad
                       return (typeof edad === 'number' && !isNaN(edad) && edad > 0) && (
-                        <div className="flex items-center gap-1 text-xs text-gray-600">
+                        <div className="flex items-center gap-1 text-xs text-gray-600 dark:text-gray-400">
                           <Calendar className="w-3 h-3" />
                           {renderSafeNumber(edad, ' años')}
                         </div>
@@ -587,8 +587,8 @@ export default function AdminUserCrud() {
                   <div className="flex flex-wrap gap-2">
                     <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
                       (user.estudiante?.b_activo ?? user.profesor?.b_activo ?? user.administrador?.b_activo ?? true)
-                        ? 'bg-green-100 text-green-800' 
-                        : 'bg-red-100 text-red-800'
+                        ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300' 
+                        : 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300'
                     }`}>
                       {(user.estudiante?.b_activo ?? user.profesor?.b_activo ?? user.administrador?.b_activo ?? true)
                         ? 'Activo' 
@@ -597,19 +597,19 @@ export default function AdminUserCrud() {
                     
                     <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
                       user.verificado
-                        ? 'bg-blue-100 text-blue-800' 
-                        : 'bg-yellow-100 text-yellow-800'
+                        ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300' 
+                        : 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300'
                     }`}>
                       {user.verificado ? 'Verificado' : 'No verificado'}
                     </span>
                   </div>
 
                   {/* Actions */}
-                  <div className="flex items-center justify-between pt-2 border-t border-gray-100">
+                  <div className="flex items-center justify-between pt-2 border-t border-gray-100 dark:border-slate-700">
                     <div className="flex items-center gap-2">
                       <button
                         onClick={() => handleEditUser(user)}
-                        className="flex items-center gap-1 text-blue-600 hover:text-blue-900 px-2 py-1 rounded text-xs"
+                        className="flex items-center gap-1 text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 px-2 py-1 rounded text-xs"
                       >
                         <Edit className="w-3 h-3" />
                         Editar
@@ -619,10 +619,10 @@ export default function AdminUserCrud() {
                         <button
                           onClick={() => handleResendVerification(user.id, user.email)}
                           disabled={resendingEmail === user.id}
-                          className="flex items-center gap-1 text-orange-600 hover:text-orange-900 px-2 py-1 rounded text-xs disabled:opacity-50"
+                          className="flex items-center gap-1 text-orange-600 hover:text-orange-900 dark:text-orange-400 dark:hover:text-orange-300 px-2 py-1 rounded text-xs disabled:opacity-50"
                         >
                           {resendingEmail === user.id ? (
-                            <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-orange-600"></div>
+                            <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-orange-600 dark:border-orange-400"></div>
                           ) : (
                             <>
                               <RotateCcw className="w-3 h-3" />
@@ -635,7 +635,7 @@ export default function AdminUserCrud() {
                     
                     <button
                       onClick={() => handleDeleteUser(user.id)}
-                      className="flex items-center gap-1 text-red-600 hover:text-red-900 px-2 py-1 rounded text-xs"
+                      className="flex items-center gap-1 text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 px-2 py-1 rounded text-xs"
                     >
                       <Trash2 className="w-3 h-3" />
                       Eliminar
@@ -649,7 +649,7 @@ export default function AdminUserCrud() {
 
         {/* Pagination */}
         {!loading && (
-          <div className="px-4 py-3 border-t border-gray-200">
+          <div className="px-4 py-3 border-t border-gray-200 dark:border-slate-700">
             <Pagination 
               page={isNaN(currentPage) ? 1 : currentPage} 
               totalPages={isNaN(totalPages) ? 1 : totalPages} 
@@ -662,15 +662,15 @@ export default function AdminUserCrud() {
       {/* Modal - Responsive */}
       {showModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+          <div className="bg-white dark:bg-slate-800 rounded-lg w-full max-w-2xl max-h-[90vh] overflow-y-auto">
             {/* Modal Header */}
-            <div className="flex justify-between items-center p-4 md:p-6 border-b">
-              <h2 className="text-lg md:text-xl font-bold text-[#00246a]">
+            <div className="flex justify-between items-center p-4 md:p-6 border-b dark:border-slate-700">
+              <h2 className="text-lg md:text-xl font-bold text-[#00246a] dark:text-blue-400">
                 {editingUser ? 'Editar Usuario' : 'Crear Nuevo Usuario'}
               </h2>
               <button
                 onClick={() => setShowModal(false)}
-                className="text-gray-400 hover:text-gray-600"
+                className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
               >
                 <X className="w-5 h-5 md:w-6 md:h-6" />
               </button>
@@ -679,7 +679,7 @@ export default function AdminUserCrud() {
             {/* Modal Content */}
             <div className="p-4 md:p-6">
               {errors.general && (
-                <div className="mb-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded flex items-start gap-2 text-sm">
+                <div className="mb-4 bg-red-100 dark:bg-red-900/30 border border-red-400 dark:border-red-700 text-red-700 dark:text-red-300 px-4 py-3 rounded flex items-start gap-2 text-sm">
                   <AlertTriangle className="w-4 h-4 mt-0.5 flex-shrink-0" />
                   <span>{errors.general}</span>
                 </div>
@@ -689,77 +689,77 @@ export default function AdminUserCrud() {
                 {/* Basic Information - Responsive Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="md:col-span-2">
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                       Email *
                     </label>
                     <input
                       type="email"
                       value={formData.email}
                       onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                      className={`w-full px-3 py-2 text-sm md:text-base border rounded-lg focus:ring-2 focus:ring-[#00246a] focus:border-transparent ${
-                        errors.email ? 'border-red-500' : 'border-gray-300'
+                      className={`w-full px-3 py-2 text-sm md:text-base border rounded-lg focus:ring-2 focus:ring-[#00246a] focus:border-transparent dark:bg-slate-700 dark:text-white ${
+                        errors.email ? 'border-red-500' : 'border-gray-300 dark:border-slate-600'
                       }`}
                       placeholder="correo@ejemplo.com"
                     />
-                    {errors.email && <p className="mt-1 text-xs text-red-600">{errors.email}</p>}
+                    {errors.email && <p className="mt-1 text-xs text-red-600 dark:text-red-400">{errors.email}</p>}
                   </div>
 
                   <div className="md:col-span-2">
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                       {editingUser ? 'Nueva Contraseña (opcional)' : 'Contraseña *'}
                     </label>
                     <input
                       type="password"
                       value={formData.password}
                       onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                      className={`w-full px-3 py-2 text-sm md:text-base border rounded-lg focus:ring-2 focus:ring-[#00246a] focus:border-transparent ${
-                        errors.password ? 'border-red-500' : 'border-gray-300'
+                      className={`w-full px-3 py-2 text-sm md:text-base border rounded-lg focus:ring-2 focus:ring-[#00246a] focus:border-transparent dark:bg-slate-700 dark:text-white ${
+                        errors.password ? 'border-red-500' : 'border-gray-300 dark:border-slate-600'
                       }`}
                       placeholder="••••••••"
                     />
-                    {errors.password && <p className="mt-1 text-xs text-red-600">{errors.password}</p>}
+                    {errors.password && <p className="mt-1 text-xs text-red-600 dark:text-red-400">{errors.password}</p>}
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                       Nombre *
                     </label>
                     <input
                       type="text"
                       value={formData.nombre}
                       onChange={(e) => setFormData({ ...formData, nombre: e.target.value })}
-                      className={`w-full px-3 py-2 text-sm md:text-base border rounded-lg focus:ring-2 focus:ring-[#00246a] focus:border-transparent ${
-                        errors.nombre ? 'border-red-500' : 'border-gray-300'
+                      className={`w-full px-3 py-2 text-sm md:text-base border rounded-lg focus:ring-2 focus:ring-[#00246a] focus:border-transparent dark:bg-slate-700 dark:text-white ${
+                        errors.nombre ? 'border-red-500' : 'border-gray-300 dark:border-slate-600'
                       }`}
                       placeholder="Nombre"
                     />
-                    {errors.nombre && <p className="mt-1 text-xs text-red-600">{errors.nombre}</p>}
+                    {errors.nombre && <p className="mt-1 text-xs text-red-600 dark:text-red-400">{errors.nombre}</p>}
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                       Apellido *
                     </label>
                     <input
                       type="text"
                       value={formData.apellido}
                       onChange={(e) => setFormData({ ...formData, apellido: e.target.value })}
-                      className={`w-full px-3 py-2 text-sm md:text-base border rounded-lg focus:ring-2 focus:ring-[#00246a] focus:border-transparent ${
-                        errors.apellido ? 'border-red-500' : 'border-gray-300'
+                      className={`w-full px-3 py-2 text-sm md:text-base border rounded-lg focus:ring-2 focus:ring-[#00246a] focus:border-transparent dark:bg-slate-700 dark:text-white ${
+                        errors.apellido ? 'border-red-500' : 'border-gray-300 dark:border-slate-600'
                       }`}
                       placeholder="Apellido"
                     />
-                    {errors.apellido && <p className="mt-1 text-xs text-red-600">{errors.apellido}</p>}
+                    {errors.apellido && <p className="mt-1 text-xs text-red-600 dark:text-red-400">{errors.apellido}</p>}
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                       Rol *
                     </label>
                     <select
                       value={formData.rol}
                       onChange={(e) => setFormData({ ...formData, rol: e.target.value as 'ESTUDIANTE' | 'PROFESOR' | 'ADMIN' })}
-                      className="w-full px-3 py-2 text-sm md:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00246a] focus:border-transparent"
+                      className="w-full px-3 py-2 text-sm md:text-base border border-gray-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-lg focus:ring-2 focus:ring-[#00246a] focus:border-transparent"
                     >
                       <option value="ESTUDIANTE">Estudiante</option>
                       <option value="PROFESOR">Profesor</option>
@@ -768,14 +768,14 @@ export default function AdminUserCrud() {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                       Teléfono
                     </label>
                     <input
                       type="tel"
                       value={formData.telefono}
                       onChange={(e) => setFormData({ ...formData, telefono: e.target.value })}
-                      className="w-full px-3 py-2 text-sm md:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00246a] focus:border-transparent"
+                      className="w-full px-3 py-2 text-sm md:text-base border border-gray-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-lg focus:ring-2 focus:ring-[#00246a] focus:border-transparent"
                       placeholder="555-1234"
                     />
                   </div>
@@ -783,11 +783,11 @@ export default function AdminUserCrud() {
 
                 {/* Role-specific fields */}
                 {formData.rol === 'ESTUDIANTE' && (
-                  <div className="border-t pt-4">
-                    <h3 className="text-lg font-medium text-gray-900 mb-3">Información del Estudiante</h3>
+                  <div className="border-t dark:border-slate-700 pt-4">
+                    <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-3">Información del Estudiante</h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                           Edad *
                         </label>
                         <input
@@ -802,16 +802,16 @@ export default function AdminUserCrud() {
                               setFormData({ ...formData, edad: isNaN(parsedValue) ? undefined : parsedValue })
                             }
                           }}
-                          className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-[#00246a] focus:border-transparent ${
-                            errors.edad ? 'border-red-500' : 'border-gray-300'
+                          className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-[#00246a] focus:border-transparent dark:bg-slate-700 dark:text-white ${
+                            errors.edad ? 'border-red-500' : 'border-gray-300 dark:border-slate-600'
                           }`}
                           min="1"
                           max="100"
                           placeholder="Edad"
                         />
-                        {errors.edad && <p className="mt-1 text-sm text-red-600">{errors.edad}</p>}
+                        {errors.edad && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.edad}</p>}
                         {typeof formData.edad === 'number' && !isNaN(formData.edad) && (
-                          <p className="mt-1 text-xs text-gray-500">
+                          <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
                             Categoría asignada automáticamente: <span className="font-medium">{obtenerNombreCategoria(formData.edad)}</span>
                           </p>
                         )}
@@ -822,11 +822,11 @@ export default function AdminUserCrud() {
                 )}
 
                 {formData.rol === 'PROFESOR' && (
-                  <div className="border-t pt-4">
-                    <h3 className="text-lg font-medium text-gray-900 mb-3">Información del Profesor</h3>
+                  <div className="border-t dark:border-slate-700 pt-4">
+                    <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-3">Información del Profesor</h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                           Edad
                         </label>
                         <input
@@ -841,7 +841,7 @@ export default function AdminUserCrud() {
                               setFormData({ ...formData, edad: isNaN(parsedValue) ? undefined : parsedValue })
                             }
                           }}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00246a] focus:border-transparent"
+                          className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-lg focus:ring-2 focus:ring-[#00246a] focus:border-transparent"
                           min="18"
                           max="80"
                           placeholder="Edad"
@@ -849,29 +849,29 @@ export default function AdminUserCrud() {
                       </div>
 
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                           Nivel de Estudios *
                         </label>
                         <input
                           type="text"
                           value={formData.nivel_estudios}
                           onChange={(e) => setFormData({ ...formData, nivel_estudios: e.target.value })}
-                          className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-[#00246a] focus:border-transparent ${
-                            errors.nivel_estudios ? 'border-red-500' : 'border-gray-300'
+                          className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-[#00246a] focus:border-transparent dark:bg-slate-700 dark:text-white ${
+                            errors.nivel_estudios ? 'border-red-500' : 'border-gray-300 dark:border-slate-600'
                           }`}
                           placeholder="Ej: Licenciatura en Lenguas"
                         />
-                        {errors.nivel_estudios && <p className="mt-1 text-sm text-red-600">{errors.nivel_estudios}</p>}
+                        {errors.nivel_estudios && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.nivel_estudios}</p>}
                       </div>
 
                       <div className="md:col-span-2">
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                           Observaciones
                         </label>
                         <textarea
                           value={formData.observaciones}
                           onChange={(e) => setFormData({ ...formData, observaciones: e.target.value })}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00246a] focus:border-transparent"
+                          className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-lg focus:ring-2 focus:ring-[#00246a] focus:border-transparent"
                           rows={3}
                           placeholder="Observaciones adicionales..."
                         />
@@ -881,18 +881,18 @@ export default function AdminUserCrud() {
                 )}
 
                 {/* Action Buttons - Responsive */}
-                <div className="flex flex-col sm:flex-row justify-end gap-3 pt-4 border-t">
+                <div className="flex flex-col sm:flex-row justify-end gap-3 pt-4 border-t dark:border-slate-700">
                   <button
                     type="button"
                     onClick={() => setShowModal(false)}
-                    className="w-full sm:w-auto px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors text-sm md:text-base"
+                    className="w-full sm:w-auto px-4 py-2 text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-slate-700 rounded-lg hover:bg-gray-200 dark:hover:bg-slate-600 transition-colors text-sm md:text-base"
                   >
                     Cancelar
                   </button>
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2 bg-[#00246a] text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 text-sm md:text-base"
+                    className="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2 bg-[#00246a] dark:bg-blue-600 text-white rounded-lg hover:bg-blue-700 dark:hover:bg-blue-500 transition-colors disabled:opacity-50 text-sm md:text-base"
                   >
                     {isSubmitting ? (
                       <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>

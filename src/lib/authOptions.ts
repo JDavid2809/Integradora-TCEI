@@ -50,15 +50,11 @@ export const authOptions: NextAuthOptions = {
         console.timeEnd("findUser");
 
         if (!user) {
-
           throw new Error("usuario no encontrado");
         }
         if (!user.verificado) {
           throw new Error("Por favor, verifica tu correo antes de iniciar sesión.");
-          
         }
-
-        console.log('👤 User found:', user.email, 'Role:', user.rol);
 
         console.time("bcrypt");
         const isValid = await bcrypt.compare(credentials.password, user.password);
@@ -67,7 +63,6 @@ export const authOptions: NextAuthOptions = {
         }
 
         console.timeEnd("bcrypt");
-        console.log('✅ Login successful for:', user.email);
 
         let extraData: Record<string, unknown> | null = null;
 
@@ -155,9 +150,8 @@ export const authOptions: NextAuthOptions = {
     error: '/Login',
   },
   events: {
-    async signOut({ token }) {
-      // Log cuando un usuario cierra sesión
-      console.log('🚪 User signed out:', token?.email)
+    async signOut() {
+      // Usuario cerró sesión
     },
   },
   secret: process.env.NEXTAUTH_SECRET,

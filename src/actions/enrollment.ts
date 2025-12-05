@@ -2,6 +2,8 @@
 
 import { prisma } from '@/lib/prisma'
 import { generateCertificate } from './certificates'
+import { getServerSession } from 'next-auth'
+import { authOptions } from '@/lib/authOptions'
 
 /**
  * Actualiza el estado de una inscripción y genera certificado si se completa
@@ -10,6 +12,22 @@ export async function updateEnrollmentStatus(
   inscripcionId: number,
   newStatus: 'ACTIVE' | 'COMPLETED' | 'DROPPED' | 'SUSPENDED' | 'TRANSFERRED'
 ) {
+  const session = await getServerSession(authOptions)
+  if (!session?.user) {
+    return {
+      success: false,
+      error: 'No autorizado. Debes iniciar sesión.'
+    }
+  }
+
+  // Solo admins y profesores pueden actualizar el estado
+  if (session.user.rol !== 'ADMIN' && session.user.rol !== 'PROFESOR') {
+    return {
+      success: false,
+      error: 'No tienes permisos para actualizar el estado de inscripciones.'
+    }
+  }
+
   try {
     // Actualizar el estado
     const inscripcion = await prisma.inscripcion.update({
@@ -57,6 +75,22 @@ export async function updateEnrollmentStatus(
  * Marca un curso como completado (calcula si cumple requisitos)
  */
 export async function completeCourse(inscripcionId: number) {
+  const session = await getServerSession(authOptions)
+  if (!session?.user) {
+    return {
+      success: false,
+      error: 'No autorizado. Debes iniciar sesión.'
+    }
+  }
+
+  // Solo admins y profesores pueden marcar cursos como completados
+  if (session.user.rol !== 'ADMIN' && session.user.rol !== 'PROFESOR') {
+    return {
+      success: false,
+      error: 'No tienes permisos para completar cursos.'
+    }
+  }
+
   try {
     // Aquí puedes agregar lógica adicional para verificar:
     // - Asistencia mínima
@@ -108,6 +142,15 @@ export async function completeCourse(inscripcionId: number) {
  * Ahora también verifica que todas las actividades estén calificadas y aprobadas
  */
 export async function canGetCertificate(inscripcionId: number) {
+  const session = await getServerSession(authOptions)
+  if (!session?.user) {
+    return {
+      success: false,
+      canGet: false,
+      reason: 'No autorizado. Debes iniciar sesión.'
+    }
+  }
+
   try {
     const inscripcion = await prisma.inscripcion.findUnique({
       where: { id: inscripcionId },
@@ -132,6 +175,21 @@ export async function canGetCertificate(inscripcionId: number) {
 
     if (!inscripcion) {
       return { success: false, canGet: false, reason: 'Inscripción no encontrada' }
+    }
+
+    // Verificar que el estudiante solo pueda consultar sus propias inscripciones
+    if (session.user.rol === 'ESTUDIANTE') {
+      const estudiante = await prisma.estudiante.findUnique({
+        where: { id_usuario: parseInt(session.user.id) }
+      })
+      
+      if (!estudiante || estudiante.id_estudiante !== inscripcion.student_id) {
+        return {
+          success: false,
+          canGet: false,
+          reason: 'No tienes permiso para ver esta inscripción.'
+        }
+      }
     }
 
     // Ya tiene certificado

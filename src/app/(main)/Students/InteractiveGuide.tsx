@@ -123,26 +123,26 @@ export default function InteractiveGuide({
     <div className="space-y-8 relative">
       {/* Guide Header with Metadata */}
       {content.title && (
-        <div className="bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-100 rounded-2xl p-8 mb-6">
+        <div className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-slate-800 dark:to-slate-900 border border-blue-100 dark:border-slate-700 rounded-2xl p-8 mb-6">
           <div className="flex items-start justify-between gap-4 flex-wrap">
             <div className="flex-1">
-              <h1 className="text-3xl font-bold text-[#00246a] mb-3 leading-tight">{content.title}</h1>
+              <h1 className="text-3xl font-bold text-[#00246a] dark:text-white mb-3 leading-tight">{content.title}</h1>
               {content.metadata && (
                 <div className="flex flex-wrap gap-3 text-sm">
                   {content.metadata.level && (
-                    <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white/80 backdrop-blur-sm text-blue-900 rounded-full font-medium shadow-sm">
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white/80 dark:bg-slate-700/80 backdrop-blur-sm text-blue-900 dark:text-blue-100 rounded-full font-medium shadow-sm">
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
                       {content.metadata.level}
                     </span>
                   )}
                   {content.metadata.estimatedTime && (
-                    <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white/80 backdrop-blur-sm text-slate-700 rounded-full font-medium shadow-sm">
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white/80 dark:bg-slate-700/80 backdrop-blur-sm text-slate-700 dark:text-slate-300 rounded-full font-medium shadow-sm">
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                       {content.metadata.estimatedTime}
                     </span>
                   )}
                   {content.metadata.topic && (
-                    <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white/80 backdrop-blur-sm text-slate-700 rounded-full font-medium shadow-sm">
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white/80 dark:bg-slate-700/80 backdrop-blur-sm text-slate-700 dark:text-slate-300 rounded-full font-medium shadow-sm">
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" /></svg>
                       {content.metadata.topic}
                     </span>
@@ -155,23 +155,23 @@ export default function InteractiveGuide({
       )}
       
       {/* Sticky Progress Bar */}
-      <div className="sticky top-6 z-40 bg-white/95 backdrop-blur-sm px-6 py-4 rounded-2xl border border-slate-100 shadow-sm mb-8 transition-all duration-300">
+      <div className="sticky top-6 z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur-sm px-6 py-4 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm mb-8 transition-all duration-300">
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-blue-50 rounded-lg text-[#00246a]">
+            <div className="p-2 bg-blue-50 dark:bg-blue-900/30 rounded-lg text-[#00246a] dark:text-blue-400">
               <BarChart3 size={20} />
             </div>
             <div>
-              <h3 className="text-sm font-bold text-slate-800">Tu Progreso</h3>
-              <p className="text-xs text-slate-500">{completedSections} de {totalSections} completado</p>
+              <h3 className="text-sm font-bold text-slate-800 dark:text-white">Tu Progreso</h3>
+              <p className="text-xs text-slate-500 dark:text-slate-400">{completedSections} de {totalSections} completado</p>
             </div>
           </div>
           <div className="text-right flex items-center gap-3">
-            <span className="text-xl font-bold text-[#00246a]">{progressPercentage}%</span>
+            <span className="text-xl font-bold text-[#00246a] dark:text-blue-400">{progressPercentage}%</span>
             <button
               type="button"
               title="Ver JSON crudo"
-              className="inline-flex items-center gap-2 px-3 py-1 text-sm rounded-md bg-slate-50 border border-slate-200 hover:bg-slate-100"
+              className="inline-flex items-center gap-2 px-3 py-1 text-sm rounded-md bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300"
               onClick={() => setShowRawJson(prev => !prev)}
             >
               <Clipboard size={16} />
@@ -179,15 +179,15 @@ export default function InteractiveGuide({
             </button>
           </div>
         </div>
-        <div className="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
+        <div className="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-2 overflow-hidden">
           <div 
-            className="bg-[#00246a] h-full rounded-full transition-all duration-500 ease-out" 
+            className="bg-[#00246a] dark:bg-blue-500 h-full rounded-full transition-all duration-500 ease-out" 
             style={{ width: `${progressPercentage}%` }}
           ></div>
         </div>
         {progressPercentage === 100 && (
           <div className="mt-3 text-center">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-green-50 text-green-700 text-xs font-bold rounded-full">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-400 text-xs font-bold rounded-full">
               <CheckCircle2 size={12} />
               ¡Guía Completada!
             </span>
@@ -197,13 +197,13 @@ export default function InteractiveGuide({
 
       <div className="space-y-6">
         {showRawJson && (
-          <div className="bg-white border border-slate-200 rounded-md p-4 shadow-sm">
+          <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-md p-4 shadow-sm">
             <div className="flex items-center justify-between mb-3">
-              <h4 className="font-semibold">JSON crudo</h4>
+              <h4 className="font-semibold text-slate-800 dark:text-white">JSON crudo</h4>
               <div className="flex items-center gap-2">
                 <button
                   type="button"
-                  className="px-3 py-1 text-sm rounded-md bg-slate-50 border border-slate-200 hover:bg-slate-100"
+                  className="px-3 py-1 text-sm rounded-md bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-300"
                   onClick={() => {
                     const raw = JSON.stringify(content, null, 2)
                     navigator.clipboard?.writeText(raw)
@@ -215,13 +215,13 @@ export default function InteractiveGuide({
                 </button>
                 <button
                   type="button"
-                  className="px-3 py-1 text-sm rounded-md bg-slate-50 border border-slate-200 hover:bg-slate-100"
+                  className="px-3 py-1 text-sm rounded-md bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-300"
                   onClick={() => setShowRawJson(false)}
                 >Cerrar</button>
               </div>
             </div>
-            <pre className="text-xs font-mono bg-slate-50 p-3 rounded-md overflow-auto max-h-64">{JSON.stringify(content, null, 2)}</pre>
-            {copied && <div className="mt-2 text-sm text-green-700">Copiado al portapapeles</div>}
+            <pre className="text-xs font-mono bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-300 p-3 rounded-md overflow-auto max-h-64">{JSON.stringify(content, null, 2)}</pre>
+            {copied && <div className="mt-2 text-sm text-green-700 dark:text-green-400">Copiado al portapapeles</div>}
           </div>
         )}
         {content.sections.map((section) => (
@@ -251,34 +251,34 @@ function SectionRenderer({ section, isCompleted, onComplete, quizAnswers, setQui
   const [isOpen, setIsOpen] = useState(true)
 
   return (
-    <div className={`border transition-all duration-300 rounded-xl overflow-hidden shadow-sm hover:shadow-md ${isCompleted ? 'border-green-200 bg-green-50/30' : 'border-slate-200 bg-white'}`}>
+    <div className={`border transition-all duration-300 rounded-xl overflow-hidden shadow-sm hover:shadow-md ${isCompleted ? 'border-green-200 dark:border-green-800 bg-green-50/30 dark:bg-green-900/10' : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800'}`}>
       <button 
         onClick={() => setIsOpen(!isOpen)}
-        className={`w-full flex justify-between items-center p-5 transition-colors text-left ${isCompleted ? 'bg-green-50/50 hover:bg-green-100/50' : 'bg-white hover:bg-slate-50'}`}
+        className={`w-full flex justify-between items-center p-5 transition-colors text-left ${isCompleted ? 'bg-green-50/50 dark:bg-green-900/20 hover:bg-green-100/50 dark:hover:bg-green-900/30' : 'bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700'}`}
       >
         <div className="flex items-center gap-4">
-          <div className={`p-2 rounded-lg ${isCompleted ? 'bg-green-100 text-green-700' : 'bg-blue-50 text-[#00246a]'}`}>
+          <div className={`p-2 rounded-lg ${isCompleted ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400' : 'bg-blue-50 dark:bg-blue-900/30 text-[#00246a] dark:text-blue-400'}`}>
             {section.type === 'quiz' && <CheckCircle2 size={24} />}
             {section.type === 'resources' && <BookOpen size={24} />}
             {section.type === 'content' && <BookOpen size={24} />}
           </div>
           <div>
-            <h3 className={`text-lg font-bold ${isCompleted ? 'text-green-800' : 'text-[#00246a]'}`}>
+            <h3 className={`text-lg font-bold ${isCompleted ? 'text-green-800 dark:text-green-400' : 'text-[#00246a] dark:text-blue-400'}`}>
               {section.title}
             </h3>
-            <p className="text-sm text-slate-500 font-medium">
+            <p className="text-sm text-slate-500 dark:text-slate-400 font-medium">
               {section.type === 'quiz' ? 'Evaluación' : section.type === 'resources' ? 'Material complementario' : 'Lección'}
             </p>
           </div>
         </div>
         <div className="flex items-center gap-3">
           {isCompleted && (
-            <span className="px-3 py-1 bg-green-100 text-green-700 text-xs font-bold rounded-full flex items-center gap-1">
+            <span className="px-3 py-1 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 text-xs font-bold rounded-full flex items-center gap-1">
               <CheckCircle2 size={12} />
               Completado
             </span>
           )}
-          {isOpen ? <ChevronUp size={20} className="text-slate-400" /> : <ChevronDown size={20} className="text-slate-400" />}
+          {isOpen ? <ChevronUp size={20} className="text-slate-400 dark:text-slate-500" /> : <ChevronDown size={20} className="text-slate-400 dark:text-slate-500" />}
         </div>
       </button>
       
@@ -290,13 +290,13 @@ function SectionRenderer({ section, isCompleted, onComplete, quizAnswers, setQui
             exit={{ height: 0, opacity: 0 }}
             transition={{ duration: 0.3, ease: "easeInOut" }}
           >
-            <div className="p-6 border-t border-slate-100 bg-white">
+            <div className="p-6 border-t border-slate-100 dark:border-slate-700 bg-white dark:bg-slate-800">
               {section.type === 'content' && <ContentSection content={section.content || ''} onComplete={onComplete} />}
               {section.type === 'quiz' && <QuizSection questions={section.questions || []} answers={quizAnswers} setAnswers={setQuizAnswers} onComplete={onComplete} onQuizComplete={onQuizComplete} />}
               {section.type === 'resources' && <ResourcesSection internal={section.internal || []} external={section.external || []} onComplete={onComplete} />}
               {section.keywords && section.keywords.filter(k => k.word && k.word.length > 2).length > 0 && (
-                <div className="mt-8 pt-6 border-t border-slate-100">
-                  <h4 className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-4 flex items-center gap-2">
+                <div className="mt-8 pt-6 border-t border-slate-100 dark:border-slate-700">
+                  <h4 className="text-sm font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-4 flex items-center gap-2">
                     <Volume2 size={16} />
                     Vocabulario Clave
                   </h4>
@@ -331,32 +331,32 @@ function ContentSection({ content, onComplete }: { content: string | ContentObje
     return obj.blocks.map((b, idx) => {
       switch (b.type) {
         case 'subtitle':
-          return <h3 key={idx} className="text-xl font-semibold mt-6 mb-2 border-l-4 border-blue-500 pl-4">{b.text}</h3>
+          return <h3 key={idx} className="text-xl font-semibold mt-6 mb-2 border-l-4 border-blue-500 pl-4 text-slate-800 dark:text-white">{b.text}</h3>
         case 'paragraph':
-          return <p key={idx} className="mb-4">{b.text}</p>
+          return <p key={idx} className="mb-4 text-slate-700 dark:text-slate-300">{b.text}</p>
         case 'blockquote':
-          return <blockquote key={idx} className="border-l-4 border-indigo-500 bg-indigo-50 py-3 px-4 my-4 rounded-r-lg">{b.text}</blockquote>
+          return <blockquote key={idx} className="border-l-4 border-indigo-500 bg-indigo-50 dark:bg-indigo-900/20 py-3 px-4 my-4 rounded-r-lg text-slate-800 dark:text-slate-200">{b.text}</blockquote>
         case 'list':
           return b.style === 'numbered' ? (
-            <ol key={idx} className="mb-4 list-decimal ml-6">{b.items.map((it, i) => <li key={i} className="mb-1">{it}</li>)}</ol>
+            <ol key={idx} className="mb-4 list-decimal ml-6 text-slate-700 dark:text-slate-300">{b.items.map((it, i) => <li key={i} className="mb-1">{it}</li>)}</ol>
           ) : (
-            <ul key={idx} className="mb-4 list-disc ml-6">{b.items.map((it, i) => <li key={i} className="mb-1">{it}</li>)}</ul>
+            <ul key={idx} className="mb-4 list-disc ml-6 text-slate-700 dark:text-slate-300">{b.items.map((it, i) => <li key={i} className="mb-1">{it}</li>)}</ul>
           )
         case 'dialogue':
           return (
             <div key={idx} className="mb-4">
               {b.dialogue.map((d, i) => (
                 <div key={i} className="flex gap-2 mb-1">
-                  <strong className="w-24 text-slate-800">{d.role}:</strong>
-                  <span className="text-slate-700">{d.text}</span>
+                  <strong className="w-24 text-slate-800 dark:text-slate-200">{d.role}:</strong>
+                  <span className="text-slate-700 dark:text-slate-300">{d.text}</span>
                 </div>
               ))}
             </div>
           )
         case 'hr':
-          return <hr key={idx} className="my-6 border-slate-300" />
+          return <hr key={idx} className="my-6 border-slate-300 dark:border-slate-700" />
         case 'code':
-          return <pre key={idx} className="bg-indigo-50 p-3 rounded text-sm font-mono">{(b as any).code}</pre>
+          return <pre key={idx} className="bg-indigo-50 dark:bg-indigo-900/30 p-3 rounded text-sm font-mono text-slate-800 dark:text-slate-200">{(b as any).code}</pre>
         default:
           return <p key={idx}>{(b as any).text || ''}</p>
       }
@@ -364,18 +364,18 @@ function ContentSection({ content, onComplete }: { content: string | ContentObje
   }
 
   return (
-    <div className="prose prose-slate prose-lg max-w-none 
-      prose-headings:text-[#00246a] prose-headings:font-bold prose-headings:mb-4
+    <div className="prose prose-slate dark:prose-invert prose-lg max-w-none 
+      prose-headings:text-[#00246a] dark:prose-headings:text-blue-400 prose-headings:font-bold prose-headings:mb-4
       prose-h3:text-xl prose-h3:mt-6 prose-h3:mb-3 prose-h3:border-l-4 prose-h3:border-blue-500 prose-h3:pl-4
-      prose-p:text-slate-700 prose-p:leading-relaxed prose-p:mb-4
-      prose-strong:text-slate-900 prose-strong:font-bold
-      prose-ul:text-slate-700 prose-ul:mb-4 prose-ul:space-y-2
-      prose-ol:text-slate-700 prose-ol:mb-4 prose-ol:space-y-2
-      prose-li:text-slate-700 prose-li:leading-relaxed
-      prose-blockquote:border-l-4 prose-blockquote:border-indigo-500 prose-blockquote:bg-indigo-50 prose-blockquote:py-3 prose-blockquote:px-4 prose-blockquote:my-4 prose-blockquote:rounded-r-lg
-      prose-blockquote:text-slate-800 prose-blockquote:not-italic
-      prose-hr:border-slate-300 prose-hr:my-6
-      prose-code:text-indigo-600 prose-code:bg-indigo-50 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:font-mono prose-code:text-sm">
+      prose-p:text-slate-700 dark:prose-p:text-slate-300 prose-p:leading-relaxed prose-p:mb-4
+      prose-strong:text-slate-900 dark:prose-strong:text-white prose-strong:font-bold
+      prose-ul:text-slate-700 dark:prose-ul:text-slate-300 prose-ul:mb-4 prose-ul:space-y-2
+      prose-ol:text-slate-700 dark:prose-ol:text-slate-300 prose-ol:mb-4 prose-ol:space-y-2
+      prose-li:text-slate-700 dark:prose-li:text-slate-300 prose-li:leading-relaxed
+      prose-blockquote:border-l-4 prose-blockquote:border-indigo-500 prose-blockquote:bg-indigo-50 dark:prose-blockquote:bg-indigo-900/20 prose-blockquote:py-3 prose-blockquote:px-4 prose-blockquote:my-4 prose-blockquote:rounded-r-lg
+      prose-blockquote:text-slate-800 dark:prose-blockquote:text-slate-200 prose-blockquote:not-italic
+      prose-hr:border-slate-300 dark:prose-hr:border-slate-700 prose-hr:my-6
+      prose-code:text-indigo-600 dark:prose-code:text-indigo-400 prose-code:bg-indigo-50 dark:prose-code:bg-indigo-900/30 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:font-mono prose-code:text-sm">
       {typeof content === 'string' ? (
         <>
           <ReactMarkdown>{content}</ReactMarkdown>
@@ -432,12 +432,12 @@ function QuizSection({ questions, answers, setAnswers, onComplete, onQuizComplet
   return (
     <div className="space-y-8">
       {questions.map((q, qIdx) => (
-        <div key={qIdx} className="bg-slate-50 p-6 rounded-xl border border-slate-200">
+        <div key={qIdx} className="bg-slate-50 dark:bg-slate-800 p-6 rounded-xl border border-slate-200 dark:border-slate-700">
           <div className="flex gap-4 mb-6">
-            <span className="flex-shrink-0 w-8 h-8 bg-[#00246a] text-white rounded-full flex items-center justify-center font-bold text-sm">
+            <span className="flex-shrink-0 w-8 h-8 bg-[#00246a] dark:bg-blue-600 text-white rounded-full flex items-center justify-center font-bold text-sm">
               {qIdx + 1}
             </span>
-            <p className="font-medium text-slate-800 text-lg pt-1">{q.question}</p>
+            <p className="font-medium text-slate-800 dark:text-white text-lg pt-1">{q.question}</p>
           </div>
           
           <div className="grid gap-3 pl-12">
@@ -448,12 +448,12 @@ function QuizSection({ questions, answers, setAnswers, onComplete, onQuizComplet
               
               let className = "w-full text-left p-4 rounded-xl border-2 transition-all relative overflow-hidden "
               if (showResult) {
-                if (isCorrect) className += "bg-green-50 border-green-500 text-green-900"
-                else if (isSelected) className += "bg-red-50 border-red-500 text-red-900"
-                else className += "bg-white border-slate-200 opacity-50 grayscale"
+                if (isCorrect) className += "bg-green-50 dark:bg-green-900/30 border-green-500 dark:border-green-600 text-green-900 dark:text-green-300"
+                else if (isSelected) className += "bg-red-50 dark:bg-red-900/30 border-red-500 dark:border-red-600 text-red-900 dark:text-red-300"
+                else className += "bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 opacity-50 grayscale"
               } else {
-                if (isSelected) className += "bg-blue-50 border-blue-500 text-blue-900 shadow-md transform scale-[1.01]"
-                else className += "bg-white border-slate-200 hover:border-blue-300 hover:bg-blue-50/30 text-slate-700"
+                if (isSelected) className += "bg-blue-50 dark:bg-blue-900/30 border-blue-500 dark:border-blue-600 text-blue-900 dark:text-blue-300 shadow-md transform scale-[1.01]"
+                else className += "bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 hover:border-blue-300 dark:hover:border-blue-500 hover:bg-blue-50/30 dark:hover:bg-blue-900/20 text-slate-700 dark:text-slate-300"
               }
 
               return (
@@ -478,7 +478,7 @@ function QuizSection({ questions, answers, setAnswers, onComplete, onQuizComplet
               <button
                 onClick={() => handleCheck(qIdx)}
                 disabled={answers[qIdx] === undefined}
-                className="px-6 py-3 bg-[#00246a] text-white rounded-lg text-sm font-bold hover:bg-[#001a4d] transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-blue-900/20"
+                className="px-6 py-3 bg-[#00246a] dark:bg-blue-600 text-white rounded-lg text-sm font-bold hover:bg-[#001a4d] dark:hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-blue-900/20"
               >
                 Verificar respuesta
               </button>
@@ -487,15 +487,15 @@ function QuizSection({ questions, answers, setAnswers, onComplete, onQuizComplet
             <motion.div 
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              className="mt-6 ml-12 p-5 bg-blue-50 border border-blue-100 rounded-xl text-blue-900"
+              className="mt-6 ml-12 p-5 bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800 rounded-xl text-blue-900 dark:text-blue-200"
             >
               <div className="flex gap-3">
-                <div className="bg-blue-100 p-2 rounded-full h-fit">
-                  <BookOpen size={16} className="text-blue-700" />
+                <div className="bg-blue-100 dark:bg-blue-800 p-2 rounded-full h-fit">
+                  <BookOpen size={16} className="text-blue-700 dark:text-blue-200" />
                 </div>
                 <div>
-                  <strong className="block mb-1 text-blue-800">Explicación:</strong>
-                  <p className="text-sm leading-relaxed text-blue-700/90">{q.explanation}</p>
+                  <strong className="block mb-1 text-blue-800 dark:text-blue-200">Explicación:</strong>
+                  <p className="text-sm leading-relaxed text-blue-700/90 dark:text-blue-300">{q.explanation}</p>
                 </div>
               </div>
             </motion.div>
@@ -522,7 +522,7 @@ function ResourcesSection({ internal, external, onComplete }: { internal: Resour
 
   if (!hasInternal && !hasExternal) {
     return (
-      <div className="text-center py-8 text-slate-500">
+      <div className="text-center py-8 text-slate-500 dark:text-slate-400">
         <BookOpen size={32} className="mx-auto mb-2 opacity-30" />
         <p>No hay recursos disponibles para esta sección.</p>
       </div>
@@ -533,8 +533,8 @@ function ResourcesSection({ internal, external, onComplete }: { internal: Resour
     <div className="grid md:grid-cols-2 gap-8">
       {hasInternal && (
         <div>
-          <h4 className="font-semibold text-slate-800 mb-4 flex items-center gap-2">
-            <BookOpen size={18} className="text-[#00246a]" />
+          <h4 className="font-semibold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
+            <BookOpen size={18} className="text-[#00246a] dark:text-blue-400" />
             Recursos de tus Cursos
           </h4>
           <div className="space-y-3">
@@ -542,10 +542,10 @@ function ResourcesSection({ internal, external, onComplete }: { internal: Resour
               <Link 
                 key={idx} 
                 href={res.link}
-                className="block p-4 bg-white border border-slate-200 rounded-xl hover:border-[#00246a] hover:shadow-sm transition-all group"
+                className="block p-4 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl hover:border-[#00246a] dark:hover:border-blue-400 hover:shadow-sm transition-all group"
               >
-                <h5 className="font-medium text-slate-800 group-hover:text-[#00246a] transition-colors">{res.title}</h5>
-                {res.description && <p className="text-sm text-slate-500 mt-1">{res.description}</p>}
+                <h5 className="font-medium text-slate-800 dark:text-white group-hover:text-[#00246a] dark:group-hover:text-blue-400 transition-colors">{res.title}</h5>
+                {res.description && <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">{res.description}</p>}
               </Link>
             ))}
           </div>
@@ -554,8 +554,8 @@ function ResourcesSection({ internal, external, onComplete }: { internal: Resour
 
       {hasExternal && (
         <div className={hasInternal ? '' : 'md:col-span-2'}>
-          <h4 className="font-semibold text-slate-800 mb-4 flex items-center gap-2">
-            <ExternalLink size={18} className="text-[#00246a]" />
+          <h4 className="font-semibold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
+            <ExternalLink size={18} className="text-[#00246a] dark:text-blue-400" />
             Recursos Externos
           </h4>
           <div className="space-y-3">
@@ -581,10 +581,10 @@ function ResourceCard({ resource }: { resource: Resource }) {
   
   const getTypeBadge = (type?: string) => {
     const badges = {
-      video: { bg: 'bg-red-50', text: 'text-red-700', label: 'Video' },
-      podcast: { bg: 'bg-purple-50', text: 'text-purple-700', label: 'Podcast' },
-      exercise: { bg: 'bg-green-50', text: 'text-green-700', label: 'Ejercicio' },
-      website: { bg: 'bg-blue-50', text: 'text-blue-700', label: 'Web' },
+      video: { bg: 'bg-red-50 dark:bg-red-900/30', text: 'text-red-700 dark:text-red-400', label: 'Video' },
+      podcast: { bg: 'bg-purple-50 dark:bg-purple-900/30', text: 'text-purple-700 dark:text-purple-400', label: 'Podcast' },
+      exercise: { bg: 'bg-green-50 dark:bg-green-900/30', text: 'text-green-700 dark:text-green-400', label: 'Ejercicio' },
+      website: { bg: 'bg-blue-50 dark:bg-blue-900/30', text: 'text-blue-700 dark:text-blue-400', label: 'Web' },
     }
     return badges[type as keyof typeof badges] || badges.website
   }
@@ -596,14 +596,14 @@ function ResourceCard({ resource }: { resource: Resource }) {
       href={resource.link}
       target="_blank"
       rel="noopener noreferrer"
-      className="block p-5 bg-gradient-to-br from-white to-slate-50 border border-slate-200 rounded-xl hover:border-[#00246a] hover:shadow-lg hover:scale-[1.02] transition-all duration-200 group"
+      className="block p-5 bg-gradient-to-br from-white to-slate-50 dark:from-slate-800 dark:to-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl hover:border-[#00246a] dark:hover:border-blue-400 hover:shadow-lg hover:scale-[1.02] transition-all duration-200 group"
     >
       <div className="flex items-start gap-3 mb-3">
-        <div className="p-2 bg-white rounded-lg border border-slate-100 group-hover:border-[#00246a] transition-colors">
+        <div className="p-2 bg-white dark:bg-slate-700 rounded-lg border border-slate-100 dark:border-slate-600 group-hover:border-[#00246a] dark:group-hover:border-blue-400 transition-colors">
           {getIcon(resource.type)}
         </div>
         <div className="flex-1 min-w-0">
-          <h5 className="font-semibold text-slate-900 group-hover:text-[#00246a] transition-colors leading-snug mb-1">
+          <h5 className="font-semibold text-slate-900 dark:text-white group-hover:text-[#00246a] dark:group-hover:text-blue-400 transition-colors leading-snug mb-1">
             {resource.title}
           </h5>
           {resource.type && (
@@ -612,10 +612,10 @@ function ResourceCard({ resource }: { resource: Resource }) {
             </span>
           )}
         </div>
-        <ExternalLink size={16} className="text-slate-300 group-hover:text-[#00246a] transition-colors flex-shrink-0 mt-1" />
+        <ExternalLink size={16} className="text-slate-300 dark:text-slate-500 group-hover:text-[#00246a] dark:group-hover:text-blue-400 transition-colors flex-shrink-0 mt-1" />
       </div>
       {resource.description && (
-        <p className="text-sm text-slate-600 leading-relaxed pl-14">
+        <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed pl-14">
           {resource.description}
         </p>
       )}
@@ -641,30 +641,30 @@ export function KeywordChip({ keyword }: { keyword: { word: string, phonetic?: s
   }
 
   return (
-    <div className="inline-flex items-center gap-2 bg-gradient-to-br from-white to-blue-50/30 border border-slate-200 pl-3 pr-4 py-2.5 rounded-full text-sm shadow-sm hover:shadow-md hover:border-blue-300 hover:scale-105 transition-all duration-200 group">
+    <div className="inline-flex items-center gap-2 bg-gradient-to-br from-white to-blue-50/30 dark:from-slate-800 dark:to-slate-900 border border-slate-200 dark:border-slate-700 pl-3 pr-4 py-2.5 rounded-full text-sm shadow-sm hover:shadow-md hover:border-blue-300 dark:hover:border-blue-500 hover:scale-105 transition-all duration-200 group">
       <button 
         onClick={() => speak(keyword.word)} 
         className={`w-7 h-7 flex items-center justify-center rounded-full transition-all duration-200 ${
           isSpeaking 
-            ? 'bg-[#00246a] text-white animate-pulse' 
-            : 'bg-blue-50 text-[#00246a] hover:bg-[#00246a] hover:text-white'
+            ? 'bg-[#00246a] dark:bg-blue-600 text-white animate-pulse' 
+            : 'bg-blue-50 dark:bg-blue-900/30 text-[#00246a] dark:text-blue-400 hover:bg-[#00246a] dark:hover:bg-blue-600 hover:text-white'
         }`}
         title="Escuchar pronunciación"
       >
         <Volume2 size={14} />
       </button>
       <div className="flex flex-col">
-        <span className="font-bold text-slate-900 leading-none">{keyword.word}</span>
+        <span className="font-bold text-slate-900 dark:text-white leading-none">{keyword.word}</span>
         {keyword.phonetic && keyword.phonetic.length > 1 && (
-          <span className="text-[10px] text-blue-600/70 font-mono leading-none mt-1">{keyword.phonetic}</span>
+          <span className="text-[10px] text-blue-600/70 dark:text-blue-400/70 font-mono leading-none mt-1">{keyword.phonetic}</span>
         )}
       </div>
       
       {keyword.example && keyword.example.length > 3 && (
-        <div className="ml-2 pl-2 border-l border-slate-200">
+        <div className="ml-2 pl-2 border-l border-slate-200 dark:border-slate-700">
           <button 
             onClick={() => speak(keyword.example || '')} 
-            className="text-xs text-slate-600 italic hover:text-[#00246a] text-left max-w-[200px] truncate block transition-colors"
+            className="text-xs text-slate-600 dark:text-slate-400 italic hover:text-[#00246a] dark:hover:text-blue-400 text-left max-w-[200px] truncate block transition-colors"
             title={keyword.example}
           >
             "{keyword.example}"
@@ -700,8 +700,8 @@ function AudioButton({ text }: { text: string }) {
       onClick={speak}
       className={`mt-6 flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all ${
         isPlaying 
-          ? 'bg-red-50 text-red-600 hover:bg-red-100 border border-red-200 animate-pulse' 
-          : 'bg-blue-50 text-[#00246a] hover:bg-[#00246a] hover:text-white border border-blue-100'
+          ? 'bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/50 border border-red-200 dark:border-red-800 animate-pulse' 
+          : 'bg-blue-50 dark:bg-blue-900/30 text-[#00246a] dark:text-blue-400 hover:bg-[#00246a] dark:hover:bg-blue-600 hover:text-white border border-blue-100 dark:border-blue-800'
       }`}
     >
       {isPlaying ? <XCircle size={16} /> : <Volume2 size={16} />}

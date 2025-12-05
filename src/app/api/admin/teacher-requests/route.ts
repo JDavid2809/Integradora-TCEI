@@ -127,14 +127,24 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    if (solicitud.estado !== 'PENDIENTE') {
+    if (solicitud.estado !== 'PENDIENTE' && accion === 'rechazar' && solicitud.estado === 'RECHAZADA') {
       return NextResponse.json(
-        { error: 'Esta solicitud ya ha sido procesada' },
+        { error: 'Esta solicitud ya ha sido rechazada' },
         { status: 400 }
       )
     }
+    
+    // Permitir re-evaluar si fue rechazada por accidente (cambiar a aprobar)
+    // O si está pendiente
 
     if (accion === 'aprobar') {
+      // Verificar si ya fue aprobada previamente
+      if (solicitud.estado === 'APROBADA') {
+         return NextResponse.json(
+          { error: 'Esta solicitud ya fue aprobada' },
+          { status: 400 }
+        )
+      }
       // Normalizar email de la solicitud
       const normalizedEmail = normalizeEmail(solicitud.email);
       

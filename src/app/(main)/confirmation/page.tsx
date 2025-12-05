@@ -1,4 +1,4 @@
-import ConfirmPage from "@/components/ui/Input";
+import ConfirmPage from "../../../../docs/ui/Input";
 
 interface Props{
    searchParams: Promise<{

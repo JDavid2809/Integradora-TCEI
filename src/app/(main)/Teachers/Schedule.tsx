@@ -186,29 +186,29 @@ function ScheduleModal({
         initial={{ scale: 0.9, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0.9, opacity: 0 }}
-        className="bg-white rounded-2xl p-6 max-w-md w-full max-h-[90vh] overflow-y-auto"
+        className="bg-white dark:bg-slate-800 rounded-2xl p-6 max-w-md w-full max-h-[90vh] overflow-y-auto"
       >
         <div className="flex items-center justify-between mb-6">
-          <h3 className="text-lg font-semibold text-[#00246a]">
+          <h3 className="text-lg font-semibold text-[#00246a] dark:text-blue-400">
             {schedule ? 'Editar Horario' : 'Crear Nuevo Horario'}
           </h3>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-slate-100 rounded-lg transition-colors"
+            className="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors"
           >
-            <X className="w-5 h-5 text-slate-600" />
+            <X className="w-5 h-5 text-slate-600 dark:text-slate-300" />
           </button>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-2">
+            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
               Curso
             </label>
             <select
               value={formData.course_id}
               onChange={(e) => setFormData({...formData, course_id: parseInt(e.target.value)})}
-              className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-700"
+              className="w-full p-3 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-700 dark:text-gray-200 dark:bg-slate-700"
               required
             >
               {courses.map((courseSchedule) => (
@@ -220,13 +220,13 @@ function ScheduleModal({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-2">
+            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
               Nivel
             </label>
             <select
               value={formData.level_id}
               onChange={(e) => setFormData({...formData, level_id: parseInt(e.target.value)})}
-              className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-700"
+              className="w-full p-3 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-700 dark:text-gray-200 dark:bg-slate-700"
               required
             >
               {levels.map((level) => (
@@ -238,13 +238,13 @@ function ScheduleModal({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-2">
+            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
               Día de la semana
             </label>
             <select
               value={formData.day_of_week}
               onChange={(e) => setFormData({...formData, day_of_week: e.target.value})}
-              className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-700"
+              className="w-full p-3 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-700 dark:text-gray-200 dark:bg-slate-700"
               required
             >
               {Object.entries(DAY_NAMES).map(([key, value]) => (
@@ -256,26 +256,26 @@ function ScheduleModal({
           <div className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">
+                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
                   🕐 Hora de inicio
                 </label>
                 <input
                   type="time"
                   value={formData.start_time}
                   onChange={(e) => setFormData({...formData, start_time: e.target.value})}
-                  className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-700"
+                  className="w-full p-3 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-700 dark:text-gray-200 dark:bg-slate-700"
                   required
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">
+                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
                   🕐 Hora de finalización
                 </label>
                 <input
                   type="time"
                   value={formData.end_time}
                   onChange={(e) => setFormData({...formData, end_time: e.target.value})}
-                  className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-700"
+                  className="w-full p-3 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-700 dark:text-gray-200 dark:bg-slate-700"
                   required
                 />
               </div>
@@ -285,19 +285,19 @@ function ScheduleModal({
           {/* Mostrar información calculada */}
           <div className={`rounded-lg p-4 border ${
             isValidTimeRange 
-              ? 'bg-blue-50 border-blue-200' 
-              : 'bg-red-50 border-red-200'
+              ? 'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800' 
+              : 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800'
           }`}>
             <div className="flex items-center justify-between">
-              <span className="text-sm font-medium text-slate-700">Horario de clase:</span>
+              <span className="text-sm font-medium text-slate-700 dark:text-slate-300">Horario de clase:</span>
               <div className={`text-lg font-semibold ${
-                isValidTimeRange ? 'text-blue-700' : 'text-red-700'
+                isValidTimeRange ? 'text-blue-700 dark:text-blue-400' : 'text-red-700 dark:text-red-400'
               }`}>
                 {formData.start_time} - {formData.end_time}
               </div>
             </div>
             <div className={`text-xs mt-1 ${
-              isValidTimeRange ? 'text-slate-600' : 'text-red-600'
+              isValidTimeRange ? 'text-slate-600 dark:text-slate-400' : 'text-red-600 dark:text-red-400'
             }`}>
               {isValidTimeRange 
                 ? `Duración total: ${durationMinutes} minutos`
@@ -309,7 +309,7 @@ function ScheduleModal({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-2">
+            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
               Aula/Ubicación
             </label>
             <input
@@ -317,7 +317,7 @@ function ScheduleModal({
               value={formData.classroom}
               onChange={(e) => setFormData({...formData, classroom: e.target.value})}
               placeholder="Ej: Aula 101, Laboratorio A, Aula Virtual"
-              className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-700"
+              className="w-full p-3 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-700 dark:text-gray-200 dark:bg-slate-700"
             />
           </div>
 
@@ -325,7 +325,7 @@ function ScheduleModal({
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 px-4 py-3 text-slate-600 bg-slate-100 rounded-lg hover:bg-slate-200 transition-colors"
+              className="flex-1 px-4 py-3 text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors"
             >
               Cancelar
             </button>

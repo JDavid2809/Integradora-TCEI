@@ -150,7 +150,7 @@ export default function CourseDetails({ courseData }: CourseDetailsProps) {
         }
     }, [session, courseData.inscripciones])
 
-    // Parsear campos JSON si existen
+    // ✅ OPTIMIZADO: Los datos ya vienen parseados del servidor, solo procesar
     let whatYouLearn: string[] = []
     let features: {icon: LucideIcon; title: string; description: string}[] = []
     let requirements: string[] = []
@@ -158,35 +158,30 @@ export default function CourseDetails({ courseData }: CourseDetailsProps) {
     let courseContent: {title: string; duration: string; lessons: number; topics: string[]}[] = []
 
     try {
-        if (courseData.what_you_learn) {
-            const parsed = JSON.parse(courseData.what_you_learn)
-            // Manejar tanto arrays de strings como arrays de objetos {id, text}
-            whatYouLearn = Array.isArray(parsed) ? parsed.map(item => 
+        // Los datos ya están parseados, solo normalizar
+        whatYouLearn = Array.isArray(courseData.what_you_learn) 
+            ? courseData.what_you_learn.map(item => 
                 typeof item === 'string' ? item : (item.text || item.title || String(item))
-            ) : []
-        }
-        if (courseData.features) {
-            const parsed = JSON.parse(courseData.features)
-            features = Array.isArray(parsed) ? parsed : []
-        }
-        if (courseData.requirements) {
-            const parsed = JSON.parse(courseData.requirements)
-            requirements = Array.isArray(parsed) ? parsed.map(item => 
+            ) 
+            : []
+        
+        features = Array.isArray(courseData.features) ? courseData.features : []
+        
+        requirements = Array.isArray(courseData.requirements) 
+            ? courseData.requirements.map(item => 
                 typeof item === 'string' ? item : (item.text || item.title || String(item))
-            ) : []
-        }
-        if (courseData.target_audience) {
-            const parsed = JSON.parse(courseData.target_audience)
-            targetAudience = Array.isArray(parsed) ? parsed.map(item => 
+            ) 
+            : []
+        
+        targetAudience = Array.isArray(courseData.target_audience) 
+            ? courseData.target_audience.map(item => 
                 typeof item === 'string' ? item : (item.text || item.title || String(item))
-            ) : []
-        }
-        if (courseData.course_content) {
-            const parsed = JSON.parse(courseData.course_content)
-            courseContent = Array.isArray(parsed) ? parsed : []
-        }
+            ) 
+            : []
+        
+        courseContent = Array.isArray(courseData.course_content) ? courseData.course_content : []
     } catch (error) {
-        console.error('Error parsing JSON fields:', error)
+        console.error('Error processing course data:', error)
     }
 
     const handleEnroll = async () => {

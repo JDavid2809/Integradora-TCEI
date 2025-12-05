@@ -96,19 +96,19 @@ export default  function LoginForm({ toggleMode }: LoginFormProps) {
     return (
         <motion.div variants={containerVariants} initial="hidden" animate="visible" className="w-full">
         
-            <div className="bg-white rounded-3xl shadow-xl border border-slate-100 p-8">
+            <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-xl border border-slate-100 dark:border-slate-800 p-8">
                 {/* Mobile header */}
                 <motion.div variants={itemVariants} className="lg:hidden flex items-center justify-center space-x-3 mb-8">
                     <div className="w-10 h-10 bg-gradient-to-br from-[#e30f28] to-[#00246a] rounded-xl flex items-center justify-center">
                         <span className="text-white font-bold">T</span>
                     </div>
-                    <h1 className="text-xl font-bold text-[#00246a] text-center">Triunfando con el Inglés</h1>
+                    <h1 className="text-xl font-bold text-[#00246a] dark:text-blue-100 text-center">Triunfando con el Inglés</h1>
                 </motion.div>
 
                 {/* Header */}
                 <motion.div variants={itemVariants} className="text-center mb-8">
-                    <h2 className="text-2xl font-bold text-[#00246a] mb-2">Bienvenido de vuelta</h2>
-                    <p className="text-slate-600">Continúa tu viaje de aprendizaje</p>
+                    <h2 className="text-2xl font-bold text-[#00246a] dark:text-blue-100 mb-2">Bienvenido de vuelta</h2>
+                    <p className="text-slate-600 dark:text-slate-400">Continúa tu viaje de aprendizaje</p>
                 </motion.div>
                    {
                     loading && <Loader />
@@ -117,7 +117,7 @@ export default  function LoginForm({ toggleMode }: LoginFormProps) {
                     error && (
                         <motion.div
                             variants={itemVariants}
-                            className="bg-red-100 text-red-800 p-4 rounded-lg mb-6 text-center"
+                            className="bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300 p-4 rounded-lg mb-6 text-center"
                         >
                             {error
                             }
@@ -128,7 +128,7 @@ export default  function LoginForm({ toggleMode }: LoginFormProps) {
                 {/* Form */}
                 <form className="space-y-6" onSubmit={handleSubmit}>
                     <motion.div variants={itemVariants} className="space-y-2">
-                        <label htmlFor="email" className="block text-sm font-medium text-[#00246a]">
+                        <label htmlFor="email" className="block text-sm font-medium text-[#00246a] dark:text-blue-100">
                             Correo electrónico
                         </label>
                         <input
@@ -138,12 +138,12 @@ export default  function LoginForm({ toggleMode }: LoginFormProps) {
                             value={email}
                             name="email"
                             placeholder="tu@email.com"
-                            className="w-full h-12 px-4 border border-[#00246a] focus:border-[#e30f28] focus:ring-2 focus:ring-[#e30f28]/10 transition-all duration-200 rounded-xl bg-white text-[#00246a] placeholder-slate-400"
+                            className="w-full h-12 px-4 border border-[#00246a] dark:border-slate-700 focus:border-[#e30f28] focus:ring-2 focus:ring-[#e30f28]/10 transition-all duration-200 rounded-xl bg-white dark:bg-slate-800 text-[#00246a] dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500"
                         />
                     </motion.div>
 
                     <motion.div variants={itemVariants} className="space-y-2">
-                        <label htmlFor="password" className="block text-sm font-medium text-[#00246a]">
+                        <label htmlFor="password" className="block text-sm font-medium text-[#00246a] dark:text-blue-100">
                             Contraseña
                         </label>
                         <div className="relative">
@@ -154,17 +154,17 @@ export default  function LoginForm({ toggleMode }: LoginFormProps) {
                                 onChange={(e) => setPassword(e.target.value)}
                                 type={showPassword ? "text" : "password"}
                                 placeholder="••••••••"
-                                className="w-full h-12 px-4 pr-12 border border-[#00246a] focus:border-[#e30f28] focus:ring-2 focus:ring-[#e30f28]/10 transition-all duration-200 rounded-xl bg-white text-[#00246a] placeholder-slate-400"
+                                className="w-full h-12 px-4 pr-12 border border-[#00246a] dark:border-slate-700 focus:border-[#e30f28] focus:ring-2 focus:ring-[#e30f28]/10 transition-all duration-200 rounded-xl bg-white dark:bg-slate-800 text-[#00246a] dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500"
                             />
                             <button
                                 type="button"
-                                className="absolute right-3 top-1/2 -translate-y-1/2 p-1 hover:bg-slate-100 rounded-lg transition-colors duration-200"
+                                className="absolute right-3 top-1/2 -translate-y-1/2 p-1 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors duration-200"
                                 onClick={() => setShowPassword(!showPassword)}
                             >
                                 {showPassword ? (
-                                    <EyeOff className="h-4 w-4 text-slate-400" />
+                                    <EyeOff className="h-4 w-4 text-slate-400 dark:text-slate-500" />
                                 ) : (
-                                    <Eye className="h-4 w-4 text-slate-400" />
+                                    <Eye className="h-4 w-4 text-slate-400 dark:text-slate-500" />
                                 )}
                             </button>
                         </div>
@@ -172,8 +172,8 @@ export default  function LoginForm({ toggleMode }: LoginFormProps) {
 
                     <motion.div variants={itemVariants} className="flex items-center justify-between text-sm">
                         <label className="flex items-center space-x-2 cursor-pointer">
-                            <input type="checkbox" className="w-4 h-4 rounded border-slate-300 text-[#e30f28] focus:ring-[#e30f28]/20" />
-                            <span className="text-slate-600">Recordarme</span>
+                            <input type="checkbox" className="w-4 h-4 rounded border-slate-300 dark:border-slate-700 text-[#e30f28] focus:ring-[#e30f28]/20 dark:bg-slate-800" />
+                            <span className="text-slate-600 dark:text-slate-400">Recordarme</span>
                         </label>
                         <Link href="/Login/olvide-password" className="text-[#e30f28] hover:text-[#e30f28]/80 transition-colors">
                             ¿Olvidaste tu contraseña?
@@ -195,16 +195,16 @@ export default  function LoginForm({ toggleMode }: LoginFormProps) {
                 {/* Divider */}
                 <motion.div variants={itemVariants} className="relative my-8">
                     <div className="absolute inset-0 flex items-center">
-                        <span className="w-full border-t border-slate-200" />
+                        <span className="w-full border-t border-slate-200 dark:border-slate-700" />
                     </div>
                     <div className="relative flex justify-center text-xs uppercase">
-                        <span className="bg-white px-3 text-slate-500">O continúa con</span>
+                        <span className="bg-white dark:bg-slate-900 px-3 text-slate-500 dark:text-slate-400">O continúa con</span>
                     </div>
                 </motion.div>
 
-                {/* Inicio de sesión con Google y Facebook */}
-                <motion.div variants={itemVariants} className="grid grid-cols-2 gap-3 mb-8">
-                    <button className="h-12 border border-slate-200 hover:border-slate-300 hover:bg-slate-50 transition-all duration-200 rounded-xl flex items-center justify-center space-x-2 text-slate-700">
+                {/* Inicio de sesión con Google */}
+                <motion.div variants={itemVariants} className="flex justify-center mb-8">
+                    <button className="h-12 w-full max-w-xs border border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all duration-200 rounded-xl flex items-center justify-center space-x-2 text-slate-700 dark:text-slate-300">
                         <svg className="w-5 h-5 text-[#e30f28]" viewBox="0 0 24 24">
                             <path
                                 fill="currentColor"
@@ -225,17 +225,12 @@ export default  function LoginForm({ toggleMode }: LoginFormProps) {
                         </svg>
                         <span className="text-sm font-medium">Google</span>
                     </button>
-                    <button className="h-12 border border-slate-200 hover:border-slate-300 hover:bg-slate-50 transition-all duration-200 rounded-xl flex items-center justify-center space-x-2 text-slate-700">
-                        <svg className="w-5 h-5 text-[#3268d4]" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
-                        </svg>
-                        <span className="text-sm font-medium">Facebook</span>
-                    </button>
+                    
                 </motion.div>
 
                 {/* Toggle */}
                 <motion.div variants={itemVariants} className="text-center">
-                    <p className="text-slate-600">
+                    <p className="text-slate-600 dark:text-slate-400">
                         ¿No tienes una cuenta?{" "}
                         <button
                             onClick={toggleMode}
@@ -247,14 +242,14 @@ export default  function LoginForm({ toggleMode }: LoginFormProps) {
 
                          
                            
-                    <p className="  ">
+                    <p className="dark:text-slate-400">
                         o
                     </p>
                     
                     
                     <Link
                      href="/Login/solicitar-token"
-                    className="text-slate-600">
+                    className="text-slate-600 dark:text-slate-400">
                    
                    <span className="text-[#e30f28] hover:text-[#e30f28]/80 transition-colors font-medium hover:underline">solicita un nuevo token</span>
                     </Link>

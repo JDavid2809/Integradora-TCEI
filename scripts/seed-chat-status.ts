@@ -49,35 +49,54 @@ async function seedChatData() {
     }
 
     // Crear chat privado entre usuarios
-    let privateRoom = await prisma.chat_room.findFirst({
+    // Buscar si ya existe una sala privada entre estos dos usuarios
+    const existingPrivateRooms = await prisma.chat_room.findMany({
       where: { 
-        tipo: 'PRIVADO',
-        participantes: {
-          every: {
-            usuario_id: { in: [users[0].id, users[1].id] }
-          }
-        }
+        tipo: 'PRIVADO'
+      },
+      include: {
+        participantes: true
       }
     })
 
+    let privateRoom = existingPrivateRooms.find(room => {
+      const participantIds = room.participantes.map(p => p.usuario_id)
+      return participantIds.includes(users[0].id) && participantIds.includes(users[1].id) && participantIds.length === 2
+    }) || null
+
     if (!privateRoom) {
-      privateRoom = await prisma.chat_room.create({
+      const newPrivateRoom = await prisma.chat_room.create({
         data: {
           nombre: `Chat: ${users[0].nombre} - ${users[1].nombre}`,
           descripcion: 'Chat privado',
           tipo: 'PRIVADO',
           creado_por: users[0].id
+        },
+        include: {
+          participantes: true
         }
       })
 
       // Agregar participantes al chat privado
       await prisma.chat_participant.createMany({
         data: [
-          { chat_room_id: privateRoom.id, usuario_id: users[0].id },
-          { chat_room_id: privateRoom.id, usuario_id: users[1].id }
+          { chat_room_id: newPrivateRoom.id, usuario_id: users[0].id },
+          { chat_room_id: newPrivateRoom.id, usuario_id: users[1].id }
         ]
       })
+      
+      // Recargar con participantes para mantener consistencia
+      privateRoom = await prisma.chat_room.findUnique({
+        where: { id: newPrivateRoom.id },
+        include: { participantes: true }
+      })
+      
       console.log('✅ Chat privado creado')
+    }
+
+    if (!privateRoom) {
+      console.log('⚠️ No se pudo crear o encontrar sala privada')
+      return
     }
 
     // Agregar participantes a salas públicas

@@ -15,12 +15,12 @@ export default function CourseDistribution({ data }: CourseDistributionProps) {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay: 0.7 }}
-      className="bg-white rounded-xl shadow-md p-6"
+      className="bg-white dark:bg-slate-900 rounded-xl shadow-md p-6"
     >
-      <h3 className="text-lg font-bold text-gray-900 mb-4">Distribución de Cursos por Nivel</h3>
+      <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">Distribución de Cursos por Nivel</h3>
       
       {data.length === 0 ? (
-        <p className="text-gray-500 text-center py-8">No hay datos disponibles</p>
+        <p className="text-gray-500 dark:text-gray-400 text-center py-8">No hay datos disponibles</p>
       ) : (
         <ResponsiveContainer width="100%" height={300}>
           <PieChart>
@@ -41,10 +41,11 @@ export default function CourseDistribution({ data }: CourseDistributionProps) {
             <Tooltip 
               formatter={(value: number) => [value, 'Cursos']}
               contentStyle={{
-                backgroundColor: 'white',
+                backgroundColor: 'rgba(255, 255, 255, 0.95)',
                 border: '1px solid #e5e7eb',
                 borderRadius: '8px',
-                boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+                boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+                color: '#1f2937'
               }}
             />
             <Legend />

@@ -57,7 +57,7 @@ export default function AuthInterface() {
             <div className="min-h-screen flex items-center justify-center">
                 <div className="text-center">
                     <Loader />
-                    <p className="text-slate-600 mt-4">Redirigiendo...</p>
+                    <p className="text-slate-600 dark:text-slate-400 mt-4">Redirigiendo...</p>
                 </div>
             </div>
         )

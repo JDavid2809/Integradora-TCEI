@@ -63,7 +63,7 @@ export default function Dashboard({ user, onLogout }: DashboardProps) {
             variants={containerVariants}
             initial="hidden"
             animate="visible"
-            className="min-h-screen bg-slate-50 flex flex-col lg:flex-row "
+            className="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col lg:flex-row "
         >
             {/* Desktop Sidebar */}
             <div className="hidden lg:block lg:w-64 lg:flex-shrink-0">

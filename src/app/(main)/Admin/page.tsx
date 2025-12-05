@@ -121,10 +121,10 @@ export default function AdminPage() {
 
   if (status === 'loading' || loading) {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+      <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-[#00246a]"></div>
-          <p className="mt-4 text-gray-600">Cargando panel de administración...</p>
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-[#00246a] dark:border-blue-500"></div>
+          <p className="mt-4 text-gray-600 dark:text-gray-300">Cargando panel de administración...</p>
         </div>
       </div>
     )
@@ -144,7 +144,7 @@ export default function AdminPage() {
   const renderDashboard = () => (
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <div className="bg-gradient-to-r from-blue-500 to-blue-600 p-6 rounded-lg text-white">
+        <div className="bg-gradient-to-r from-blue-500 to-blue-600 dark:from-blue-600 dark:to-blue-700 p-6 rounded-lg text-white">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-blue-100">Total Usuarios</p>
@@ -154,7 +154,7 @@ export default function AdminPage() {
           </div>
         </div>
 
-        <div className="bg-gradient-to-r from-green-500 to-green-600 p-6 rounded-lg text-white">
+        <div className="bg-gradient-to-r from-green-500 to-green-600 dark:from-green-600 dark:to-green-700 p-6 rounded-lg text-white">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-green-100">Estudiantes Activos</p>
@@ -164,7 +164,7 @@ export default function AdminPage() {
           </div>
         </div>
 
-        <div className="bg-gradient-to-r from-orange-500 to-orange-600 p-6 rounded-lg text-white">
+        <div className="bg-gradient-to-r from-orange-500 to-orange-600 dark:from-orange-600 dark:to-orange-700 p-6 rounded-lg text-white">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-orange-100">Ingresos Total</p>
@@ -176,55 +176,55 @@ export default function AdminPage() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="bg-white p-6 rounded-lg shadow-md">
-          <h3 className="text-lg font-semibold text-[#00246a] mb-4">Usuarios Recientes</h3>
+        <div className="bg-white dark:bg-slate-900 p-6 rounded-lg shadow-md">
+          <h3 className="text-lg font-semibold text-[#00246a] dark:text-blue-400 mb-4">Usuarios Recientes</h3>
           <div className="space-y-3">
             {stats?.actividad_reciente.nuevos_usuarios.map(usuario => (
-              <div key={usuario.id} className="flex items-center space-x-3 p-2 hover:bg-gray-50 rounded">
-                <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                  <span className="text-blue-600 text-xs font-semibold">{usuario.nombre.charAt(0)}</span>
+              <div key={usuario.id} className="flex items-center space-x-3 p-2 hover:bg-gray-50 dark:hover:bg-slate-800 rounded transition-colors">
+                <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center">
+                  <span className="text-blue-600 dark:text-blue-400 text-xs font-semibold">{usuario.nombre.charAt(0)}</span>
                 </div>
                 <div className="flex-1">
-                  <p className="text-sm font-medium text-gray-900">{usuario.nombre}</p>
-                  <p className="text-xs text-gray-500">{usuario.tipo_perfil}</p>
+                  <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{usuario.nombre}</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">{usuario.tipo_perfil}</p>
                 </div>
               </div>
             ))}
           </div>
         </div>
 
-        <div className="bg-white p-6 rounded-lg shadow-md">
-          <h3 className="text-lg font-semibold text-[#00246a] mb-4">Pagos Recientes</h3>
+        <div className="bg-white dark:bg-slate-900 p-6 rounded-lg shadow-md">
+          <h3 className="text-lg font-semibold text-[#00246a] dark:text-blue-400 mb-4">Pagos Recientes</h3>
           <div className="space-y-3">
             {stats?.actividad_reciente.pagos_recientes.map(pago => (
-              <div key={pago.id} className="flex items-center justify-between p-2 hover:bg-gray-50 rounded">
+              <div key={pago.id} className="flex items-center justify-between p-2 hover:bg-gray-50 dark:hover:bg-slate-800 rounded transition-colors">
                 <div className="flex-1">
-                  <p className="text-sm font-medium">{pago.estudiante}</p>
-                  <p className="text-xs text-gray-500">{pago.curso}</p>
+                  <p className="text-sm font-medium dark:text-gray-200">{pago.estudiante}</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">{pago.curso}</p>
                 </div>
                 <div className="text-right">
-                  <p className="text-sm font-bold text-green-600">${pago.monto}</p>
-                  <p className="text-xs text-gray-500">{new Date(pago.fecha).toLocaleDateString()}</p>
+                  <p className="text-sm font-bold text-green-600 dark:text-green-400">${pago.monto}</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">{new Date(pago.fecha).toLocaleDateString()}</p>
                 </div>
               </div>
             ))}
           </div>
         </div>
 
-        <div className="bg-white p-6 rounded-lg shadow-md">
-          <h3 className="text-lg font-semibold text-[#00246a] mb-4">Exámenes Recientes</h3>
+        <div className="bg-white dark:bg-slate-900 p-6 rounded-lg shadow-md">
+          <h3 className="text-lg font-semibold text-[#00246a] dark:text-blue-400 mb-4">Exámenes Recientes</h3>
           <div className="space-y-3">
             {stats?.actividad_reciente.examenes_recientes.map(examen => (
-              <div key={examen.id} className="flex items-center justify-between p-2 hover:bg-gray-50 rounded">
+              <div key={examen.id} className="flex items-center justify-between p-2 hover:bg-gray-50 dark:hover:bg-slate-800 rounded transition-colors">
                 <div className="flex-1">
-                  <p className="text-sm font-medium">{examen.estudiante}</p>
-                  <p className="text-xs text-gray-500">{examen.examen}</p>
+                  <p className="text-sm font-medium dark:text-gray-200">{examen.estudiante}</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">{examen.examen}</p>
                 </div>
                 <div className="text-right">
-                  <p className={`text-sm font-bold ${examen.calificacion >= 70 ? 'text-green-600' : 'text-red-600'}`}>
+                  <p className={`text-sm font-bold ${examen.calificacion >= 70 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
                     {examen.calificacion}%
                   </p>
-                  <p className="text-xs text-gray-500">{new Date(examen.fecha).toLocaleDateString()}</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">{new Date(examen.fecha).toLocaleDateString()}</p>
                 </div>
               </div>
             ))}
@@ -239,8 +239,8 @@ export default function AdminPage() {
       return (
         <div className="flex items-center justify-center p-12">
           <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#00246a] mx-auto"></div>
-            <p className="mt-4 text-gray-600">Cargando métricas...</p>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#00246a] dark:border-blue-500 mx-auto"></div>
+            <p className="mt-4 text-gray-600 dark:text-gray-300">Cargando métricas...</p>
           </div>
         </div>
       )
@@ -272,25 +272,25 @@ export default function AdminPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 pb-20 md:pb-0">
-      <div className="bg-white shadow-sm border-b">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 pb-20 md:pb-0">
+      <div className="bg-white dark:bg-slate-900 shadow-sm border-b dark:border-slate-800">
         <div className="px-4 md:px-6 py-4">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-xl md:text-2xl font-bold text-[#00246a]">Panel Admin</h1>
-              <p className="text-sm md:text-base text-gray-600 hidden md:block">
+              <h1 className="text-xl md:text-2xl font-bold text-[#00246a] dark:text-blue-400">Panel Admin</h1>
+              <p className="text-sm md:text-base text-gray-600 dark:text-gray-400 hidden md:block">
                 Bienvenido, {session.user.name} {session.user.apellido}
               </p>
             </div>
             <div className="flex items-center space-x-4">
-              <span className="text-xs md:text-sm text-gray-500">Rol: {session.user.rol}</span>
+              <span className="text-xs md:text-sm text-gray-500 dark:text-gray-400">Rol: {session.user.rol}</span>
             </div>
           </div>
         </div>
       </div>
 
       <div className="flex">
-        <div className="hidden md:block w-64 bg-white shadow-sm h-screen sticky top-0">
+        <div className="hidden md:block w-64 bg-white dark:bg-slate-900 shadow-sm h-screen sticky top-0">
           <nav className="p-4">
             <div className="space-y-2">
               {navigationItems.map(item => {
@@ -301,8 +301,8 @@ export default function AdminPage() {
                     onClick={() => setActiveSection(item.id)}
                     className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${
                       activeSection === item.id
-                        ? 'bg-[#00246a] text-white'
-                        : 'text-gray-700 hover:bg-gray-100'
+                        ? 'bg-[#00246a] dark:bg-blue-600 text-white'
+                        : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-800'
                     }`}
                   >
                     <IconComponent className="w-5 h-5" />
@@ -319,7 +319,7 @@ export default function AdminPage() {
         </div>
       </div>
 
-      <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t shadow-lg z-50">
+      <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white dark:bg-slate-900 border-t dark:border-slate-800 shadow-lg z-50">
         <div className="flex items-center justify-around overflow-x-auto">
           {navigationItems.map(item => {
             const IconComponent = item.icon
@@ -329,7 +329,7 @@ export default function AdminPage() {
                 key={item.id}
                 onClick={() => setActiveSection(item.id)}
                 className={`flex-1 flex flex-col items-center justify-center py-3 px-2 transition-colors ${
-                  isActive ? 'text-[#00246a]' : 'text-gray-500'
+                  isActive ? 'text-[#00246a] dark:text-blue-400' : 'text-gray-500 dark:text-gray-400'
                 }`}
               >
                 <div className={`relative ${isActive ? 'scale-110' : ''} transition-transform`}>
@@ -352,17 +352,17 @@ export default function AdminPage() {
 
 function AdminSystemSection({ navigateToPage }: { navigateToPage: (page: string) => void }) {
   return (
-    <div className="bg-white p-3 md:p-6 rounded-lg shadow-md">
+    <div className="bg-white dark:bg-slate-900 p-3 md:p-6 rounded-lg shadow-md">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 md:gap-4 mb-4 md:mb-6">
         <div>
-          <h2 className="text-lg md:text-xl font-bold text-[#00246a]">Configuración del Sistema</h2>
-          <p className="text-xs md:text-sm text-gray-600 mt-1 hidden sm:block">
+          <h2 className="text-lg md:text-xl font-bold text-[#00246a] dark:text-blue-400">Configuración del Sistema</h2>
+          <p className="text-xs md:text-sm text-gray-600 dark:text-gray-400 mt-1 hidden sm:block">
             Administra configuraciones del sistema.
           </p>
         </div>
         <button
           onClick={() => navigateToPage('system')}
-          className="w-full sm:w-auto bg-[#00246a] text-white px-3 md:px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center gap-2 text-sm md:text-base"
+          className="w-full sm:w-auto bg-[#00246a] dark:bg-blue-600 text-white px-3 md:px-4 py-2 rounded-lg hover:bg-blue-700 dark:hover:bg-blue-500 transition-colors flex items-center justify-center gap-2 text-sm md:text-base"
         >
           <span className="hidden xs:inline">Ir a Configuraciones</span>
           <span className="xs:hidden">Configuraciones</span>
@@ -370,37 +370,37 @@ function AdminSystemSection({ navigateToPage }: { navigateToPage: (page: string)
         </button>
       </div>
 
-      <p className="text-sm text-gray-600 mb-4 sm:hidden">
+      <p className="text-sm text-gray-600 dark:text-gray-400 mb-4 sm:hidden">
         Administra configuraciones del sistema.
       </p>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
-        <div className="p-3 md:p-4 border border-gray-200 rounded-lg hover:shadow-md transition-shadow cursor-pointer">
+        <div className="p-3 md:p-4 border border-gray-200 dark:border-slate-700 rounded-lg hover:shadow-md transition-shadow cursor-pointer">
           <div className="flex items-center gap-2 mb-2">
-            <Target className="w-4 h-4 md:w-5 md:h-5 text-purple-600 flex-shrink-0" />
-            <h3 className="font-semibold text-purple-600 text-sm md:text-base">Niveles de Inglés</h3>
+            <Target className="w-4 h-4 md:w-5 md:h-5 text-purple-600 dark:text-purple-400 flex-shrink-0" />
+            <h3 className="font-semibold text-purple-600 dark:text-purple-400 text-sm md:text-base">Niveles de Inglés</h3>
           </div>
-          <p className="text-xs md:text-sm text-gray-600 leading-relaxed">
+          <p className="text-xs md:text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
             Configurar niveles del sistema (A1, A2, B1, etc.)
           </p>
         </div>
 
-        <div className="p-3 md:p-4 border border-gray-200 rounded-lg hover:shadow-md transition-shadow cursor-pointer">
+        <div className="p-3 md:p-4 border border-gray-200 dark:border-slate-700 rounded-lg hover:shadow-md transition-shadow cursor-pointer">
           <div className="flex items-center gap-2 mb-2">
-            <Users className="w-4 h-4 md:w-5 md:h-5 text-blue-600 flex-shrink-0" />
-            <h3 className="font-semibold text-blue-600 text-sm md:text-base">Categorías de Edad</h3>
+            <Users className="w-4 h-4 md:w-5 md:h-5 text-blue-600 dark:text-blue-400 flex-shrink-0" />
+            <h3 className="font-semibold text-blue-600 dark:text-blue-400 text-sm md:text-base">Categorías de Edad</h3>
           </div>
-          <p className="text-xs md:text-sm text-gray-600 leading-relaxed">
+          <p className="text-xs md:text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
             Gestionar rangos de edad para estudiantes
           </p>
         </div>
 
-        <div className="p-3 md:p-4 border border-gray-200 rounded-lg hover:shadow-md transition-shadow cursor-pointer md:col-span-2 lg:col-span-1">
+        <div className="p-3 md:p-4 border border-gray-200 dark:border-slate-700 rounded-lg hover:shadow-md transition-shadow cursor-pointer md:col-span-2 lg:col-span-1">
           <div className="flex items-center gap-2 mb-2">
-            <Activity className="w-4 h-4 md:w-5 md:h-5 text-orange-600 flex-shrink-0" />
-            <h3 className="font-semibold text-orange-600 text-sm md:text-base">Estado del Sistema</h3>
+            <Activity className="w-4 h-4 md:w-5 md:h-5 text-orange-600 dark:text-orange-400 flex-shrink-0" />
+            <h3 className="font-semibold text-orange-600 dark:text-orange-400 text-sm md:text-base">Estado del Sistema</h3>
           </div>
-          <p className="text-xs md:text-sm text-gray-600 leading-relaxed">
+          <p className="text-xs md:text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
             Ver estadísticas de uso de configuraciones
           </p>
         </div>
@@ -408,7 +408,7 @@ function AdminSystemSection({ navigateToPage }: { navigateToPage: (page: string)
 
       <div className="mt-4 md:hidden">
         <div className="flex flex-col space-y-2">
-          <button className="flex items-center justify-between p-3 bg-purple-50 border border-purple-200 rounded-lg text-purple-700 hover:bg-purple-100 transition-colors">
+          <button className="flex items-center justify-between p-3 bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 rounded-lg text-purple-700 dark:text-purple-300 hover:bg-purple-100 dark:hover:bg-purple-900/40 transition-colors">
             <div className="flex items-center gap-2">
               <Target className="w-4 h-4" />
               <span className="text-sm font-medium">Gestionar Niveles</span>
@@ -416,7 +416,7 @@ function AdminSystemSection({ navigateToPage }: { navigateToPage: (page: string)
             <ArrowRight className="w-4 h-4" />
           </button>
           
-          <button className="flex items-center justify-between p-3 bg-blue-50 border border-blue-200 rounded-lg text-blue-700 hover:bg-blue-100 transition-colors">
+          <button className="flex items-center justify-between p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg text-blue-700 dark:text-blue-300 hover:bg-blue-100 dark:hover:bg-blue-900/40 transition-colors">
             <div className="flex items-center gap-2">
               <Users className="w-4 h-4" />
               <span className="text-sm font-medium">Gestionar Edades</span>
@@ -424,7 +424,7 @@ function AdminSystemSection({ navigateToPage }: { navigateToPage: (page: string)
             <ArrowRight className="w-4 h-4" />
           </button>
           
-          <button className="flex items-center justify-between p-3 bg-orange-50 border border-orange-200 rounded-lg text-orange-700 hover:bg-orange-100 transition-colors">
+          <button className="flex items-center justify-between p-3 bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 rounded-lg text-orange-700 dark:text-orange-300 hover:bg-orange-100 dark:hover:bg-orange-900/40 transition-colors">
             <div className="flex items-center gap-2">
               <Activity className="w-4 h-4" />
               <span className="text-sm font-medium">Ver Estado</span>

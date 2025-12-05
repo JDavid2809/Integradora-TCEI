@@ -38,7 +38,15 @@ export async function getStudentDashboardStats(): Promise<StudentDashboardStats>
   try {
     const session = await getServerSession(authOptions)
     if (!session?.user?.extra?.id_estudiante) {
-      throw new Error('Debes iniciar sesión como estudiante')
+      console.error('❌ No student ID found in session')
+      return {
+        activeCourses: 0,
+        completedCourses: 0,
+        totalActivities: 0,
+        completedActivities: 0,
+        certificates: 0,
+        averageGrade: null
+      }
     }
 
     const studentId = session.user.extra.id_estudiante
@@ -128,8 +136,16 @@ export async function getStudentDashboardStats(): Promise<StudentDashboardStats>
       averageGrade
     }
   } catch (error) {
-    console.error('Error fetching dashboard stats:', error)
-    throw error
+    console.error('❌ Error fetching dashboard stats:', error)
+    // En lugar de lanzar error, devolver datos vacíos
+    return {
+      activeCourses: 0,
+      completedCourses: 0,
+      totalActivities: 0,
+      completedActivities: 0,
+      certificates: 0,
+      averageGrade: null
+    }
   }
 }
 
@@ -140,7 +156,8 @@ export async function getRecentActivities(): Promise<RecentActivity[]> {
   try {
     const session = await getServerSession(authOptions)
     if (!session?.user?.extra?.id_estudiante) {
-      throw new Error('Debes iniciar sesión como estudiante')
+      console.error('❌ No student ID found in session for recent activities')
+      return []
     }
 
     const studentId = session.user.extra.id_estudiante
@@ -258,8 +275,8 @@ export async function getRecentActivities(): Promise<RecentActivity[]> {
     
     return activities.slice(0, 6)
   } catch (error) {
-    console.error('Error fetching recent activities:', error)
-    throw error
+    console.error('❌ Error fetching recent activities:', error)
+    return []
   }
 }
 
@@ -270,7 +287,8 @@ export async function getNextClasses(): Promise<NextClass[]> {
   try {
     const session = await getServerSession(authOptions)
     if (!session?.user?.extra?.id_estudiante) {
-      throw new Error('Debes iniciar sesión como estudiante')
+      console.error('❌ No student ID found in session for next classes')
+      return []
     }
 
     const studentId = session.user.extra.id_estudiante
@@ -331,8 +349,8 @@ export async function getNextClasses(): Promise<NextClass[]> {
 
     return nextClasses.slice(0, 3)
   } catch (error) {
-    console.error('Error fetching next classes:', error)
-    throw error
+    console.error('❌ Error fetching next classes:', error)
+    return []
   }
 }
 

@@ -76,7 +76,7 @@ export default function RegisterForm({ toggleMode }: RegisterFormProps) {
       animate="visible"
       className="w-full"
     >
-      <div className="bg-white rounded-3xl shadow-xl border border-slate-100 p-8">
+      <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-xl border border-slate-100 dark:border-slate-800 p-8">
         {/* Mobile header */}
         <motion.div
           variants={itemVariants}
@@ -85,17 +85,17 @@ export default function RegisterForm({ toggleMode }: RegisterFormProps) {
           <div className="w-10 h-10 bg-gradient-to-br from-[#e30f28] to-[#00246a] rounded-xl flex items-center justify-center">
             <span className="text-white font-bold">T</span>
           </div>
-          <h1 className="text-xl font-bold text-[#00246a] text-center">
+          <h1 className="text-xl font-bold text-[#00246a] dark:text-blue-100 text-center">
             Triunfando con el Inglés
           </h1>
         </motion.div>
 
         {/* Header */}
         <motion.div variants={itemVariants} className="text-center mb-8">
-          <h2 className="text-2xl font-bold text-[#00246a] mb-2">
+          <h2 className="text-2xl font-bold text-[#00246a] dark:text-blue-100 mb-2">
             Crea tu cuenta
           </h2>
-          <p className="text-slate-600">
+          <p className="text-slate-600 dark:text-slate-400 dark:text-slate-500">
             Comienza tu aventura aprendiendo inglés
           </p>
         </motion.div>
@@ -104,7 +104,7 @@ export default function RegisterForm({ toggleMode }: RegisterFormProps) {
         {error && (
           <motion.div
             variants={itemVariants}
-            className="bg-red-100 text-red-800 p-4 rounded-lg mb-6 text-center"
+            className="bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300 p-4 rounded-lg mb-6 text-center"
           >
             {errorMessage}
           </motion.div>
@@ -112,7 +112,7 @@ export default function RegisterForm({ toggleMode }: RegisterFormProps) {
         {mensaje && (
           <motion.div
             variants={itemVariants}
-            className="bg-green-100 text-green-800 p-4 rounded-lg mb-6 text-center"
+            className="bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 p-4 rounded-lg mb-6 text-center"
           >
             {mensaje}
           </motion.div>
@@ -134,7 +134,7 @@ export default function RegisterForm({ toggleMode }: RegisterFormProps) {
                 className={`w-full h-12 px-4 border rounded-xl transition-all duration-200 ${
                   errors.nombre
                     ? "border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-200"
-                    : "border-slate-200 focus:border-[#e30f28] focus:ring-2 focus:ring-[#e30f28]/10"
+                    : "border-slate-200 dark:border-slate-700 focus:border-[#e30f28] focus:ring-2 focus:ring-[#e30f28]/10"
                 }`}
                 {...register("nombre", {
                   required: "El nombre es obligatorio",
@@ -168,7 +168,7 @@ export default function RegisterForm({ toggleMode }: RegisterFormProps) {
                 className={`w-full h-12 px-4 border rounded-xl transition-all duration-200 ${
                   errors.apellidoPaterno
                     ? "border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-200"
-                    : "border-slate-200 focus:border-[#e30f28] focus:ring-2 focus:ring-[#e30f28]/10"
+                    : "border-slate-200 dark:border-slate-700 focus:border-[#e30f28] focus:ring-2 focus:ring-[#e30f28]/10"
                 }`}
                 {...register("apellidoPaterno", {
                   required: "El apellido paterno es obligatorio",
@@ -197,7 +197,7 @@ export default function RegisterForm({ toggleMode }: RegisterFormProps) {
                 className={`w-full h-12 px-4 border rounded-xl transition-all duration-200 ${
                   errors.apellidoMaterno
                     ? "border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-200"
-                    : "border-slate-200 focus:border-[#e30f28] focus:ring-2 focus:ring-[#e30f28]/10"
+                    : "border-slate-200 dark:border-slate-700 focus:border-[#e30f28] focus:ring-2 focus:ring-[#e30f28]/10"
                 }`}
                 {...register("apellidoMaterno", {
                   required: "El apellido materno es obligatorio",
@@ -227,7 +227,7 @@ export default function RegisterForm({ toggleMode }: RegisterFormProps) {
               className={`w-full h-12 px-4 border rounded-xl transition-all duration-200 ${
                 errors.email
                   ? "border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-200"
-                  : "border-slate-200 focus:border-[#e30f28] focus:ring-2 focus:ring-[#e30f28]/10"
+                  : "border-slate-200 dark:border-slate-700 focus:border-[#e30f28] focus:ring-2 focus:ring-[#e30f28]/10"
               }`}
               {...register("email", {
                 required: "El correo es obligatorio",
@@ -253,7 +253,7 @@ export default function RegisterForm({ toggleMode }: RegisterFormProps) {
               className={`w-full h-12 px-4 border rounded-xl transition-all duration-200 ${
                 errors.telefono
                   ? "border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-200"
-                  : "border-slate-200 focus:border-[#e30f28] focus:ring-2 focus:ring-[#e30f28]/10"
+                  : "border-slate-200 dark:border-slate-700 focus:border-[#e30f28] focus:ring-2 focus:ring-[#e30f28]/10"
               }`}
               {...register("telefono", {
                 required: "El teléfono es obligatorio",
@@ -291,7 +291,7 @@ export default function RegisterForm({ toggleMode }: RegisterFormProps) {
                 className={`w-full h-12 px-4 pr-12 border rounded-xl transition-all duration-200 ${
                   errors.password
                     ? "border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-200"
-                    : "border-slate-200 focus:border-[#e30f28] focus:ring-2 focus:ring-[#e30f28]/10"
+                    : "border-slate-200 dark:border-slate-700 focus:border-[#e30f28] focus:ring-2 focus:ring-[#e30f28]/10"
                 }`}
                  {...register("password", {
     required: "La contraseña es obligatoria",
@@ -316,13 +316,13 @@ export default function RegisterForm({ toggleMode }: RegisterFormProps) {
 
               <button
                 type="button"
-                className="absolute right-3 top-1/2 -translate-y-1/2 p-1 hover:bg-slate-100 rounded-lg transition-colors duration-200"
+                className="absolute right-3 top-1/2 -translate-y-1/2 p-1 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors duration-200"
                 onClick={() => setShowPassword(!showPassword)}
               >
                 {showPassword ? (
-                  <EyeOff className="h-4 w-4 text-slate-400" />
+                  <EyeOff className="h-4 w-4 text-slate-400 dark:text-slate-500" />
                 ) : (
-                  <Eye className="h-4 w-4 text-slate-400" />
+                  <Eye className="h-4 w-4 text-slate-400 dark:text-slate-500" />
                 )}
               </button>
             </div>
@@ -347,7 +347,7 @@ export default function RegisterForm({ toggleMode }: RegisterFormProps) {
                 className={`w-full h-12 px-4 pr-12 border rounded-xl transition-all duration-200 ${
                   errors.confirmPassword
                     ? "border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-200"
-                    : "border-slate-200 focus:border-[#e30f28] focus:ring-2 focus:ring-[#e30f28]/10"
+                    : "border-slate-200 dark:border-slate-700 focus:border-[#e30f28] focus:ring-2 focus:ring-[#e30f28]/10"
                 }`}
                 {...register("confirmPassword", {
                   required: "Debes confirmar tu contraseña",
@@ -357,13 +357,13 @@ export default function RegisterForm({ toggleMode }: RegisterFormProps) {
 
               <button
                 type="button"
-                className="absolute right-3  top-1/2 -translate-y-1/2 p-1 hover:bg-slate-100 rounded-lg transition-colors duration-200"
+                className="absolute right-3  top-1/2 -translate-y-1/2 p-1 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors duration-200"
                 onClick={() => setShowConfirmPassword(!showConfirmPassword)}
               >
                 {showConfirmPassword ? (
-                  <EyeOff className="h-4 w-4 text-slate-400" />
+                  <EyeOff className="h-4 w-4 text-slate-400 dark:text-slate-500" />
                 ) : (
-                  <Eye className="h-4 w-4 text-slate-400" />
+                  <Eye className="h-4 w-4 text-slate-400 dark:text-slate-500" />
                 )}
               </button>
             </div>
@@ -376,7 +376,7 @@ export default function RegisterForm({ toggleMode }: RegisterFormProps) {
             <label className="flex items-start space-x-3 cursor-pointer">
               <input
                 type="checkbox"
-                className="w-4 h-4 rounded border-slate-300 text-[#e30f28] focus:ring-[#e30f28]/20 mt-1"
+                className="w-4 h-4 rounded border-slate-300 dark:border-slate-700 text-[#e30f28] dark:bg-slate-800 focus:ring-[#e30f28]/20 mt-1"
               />
               <span className="text-sm text-slate-600 leading-relaxed">
                 Acepto los{" "}
@@ -399,9 +399,9 @@ export default function RegisterForm({ toggleMode }: RegisterFormProps) {
             <label className="flex items-start space-x-3 cursor-pointer">
               <input
                 type="checkbox"
-                className="w-4 h-4 rounded border-slate-300 text-[#e30f28] focus:ring-[#e30f28]/20 mt-1"
+                className="w-4 h-4 rounded border-slate-300 dark:border-slate-700 text-[#e30f28] dark:bg-slate-800 focus:ring-[#e30f28]/20 mt-1"
               />
-              <span className="text-sm text-slate-600">
+              <span className="text-sm text-slate-600 dark:text-slate-400 dark:text-slate-500">
                 Quiero recibir noticias y ofertas especiales por email
               </span>
             </label>
@@ -424,7 +424,7 @@ export default function RegisterForm({ toggleMode }: RegisterFormProps) {
             <span className="w-full border-t border-slate-200" />
           </div>
           <div className="relative flex justify-center text-xs uppercase">
-            <span className="bg-white px-3 text-slate-500">
+            <span className="bg-white dark:bg-slate-900 px-3 text-slate-500 dark:text-slate-400">
               O regístrate con
             </span>
           </div>
@@ -433,9 +433,9 @@ export default function RegisterForm({ toggleMode }: RegisterFormProps) {
         {/* Social buttons */}
         <motion.div
           variants={itemVariants}
-          className="grid grid-cols-2 gap-3 mb-8"
+          className="flex justify-center mb-8"
         >
-          <button className="h-12 border border-slate-200 hover:border-slate-300 hover:bg-slate-50 transition-all duration-200 rounded-xl flex items-center justify-center space-x-2 text-slate-700">
+          <button className="h-12 w-full max-w-xs border border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all duration-200 rounded-xl flex items-center justify-center space-x-2 text-slate-700 dark:text-slate-300">
             <svg className="w-5 h-5 text-[#e30f28]" viewBox="0 0 24 24">
               <path
                 fill="currentColor"
@@ -456,21 +456,12 @@ export default function RegisterForm({ toggleMode }: RegisterFormProps) {
             </svg>
             <span className="text-sm font-medium">Google</span>
           </button>
-          <button className="h-12 border border-slate-200 hover:border-slate-300 hover:bg-slate-50 transition-all duration-200 rounded-xl flex items-center justify-center space-x-2 text-slate-700">
-            <svg
-              className="w-5 h-5 text-[#3268d4]"
-              fill="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
-            </svg>
-            <span className="text-sm font-medium">Facebook</span>
-          </button>
+          
         </motion.div>
 
         {/* Toggle */}
         <motion.div variants={itemVariants} className="text-center">
-          <p className="text-slate-600">
+          <p className="text-slate-600 dark:text-slate-400 dark:text-slate-500">
             ¿Ya tienes una cuenta?{" "}
             <button
               onClick={toggleMode}
